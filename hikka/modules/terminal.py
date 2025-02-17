@@ -317,7 +317,7 @@ class TerminalMod(loader.Module):
     async def pipcmd(self, message):
         await self.run_command(
             message,
-            ("pip " if os.geteuid() == 0 else "sudo -S apt ")
+            ("pip " if os.geteuid() == 0 else "sudo -S pip ")
             + utils.get_args_raw(message)
             )
 
