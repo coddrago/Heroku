@@ -180,7 +180,7 @@ terminal:
   _cmd_doc_terminate: "[-f zum Erzwingen] - Antworten Sie auf eine Nachricht, um den Prozess zu beenden"
 
 heroku_backup:
-  period: "⌚️ <b>Einheit „ALPHA“</b> erstellt regelmäßige Sicherungen. Diese Einstellungen können später geändert werden.\n\nBitte wählen Sie die Häufigkeit der Sicherungen"
+  period: "⌚️ <b>Einheit „ALPHA“</b> erstellt regelmäßige Sicherungen. Diese Einstellungen können später geändert werden.\n\nBitte wählen Sie die Häufigkeit der Sicherungen.\n\n<b>🚫 Daher ist es unmöglich, mit dem Befehl .lm aus Dateien heruntergeladene Module wiederherzustellen! Seien Sie vorsichtig und führen Sie vor der Wiederherstellung .backupmods aus.</b>"
   saved: "✅ Häufigkeit gespeichert! Sie kann mit .set_backup_period geändert werden"
   never: "✅ Ich werde keine automatischen Sicherungen durchführen. Dies kann mit .set_backup_period rückgängig gemacht werden"
   invalid_args: "🚫 <b>Geben Sie die richtige Häufigkeit in Stunden an oder `0`, um sie zu deaktivieren</b>"
