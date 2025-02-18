@@ -197,7 +197,7 @@ heroku_backup:
   name: "HerokuBackup"
   period: "⌚️ <b>Unit «ALPHA»</b> creates database backups periodically. You can change this behavior later.\n\nPlease, select the periodicity of automatic database backups.\n\n<b>🚫 It is therefore impossible to restore modules downloaded from files with the .lm command! Be careful and do .backupmods before restoring.</b>"
   saved: "✅ Backup period saved. You can re-configure it later with .set_backup_period"
-  never: "✅ I will not make automatic backups. You can re-configure it later with .set_backup_period"
+  never: "✅ I will not make automatic backups. You can re-configure it later with {prefix}set_backup_period"
   invalid_args: "🚫 <b>Specify correct backup period in hours, or `0` to disable</b>"
   backup_caption: '<emoji document_id=5469718869536940860>👆</emoji> <b>This is your database backup. Do not give it to anyone, it contains personal info. If you need to restore it, you can use</b> <pre><code class="language-heroku">{prefix}restoredb</code></pre> <b>in reply to this file.</b>'
   reply_to_file: "<emoji document_id=5210952531676504517>🚫</emoji> <b>Reply to .json or .zip file</b>"
