@@ -90,6 +90,11 @@ class LoaderMod(loader.Module):
                     loader.validators.RegExp(r"^.*:.*$")
                 ),
             ),
+            loader.ConfigValue(
+                "command_emoji",
+                "<emoji document_id=5197195523794157505>▫️</emoji>",
+                lambda: "Emoji for command",
+            ),
         )
 
     async def _async_init(self):
@@ -643,8 +648,7 @@ class LoaderMod(loader.Module):
                         message,
                         self.strings("requirements_installing").format(
                             "\n".join(
-                                "<emoji"
-                                " document_id=4971987363145188045>▫️</emoji>"
+                                f"{self.config['command_emoji']}"
                                 f" {req}"
                                 for req in requirements
                             )
@@ -884,7 +888,7 @@ class LoaderMod(loader.Module):
             value = getattr(instance, key)
             if isinstance(value, loader.Library):
                 depends_from.append(
-                    "<emoji document_id=5197195523794157505>▫️</emoji>"
+                    f"{self.config['command_emoji']"
                     " <code>{}</code> <b>{}</b> <code>{}</code>".format(
                         value.__class__.__name__,
                         self.strings("by"),
