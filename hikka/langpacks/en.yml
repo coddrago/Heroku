@@ -195,7 +195,7 @@ terminal:
 
 heroku_backup:
   name: "HerokuBackup"
-  period: "⌚️ <b>Unit «ALPHA»</b> creates database backups periodically. You can change this behavior later.\n\nPlease, select the periodicity of automatic database backups"
+  period: "⌚️ <b>Unit «ALPHA»</b> creates database backups periodically. You can change this behavior later.\n\nPlease, select the periodicity of automatic database backups.\n\n<b>🚫 It is therefore impossible to restore modules downloaded from files with the .lm command! Be careful and do .backupmods before restoring.</b>"
   saved: "✅ Backup period saved. You can re-configure it later with .set_backup_period"
   never: "✅ I will not make automatic backups. You can re-configure it later with .set_backup_period"
   invalid_args: "🚫 <b>Specify correct backup period in hours, or `0` to disable</b>"
