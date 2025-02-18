@@ -63,10 +63,6 @@ class HerokuConfigMod(loader.Module):
 
         return self.prep_value("*" * len(str(value)))
 
-    async def dell(self, call):
-        """Callback button"""
-        await call.delete()
-
     def _get_value(self, mod: str, option: str) -> str:
         return (
             self.prep_value(self.lookup(mod).config[option])
@@ -117,7 +113,7 @@ class HerokuConfigMod(loader.Module):
                         "args": (mod,),
                         "kwargs": {"obj_type": obj_type},
                     },
-                    {"text": self.strings("close_btn"), "callback": self.dell},
+                    {"text": self.strings("close_btn"), "action": "close"},
                 ]
             ],
             inline_message_id=inline_message_id,
@@ -149,7 +145,7 @@ class HerokuConfigMod(loader.Module):
                         "args": (mod,),
                         "kwargs": {"obj_type": obj_type},
                     },
-                    {"text": self.strings("close_btn"), "callback": self.dell},
+                    {"text": self.strings("close_btn"), "action": "close"},
                 ]
             ],
         )
@@ -269,7 +265,7 @@ class HerokuConfigMod(loader.Module):
                     "args": (mod,),
                     "kwargs": {"obj_type": obj_type},
                 },
-                {"text": self.strings("close_btn"), "callback": self.dell},
+                {"text": self.strings("close_btn"), "action": "close"},
             ],
         ]
 
@@ -321,7 +317,7 @@ class HerokuConfigMod(loader.Module):
                         "args": (mod,),
                         "kwargs": {"obj_type": obj_type},
                     },
-                    {"text": self.strings("close_btn"), "callback": self.dell},
+                    {"text": self.strings("close_btn"), "action": "close"},
                 ]
             ],
             inline_message_id=inline_message_id,
@@ -387,7 +383,7 @@ class HerokuConfigMod(loader.Module):
                         "args": (mod,),
                         "kwargs": {"obj_type": obj_type},
                     },
-                    {"text": self.strings("close_btn"), "callback": self.dell},
+                    {"text": self.strings("close_btn"), "action": "close"},
                 ]
             ],
             inline_message_id=inline_message_id,
@@ -454,7 +450,7 @@ class HerokuConfigMod(loader.Module):
                     "args": (mod,),
                     "kwargs": {"obj_type": obj_type},
                 },
-                {"text": self.strings("close_btn"), "callback": self.dell},
+                {"text": self.strings("close_btn"), "action": "close"},
             ],
         ]
 
@@ -496,7 +492,7 @@ class HerokuConfigMod(loader.Module):
                         "args": (mod,),
                         "kwargs": {"obj_type": obj_type},
                     },
-                    {"text": self.strings("close_btn"), "callback": self.dell},
+                    {"text": self.strings("close_btn"), "action": "close"},
                 ]
             ],
         )
@@ -598,7 +594,7 @@ class HerokuConfigMod(loader.Module):
                     "args": (mod,),
                     "kwargs": {"obj_type": obj_type},
                 },
-                {"text": self.strings("close_btn"), "callback": self.dell},
+                {"text": self.strings("close_btn"), "action": "close"},
             ],
         ]
 
@@ -667,7 +663,7 @@ class HerokuConfigMod(loader.Module):
                     "args": (mod,),
                     "kwargs": {"obj_type": obj_type},
                 },
-                {"text": self.strings("close_btn"), "callback": self.dell},
+                {"text": self.strings("close_btn"), "action": "close"},
             ],
         ]
 
@@ -831,7 +827,7 @@ class HerokuConfigMod(loader.Module):
                         "args": (mod,),
                         "kwargs": {"obj_type": obj_type},
                     },
-                    {"text": self.strings("close_btn"), "callback": self.dell},
+                    {"text": self.strings("close_btn"), "action": "close"},
                 ],
             ],
         )
@@ -875,7 +871,7 @@ class HerokuConfigMod(loader.Module):
                         "callback": self.inline__global_config,
                         "kwargs": {"obj_type": obj_type},
                     },
-                    {"text": self.strings("close_btn"), "callback": self.dell},
+                    {"text": self.strings("close_btn"), "action": "close"},
                 ]
             ],
         )
@@ -910,7 +906,7 @@ class HerokuConfigMod(loader.Module):
                     and any(hasattr(lib, "config") for lib in self.allmodules.libraries)
                     else []
                 ),
-                [{"text": self.strings("close_btn"), "callback": self.dell}],
+                [{"text": self.strings("close_btn"), "action": "close"}],
             ],
         )
 
@@ -967,7 +963,7 @@ class HerokuConfigMod(loader.Module):
                     "text": self.strings("back_btn"),
                     "callback": self.inline__choose_category,
                 },
-                {"text": self.strings("close_btn"), "callback": self.dell},
+                {"text": self.strings("close_btn"), "action": "close"},
             ]
         ]
 
