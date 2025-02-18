@@ -96,7 +96,7 @@ class HerokuBackupMod(loader.Module):
 
         if not int(args):
             self.set("period", "disabled")
-            (await utils.answer(message, f"<b>{self.strings('never')}</b>")).format(prefix=self.get_prefix())
+            await utils.answer(message, f"<b>{self.strings('never')}</b>").format(prefix=self.get_prefix())
             return
 
         period = int(args) * 60 * 60
