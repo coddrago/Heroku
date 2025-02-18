@@ -45,6 +45,11 @@ class Help(loader.Module):
                 "<emoji document_id=5188377234380954537>🪐</emoji>",
                 lambda: "Desc emoji",
             ),
+            loader.ConfigValue(
+                "command_emoji",
+                "<emoji document_id=5197195523794157505>▫️</emoji>",
+                lambda: "Emoji for command",
+            ),
         )
 
     @loader.command(ru_doc="[args] | Спрячет ваши модули", ua_doc="[args] | Сховає ваші модулі", de_doc="[args] | Versteckt Ihre Module")
@@ -170,7 +175,7 @@ class Help(loader.Module):
 
         for name, fun in commands.items():
             reply += (
-                "\n<emoji document_id=5197195523794157505>▫️</emoji>"
+                "\n{self.config["command_emoji"]}"
                 " <code>{}{}</code>{} {}".format(
                     utils.escape_html(self.get_prefix()),
                     name,
