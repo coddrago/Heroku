@@ -6,6 +6,12 @@
 # You can redistribute it and/or modify it under the terms of the GNU AGPLv3
 # 🔑 https://www.gnu.org/licenses/agpl-3.0.html
 
+# Codrago 2024-2026
+# This file is a part of Heroku Userbot
+# https://github.com/coddrago/Heroku
+# You can redistribute it and/or modify it under the terms of the GNU AGPLv3
+# https://www.gnu.org/licenses/agpl-3.0.html
+
 import asyncio
 import collections
 import functools
@@ -241,7 +247,11 @@ class Web:
 
     async def init_qr_login(self, request: web.Request) -> web.Response:
         if self.client_data and "LAVHOST" in os.environ:
-            return web.Response(status=403, body="Forbidden by host EULA")
+            return web.Response(status=403, body="Forbidden by lavhost EULA")
+        if self.client_data and "JAMHOST" in os.environ:
+            return web.Response(status=403, body="Forbidden by JamHost EULA")
+        if self.client_data and "HIKKAHOST" in os.environ:
+            return web.Response(status=403, body="Forbidden by HikkaHost EULA")
 
         if not self._check_session(request):
             return web.Response(status=401)
