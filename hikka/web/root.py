@@ -314,7 +314,13 @@ class Web:
 
     async def can_add(self, request: web.Request) -> web.Response:
         if self.client_data and "LAVHOST" in os.environ:
-            return web.Response(status=403, body="Forbidden by host EULA")
+            return web.Response(status=403, body="Forbidden by lavhost EULA")
+
+        if "JAMHOST" in os.environ:
+            return web.Response(status=403, body="Forbidden by JamHost EULA")
+
+        if "HIKKAHOST" in os.environ:
+            return web.Response(status=403, body="Forbidden by HikkaHost EULA")
 
         return web.Response(status=200, body="Yes")
 
