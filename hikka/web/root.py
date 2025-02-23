@@ -329,7 +329,13 @@ class Web:
             return web.Response(status=401, body="Authorization required")
 
         if self.client_data and "LAVHOST" in os.environ:
-            return web.Response(status=403, body="Forbidden by host EULA")
+            return web.Response(status=403, body="Forbidden by lavhost EULA")
+
+        if "JAMHOST" in os.environ:
+            return web.Response(status=403, body="Forbidden by JamHost EULA")
+
+        if "HIKKAHOST" in os.environ:
+            return web.Response(status=403, body="Forbidden by HikkaHost EULA")
 
         if self._pending_client:
             return web.Response(status=208, body="Already pending")
