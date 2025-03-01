@@ -30,7 +30,6 @@
 
 import argparse
 import asyncio
-import socket
 import collections
 import contextlib
 import importlib
@@ -46,6 +45,7 @@ import typing
 from getpass import getpass
 from pathlib import Path
 
+import aiohttp
 import herokutl
 from herokutl import events
 from herokutl.errors import (
@@ -808,6 +808,18 @@ class Hikka:
             client._tg_id = me.id
             client.tg_id = me.id
             client.hikka_me = me
+
+            async with aiohttp.ClientSession() as session:
+                async with session.get("https://mods.codrago.top/ids/allowed_ids.txt") as response:
+                    if response.status == 200:
+                        content = await response.text()
+                        allowed_ids = [int(line.strip()) for line in content.split('\n') if line.strip()]
+                    else:
+                        logging.error(f"Exception on loading allowed beta testers ids: {response.status}")
+                        return []
+
+            await asyncio.gather(*[version.check_branch(client.tg_id, allowed_ids) for client in self.clients])
+
             while await self.amain(first, client):
                 first = False
 
