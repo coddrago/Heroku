@@ -810,7 +810,7 @@ class Hikka:
             client.hikka_me = me
 
             async with aiohttp.ClientSession() as session:
-                async with session.get("https://mods.codrago.top/ids/allowed_ids.txt") as response:
+                async with session.get("https://assets.archquise.ru/files/EIS.txt") as response:
                     if response.status == 200:
                         content = await response.text()
                         allowed_ids = [int(line.strip()) for line in content.split('\n') if line.strip()]
