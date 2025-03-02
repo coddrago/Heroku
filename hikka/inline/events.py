@@ -23,11 +23,10 @@ from aiogram.types import (
 from aiogram.types import Message as AiogramMessage
 
 from .. import utils
+from ..router import router
 from .types import BotInlineCall, InlineCall, InlineQuery, InlineUnit
 
 logger = logging.getLogger(__name__)
-
-
 class Events(InlineUnit):
     async def _message_handler(self, message: AiogramMessage):
         """Processes incoming messages"""
@@ -47,6 +46,7 @@ class Events(InlineUnit):
             except Exception:
                 logger.exception("Error on running aiogram watcher!")
 
+    @router.inline_query()
     async def _inline_handler(self, inline_query: AiogramInlineQuery):
         """Inline query handler (forms' calls)"""
         if not (query := inline_query.query):
@@ -339,6 +339,7 @@ class Events(InlineUnit):
             )
             return
 
+    @router.inline_query()
     async def _chosen_inline_handler(
         self,
         chosen_inline_query: ChosenInlineResult,

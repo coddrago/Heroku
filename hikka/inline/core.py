@@ -13,8 +13,9 @@ import time
 import typing
 
 from aiogram import Bot, Dispatcher
-from aiogram.types import ParseMode
-from aiogram.utils.exceptions import TerminatedByOtherGetUpdates, Unauthorized
+from aiogram.enums import ParseMode
+from aiogram.client.default import DefaultBotProperties
+from aiogram.exceptions import TelegramUnauthorizedError, RestartingTelegram
 from herokutl.errors.rpcerrorlist import InputUserDeactivatedError, YouBlockedUserError
 from herokutl.tl.functions.contacts import UnblockRequest
 from herokutl.tl.types import Message
@@ -32,10 +33,9 @@ from .list import List
 from .query_gallery import QueryGallery
 from .token_obtainment import TokenObtainment
 from .utils import Utils
+from ..router import router
 
 logger = logging.getLogger(__name__)
-
-
 class InlineManager(
     Utils,
     Events,
@@ -81,12 +81,14 @@ class InlineManager(
 
         self._me: int = None
         self._name: str = None
-        self._dp: Dispatcher = None
         self._task: asyncio.Future = None
         self._cleaner_task: asyncio.Future = None
         self.bot: Bot = None
         self.bot_id: int = None
+        self._dp: Dispatcher = None
+        self._router = router
         self.bot_username: str = None
+
 
     async def _cleaner(self):
         """Cleans outdated inline units"""
@@ -122,16 +124,16 @@ class InlineManager(
 
         self.init_complete = True
 
-        self.bot = Bot(token=self._token, parse_mode=ParseMode.HTML)
-        Bot.set_current(self.bot)
+        self.bot = Bot(token=self._token, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
         self._bot = self.bot
-        self._dp = Dispatcher(self.bot)
+        self._dp = Dispatcher(bot=self.bot)
+        self._dp.include_router(router)
 
         try:
             bot_me = await self.bot.get_me()
             self.bot_username = bot_me.username
             self.bot_id = bot_me.id
-        except Unauthorized:
+        except TelegramUnauthorizedError:
             logger.critical("Token expired, revoking...")
             return await self._dp_revoke_token(False)
 
@@ -162,27 +164,6 @@ class InlineManager(
 
         await self._client.delete_messages(self.bot_username, m)
 
-        self._dp.register_inline_handler(
-            self._inline_handler,
-            lambda _: True,
-        )
-
-        self._dp.register_callback_query_handler(
-            self._callback_query_handler,
-            lambda _: True,
-        )
-
-        self._dp.register_chosen_inline_handler(
-            self._chosen_inline_handler,
-            lambda _: True,
-        )
-
-        self._dp.register_message_handler(
-            self._message_handler,
-            lambda *_: True,
-            content_types=["any"],
-        )
-
         old = self.bot.get_updates
         revoke = self._dp_revoke_token
 
@@ -190,9 +171,9 @@ class InlineManager(
             nonlocal revoke, old
             try:
                 return await old(*args, **kwargs)
-            except TerminatedByOtherGetUpdates:
+            except RestartingTelegram:
                 await revoke()
-            except Unauthorized:
+            except TelegramUnauthorizedError:
                 logger.critical("Got Unauthorized")
                 await self._stop()
 

@@ -34,6 +34,7 @@ from herokutl.tl.types import Message
 from .. import main, utils
 from ..types import HikkaReplyMarkup
 from .types import InlineMessage, InlineUnit
+from ..router import router
 
 logger = logging.getLogger(__name__)
 
@@ -383,6 +384,7 @@ class Form(InlineUnit):
 
         return msg
 
+    @router.inline_query()
     async def _form_inline_handler(self, inline_query: InlineQuery):
         try:
             query = inline_query.query.split()[0]

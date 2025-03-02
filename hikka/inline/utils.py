@@ -28,11 +28,9 @@ from aiogram.types import (
     InputMediaPhoto,
     InputMediaVideo,
 )
-from aiogram.utils.exceptions import (
-    BadRequest,
-    MessageIdInvalid,
-    MessageNotModified,
-    RetryAfter,
+from aiogram.exceptions import (
+    TelegramBadRequest,
+    TelegramRetryAfter,
 )
 from herokutl.utils import resolve_inline_message_id
 
@@ -477,24 +475,26 @@ class Utils(InlineUnit):
                         else unit.get("buttons", [])
                     ),
                 )
-            except MessageNotModified:
-                if query:
-                    with contextlib.suppress(Exception):
-                        await query.answer()
+            except TelegramBadRequest as e:
+                if "message is not modified" in str(e).lower():
+                    if query:
+                        with contextlib.suppress(Exception):
+                            await query.answer()
 
                 return False
-            except RetryAfter as e:
+            except TelegramRetryAfter as e:
                 logger.info("Sleeping %ss on aiogram FloodWait...", e.timeout)
                 await asyncio.sleep(e.timeout)
                 return await self._edit_unit(**utils.get_kwargs())
-            except MessageIdInvalid:
-                with contextlib.suppress(Exception):
-                    await query.answer(
-                        "I should have edited some message, but it is deleted :("
-                    )
+            except TelegramBadRequest as e:
+                if "message to delete not found" in str(e).lower():
+                    with contextlib.suppress(Exception):
+                        await query.answer(
+                            "I should have edited some message, but it is deleted :("
+                        )
 
                 return False
-            except BadRequest as e:
+            except TelegramBadRequest as e:
                 if "There is no text in the message to edit" not in str(e):
                     raise
 
@@ -528,12 +528,12 @@ class Utils(InlineUnit):
                 ),
                 media=media,
                 reply_markup=self.generate_markup(
-                    reply_markup
+                    reply_markups
                     if isinstance(reply_markup, list)
                     else unit.get("buttons", [])
                 ),
             )
-        except RetryAfter as e:
+        except TelegramRetryAfter as e:
             logger.info("Sleeping %ss on aiogram FloodWait...", e.timeout)
             await asyncio.sleep(e.timeout)
             return await self._edit_unit(**utils.get_kwargs())
