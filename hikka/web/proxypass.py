@@ -4,12 +4,6 @@
 # You can redistribute it and/or modify it under the terms of the GNU AGPLv3
 # 🔑 https://www.gnu.org/licenses/agpl-3.0.html
 
-# ©️ Codrago, 2024-2025
-# This file is a part of Heroku Userbot
-# 🌐 https://github.com/coddrago/Heroku
-# You can redistribute it and/or modify it under the terms of the GNU AGPLv3
-# 🔑 https://www.gnu.org/licenses/agpl-3.0.html
-
 import asyncio
 import logging
 import os
@@ -70,7 +64,14 @@ class ProxyPasser:
                     return self._tunnel_url
                 else:
                     self.kill()
-            # вырезана проверка на контейнер
+
+            if "DOCKER" in os.environ:
+                # We're in a Docker container, so we can't use ssh
+                # Also, the concept of Docker is to keep
+                # everything isolated, so we can't proxy-pass to
+                # open web.
+                return None
+
             logger.debug("Starting proxy pass shell for port %d", port)
             self._sproc = await asyncio.create_subprocess_shell(
                 (
