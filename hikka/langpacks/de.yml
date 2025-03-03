@@ -154,9 +154,13 @@ heroku_settings:
   _cmd_doc_watchers: "Zeigt aktive Wächter an"
   _cmd_doc_weburl: "Öffnet einen Tunnel zur Hikka-Weboberfläche"
   core_protection_already_removed: "<emoji document_id=6003424016977628379>🔒</emoji> <b>Kernschutz wurde bereits entfernt</b>"
+  core_protection_already_enabled: "<emoji document_id=6003424016977628379>🔒</emoji> <b>kernschutz wurde bereits installiert</b>"
   core_protection_confirm: "⚠️ <b>BITTE SORGFÄLTIG LESEN!</b>\n\nDurch das Entfernen des Kernschutzes bestätigst du, dass du weißt, was dies bedeutet und wofür es ist. Normalerweise benötigst du dies <b>nicht</b>. Wenn du kein Entwickler bist, benötigst du dies <b>nicht</b>. Wenn du unsicher bist, benötigst du dies <b>nicht</b>.\n\n<b>Bist du sicher, dass du den Kernschutz entfernen möchtest?</b>"
+  core_protection_confirm_e: "⚠️ <b>BITTE SORGFÄLTIG LESEN!</b>\n\nDurch das installierst des Kernschutzes bestätigst du, dass du weißt, was dies bedeutet und wofür es ist. Normalerweise benötigst du dies <b>nicht</b>. Wenn du kein Entwickler bist, benötigst du dies <b>nicht</b>. Wenn du unsicher bist, benötigst du dies <b>nicht</b>.\n\n<b>Bist du sicher, dass du den Kernschutz installieren möchtest?</b>"
   core_protection_btn: "🔓 Kernschutz entfernen"
+  core_protection_e_btn: "🔓 Kernschutz installieren"
   core_protection_removed: "🔓 <b>Kernschutz erfolgreich entfernt</b>"
+  core_protection_enabled: "🔓 <b>Kernschutz erfolgreich installiert</b>"
 
 terminal:
   fw_protect: "Verzögerung zwischen Bearbeitungen"

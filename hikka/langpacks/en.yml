@@ -166,9 +166,13 @@ heroku_settings:
   _cmd_doc_weburl: "Opens web tunnel to your Heroku web interface"
   _cls_doc: "Advanced settings for Heroku Userbot"
   core_protection_already_removed: "<emoji document_id=6003424016977628379>🔒</emoji> <b>Core protection is already removed</b>"
+  core_protection_already_enabled: "<emoji document_id=6003424016977628379>🔒</emoji> <b>Core protection is already set up</b>"
   core_protection_confirm: "⚠️ <b>READ CAREFULLY!</b>\n\nBy removing core protection you confirm, that you know what is it and what is it for. In common life scenario you <b>don't need it</b>. If you're not a developer, you <b>don't need it</b>. If you're not sure, you <b>don't need it</b>.\n\n<b>Are you sure you want to remove core protection?</b>"
+  core_protection_confirm_e: "⚠️ <b>READ CAREFULLY!</b>\n\nBy restoring core protection you confirm, that you know what is it and what is it for. In common life scenario you <b>didn't need to remove it</b>. If you're not a developer, you <b>didn't need it</b>. If you're not sure, you <b>don't need it</b>.\n\n<b>Are you sure you want to restore core protection?</b>"
   core_protection_btn: "🔓 Remove core protection"
+  core_protection_e_btn: "🔓 Restore core protection"
   core_protection_removed: "🔓 <b>Core protection removed successfully</b>"
+  core_protection_enabled: "🔓 <b>Core protection enabled successfully</b>"
 
 terminal:
   name: "Terminal"
