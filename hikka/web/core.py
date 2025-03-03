@@ -22,12 +22,6 @@
 # You can redistribute it and/or modify it under the terms of the GNU AGPLv3
 # 🔑 https://www.gnu.org/licenses/agpl-3.0.html
 
-# ©️ Codrago, 2024-2025
-# This file is a part of Heroku Userbot
-# 🌐 https://github.com/coddrago/Heroku
-# You can redistribute it and/or modify it under the terms of the GNU AGPLv3
-# 🔑 https://www.gnu.org/licenses/agpl-3.0.html
-
 import asyncio
 import contextlib
 import inspect
@@ -93,8 +87,17 @@ class Web(root.Web):
                 )
 
         if not url:
-            # вырезана проверка на докер
-            ip = "127.0.0.1"
+            ip = (
+                "127.0.0.1"
+                if "DOCKER" not in os.environ
+                else subprocess.run(
+                    ["hostname", "-i"],
+                    stdout=subprocess.PIPE,
+                    check=True,
+                )
+                .stdout.decode("utf-8")
+                .strip()
+            )
 
             url = f"http://{ip}:{self.port}"
 
