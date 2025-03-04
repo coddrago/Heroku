@@ -390,9 +390,9 @@ class SecurityManager:
         if not (config := self.get_flags(func)):
             return False
 
-        if not user_id and isinstance((await c.get_entity(message.peer_id)), tl.types.User):
+        if not user_id and isinstance((await self.client.get_entity(message.peer_id)), tl.types.User):
             user_id = message.sender_id
-        if not user_id and isinstance((await c.get_entity(message.peer_id)), tl.types.Channel):
+        if not user_id and isinstance((await self.client.get_entity(message.peer_id)), tl.types.Channel):
             user_id = message.peer_id
 
         is_channel = False
