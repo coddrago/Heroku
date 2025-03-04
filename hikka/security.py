@@ -390,7 +390,7 @@ class SecurityManager:
             return False
 
         if not user_id:
-            user_id = message.sender_id
+            user_id = message.peer_id
 
         is_channel = False
 
