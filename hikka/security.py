@@ -38,7 +38,7 @@ from herokutl.tl.types import ChatParticipantAdmin, ChatParticipantCreator, Mess
 from herokutl.utils import get_display_name
 import herokutl as tl
 
-from . import main, utils
+from . import main, utils, loader
 from .database import Database
 from .tl_cache import CustomTelegramClient
 from .types import Command
