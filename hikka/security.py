@@ -36,9 +36,8 @@ from herokutl.hints import EntityLike
 from herokutl.tl.functions.messages import GetFullChatRequest
 from herokutl.tl.types import ChatParticipantAdmin, ChatParticipantCreator, Message
 from herokutl.utils import get_display_name
-import herokutl as tl
 
-from . import main, utils, loader
+from . import main, utils
 from .database import Database
 from .tl_cache import CustomTelegramClient
 from .types import Command
@@ -390,9 +389,10 @@ class SecurityManager:
         if not (config := self.get_flags(func)):
             return False
 
-        if not user_id and isinstance((await self.client.get_entity(message.peer_id)), tl.types.User):
+        if not user_id:
             user_id = message.sender_id
-        if not user_id and isinstance((await self.client.get_entity(message.peer_id)), tl.types.Channel):
+
+        if not user_id:
             user_id = message.peer_id
 
         is_channel = False
