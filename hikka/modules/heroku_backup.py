@@ -65,7 +65,7 @@ class HerokuBackupMod(loader.Module):
             "📼 Your database backups will appear here",
             silent=True,
             archive=True,
-            avatar="https://raw.githubusercontent.com/coddrago/Heroku/refs/heads/v1.6.8/assets/heroku-backups.png",
+            avatar="https://raw.githubusercontent.com/coddrago/Heroku/master/assets/heroku-backups.png",
             _folder="hikka",
             invite_bot=True,
         )
