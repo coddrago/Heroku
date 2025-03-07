@@ -123,7 +123,7 @@ class Database(dict):
                 "heroku-assets",
                 "🌆 Your Heroku assets will be stored here",
                 archive=True,
-                avatar="https://raw.githubusercontent.com/coddrago/Heroku/refs/heads/v1.6.8/assets/heroku-assets.png"
+                avatar="https://raw.githubusercontent.com/coddrago/Heroku/dev-test/assets/heroku-assets.png"
             )
         except ChannelsTooMuchError:
             self._assets = None
