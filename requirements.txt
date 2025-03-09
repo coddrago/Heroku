@@ -15,5 +15,6 @@ psutil==6.0.0
 tgcrypto==1.2.5
 rsa==4.9
 ruamel.yaml==0.17.21
+pycloudflared==0.2.0
 
 # Python 3.8+
