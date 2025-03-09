@@ -1,6 +1,12 @@
 # https://raw.githubusercontent.com/lincolnloop/python-qrcode/b80fea6ee7e75f3024b9ed7adf891a143e0b14e3/qrcode/main.py
 # The code was copied in such weird way since the original project requires Pillow
 
+# ©️ Codrago, 2024-2025
+# This file is a part of Heroku Userbot
+# 🌐 https://github.com/coddrago/Heroku
+# You can redistribute it and/or modify it under the terms of the GNU AGPLv3
+# 🔑 https://www.gnu.org/licenses/agpl-3.0.html
+
 import math
 import re
 import sys

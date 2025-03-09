@@ -15,7 +15,7 @@ import time
 import zipfile
 from pathlib import Path
 
-from hikkatl.tl.types import Message
+from herokutl.tl.types import Message
 
 from .. import loader, utils
 from ..inline.types import BotInlineCall
@@ -65,7 +65,7 @@ class HerokuBackupMod(loader.Module):
             "📼 Your database backups will appear here",
             silent=True,
             archive=True,
-            avatar="https://raw.githubusercontent.com/coddrago/Heroku/refs/heads/master/assets/heroku-backups.png",
+            avatar="https://raw.githubusercontent.com/coddrago/Heroku/dev-test/assets/heroku-backups.png",
             _folder="heroku",
             invite_bot=True,
         )
@@ -96,13 +96,13 @@ class HerokuBackupMod(loader.Module):
 
         if not int(args):
             self.set("period", "disabled")
-            await utils.answer(message, f"<b>{self.strings('never')}</b>")
+            await utils.answer(message, f"<b>{self.strings('never').format(prefix=self.get_prefix())}</b>")
             return
 
         period = int(args) * 60 * 60
         self.set("period", period)
         self.set("last_backup", round(time.time()))
-        await utils.answer(message, f"<b>{self.strings('saved')}</b>")
+        await utils.answer(message, f"<b>{self.strings('saved').format(prefix=self.get_prefix())}</b>")
 
     @loader.loop(interval=1, autostart=True)
     async def handler(self):

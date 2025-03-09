@@ -13,10 +13,10 @@ import tempfile
 import typing
 from types import ModuleType
 
-import hikkatl
-from hikkatl.errors.rpcerrorlist import MessageIdInvalidError
-from hikkatl.sessions import StringSession
-from hikkatl.tl.types import Message
+import herokutl
+from herokutl.errors.rpcerrorlist import MessageIdInvalidError
+from herokutl.sessions import StringSession
+from herokutl.tl.types import Message
 from meval import meval
 
 from .. import loader, main, utils
@@ -462,16 +462,16 @@ class Evaluator(loader.Module):
             "client": self._client,
             "reply": reply,
             "r": reply,
-            **self.get_sub(hikkatl.tl.types),
-            **self.get_sub(hikkatl.tl.functions),
+            **self.get_sub(herokutl.tl.types),
+            **self.get_sub(herokutl.tl.functions),
             "event": message,
             "chat": message.to_id,
-            "hikkatl": hikkatl,
-            "telethon": hikkatl,
+            "herokutl": herokutl,
+            "telethon": herokutl,
             "utils": utils,
             "main": main,
             "loader": loader,
-            "f": hikkatl.tl.functions,
+            "f": herokutl.tl.functions,
             "c": self._client,
             "m": message,
             "lookup": self.lookup,
@@ -498,7 +498,7 @@ class Evaluator(loader.Module):
                             lambda x: x[0][0] != "_"
                             and isinstance(x[1], ModuleType)
                             and x[1] != obj
-                            and x[1].__package__.rsplit(".", _depth)[0] == "hikkatl.tl",
+                            and x[1].__package__.rsplit(".", _depth)[0] == "herokutl.tl",
                             obj.__dict__.items(),
                         )
                     ]

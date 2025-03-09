@@ -4,26 +4,32 @@
 # You can redistribute it and/or modify it under the terms of the GNU AGPLv3
 # 🔑 https://www.gnu.org/licenses/agpl-3.0.html
 
+# ©️ Codrago, 2024-2025
+# This file is a part of Heroku Userbot
+# 🌐 https://github.com/coddrago/Heroku
+# You can redistribute it and/or modify it under the terms of the GNU AGPLv3
+# 🔑 https://www.gnu.org/licenses/agpl-3.0.html
+
 import copy
 import inspect
 import logging
 import time
 import typing
 
-from hikkatl import TelegramClient
-from hikkatl import __name__ as __base_name__
-from hikkatl import helpers
-from hikkatl._updates import ChannelState, Entity, EntityType, SessionState
-from hikkatl.errors import RPCError
-from hikkatl.errors.rpcerrorlist import TopicDeletedError
-from hikkatl.hints import EntityLike
-from hikkatl.network import MTProtoSender
-from hikkatl.tl import functions
-from hikkatl.tl.alltlobjects import LAYER
-from hikkatl.tl.functions.channels import GetFullChannelRequest
-from hikkatl.tl.functions.users import GetFullUserRequest
-from hikkatl.tl.tlobject import TLRequest
-from hikkatl.tl.types import (
+from herokutl import TelegramClient
+from herokutl import __name__ as __base_name__
+from herokutl import helpers
+from herokutl._updates import ChannelState, Entity, EntityType, SessionState
+from herokutl.errors import RPCError
+from herokutl.errors.rpcerrorlist import TopicDeletedError
+from herokutl.hints import EntityLike
+from herokutl.network import MTProtoSender
+from herokutl.tl import functions
+from herokutl.tl.alltlobjects import LAYER
+from herokutl.tl.functions.channels import GetFullChannelRequest
+from herokutl.tl.functions.users import GetFullUserRequest
+from herokutl.tl.tlobject import TLRequest
+from herokutl.tl.types import (
     ChannelFull,
     Message,
     Pong,
@@ -32,7 +38,7 @@ from hikkatl.tl.types import (
     UpdateShort,
     UserFull,
 )
-from hikkatl.utils import is_list_like
+from herokutl.utils import is_list_like
 
 from .types import (
     CacheRecordEntity,

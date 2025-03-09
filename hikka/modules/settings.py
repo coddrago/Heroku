@@ -4,9 +4,9 @@
 # You can redistribute it and/or modify it under the terms of the GNU AGPLv3
 # 🔑 https://www.gnu.org/licenses/agpl-3.0.html
 
-import hikkatl
-from hikkatl.extensions.html import CUSTOM_EMOJIS
-from hikkatl.tl.types import Message
+import herokutl
+from herokutl.extensions.html import CUSTOM_EMOJIS
+from herokutl.tl.types import Message
 
 from .. import loader, main, utils, version
 from ..inline.types import InlineCall
@@ -43,6 +43,21 @@ class CoreMod(loader.Module):
                 validator=loader.validators.Boolean(),
                 on_change=self._process_config_changes,
                 ),
+        )
+
+    async def client_ready(self):
+        self._markup = utils.chunks(
+            [
+                {
+                    "text": self.strings(platform),
+                    "callback": self._inline__choose__installation,
+                    "args": (platform,),
+                }
+                for platform in ['vds', 'termux',
+                                 'userland', 'railway',
+                                 'jamhost', 'module_switch']
+            ],
+            2
         )
 
     def _process_config_changes(self):
@@ -86,7 +101,7 @@ class CoreMod(loader.Module):
         module = self.allmodules.get_classname(module)
         return f"{str(chatid)}.{module}" if module else chatid
 
-    @loader.command(alias="hikka", ru_doc="Информация о Хероку", en_doc="Information of Heroku", ua_doc="Інформація про Хероку", de_doc="Informationen über Heroku")
+    @loader.command(ru_doc="Информация о Хероку", en_doc="Information of Heroku", ua_doc="Інформація про Хероку", de_doc="Informationen über Heroku")
     async def herokucmd(self, message: Message):
         await utils.answer_file(
             message,
@@ -99,7 +114,7 @@ class CoreMod(loader.Module):
                 ),
                 *version.__version__,
                 utils.get_commit_url(),
-                f"{hikkatl.__version__} #{hikkatl.tl.alltlobjects.LAYER}",
+                f"{herokutl.__version__} #{herokutl.tl.alltlobjects.LAYER}",
             )
             + (
                 ""
@@ -290,9 +305,38 @@ class CoreMod(loader.Module):
     async def installationcmd(self, message: Message):
         """| Guide of installation"""
 
-        await self.client.send_file(
-            message.peer_id,
-            "https://imgur.com/a/HrrFair.png",
-            caption=self.strings["installation"].format('{}', prefix=self.get_prefix()), reply_to=getattr(message, "reply_to_msg_id", None),)
-    
-        await message.delete()
+        args = utils.get_args_raw(message)
+
+        if (not args or args not in {'-t', '-v', '-r', '-jh', '-ms', '-u'}) and \
+            not (await self.inline.form(
+                self.strings("choose_installation"),
+                message,
+                reply_markup=self._markup,
+                photo="https://imgur.com/a/HrrFair.png",
+                disable_security=True
+        )
+            ):
+
+            await self.client.send_file(
+                message.peer_id,
+                "https://imgur.com/a/HrrFair.png",
+                caption=self.strings["installation"], reply_to=getattr(message, "reply_to_msg_id", None),)
+        elif "-t" in args:
+            await utils.answer(message, self.strings["termux_install"])
+        elif "-v" in args:
+            await utils.answer(message, self.strings["vds_install"])
+        elif "-r" in args:
+            await utils.answer(message, self.strings["railway_install"])
+        elif "-jh" in args:
+            await utils.answer(message, self.strings["jamhost_install"])
+        elif "-ms" in args:
+            await utils.answer(message, self.strings["module_switch_install"])
+        elif "-u" in args:
+            await utils.answer(message, self.strings["userland_install"])
+
+    async def _inline__choose__installation(self, call: InlineCall, platform: str):
+        await call.edit(
+            text=self.strings(f'{platform}_install'),
+            reply_markup=self._markup,
+        )
+

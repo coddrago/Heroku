@@ -22,6 +22,12 @@
 # You can redistribute it and/or modify it under the terms of the GNU AGPLv3
 # 🔑 https://www.gnu.org/licenses/agpl-3.0.html
 
+# ©️ Codrago, 2024-2025
+# This file is a part of Heroku Userbot
+# 🌐 https://github.com/coddrago/Heroku
+# You can redistribute it and/or modify it under the terms of the GNU AGPLv3
+# 🔑 https://www.gnu.org/licenses/agpl-3.0.html
+
 import asyncio
 import collections
 import contextlib
@@ -34,9 +40,9 @@ import traceback
 import typing
 
 import requests
-from hikkatl import events
-from hikkatl.errors import FloodWaitError, RPCError
-from hikkatl.tl.types import Message
+from herokutl import events
+from herokutl.errors import FloodWaitError, RPCError
+from herokutl.tl.types import Message
 
 from . import main, security, utils
 from .database import Database

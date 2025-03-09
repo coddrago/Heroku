@@ -154,9 +154,13 @@ heroku_settings:
   _cmd_doc_watchers: "Zeigt aktive Wächter an"
   _cmd_doc_weburl: "Öffnet einen Tunnel zur Hikka-Weboberfläche"
   core_protection_already_removed: "<emoji document_id=6003424016977628379>🔒</emoji> <b>Kernschutz wurde bereits entfernt</b>"
+  core_protection_already_enabled: "<emoji document_id=6003424016977628379>🔒</emoji> <b>kernschutz wurde bereits installiert</b>"
   core_protection_confirm: "⚠️ <b>BITTE SORGFÄLTIG LESEN!</b>\n\nDurch das Entfernen des Kernschutzes bestätigst du, dass du weißt, was dies bedeutet und wofür es ist. Normalerweise benötigst du dies <b>nicht</b>. Wenn du kein Entwickler bist, benötigst du dies <b>nicht</b>. Wenn du unsicher bist, benötigst du dies <b>nicht</b>.\n\n<b>Bist du sicher, dass du den Kernschutz entfernen möchtest?</b>"
+  core_protection_confirm_e: "⚠️ <b>BITTE SORGFÄLTIG LESEN!</b>\n\nDurch das installierst des Kernschutzes bestätigst du, dass du weißt, was dies bedeutet und wofür es ist. Normalerweise benötigst du dies <b>nicht</b>. Wenn du kein Entwickler bist, benötigst du dies <b>nicht</b>. Wenn du unsicher bist, benötigst du dies <b>nicht</b>.\n\n<b>Bist du sicher, dass du den Kernschutz installieren möchtest?</b>"
   core_protection_btn: "🔓 Kernschutz entfernen"
+  core_protection_e_btn: "🔓 Kernschutz installieren"
   core_protection_removed: "🔓 <b>Kernschutz erfolgreich entfernt</b>"
+  core_protection_enabled: "🔓 <b>Kernschutz erfolgreich installiert</b>"
 
 terminal:
   fw_protect: "Verzögerung zwischen Bearbeitungen"
@@ -180,14 +184,14 @@ terminal:
   _cmd_doc_terminate: "[-f zum Erzwingen] - Antworten Sie auf eine Nachricht, um den Prozess zu beenden"
 
 heroku_backup:
-  period: "⌚️ <b>Einheit „ALPHA“</b> erstellt regelmäßige Sicherungen. Diese Einstellungen können später geändert werden.\n\nBitte wählen Sie die Häufigkeit der Sicherungen"
-  saved: "✅ Häufigkeit gespeichert! Sie kann mit .set_backup_period geändert werden"
-  never: "✅ Ich werde keine automatischen Sicherungen durchführen. Dies kann mit .set_backup_period rückgängig gemacht werden"
+  period: "⌚️ <b>Einheit „ALPHA“</b> erstellt regelmäßige Sicherungen. Diese Einstellungen können später geändert werden.\n\nBitte wählen Sie die Häufigkeit der Sicherungen.\n\n<b>🚫 Daher ist es unmöglich, mit dem Befehl .lm aus Dateien heruntergeladene Module wiederherzustellen! Seien Sie vorsichtig und führen Sie vor der Wiederherstellung .backupmods aus.</b>"
+  saved: "✅ Häufigkeit gespeichert! Sie kann mit <code>{prefix}set_backup_period</code> geändert werden"
+  never: "✅ Ich werde keine automatischen Sicherungen durchführen. Dies kann mit <code>{prefix}set_backup_period</code> rückgängig gemacht werden"
   invalid_args: "🚫 <b>Geben Sie die richtige Häufigkeit in Stunden an oder `0`, um sie zu deaktivieren</b>"
-  backup_caption: '<emoji document_id=5469718869536940860>👆</emoji> <b>Dies ist Ihre Sicherung der Datenbank. Geben Sie sie niemandem, da sie persönliche Informationen enthält. Wenn Sie sie wiederherstellen müssen, verwenden Sie</b> <pre><code class="language-hikka">{prefix}restoredb</code></pre> <b>als Antwort auf diese Datei.</b>'
+  backup_caption: '<emoji document_id=5469718869536940860>👆</emoji> <b>Dies ist Ihre Sicherung der Datenbank. Geben Sie sie niemandem, da sie persönliche Informationen enthält. Wenn Sie sie wiederherstellen müssen, verwenden Sie</b> <pre><code class="language-heroku">{prefix}restoredb</code></pre> <b>als Antwort auf diese Datei.</b>'
   reply_to_file: "<emoji document_id=5210952531676504517>🚫</emoji> <b>Antworten Sie auf eine .json- oder .zip-Datei</b>"
   db_restored: "<emoji document_id=5774134533590880843>🔄</emoji> <b>Datenbank aktualisiert, Neustart...</b>"
-  modules_backup: "<emoji document_id=5431736674147114227>🗂</emoji> <b>Modul-Sicherung ({})</b>\n\n<b>Sie können sie wiederherstellen mit:</b>\n<pre><code class=\"language-hikka\">{}restoremods</code></pre>"
+  modules_backup: "<emoji document_id=5431736674147114227>🗂</emoji> <b>Modul-Sicherung ({})</b>\n\n<b>Sie können sie wiederherstellen mit:</b>\n<pre><code class=\"language-heroku\">{}restoremods</code></pre>"
   mods_restored: "<emoji document_id=5774134533590880843>🔄</emoji> <b>Module wiederhergestellt, Neustart...</b>"
   backup_sent: "<emoji document_id=5431736674147114227>🗂</emoji> <b>Sicherung in gespeicherte Nachrichten gesendet</b>"
   _cls_doc: "Verarbeitet Sicherungen der Datenbank und Module"
@@ -216,21 +220,9 @@ presets:
   already_installed: "✅ [Installiert]"
 
 settings:
-  installation: '<emoji document_id=5363805650327450240>▪️</emoji> Die Installation ist wirklich einfach! Schreibe einfach folgendes in das Terminal deines Servers:
-  <pre><code class="language-bash">sudo apt update && sudo apt upgrade -y && sudo apt install git && sudo apt install python3-pip && git clone https://github.com/coddrago/Heroku && cd Heroku && pip install -r requirements.txt && python3 -m hikka</code></pre>
-  
-  <emoji document_id=5299027123913105700>😐</emoji> Wenn du keinen Zugriff auf sudo hast, kannst du einfach die Anfangsbefehle weglassen.
-  
-  <emoji document_id=5300777464820145682>🥳</emoji> Lass uns die Argumente ein wenig erklären:
-  
-  <emoji document_id=5787313834012184077>🔐</emoji> Argument <code>--root</code> - erlaubt dir, Hikka als <b>Root-Benutzer</b> zu starten.
-  
-  <emoji document_id=5785209342986817408>🌎</emoji> Argument <code>--no-web</code> - öffnet den Login-Prozess in deinem <b>Terminal statt über einen Link</b> <code>{}.lhr.life</code>.
-  
-  <emoji document_id=5471895949804575096>🤲</emoji> Wenn du jedoch von Hikka von hikariatama wechseln möchtest, solltest du dieses Modul herunterladen:
-  
-  <pre><code class="language-hikka">{prefix}dlm https://raw.githubusercontent.com/coddrago/modules/main/SwitchToHeroku.py</code></pre>
-  Es ist völlig sicher und hilft dir, von Hikka zu Heroku zu wechseln.'
+  choose_installation: "<emoji document_id=5363805650327450240>🪐</emoji> <b>Wählen Sie Ihre Heroku-Installationsoption:</b>"
+  module_switch: "📁 Modulumschaltung"
+  installation: "<emoji document_id=5363805650327450240>▪️</emoji> Die Installation ist wirklich einfach! Schreibe einfach folgendes in das Terminal deines Servers:\n<pre><code class=\"language-bash\">sudo apt update && sudo apt upgrade -y && sudo apt install git && sudo apt install python3-pip && git clone https://github.com/coddrago/Heroku && cd Heroku && pip install -r requirements.txt && python3 -m hikka</code></pre>\n\n<emoji document_id=5299027123913105700>😐</emoji> Wenn du keinen Zugriff auf sudo hast, kannst du einfach die Anfangsbefehle weglassen.\n\n<emoji document_id=5300777464820145682>🥳</emoji> Lass uns die Argumente ein wenig erklären:\n\n<emoji document_id=5787313834012184077>🔐</emoji> Argument <code>--root</code> - erlaubt dir, Hikka als <b>Root-Benutzer</b> zu starten.\n\n<emoji document_id=5785209342986817408>🌎</emoji> Argument <code>--no-web</code> - öffnet den Login-Prozess in deinem <b>Terminal statt über einen Link</b> <code>{}.lhr.life</code>.\n\n<emoji document_id=5471895949804575096>🤲</emoji> Wenn du jedoch von Hikka von hikariatama wechseln möchtest, solltest du dieses Modul herunterladen:\n\n<pre><code class=\"language-heroku\">{prefix}dlm https://mods.codrago.top/SwitchToHeroku.py</code></pre>\nEs ist völlig sicher und hilft dir, von Hikka zu Heroku zu wechseln."
   too_many_args: "<emoji document_id=5210952531676504517>🚫</emoji> <b>Zu viele Argumente</b>"
   blacklisted: "<emoji document_id=5197474765387864959>👍</emoji> <b>Chat {} wurde zur Blacklist des Userbots hinzugefügt</b>"
   unblacklisted: "<emoji document_id=5197474765387864959>👍</emoji> <b>Chat {} wurde aus der Blacklist des Userbots entfernt</b>"
@@ -248,7 +240,7 @@ settings:
   alias_removed: "<emoji document_id=5197474765387864959>👍</emoji> <b>Alias</b> <code>{}</code> <b>wurde entfernt</b>."
   no_alias: "<emoji document_id=5210952531676504517>🚫</emoji> <b>Alias</b> <code>{}</code> <b>existiert nicht</b>"
   db_cleared: "<emoji document_id=5197474765387864959>👍</emoji> <b>Datenbank wurde gelöscht</b>"
-  hikka: "{} <b>{}.{}.{}</b> <i>{}</i>\n\n<b><emoji document_id=5289608677244811430>📁</emoji> <b>Telethon:</b> <i>1.37.0</i>\n\n<emoji document_id=5228879218363872764>⌨</emoji> <b>Developer: t.me/codrago</b>\n<emoji document_id=5375368793209972850>🖋</emoji> <b>Designer: t.me/tr4mq</b>"
+  hikka: "{} <b>{}.{}.{}</b> <i>{}</i>\n\n<b><emoji document_id=5289608677244811430>📁</emoji> <b>heroku-tl:</b> <i>{}</i>\n\n<emoji document_id=5228879218363872764>⌨</emoji> <b>Developer: t.me/codrago</b>\n<emoji document_id=5375368793209972850>🖋</emoji> <b>Designer: t.me/tr4mq</b>"
   _cls_doc: "Verwaltung der grundlegenden Einstellungen des Userbots"
   confirm_cleardb: "⚠️ <b>Bist du sicher, dass du die Datenbank zurücksetzen möchtest?</b>"
   cleardb_confirm: "🗑 Datenbank löschen"
@@ -261,7 +253,7 @@ settings:
   _cmd_doc_blacklistuser: "[Benutzer] - Verhindert, dass ein Benutzer Befehle ausführt"
   _cmd_doc_cleardb: "Löscht die Datenbank"
   _cmd_doc_delalias: "Entfernt einen Alias für einen Befehl"
-  _cmd_doc_hikka: "Zeigt die Version von Hikka an"
+  _cmd_doc_heroku: "Zeigt die Version von Hikka an"
   _cmd_doc_setprefix: "<Präfix> - Setzt den Befehlspräfix"
   _cmd_doc_unblacklist: "[Chat] - Aktiviert den Bot an einem bestimmten Ort"
   _cmd_doc_unblacklistuser: "[Benutzer] - Erlaubt einem Benutzer, Befehle auszuführen"
@@ -305,18 +297,20 @@ heroku_config:
 
 inline_stuff:
   bot_username_invalid: "<emoji document_id=5210952531676504517>🚫</emoji> <b>Ungültiger Bot-Benutzername. Er muss auf</b> <code>bot</code> <b>enden und mindestens 5 Zeichen lang sein</b>"
+  token_invalid: "<emoji document_id=5210952531676504517>🚫</emoji> <b>Das angegebene Bot-Token ist ungültig. Es muss 8-10 Zahlen, </b><code>:</code> <b>und 34-36 Symbole enthalten</b>"
   bot_username_occupied: "<emoji document_id=5210952531676504517>🚫</emoji> <b>Dieser Bot-Benutzername ist bereits vergeben</b>"
   bot_updated: "<emoji document_id=6318792204118656433>🎉</emoji> <b>Einstellungen gespeichert. Um sie anzuwenden, starte den Userbot neu</b>"
   this_is_hikka: "🪐 <b>Hallo! Das ist Heroku — ein leistungsstarker modularer Telegram-Userbot. Du kannst ihn auf deinem Account installieren!</b>\n\n<b>🌍 <a href=\"https://github.com/coddrago/Heroku\">GitHub</a></b>\n<b>👥 <a href=\"https://t.me/heroku_talks\">Support-Chat</a></b>"
   _cmd_doc_ch_hikka_bot: "<Benutzername> - Ändert den Benutzernamen des Inline-Bots"
 
 test:
-  set_loglevel: "<emoji document_id=5210952531676504517>🚫</emoji> <b>Gib das Log-Level als Zahl oder String an</b>"
-  no_logs: "<emoji document_id=5363948200291998612>🤷‍♀️</emoji> <b>Es gibt keine Logs mit dem Level</b> <code>{}</code><b>.</b>"
+  set_loglevel: "<emoji document_id=5355133243773435190>🚫</emoji> <b>Gib das Log-Level als Zahl oder String an</b>"
+  no_logs: "<emoji document_id=5355133243773435190>🤷‍♀️</emoji> <b>Es gibt keine Logs mit dem Level</b> <code>{}</code><b>.</b>"
   configping: "Ihr benutzerdefinierter Text. Platzhalter können verwendet werden: {ping} - Ihr Ping, {uptime} - Ihre Uptime, {ping_hint} - Hinweis. Sie können den Platzhaltername {hostname} verwenden, wenn Sie den Hostname Ihres Servers benötigen"
   hint: "Geben Sie einen Hinweis an"
   ping_emoji: "Emoji, das bei einer leichten Ping-Erhöhung angezeigt wird."
-  logs_caption: "<emoji document_id=5188377234380954537>🪐</emoji> <b>Heroku-Logs des Levels</b> <code>{}</code>\n\n<emoji document_id=6318902906900711458>⚪️</emoji> <b>Version: {}.{}.{}</b>{}"
+  banner_url: "Bild für Ihren Ping, zum Beispiel: https://imgur.com/a/dsh7Fvb.png"
+  logs_caption: "<emoji document_id=5350594756126721186>🪐</emoji> <b>Heroku-Logs des Levels</b> <code>{}</code>\n\n<emoji document_id=5228879218363872764>⚪️</emoji> <b>Version: {}.{}.{}</b>{}"
   debugging_enabled: "<emoji document_id=5332533929020761310>✅</emoji> <b>Der Entwicklermodus wurde für das Modul</b> <code>{0}</code> <b>aktiviert</b>\n<i>Gehe zum Ordner `debug_modules`, ändere die Datei `{0}.py` und beobachte die Änderungen in Echtzeit</i>"
   debugging_disabled: "<emoji document_id=5332533929020761310>✅</emoji> <b>Der Entwicklermodus wurde deaktiviert</b>"
   suspend_invalid_time: "<emoji document_id=5210952531676504517>🚫</emoji> <b>Ungültige Zeitdauer für das Einfrieren</b>"
@@ -334,22 +328,13 @@ test:
   logs_cleared: "🗑 <b>Logs wurden gelöscht</b>"
   _cmd_doc_clearlogs: "Löscht die Logs"
 
-update_notifier:
-  update_required: "🆕 <b>Ein Heroku-Update ist verfügbar!</b>\n\nEine neue Version von Heroku wurde veröffentlicht.\n🔮 <b>Heroku <s>{}</s> -> {}</b>\n\n{}"
-  more: "\n<i><b>🎥 Und noch {}...</b></i>"
-  _cfg_doc_disable_notifications: "Update-Benachrichtigungen deaktivieren"
-  latest_disabled: "Benachrichtigungen über das neueste Update wurden deaktiviert"
-  update: "🔄 Aktualisieren"
-  ignore: "🚫 Ignorieren"
-  changelog: '<emoji document_id=5434144690511290129>📰</emoji> <b>Änderungsprotokoll des letzten großen Updates:</b><pre><code class="language-heroku">{}</code></pre>'
-  
 updater:
-  source: "<emoji document_id=5456255401194429832>📖</emoji> <b>Den Quellcode kannst du <a href='{}'>hier</a> einsehen</b>"
-  restarting_caption: "<emoji document_id=5328274090262275771>🕗</emoji> <b>Dein {} wird neu gestartet...</b>"
-  downloading: "<emoji document_id=5328274090262275771>🕗</emoji> <b>Updates werden heruntergeladen...</b>"
-  installing: "<emoji document_id=5328274090262275771>🕗</emoji> <b>Updates werden installiert...</b>"
-  success: "<emoji document_id=5326015457155620929>⏱</emoji> <b>Neustart erfolgreich! {}</b>\n<i>Die Module werden jedoch noch geladen...</i>\n<i>Der Neustart dauerte {} Sekunden</i>"
-  full_success: "<emoji document_id=5301096082674032190>👍</emoji> <b>Der Userbot ist vollständig geladen! {}</b>\n<i>Der vollständige Neustart dauerte {} Sekunden.</i>"
+  source: "<emoji document_id=5208634061085492935>📖</emoji> <b>Den Quellcode kannst du <a href='{}'>hier</a> einsehen</b>"
+  restarting_caption: "<emoji document_id=5208622108191506906>🕗</emoji> <b>Dein {} wird neu gestartet...</b>"
+  downloading: "<emoji document_id=5208622108191506906>🕗</emoji> <b>Updates werden heruntergeladen...</b>"
+  installing: "<emoji document_id=5208622108191506906>🕗</emoji> <b>Updates werden installiert...</b>"
+  success: "<emoji document_id=5208661316947955396>⏱</emoji> <b>Neustart erfolgreich! {}</b>\n<i>Die Module werden jedoch noch geladen...</i>\n<i>Der Neustart dauerte {} Sekunden</i>"
+  full_success: "<emoji document_id=6028215594707324419>👍</emoji> <b>Der Userbot ist vollständig geladen! {}</b>\n<i>Der vollständige Neustart dauerte {} Sekunden.</i>"
   secure_boot_complete: "<emoji document_id=5472308992514464048>🔐</emoji> <b>Sicherer Start abgeschlossen! {}</b>\n<i>Der Neustart dauerte {} Sekunden</i>"
   origin_cfg_doc: "Die URL, von der die Updates heruntergeladen werden"
   btn_restart: "🔄 Neu starten"
@@ -360,11 +345,23 @@ updater:
   no_update: "🚸 <b>Du hast bereits die neueste Version. Möchtest du trotzdem ein Update erzwingen?</b>"
   cancel: "🚫 Abbrechen"
   _cls_doc: "Aktualisiert den Userbot"
-  lavhost_update: "<emoji document_id=5469986291380657759>✌️</emoji> <b>Dein {} wird aktualisiert...</b>"
+  lavhost_update: "<emoji document_id=5208661316947955396>✌️</emoji> <b>Dein {} wird aktualisiert...</b>"
+  invalid_args: "<emoji document_id=5210952531676504517>🚫</emoji> <b>Sie müssen die Anzahl der Commits angeben, die zurückgesetzt werden sollen!</b>"
+  rollback_too_far: "<emoji document_id=5210952531676504517>🚫</emoji> <b>Du rollst zu weit zurück!</b>"
+  rollback_confirm: "❓ <b>Sind Sie sicher, dass Sie {num} Commit(s) zurücksetzen möchten?</b>"
+  rollback_process: "🕗 <b>{num} Commits zurücksetzen...</b>"
   _cmd_doc_restart: "Startet den Userbot neu"
   _cmd_doc_source: "Zeigt den Link zum Quellcode des Projekts"
   _cmd_doc_update: "Lädt Updates für den Userbot herunter"
-  
+  _cmd_doc_rollback: "Macht Userbot-Updates rückgängig"
+  update_required: "🆕 <b>Ein Heroku-Update ist verfügbar!</b>\n\nEine neue Version von Heroku wurde veröffentlicht.\n🔮 <b>Heroku <s>{}</s> -> {}</b>\n\n{}"
+  more: "\n<i><b>🎥 Und noch {}...</b></i>"
+  _cfg_doc_disable_notifications: "Update-Benachrichtigungen deaktivieren"
+  latest_disabled: "Benachrichtigungen über das neueste Update wurden deaktiviert"
+  update: "🔄 Aktualisieren"
+  ignore: "🚫 Ignorieren"
+  changelog: '<emoji document_id=5434144690511290129>📰</emoji> <b>Änderungsprotokoll des letzten großen Updates:</b><pre><code class="language-heroku">{}</code></pre>'
+
 api_protection:
   warning: "⚠️ <b>ACHTUNG!</b>\n\nDas Konto hat die in der Konfiguration angegebenen Anfrageratenlimits überschritten. Um Telegram API-Fluten zu vermeiden, wurde der Userbot <b>vollständig eingefroren</b> für {} Sekunden. Weitere Informationen befinden sich in der beigefügten Datei unten. \n\nEs wird empfohlen, die Hilfe der <code>{prefix}support</code> Gruppe in Anspruch zu nehmen!\n\nWenn du davon ausgehst, dass dies ein geplantes Verhalten des Userbots ist, warte einfach, bis der Timer abläuft, und beim nächsten Mal, wenn du eine ressourcenintensive Aufgabe planst, benutze <code>{prefix}suspend_api_protect</code> Zeit in Sekunden"
   args_invalid: "<emoji document_id=5210952531676504517>🚫</emoji> <b>Ungültige Argumente</b>"
@@ -411,18 +408,20 @@ heroku_info:
   branch: "Branch"
   cpu_usage: "CPU-Nutzung"
   ram_usage: "RAM-Nutzung"
+  non_detectable: "<emoji document_id=5210952531676504517>❌</emoji> <b>Diese Komponente kann auf Ihrem Server nicht erkannt werden!</b>"
+  ping_emoji: "Emoji zur Verwendung von Ping"
   send_info: "Sende Informationen zum Userbot"
   description: "ℹ Dies wird keine persönlichen Informationen preisgeben"
   _ihandle_doc_info: "Sende Informationen zum Userbot"
   up-to-date: "<emoji document_id=5370699111492229743>😌</emoji> <b>Aktuelle Version</b>"
-  update_required: "<emoji document_id=5424728541650494040>😕</emoji> <b>Update erforderlich</b> <code>.update</code>"
-  _cfg_cst_msg: "Benutzerdefinierter Nachrichtentext in info. Kann Schlüsselwörter {me}, {version}, {build}, {prefix}, {platform}, {upd}, {uptime}, {cpu_usage}, {ram_usage}, {branch} enthalten"
+  update_required: "<emoji document_id=5424728541650494040>😕</emoji> <b>Update erforderlich</b> <code>{prefix}update</code>"
+  _cfg_cst_msg: "Benutzerdefinierter Nachrichtentext in info. Kann Schlüsselwörter {me}, {version}, {build}, {prefix}, {platform}, {upd}, {uptime}, {cpu_usage}, {ram_usage}, {branch}, {hostname}, {user}, {os}, {kernel}, {cpu}, {ping} enthalten"
   _cfg_cst_btn: "Benutzerdefinierte Schaltfläche in der Nachricht in info. Lasse es leer, um die Schaltfläche zu entfernen"
   _cfg_banner: "Link zum Banner-Bild"
   setinfo_no_args: "<emoji document_id=5370881342659631698>😢</emoji> <b>Du musst den Text für benutzerdefiniertes Info angeben</b>"
   setinfo_success: "<emoji document_id=5436040291507247633>🎉</emoji> <b>Der Info-Text wurde erfolgreich geändert</b>"
   desc: "Userbots können verwendet werden, um verschiedene Aufgaben zu automatisieren, wie <b>Nachrichten senden, Kanälen beitreten, Mediendateien hochladen und vieles mehr</b>.\n\n<emoji document_id=5474667187258006816>😎</emoji> Userbots unterscheiden sich von normalen Telegram-Bots, da <b>sie auf dem Benutzerkonto</b> und nicht auf einem Bot-Konto arbeiten. Das bedeutet, dass sie auf mehr Funktionen zugreifen können und eine größere Flexibilität bei der Ausführung von Aktionen bieten.\n\n<emoji document_id=5472267631979405211>🚫</emoji> Es ist jedoch wichtig zu beachten, dass <b>Userbots offiziell von Telegram nicht unterstützt werden</b> und ihre Nutzung gegen die Nutzungsbedingungen der Plattform verstoßen kann. Daher <b>sollten Benutzer vorsichtig sein</b> und sicherstellen, dass auf ihrem Konto kein schadhafter Code ausgeführt wird.\n\n"
-  _cmd_doc_hikkainfo: "Sende Informationen im Stil von 'Was ist Heroku?'"
+  _cmd_doc_herokuinfo: "Sende Informationen im Stil von 'Was ist Heroku?'"
   _cmd_doc_info: "Sendet Informationen über den Bot"
   _cmd_doc_setinfo: "<Text> - Ändere den Text in .info"
 
@@ -462,7 +461,7 @@ loader:
   version_incompatible: "<emoji document_id=5454225457916420314>😖</emoji> <b>Dieses Modul benötigt Hikka Version {}+\nAktualisieren Sie mit</b> <code>.update</code>"
   ffmpeg_required: "<emoji document_id=5454225457916420314>😖</emoji> <b>Dieses Modul benötigt FFMPEG, das nicht installiert ist</b>"
   developer: "\n\n<emoji document_id=5287454910059654880>🫶</emoji> <b>Entwickler:</b> {}"
-  depends_from: "\n\n<emoji document_id=5431736674147114227>📦</emoji> <b>Abhängigkeiten:</b> \n{}"
+  depends_from: "\n\n<emoji document_id=5341492148468465410>📦</emoji> <b>Abhängigkeiten:</b> \n{}"
   by: "von"
   module_fs: "💿 <b>Willst du das Modul auf der Festplatte speichern, damit es nach einem Neustart nicht entladen wird?</b>"
   save: "💿 Speichern"
@@ -510,7 +509,7 @@ translations:
   lang_removed: "<emoji document_id=5197474765387864959>👍</emoji> <b>Übersetzungen auf Standard zurückgesetzt</b>"
   check_pack: "<emoji document_id=5210952531676504517>🚫</emoji> <b>Falsches Format des Übersetzungspakets im Link</b>"
   check_url: "<emoji document_id=5210952531676504517>🚫</emoji> <b>Du musst einen Link angeben, der ein Übersetzungspaket enthält</b>"
-  too_long: "<emoji document_id=5433653135799228968>📁</emoji> <b>Die Ausgabe des Befehls ist zu lang, daher wurde sie in einer Datei gesendet.</b>"
+  too_long: "<emoji document_id=5341492148468465410>📁</emoji> <b>Die Ausgabe des Befehls ist zu lang, daher wurde sie in einer Datei gesendet.</b>"
   choose_language: "🗽 <b>Wähle eine Sprache</b>"
   not_official: "<emoji document_id=5312383351217201533>⚠️</emoji> <b>Diese Sprache wird nicht offiziell unterstützt</b>"
   requested_join: "💫 <b>Das Modul</b> <code>{}</code> <b>hat um den Beitritt zum Kanal <a href='https://t.me/{}'>{}</a> gebeten</b>\n\n<b>❓ Grund:</b> <i>{}</i>"
@@ -541,7 +540,7 @@ translate:
   _cmd_doc_tr: "[Sprache] [Text] - Übersetzt den Text"
 
 quickstart:
-  base: "🪐🇩🇪 <b>Hallo.</b> Dein Userbot <b>Heroku</b> ist installiert.\n\n❓ <b>Brauchst du Hilfe?</b> Trete unserem Support-Chat bei. Wir helfen <b>jedem</b>.\n\n📼 <b>Du kannst nach Modulen suchen und sie mit </b><code>.heta</code><b> installieren. Gib einfach deine Suchanfrage ein und klicke auf ⛩ Install bei dem gewünschten Modul</b>\n\n📣 <b>Schau dir Kanäle mit von der Community erstellten Modulen an: <a href=\"https://t.me/hikka_ub/126\">zeigen</a></b>\n\n💁‍♀️ <b>Kurzanleitung:</b>\n\n1️⃣ <b>Schreib</b> <code>.help</code> <b>um eine Liste der Module zu sehen</b>\n2️⃣ <b>Schreib</b> <code>.help [Modulname/Befehl]</code> <b>um die Modulbeschreibung zu sehen</b>\n3️⃣ <b>Schreib</b> <code>.dlmod [Link]</code> <b>um ein Modul von einem Link zu laden</b>\n4️⃣ <b>Schreib</b> <code>.loadmod</code> <b>als Antwort auf eine Datei, um ein Modul aus der Datei zu laden</b>\n5️⃣ <b>Schreib</b> <code>.unloadmod [Modulname]</code>"
+  base: "🪐 <b>Hallo.</b> Ihr <b>Heroku</b>-Userbot ist jetzt installiert.\n\n❓ <b>Benötigen Sie Hilfe?</b> Nehmen Sie an <a href=\"https://t.me/heroku_talks\">unserem Support-Chat</a> teil. Wir helfen <b>jedem</b>.\n\n💁‍♀️ <b>Kurzanleitung:</b>\n\n1️⃣ <b>Schreiben Sie</b> <code>.help</code>, <b>um die Liste der Module anzuzeigen</b>\n2️⃣ <b>Schreiben Sie</b> <code>.help <Modulname/Befehl></code>, <b>um die Beschreibung des Moduls anzuzeigen</b>\n3️⃣ <b>Schreiben Sie</b> <code>.dlmod <link></code> <b>um ein Modul von einem Link zu laden</b>\n4️⃣ <b>Schreiben</b> <code>.loadmod</code> <b>als Antwort auf eine Datei, um ein Modul daraus zu laden</b>\n5️⃣ <b>Schreiben</b> <code>.unloadmod <Modulname></code> <b>um ein Modul zu entladen</b>\n\n💡 <b>Heroku unterstützt Module von Hikka, Friendly-Telegram und GeekTG sowie seine eigenen.</b>\n"
   railway: "🚂 <b>Dein Userbot ist auf Railway installiert</b>. Auf dieser Plattform erhältst du nur <b>500 kostenlose Stunden pro Monat</b>. Wenn das Limit erreicht ist, wird dein <b>Userbot eingefroren</b>. Im nächsten Monat <b>musst du zu https://railway.app gehen und ihn neu starten</b>."
   lavhost: "✌️ <b>Dein Userbot ist auf lavHost installiert</b>. Trete @lavhost bei, um wichtige Benachrichtigungen und Updates zu erhalten. Alle Fragen zur Plattform sollten in @lavhostchat gestellt werden."
   language_saved: "🇩🇪 Sprache gespeichert!"

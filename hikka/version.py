@@ -5,11 +5,18 @@
 # You can redistribute it and/or modify it under the terms of the GNU AGPLv3
 # 🔑 https://www.gnu.org/licenses/agpl-3.0.html
 
-__version__ = (1, 6, 8)
+# ©️ Codrago, 2024-2025
+# This file is a part of Heroku Userbot
+# 🌐 https://github.com/coddrago/Heroku
+# You can redistribute it and/or modify it under the terms of the GNU AGPLv3
+# 🔑 https://www.gnu.org/licenses/agpl-3.0.html
+
+__version__ = (1, 6, 9)
 
 import os
 
 import git
+from hikka._internal import restart
 
 try:
     branch = git.Repo(
@@ -17,3 +24,11 @@ try:
     ).active_branch.name
 except Exception:
     branch = "master"
+
+
+async def check_branch(me_id: int, allowed_ids: list):
+    if branch != "master" and me_id not in allowed_ids:
+        repo = git.Repo(path=os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+        repo.git.reset("--hard", "HEAD")
+        repo.git.checkout("master", force=True)
+        restart()

@@ -7,9 +7,9 @@
 import re
 import string
 
-from hikkatl.errors.rpcerrorlist import YouBlockedUserError
-from hikkatl.tl.functions.contacts import UnblockRequest
-from hikkatl.tl.types import Message
+from herokutl.errors.rpcerrorlist import YouBlockedUserError
+from herokutl.tl.functions.contacts import UnblockRequest
+from herokutl.tl.types import Message
 
 from .. import loader, utils
 from ..inline.types import BotInlineMessage
@@ -107,6 +107,15 @@ class InlineStuff(loader.Module):
 
         self._db.set("hikka.inline", "custom_bot", args)
         self._db.set("hikka.inline", "bot_token", None)
+        await utils.answer(message, self.strings("bot_updated"))
+
+    @loader.command()
+    async def ch_bot_token(self, message: Message):
+        args = utils.get_args_raw(message)
+        if not args or not re.match(r'[0-9]{8,10}:[a-zA-Z0-9_-]{34,36}', args):
+            await utils.answer(message, self.strings('token_invalid'))
+            return
+        self._db.set("hikka.inline", "bot_token", args)
         await utils.answer(message, self.strings("bot_updated"))
 
     async def aiogram_watcher(self, message: BotInlineMessage):

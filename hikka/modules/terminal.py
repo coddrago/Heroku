@@ -29,7 +29,7 @@ import os
 import re
 import typing
 
-import hikkatl
+import herokutl
 
 from .. import loader, utils
 
@@ -38,7 +38,6 @@ logger = logging.getLogger(__name__)
 
 def hash_msg(message):
     return f"{str(utils.get_chat_id(message))}/{str(message.id)}"
-
 
 async def read_stream(func: callable, stream, delay: float):
     last_task = None
@@ -71,7 +70,7 @@ async def sleep_for_task(func: callable, data: bytes, delay: float):
 class MessageEditor:
     def __init__(
         self,
-        message: hikkatl.tl.types.Message,
+        message: herokutl.tl.types.Message,
         command: str,
         config,
         strings,
@@ -107,10 +106,10 @@ class MessageEditor:
         text += (self.strings("stderr") + stderr) if stderr else ""
         text += self.strings("end")
 
-        with contextlib.suppress(hikkatl.errors.rpcerrorlist.MessageNotModifiedError):
+        with contextlib.suppress(herokutl.errors.rpcerrorlist.MessageNotModifiedError):
             try:
                 self.message = await utils.answer(self.message, text)
-            except hikkatl.errors.rpcerrorlist.MessageTooLongError as e:
+            except herokutl.errors.rpcerrorlist.MessageTooLongError as e:
                 logger.error(e)
                 logger.error(text)
         # The message is never empty due to the template header
@@ -167,7 +166,7 @@ class SudoMessageEditor(MessageEditor):
 
             try:
                 await utils.answer(self.message, text)
-            except hikkatl.errors.rpcerrorlist.MessageNotModifiedError as e:
+            except herokutl.errors.rpcerrorlist.MessageNotModifiedError as e:
                 logger.debug(e)
 
             logger.debug("edited message with link to self")
@@ -183,7 +182,7 @@ class SudoMessageEditor(MessageEditor):
             self.message[0].client.remove_event_handler(self.on_message_edited)
             self.message[0].client.add_event_handler(
                 self.on_message_edited,
-                hikkatl.events.messageedited.MessageEdited(chats=["me"]),
+                herokutl.events.messageedited.MessageEdited(chats=["me"]),
             )
 
             logger.debug("registered handler")
@@ -231,7 +230,7 @@ class SudoMessageEditor(MessageEditor):
             # The user has provided interactive authentication. Send password to stdin for sudo.
             try:
                 self.authmsg = await utils.answer(message, self.strings("auth_ongoing"))
-            except hikkatl.errors.rpcerrorlist.MessageNotModifiedError:
+            except herokutl.errors.rpcerrorlist.MessageNotModifiedError:
                 # Try to clear personal info if the edit fails
                 await message.delete()
 
@@ -282,13 +281,13 @@ class RawMessageEditor(SudoMessageEditor):
         logger.debug(text)
 
         with contextlib.suppress(
-            hikkatl.errors.rpcerrorlist.MessageNotModifiedError,
-            hikkatl.errors.rpcerrorlist.MessageEmptyError,
+            herokutl.errors.rpcerrorlist.MessageNotModifiedError,
+            herokutl.errors.rpcerrorlist.MessageEmptyError,
             ValueError,
         ):
             try:
                 await utils.answer(self.message, text)
-            except hikkatl.errors.rpcerrorlist.MessageTooLongError as e:
+            except herokutl.errors.rpcerrorlist.MessageTooLongError as e:
                 logger.error(e)
                 logger.error(text)
 
@@ -313,6 +312,14 @@ class TerminalMod(loader.Module):
     @loader.command()
     async def terminalcmd(self, message):
         await self.run_command(message, utils.get_args_raw(message))
+        
+    @loader.command()
+    async def pipcmd(self, message):
+        await self.run_command(
+            message,
+            ("pip " if os.geteuid() == 0 else "sudo -S pip ")
+            + utils.get_args_raw(message)
+            )
 
     @loader.command()
     async def aptcmd(self, message):
@@ -333,7 +340,7 @@ class TerminalMod(loader.Module):
 
     async def run_command(
         self,
-        message: hikkatl.tl.types.Message,
+        message: herokutl.tl.types.Message,
         cmd: str,
         editor: typing.Optional[MessageEditor] = None,
     ):

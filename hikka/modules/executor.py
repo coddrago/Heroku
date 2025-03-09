@@ -2,7 +2,7 @@ import sys
 import traceback
 import html
 import time
-import hikkatl
+import herokutl
 import asyncio
 import logging
 
@@ -53,11 +53,11 @@ class Executor(loader.Module):
             "event": message,
             "chat": message.to_id,
             "me": me,
-            "hikkatl": hikkatl,
-            "telethon": hikkatl,
+            "herokutl": herokutl,
+            "telethon": herokutl,
             "utils": utils,
             "loader": loader,
-            "f": hikkatl.tl.functions,
+            "f": herokutl.tl.functions,
             "c": self._client,
             "m": message,
             "lookup": self.lookup,

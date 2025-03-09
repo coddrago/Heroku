@@ -8,8 +8,8 @@ import asyncio
 import logging
 import re
 
-from hikkatl.errors.rpcerrorlist import YouBlockedUserError
-from hikkatl.tl.functions.contacts import UnblockRequest
+from herokutl.errors.rpcerrorlist import YouBlockedUserError
+from herokutl.tl.functions.contacts import UnblockRequest
 
 from .. import utils
 from .._internal import fw_protect
@@ -72,7 +72,10 @@ class TokenObtainment(InlineUnit):
                 await fw_protect()
                 from .. import main
 
-                m = await conv.send_file(main.BASE_PATH / "assets" / "heroku-ava.png")
+                if "DOCKER" in os.environ():
+                    m = await conv.send_file("https://raw.githubusercontent.com/coddrago/Heroku/refs/heads/master/assets/heroku-ava.png")
+                else:
+                    m = await conv.send_file(main.BASE_PATH / "assets" / "heroku-ava.png")
                 r = await conv.get_response()
 
                 logger.debug(">> <Photo>")

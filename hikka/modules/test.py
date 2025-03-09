@@ -3,7 +3,8 @@
 # 🌐 https://github.com/hikariatama/Hikka
 # You can redistribute it and/or modify it under the terms of the GNU AGPLv3
 # 🔑 https://www.gnu.org/licenses/agpl-3.0.html
-
+import getpass
+import platform as lib_platform
 import inspect
 import logging
 import os
@@ -13,7 +14,7 @@ import time
 import typing
 from io import BytesIO
 
-from hikkatl.tl.types import Message
+from herokutl.tl.types import Message
 
 from .. import loader, main, utils
 from ..inline.types import InlineCall
@@ -90,6 +91,12 @@ class TestMod(loader.Module):
                 "ping_emoji",
                 "🪐",
                 lambda: self.strings["ping_emoji"],
+                validator=loader.validators.String(),
+            ),
+            loader.ConfigValue(
+                "banner_url",
+                None,
+                lambda: self.strings["banner_url"],
                 validator=loader.validators.String(),
             ),
         )
@@ -361,19 +368,39 @@ class TestMod(loader.Module):
         """- Find out your userbot ping"""
         start = time.perf_counter_ns()
         message = await utils.answer(message, self.config["ping_emoji"])
+        banner = self.config["banner_url"]
+        
+        if self.config["banner_url"]:
+            await message.delete()
+            await self.client.send_file(
+                message.peer_id,
+                banner,
+                caption = self.config["Text_Of_Ping"].format(
+                    ping=round((time.perf_counter_ns() - start) / 10**6, 3),
+                    uptime=utils.formatted_uptime(),
+                    ping_hint=(
+                        (self.config["hint"]) if random.choice([0, 0, 1]) == 1 else ""
+                    ),
+                    hostname=lib_platform.node(),
+                    user=getpass.getuser(),
+        ),
+                reply_to=getattr(message, "reply_to_msg_id", None),
+            )
 
-        await utils.answer(
-            message,
-            self.config["Text_Of_Ping"].format(
-                ping=round((time.perf_counter_ns() - start) / 10**6, 3),
-                uptime=utils.formatted_uptime(),
-                ping_hint=(
-                    (self.config["hint"]) if random.choice([0, 0, 1]) == 1 else ""
-                ),
-                hostname=subprocess.run(['hostname'], stdout=subprocess.PIPE).stdout.decode().strip(),
-                user=subprocess.run(['whoami'], stdout=subprocess.PIPE).stdout.decode().strip(),
-    ),
-        )
+        else:
+            await utils.answer(
+                message,
+                self.config["Text_Of_Ping"].format(
+                    ping=round((time.perf_counter_ns() - start) / 10**6, 3),
+                    uptime=utils.formatted_uptime(),
+                    ping_hint=(
+                        (self.config["hint"]) if random.choice([0, 0, 1]) == 1 else ""
+                    ),
+                    hostname=lib_platform.node(),
+                    user=getpass.getuser(),
+        ),
+            )
+
 
     async def client_ready(self):
         chat, _ = await utils.asset_channel(
@@ -382,7 +409,7 @@ class TestMod(loader.Module):
             "🪐 Your Heroku logs will appear in this chat",
             silent=True,
             invite_bot=True,
-            avatar=" https://raw.githubusercontent.com/coddrago/Heroku/refs/heads/master/assets/heroku-logs.png",
+            avatar="https://raw.githubusercontent.com/coddrago/Heroku/dev-test/assets/heroku-logs.png",
         )
 
         self.logchat = int(f"-100{chat.id}")

@@ -8,13 +8,13 @@ import logging
 import os
 import random
 
-import hikkatl
-from hikkatl.tl.functions.messages import (
+import herokutl
+from herokutl.tl.functions.messages import (
     GetDialogFiltersRequest,
     UpdateDialogFilterRequest,
 )
-from hikkatl.tl.types import Message
-from hikkatl.utils import get_display_name
+from herokutl.tl.types import Message
+from herokutl.utils import get_display_name
 
 from .. import loader, log, main, utils
 from .._internal import fw_protect, restart
@@ -465,7 +465,7 @@ class HerokuSettingsMod(loader.Module):
     async def inline__setting(self, call: InlineCall, key: str, state: bool = False):
         if callable(key):
             key()
-            hikkatl.extensions.html.CUSTOM_EMOJIS = not main.get_config_key(
+            herokutl.extensions.html.CUSTOM_EMOJIS = not main.get_config_key(
                 "disable_custom_emojis"
             )
         else:
@@ -520,6 +520,31 @@ class HerokuSettingsMod(loader.Module):
                 {
                     "text": self.strings("core_protection_btn"),
                     "callback": self._remove_core_protection,
+                },
+                {
+                    "text": self.strings("btn_no"),
+                    "action": "close",
+                },
+            ],
+        )
+
+    async def _enable_core_protection(self, call: InlineCall):
+        self._db.set(main.__name__, "remove_core_protection", False)
+        await call.edit(self.strings("core_protection_enabled"))
+
+    @loader.command()
+    async def enable_core_protection(self, message: Message):
+        if self._db.get(main.__name__, "remove_core_protection", True):
+            await utils.answer(message, self.strings("core_protection_already_enabled"))
+            return
+
+        await self.inline.form(
+            message=message,
+            text=self.strings("core_protection_confirm_e"),
+            reply_markup=[
+                {
+                    "text": self.strings("core_protection_e_btn"),
+                    "callback": self._enable_core_protection,
                 },
                 {
                     "text": self.strings("btn_no"),

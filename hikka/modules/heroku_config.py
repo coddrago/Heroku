@@ -10,7 +10,7 @@ import functools
 import typing
 from math import ceil
 
-from hikkatl.tl.types import Message
+from herokutl.tl.types import Message
 
 from .. import loader, translations, utils
 from ..inline.types import InlineCall
@@ -30,6 +30,16 @@ class HerokuConfigMod(loader.Module):
     """Interactive configurator for Hikka Userbot"""
 
     strings = {"name": "HerokuConfig"}
+
+    def __init__(self):
+        self.config = loader.ModuleConfig(
+            loader.ConfigValue(
+                "cfg_emoji",
+                "🪐",
+                "Change emoji when opening config",
+                validator=loader.validators.String(),
+            ),
+        )
 
     @staticmethod
     def prep_value(value: typing.Any) -> typing.Any:
@@ -967,8 +977,9 @@ class HerokuConfigMod(loader.Module):
     @loader.command(alias="cfg")
     async def configcmd(self, message: Message):
         args = utils.get_args_raw(message)
-        if self.lookup(args) and hasattr(self.lookup(args), "config"):
-            form = await self.inline.form("🪐", message, silent=True)
+        args_s = args.split()
+        if len(args_s) == 1 and self.lookup(args_s[0]) and hasattr(self.lookup(args_s[0]), 'config'):
+            form = await self.inline.form(self.config["cfg_emoji"], message, silent=True)
             mod = self.lookup(args)
             if isinstance(mod, loader.Library):
                 type_ = "library"
@@ -976,6 +987,20 @@ class HerokuConfigMod(loader.Module):
                 type_ = mod.__origin__.startswith("<core")
 
             await self.inline__configure(form, args, obj_type=type_)
+            return
+
+        if len(args_s) == 2 and self.lookup(args_s[0]) and hasattr(self.lookup(args_s[0]), 'config'):
+            form = await self.inline.form(self.config["cfg_emoji"], message, silent=True)
+            mod = self.lookup(args_s[0])
+            if isinstance(mod, loader.Library):
+                type_ = "library"
+            else:
+                type_ = mod.__origin__.startswith("<core")
+
+            if args_s[1] in mod.config.keys():
+                await self.inline__configure_option(form, args_s[0], args_s[1], obj_type=type_)
+            else:
+                await self.inline__configure(form, args, obj_type=type_)
             return
 
         await self.inline__choose_category(message)

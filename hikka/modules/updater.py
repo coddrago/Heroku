@@ -15,12 +15,12 @@ import typing
 
 import git
 from git import GitCommandError, Repo
-from hikkatl.extensions.html import CUSTOM_EMOJIS
-from hikkatl.tl.functions.messages import (
+from herokutl.extensions.html import CUSTOM_EMOJIS
+from herokutl.tl.functions.messages import (
     GetDialogFiltersRequest,
     UpdateDialogFilterRequest,
 )
-from hikkatl.tl.types import DialogFilter, Message
+from herokutl.tl.types import DialogFilter, Message
 
 from .. import loader, main, utils, version
 from .._internal import restart
@@ -31,19 +31,131 @@ logger = logging.getLogger(__name__)
 
 @loader.tds
 class UpdaterMod(loader.Module):
-    """Updates itself"""
+    """Updates itself, tracks latest Heroku releases, and notifies you, if update is required"""
 
     strings = {"name": "Updater"}
 
     def __init__(self):
+        self._notified = None
         self.config = loader.ModuleConfig(
             loader.ConfigValue(
                 "GIT_ORIGIN_URL",
                 "https://github.com/coddrago/Heroku",
                 lambda: self.strings("origin_cfg_doc"),
                 validator=loader.validators.Link(),
+            ),
+            loader.ConfigValue(
+                "disable_notifications",
+                doc=lambda: self.strings("_cfg_doc_disable_notifications"),
+                validator=loader.validators.Boolean(),
             )
         )
+
+    def get_changelog(self) -> str:
+        try:
+            repo = git.Repo()
+
+            for remote in repo.remotes:
+                remote.fetch()
+
+            if not (
+                diff := repo.git.log([f"HEAD..origin/{version.branch}", "--oneline"])
+            ):
+                return False
+        except Exception:
+            return False
+
+        res = "\n".join(
+            f"<b>{commit.split()[0]}</b>:"
+            f" <i>{utils.escape_html(' '.join(commit.split()[1:]))}</i>"
+            for commit in diff.splitlines()[:10]
+        )
+
+        if diff.count("\n") >= 10:
+            res += self.strings("more").format(len(diff.splitlines()) - 10)
+
+        return res
+
+    def get_latest(self) -> str:
+        try:
+            return next(
+                git.Repo().iter_commits(f"origin/{version.branch}", max_count=1)
+            ).hexsha
+        except Exception:
+            return ""
+
+    @loader.loop(interval=60, autostart=True)
+    async def poller(self):
+        if self.config["disable_notifications"] or not self.get_changelog():
+            return
+
+        self._pending = self.get_latest()
+
+        if (
+            self.get("ignore_permanent", False)
+            and self.get("ignore_permanent") == self._pending
+        ):
+            await asyncio.sleep(60)
+            return
+
+        if self._pending not in {utils.get_git_hash(), self._notified}:
+            m = await self.inline.bot.send_animation(
+                self.tg_id,
+                "https://t.me/hikari_assets/71",
+                caption=self.strings("update_required").format(
+                    utils.get_git_hash()[:6],
+                    '<a href="https://github.com/coddrago/Heroku/compare/{}...{}">{}</a>'.format(
+                        utils.get_git_hash()[:12],
+                        self.get_latest()[:12],
+                        self.get_latest()[:6],
+                    ),
+                    self.get_changelog(),
+                ),
+                reply_markup=self._markup(),
+            )
+
+            self._notified = self._pending
+            self.set("ignore_permanent", False)
+
+            await self._delete_all_upd_messages()
+
+            self.set("upd_msg", m.message_id)
+
+    async def _delete_all_upd_messages(self):
+        for client in self.allclients:
+            with contextlib.suppress(Exception):
+                await client.loader.inline.bot.delete_message(
+                    client.tg_id,
+                    client.loader.db.get("Updater", "upd_msg"),
+                )
+
+    @loader.callback_handler()
+    async def update_call(self, call: InlineCall):
+        """Process update buttons clicks"""
+        if call.data not in {"heroku/update", "heroku/ignore_upd"}:
+            return
+
+        if call.data == "heroku/ignore_upd":
+            self.set("ignore_permanent", self.get_latest())
+            await call.answer(self.strings("latest_disabled"))
+            return
+
+        await self._delete_all_upd_messages()
+
+        with contextlib.suppress(Exception):
+            await call.delete()
+
+        await self.invoke("update", "-f", peer=self.inline.bot_username)
+
+    @loader.command()
+    async def changelog(self, message: Message):
+        """Shows the changelog of the last major update"""
+        with open('CHANGELOG.md', mode='r', encoding='utf-8') as f:
+            changelog = f.read().split('##')[1].strip()
+        if (await self._client.get_me()).premium:
+            changelog.replace('🌑 Heroku', '<emoji document_id=5192765204898783881>🌘</emoji><emoji document_id=5195311729663286630>🌘</emoji><emoji document_id=5195045669324201904>🌘</emoji>')
+
+        await utils.answer(message, self.strings('changelog').format(changelog))
 
     @loader.command()
     async def restart(self, message: Message):
@@ -272,6 +384,18 @@ class UpdaterMod(loader.Module):
         )
 
     async def client_ready(self):
+        try:
+            git.Repo()
+        except Exception as e:
+            raise loader.LoadError("Can't load due to repo init error") from e
+
+        self._markup = lambda: self.inline.generate_markup(
+            [
+                {"text": self.strings("update"), "data": "heroku/update"},
+                {"text": self.strings("ignore"), "data": "heroku/ignore_upd"},
+            ]
+        )
+
         if self.get("selfupdatemsg") is not None:
             try:
                 await self.update_complete()
@@ -291,7 +415,7 @@ class UpdaterMod(loader.Module):
     async def _add_folder(self):
         folders = await self._client(GetDialogFiltersRequest())
 
-        if any(getattr(folder, "title", None) == "hikka" for folder in folders):
+        if any(getattr(folder, "title", None) == "heroku" for folder in folders):
             return
 
         try:
@@ -311,7 +435,7 @@ class UpdaterMod(loader.Module):
                     folder_id,
                     DialogFilter(
                         folder_id,
-                        title="hikka",
+                        title="heroku",
                         pinned_peers=(
                             [
                                 await self._client.get_input_entity(
@@ -340,7 +464,7 @@ class UpdaterMod(loader.Module):
                             and (
                                 dialog.entity.participants_count == 1
                                 or dialog.entity.participants_count == 2
-                                and dialog.name in {"hikka-logs", "silent-tags"}
+                                and dialog.name in {"heroku-logs", "silent-tags"}
                             )
                             or (
                                 self._client.loader.inline.init_complete
@@ -349,9 +473,8 @@ class UpdaterMod(loader.Module):
                             )
                             or dialog.entity.id
                             in [
-                                1554874075,
-                                1697279580,
-                                1679998924,
+                                2445389036,
+                                2341345589,
                                 2410964167,
                             ]  # official heroku chats
                         ],
@@ -430,3 +553,37 @@ class UpdaterMod(loader.Module):
             inline_message_id=ms,
             text=self.inline.sanitise_text(msg),
         )
+
+    @loader.command()
+    async def rollback(self, message: Message):
+        if not (args := utils.get_args_raw(message)).isdigit():
+            await utils.answer(message, self.strings('invalid_args'))
+            return
+        if int(args) > 10:
+            await utils.answer(message, self.strings('rollback_too_far'))
+            return
+        form = await self.inline.form(
+            message=message,
+            text=self.strings('rollback_confirm').format(num=args),
+            reply_markup=[
+                [
+                    {
+                        "text": "✅",
+                        "callback": self.rollback_confirm,
+                        "args": [args],
+                    }
+                ],
+                [
+                    {
+                        "text": "❌",
+                        "action": "close",
+                    }
+                ]
+            ]
+        )
+
+    async def rollback_confirm(self, call: InlineCall, number: int):
+        await utils.answer(call, self.strings('rollback_process').format(num=number))
+        await asyncio.create_subprocess_shell(f'git reset --hard HEAD~{number}', stdout=asyncio.subprocess.PIPE)
+        await self.restart_common(call)
+

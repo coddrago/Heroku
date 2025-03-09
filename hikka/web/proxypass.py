@@ -4,10 +4,12 @@
 # You can redistribute it and/or modify it under the terms of the GNU AGPLv3
 # 🔑 https://www.gnu.org/licenses/agpl-3.0.html
 
+import os
 import logging
 import typing
 from .ssh_tunnel import SSHTunnel
 from .cloudflare_tunnel import CloudflareTunnel
+
 
 logger = logging.getLogger(__name__)
 
@@ -38,6 +40,14 @@ class ProxyPasser:
         self.port = port
 
     async def get_url(self, timeout: float = 25) -> typing.Optional[str]:
+        
+        if "DOCKER" in os.environ:
+            # We're in a Docker container, so we can't use ssh
+            # Also, the concept of Docker is to keep
+            # everything isolated, so we can't proxy-pass to
+            # open web.
+            return None
+        
         for tunnel in self._tunnels:
             try:
                 await tunnel.start()

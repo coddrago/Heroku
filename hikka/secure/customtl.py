@@ -3,12 +3,12 @@ import logging
 import struct
 import time
 
-from hikkatl.errors import InvalidBufferError, SecurityError
-from hikkatl.extensions import BinaryReader
-from hikkatl.network.connection import ConnectionTcpFull as ConnectionTcpFullOrig
-from hikkatl.network.mtprotostate import MTProtoState as MTProtoStateOrig
-from hikkatl.tl.core import TLMessage
-from hikkatl.tl.types import BadMsgNotification, BadServerSalt
+from herokutl.errors import InvalidBufferError, SecurityError
+from herokutl.extensions import BinaryReader
+from herokutl.network.connection import ConnectionTcpFull as ConnectionTcpFullOrig
+from herokutl.network.mtprotostate import MTProtoState as MTProtoStateOrig
+from herokutl.tl.core import TLMessage
+from herokutl.tl.types import BadMsgNotification, BadServerSalt
 
 MSG_TOO_NEW_DELTA = 30
 MSG_TOO_OLD_DELTA = 300

@@ -6,6 +6,12 @@
 # You can redistribute it and/or modify it under the terms of the GNU AGPLv3
 # 🔑 https://www.gnu.org/licenses/agpl-3.0.html
 
+# ©️ Codrago, 2024-2025
+# This file is a part of Heroku Userbot
+# 🌐 https://github.com/coddrago/Heroku
+# You can redistribute it and/or modify it under the terms of the GNU AGPLv3
+# 🔑 https://www.gnu.org/licenses/agpl-3.0.html
+
 import ast
 import asyncio
 import contextlib
@@ -27,9 +33,9 @@ from importlib.machinery import ModuleSpec
 from urllib.parse import urlparse
 
 import requests
-from hikkatl.errors.rpcerrorlist import MediaCaptionTooLongError
-from hikkatl.tl.functions.channels import JoinChannelRequest
-from hikkatl.tl.types import Channel, Message, PeerUser
+from herokutl.errors.rpcerrorlist import MediaCaptionTooLongError
+from herokutl.tl.functions.channels import JoinChannelRequest
+from herokutl.tl.types import Channel, Message, PeerUser
 
 from .. import loader, main, utils
 from .._local_storage import RemoteStorage
@@ -89,6 +95,11 @@ class LoaderMod(loader.Module):
                 validator=loader.validators.Hidden(
                     loader.validators.RegExp(r"^.*:.*$")
                 ),
+            ),
+            loader.ConfigValue(
+                "command_emoji",
+                "<emoji document_id=5197195523794157505>▫️</emoji>",
+                lambda: "Emoji for command",
             ),
         )
 
@@ -472,7 +483,7 @@ class LoaderMod(loader.Module):
                 "💫 <b>Joined <a"
                 f' href="https://t.me/{channel.username}">{utils.escape_html(channel.title)}</a></b>'
             ),
-            photo="https://imgur.com/a/gWKLn7h.png",
+            photo="https://imgur.com/a/XpwmHo6.png",
         )
 
     async def load_module(
@@ -500,8 +511,8 @@ class LoaderMod(loader.Module):
                 await utils.answer(message, self.strings("inline_init_failed"))
             return
 
-        if re.search(r"# ?scope: ?hikka_min", doc):
-            ver = re.search(r"# ?scope: ?hikka_min ((?:\d+\.){2}\d+)", doc).group(1)
+        if re.search(r"# ?scope: ?heroku_min", doc):
+            ver = re.search(r"# ?scope: ?heroku_min ((?:\d+\.){2}\d+)", doc).group(1)
             ver_ = tuple(map(int, ver.split(".")))
             if main.__version__ < ver_:
                 if isinstance(message, Message):
@@ -620,7 +631,7 @@ class LoaderMod(loader.Module):
                         {
                             "sklearn": "scikit-learn",
                             "pil": "Pillow",
-                            "hikkatl": "Hikka-TL-New",
+                            "herokutl": "Hikka-TL-New",
                         }.get(e.name.lower(), e.name)
                     ]
 
@@ -643,8 +654,7 @@ class LoaderMod(loader.Module):
                         message,
                         self.strings("requirements_installing").format(
                             "\n".join(
-                                "<emoji"
-                                " document_id=4971987363145188045>▫️</emoji>"
+                                f"{self.config['command_emoji']}"
                                 f" {req}"
                                 for req in requirements
                             )
@@ -981,7 +991,7 @@ class LoaderMod(loader.Module):
             key=lambda x: x[0],
         ):
             modhelp += "\n{} <code>{}{}</code> {}".format(
-                "<emoji document_id=5197195523794157505>▫️</emoji>",
+                f"{self.config['command_emoji']}",
                 utils.escape_html(self.get_prefix()),
                 _name,
                 (

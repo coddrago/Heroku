@@ -159,16 +159,20 @@ heroku_settings:
   _cmd_doc_nonickuser: "Allow no nickname for certain user"
   _cmd_doc_nonickusers: "Returns the list of NoNick users"
   _cmd_doc_settings: "Show settings menu"
-  _cmd_doc_uninstall_hikka: "Uninstall Heroku"
+  _cmd_doc_uninstall_heroku: "Uninstall Heroku"
   _cmd_doc_watcherbl: "<module> - Toggle watcher in current chat"
   _cmd_doc_watcher: "<module> - Toggle global watcher rules\nArgs:\n[-c - only in chats]\n[-p - only in pm]\n[-o - only out]\n[-i - only incoming]"
   _cmd_doc_watchers: "List current watchers"
   _cmd_doc_weburl: "Opens web tunnel to your Heroku web interface"
   _cls_doc: "Advanced settings for Heroku Userbot"
   core_protection_already_removed: "<emoji document_id=6003424016977628379>🔒</emoji> <b>Core protection is already removed</b>"
+  core_protection_already_enabled: "<emoji document_id=6003424016977628379>🔒</emoji> <b>Core protection is already set up</b>"
   core_protection_confirm: "⚠️ <b>READ CAREFULLY!</b>\n\nBy removing core protection you confirm, that you know what is it and what is it for. In common life scenario you <b>don't need it</b>. If you're not a developer, you <b>don't need it</b>. If you're not sure, you <b>don't need it</b>.\n\n<b>Are you sure you want to remove core protection?</b>"
+  core_protection_confirm_e: "⚠️ <b>READ CAREFULLY!</b>\n\nBy restoring core protection you confirm, that you know what is it and what is it for. In common life scenario you <b>didn't need to remove it</b>. If you're not a developer, you <b>didn't need it</b>. If you're not sure, you <b>don't need it</b>.\n\n<b>Are you sure you want to restore core protection?</b>"
   core_protection_btn: "🔓 Remove core protection"
+  core_protection_e_btn: "🔓 Restore core protection"
   core_protection_removed: "🔓 <b>Core protection removed successfully</b>"
+  core_protection_enabled: "🔓 <b>Core protection enabled successfully</b>"
 
 terminal:
   name: "Terminal"
@@ -195,9 +199,9 @@ terminal:
 
 heroku_backup:
   name: "HerokuBackup"
-  period: "⌚️ <b>Unit «ALPHA»</b> creates database backups periodically. You can change this behavior later.\n\nPlease, select the periodicity of automatic database backups"
-  saved: "✅ Backup period saved. You can re-configure it later with .set_backup_period"
-  never: "✅ I will not make automatic backups. You can re-configure it later with .set_backup_period"
+  period: "⌚️ <b>Unit «ALPHA»</b> creates database backups periodically. You can change this behavior later.\n\nPlease, select the periodicity of automatic database backups.\n\n<b>🚫 It is therefore impossible to restore modules downloaded from files with the .lm command! Be careful and do .backupmods before restoring.</b>"
+  saved: "✅ Backup period saved. You can re-configure it later with <code>{prefix}set_backup_period</code>"
+  never: "✅ I will not make automatic backups. You can re-configure it later with <code>{prefix}set_backup_period</code>"
   invalid_args: "🚫 <b>Specify correct backup period in hours, or `0` to disable</b>"
   backup_caption: '<emoji document_id=5469718869536940860>👆</emoji> <b>This is your database backup. Do not give it to anyone, it contains personal info. If you need to restore it, you can use</b> <pre><code class="language-heroku">{prefix}restoredb</code></pre> <b>in reply to this file.</b>'
   reply_to_file: "<emoji document_id=5210952531676504517>🚫</emoji> <b>Reply to .json or .zip file</b>"
@@ -229,22 +233,20 @@ presets:
 
 settings:
   name: "Settings"
-  installation: '<emoji document_id=5363805650327450240>▪️</emoji> The installation is very easy! Just enter the following in your servers terminal:
-
-<pre><code class="language-bash">sudo apt update &amp;&amp; sudo apt upgrade -y &amp;&amp; sudo apt install git &amp;&amp; sudo apt install python3-pip &amp;&amp; git clone https://github.com/coddrago/Heroku &amp;&amp; cd Heroku &amp;&amp; pip install -r requirements.txt &amp;&amp; python3 -m hikka</code></pre>
-<emoji document_id=5299027123913105700>😐</emoji> If you dont have sudo access, simply remove the initial steps.
-
-<emoji document_id=5300777464820145682>🥳</emoji> Lets go over a few arguments:
-
-<emoji document_id=5787313834012184077>🔐</emoji> The <code>--root</code> argument allows you to run Heroku as a <b>root user</b>.
-
-<emoji document_id=5785209342986817408>🌎</emoji> The <code>--no-web</code> argument enables login to your account <b>directly in the terminal, rather than through a link</b> <code>{}.lhr.life</code>.
-
-<emoji document_id=5471895949804575096>🤲</emoji> However, if you want to migrate from hikariatama Hikka, download this module:
-
-<pre><code class="language-heroku">{prefix}dlm https://raw.githubusercontent.com/coddrago/modules/main/SwitchToHeroku.py</code></pre>
-
-It completely safe and will help you upgrade to Heroku automatically'
+  termux: "🕶 Termux"
+  vds: "💎 VDS"
+  railway: "🚂 RailWay"
+  jamhost: "🧃 JamHost"
+  module_switch: "📁 Module Switching"
+  userland: "🐧 UserLand"
+  choose_installation: "<emoji document_id=5363805650327450240>🪐</emoji> <b>Choose your Heroku installation option:</b>"
+  installation: "<emoji document_id=5363805650327450240>▪️</emoji> The installation is very easy! Just enter the following in your servers terminal:\n<pre><code class=\"language-bash\">sudo apt update &amp;&amp; sudo apt upgrade -y &amp;&amp; sudo apt install git &amp;&amp; sudo apt install python3-pip &amp;&amp; git clone https://github.com/coddrago/Heroku &amp;&amp; cd Heroku &amp;&amp; pip install -r requirements.txt &amp;&amp; python3 -m hikka</code></pre>\n<emoji document_id=5299027123913105700>😐</emoji> If you dont have sudo access, simply remove the initial steps.\n\n<emoji document_id=5300777464820145682>🥳</emoji> Lets go over a few arguments:\n\n<emoji document_id=5787313834012184077>🔐</emoji> The <code>--root</code> argument allows you to run Heroku as a <b>root user</b>.\n\n<emoji document_id=5785209342986817408>🌎</emoji> The <code>--no-web</code> argument enables login to your account <b>directly in the terminal, rather than through a link</b> <code>{}.lhr.life</code>.\n\n<emoji document_id=5471895949804575096>🤲</emoji> However, if you want to migrate from hikariatama Hikka, download this module:\n<pre><code class=\"language-heroku\">{prefix}dlm https://mods.codrago.top/SwitchToHeroku.py</code></pre>\nIt completely safe and will help you upgrade to Heroku automatically"
+  vds_install: "🪐 <b>Installation on 💎 VDS:</b>\n<pre><code class=\"language-bash\">sudo apt update &amp;&amp; sudo apt upgrade -y &amp;&amp; sudo apt install git &amp;&amp; sudo apt install python3-pip &amp;&amp; git clone https://github.com/coddrago/Heroku &amp;&amp; cd Heroku &amp;&amp; pip install -r requirements.txt &amp;&amp; python3 -m hikka</code></pre>"
+  termux_install: "🪐 <b>Installation on 🕶 Termux:</b>\n\n⬜️ <b>Download Termux from</b> <a href=\"https://f-droid.org/repo/com.termux_118.apk\"><b>the link</b></a><b>. ⚠️ The version from Play Market will not work!</b>\n<b>⬜️ Copy the command into it:</b> \n<pre><code class=\"language-bash\">termux-wake-lock &amp;&amp; export AIOHTTP_NO_EXTENSIONS=1 &amp;&amp; pkg upgr -y &amp;&amp; pkg install tur-repo &amp;&amp; pkg update &amp;&amp; pkg install python3.10 &amp;&amp; pkg i wget ncurses-utils python3.10 -y &amp;&amp; pkg update &amp;&amp; pkg install openssl -y &amp;&amp; pkg install git &amp;&amp; clear &amp;&amp; git clone https://github.com/coddrago/Heroku &amp;&amp; cd Heroku &amp;&amp; pip install -r requirements.txt &amp;&amp; python3.10 -m hikka --no-web</code></pre>\n\n⬜️ <b>Answer \"y\" to everything the script asks</b>\n⬜️ <b>Follow the instructions in the script.</b>\n\n⬜️ <b>Where to get API_ID and API_HASH?</b> 🎬 <a href=\"https://youtu.be/DcqDA249Lhg?t=24\">Video</a>"
+  railway_install: "🪐 <b>Installation on 🚂 RailWay:</b>\n\n<b>Link:</b>\nhttps://railway.com/template/2YO_QL?referralCode=RfzFur\n\n<i><u>Be careful! Any userbots are officially prohibited on RailWay, if your account is banned, neither the creator nor other people are to blame for this.</u></i>"
+  jamhost_install: "🪐 <b>Installation on 🧃 JamHost:</b>\n\n<b>Proceed to @jamhostbot, type </b><code>/pay</code><b> and follow its instructions.</b>"
+  module_switch_install: "<b>🪐 Installation via module:</b>\n\n<b>Download this module and it will do all the stuff for you.</b>\n<pre><code class=\"language-heroku\">dlm https://mods.codrago.top/SwitchToHeroku.py</code></pre>"
+  userland_install: "<b>🪐 Installation on 🐧 UserLAnd:\n\nInstall UserLAnd from</b> <a href=\"https://play.google.com/store/apps/details?id=tech.ula\">the link</a>\n\n<b>Open it, choose Ubuntu —&gt; Minimal —&gt; Terminal</b>\n\n<b>Wait for the distribution to install, you can pour some tea</b>\n\n<b>After successful installation, a terminal will open in front of you, write there:</b>\n<pre><code class=\"language-bash\">sudo apt update &amp;&amp; sudo apt upgrade -y &amp;&amp; sudo apt install python3 git python3-pip -y &amp;&amp; git clone https://github.com/coddrago/Heroku &amp;&amp; cd Heroku &amp;&amp; sudo pip install -r requirements.txt &amp;&amp; python3 -m hikka</code></pre>\n\n<b>At the end of the installation, a link will appear, follow it and enter your account details to log in.\n\nVoila! You have installed Heroku on UserLAnd.</b>"
   too_many_args: "<emoji document_id=5210952531676504517>🚫</emoji> <b>Too many args</b>"
   blacklisted: "<emoji document_id=5197474765387864959>👍</emoji> <b>Chat {} blacklisted from userbot</b>"
   unblacklisted: "<emoji document_id=5197474765387864959>👍</emoji> <b>Chat {} unblacklisted from userbot</b>"
@@ -262,7 +264,7 @@ It completely safe and will help you upgrade to Heroku automatically'
   alias_removed: "<emoji document_id=5197474765387864959>👍</emoji> <b>Alias</b> <code>{}</code> <b>removed</b>."
   no_alias: "<emoji document_id=5210952531676504517>🚫</emoji> <b>Alias</b> <code>{}</code> <b>does not exist</b>"
   db_cleared: "<emoji document_id=5197474765387864959>👍</emoji> <b>Database cleared</b>"
-  hikka: "{} <b>{}.{}.{}</b> <i>{}</i>\n\n<b><emoji document_id=5289608677244811430>📁</emoji> <b>Telethon:</b> <i>1.37.0</i>\n\n<emoji document_id=5228879218363872764>⌨</emoji> <b>Developer: t.me/codrago</b>\n<emoji document_id=5375368793209972850>🖋</emoji> <b>Designer: t.me/tr4mq</b>"
+  hikka: "{} <b>{}.{}.{}</b> <i>{}</i>\n\n<b><emoji document_id=5289608677244811430>📁</emoji> <b>heroku-tl:</b> <i>{}</i>\n\n<emoji document_id=5228879218363872764>⌨</emoji> <b>Developer: t.me/codrago</b>\n<emoji document_id=5375368793209972850>🖋</emoji> <b>Designer: t.me/tr4mq</b>"
   confirm_cleardb: "⚠️ <b>Are you sure, that you want to clear database?</b>"
   cleardb_confirm: "🗑 Clear database"
   cancel: "🚫 Cancel"
@@ -322,6 +324,7 @@ heroku_config:
 inline_stuff:
   name: "InlineStuff"
   bot_username_invalid: "<emoji document_id=5210952531676504517>🚫</emoji> <b>Specified bot username is invalid. It must end with</b> <code>bot</code> <b>and contain at least 4 symbols</b>"
+  token_invalid: "<emoji document_id=5210952531676504517>🚫</emoji> <b>Specified bot token is invalid. It must contain 8-10 numbers, </b><code>:</code> <b>and 34-36 symbols</b>"
   bot_username_occupied: "<emoji document_id=5210952531676504517>🚫</emoji> <b>This username is already occupied</b>"
   bot_updated: "<emoji document_id=6318792204118656433>🎉</emoji> <b>Config successfully saved. Restart userbot to apply changes</b>"
   this_is_hikka: "🪐 <b>Hi! This is Heroku — powerful modular Telegram userbot. You can install it to your account!</b>\n\n<b>🌍 <a href=\"https://github.com/coddrago/Heroku\">GitHub</a></b>\n<b>👥 <a href=\"https://t.me/heroku_talks\">Support chat</a></b>"
@@ -330,18 +333,19 @@ inline_stuff:
 
 test:
   name: "Tester"
-  set_loglevel: "<emoji document_id=5210952531676504517>🚫</emoji> <b>Please specify verbosity as an integer or string</b>"
-  no_logs: "<emoji document_id=5363948200291998612>🤷‍♀️</emoji> <b>You don't have any logs at verbosity</b> <code>{}</code><b>.</b>"
+  set_loglevel: "<emoji document_id=5355133243773435190>🚫</emoji> <b>Please specify verbosity as an integer or string</b>"
+  no_logs: "<emoji document_id=5355133243773435190>🤷‍♀️</emoji> <b>You don't have any logs at verbosity</b> <code>{}</code><b>.</b>"
   configping: "Your custom text. You can use placeholders: {ping} - That's your ping. {uptime} - It's your uptime. {ping_hint} - This is the same hint as in the heroku module, it is chosen with random chance, also you can specify this hint in the config. You can use the {hostname} placeholder if you need the hostname of your server"
   hint: "Set a hint"
   ping_emoji: "Emoji that appears when ping does not increase significantly"
-  logs_caption: "<emoji document_id=5188377234380954537>🪐</emoji> <b>Heroku logs with verbosity</b> <code>{}</code>\n\n<emoji document_id=6318902906900711458>⚪️</emoji> <b>Version: {}.{}.{}</b>{}"
+  banner_url: "Image for your ping, for example: https://imgur.com/a/dsh7Fvb.png"
+  logs_caption: "<emoji document_id=5350594756126721186>🪐</emoji> <b>Heroku logs with verbosity</b> <code>{}</code>\n\n<emoji document_id=5228879218363872764>⚪️</emoji> <b>Version: {}.{}.{}</b>{}"
   suspend_invalid_time: "<emoji document_id=5210952531676504517>🚫</emoji> <b>Invalid time to suspend</b>"
   suspended: "<emoji document_id=5452023368054216810>🥶</emoji> <b>Bot  suspended for {}</b>"
   confidential: "⚠️ <b>Log level</b> <code>{}</code> <b>may reveal your confidential info, be careful</b>"
   confidential_text: "⚠️ <b>Log level</b> <code>{0}</code> <b>may reveal your confidential info, be careful</b>\n<b>Type</b> <code>.logs {0} force_insecure</code> <b>to ignore this warning</b>"
   choose_loglevel: "💁‍♂️ <b>Choose log level</b>"
-  bad_module: "<emoji document_id=5210952531676504517>🚫</emoji> <b>Module not found</b>"
+  bad_module: "<emoji document_id=5355133243773435190>🚫</emoji> <b>Module not found</b>"
   debugging_enabled: "<emoji document_id=5332533929020761310>✅</emoji> <b>Debugging mode enabled for module</b> <code>{0}</code>\n<i>Go to directory named `debug_modules`, edit file named `{0}.py` and see changes in real time</i>"
   debugging_disabled: "<emoji document_id=5332533929020761310>✅</emoji> <b>Debugging disabled</b>"
   send_anyway: "📤 Send anyway"
@@ -355,24 +359,13 @@ test:
   _cmd_doc_suspend: "<time> - Suspends the bot for N seconds"
   _cls_doc: "Perform operations based on userbot self-testing"
 
-update_notifier:
-  name: "UpdateNotifier"
-  update_required: "🆕 <b>Heroku Update available!</b>\n\nNew Heroku version released.\n🔮 <b>Heroku <s>{}</s> -> {}</b>\n\n{}"
-  more: "\n<i><b>🎥 And {} more...</b></i>"
-  _cfg_doc_disable_notifications: "Disable update notifications"
-  latest_disabled: "Notifications about the latest update have been suppressed"
-  update: "🔄 Update"
-  ignore: "🚫 Ignore"
-  changelog: '<emoji document_id=5434144690511290129>📰</emoji> <b>Changelog of the last major update:</b><pre><code class="language-heroku">{}</code></pre>'
-  _cls_doc: "Tracks latest Heroku releases, and notifies you, if update is required"
-
 updater:
   name: "Updater"
-  source: "<emoji document_id=5456255401194429832>📖</emoji> <b>Read the source code from</b> <a href='{}'>here</a>"
-  restarting_caption: "<emoji document_id=5328274090262275771>🕗</emoji> <b>Your {} is restarting...</b>"
-  downloading: "<emoji document_id=5328274090262275771>🕗</emoji> <b>Downloading updates...</b>"
-  installing: "<emoji document_id=5328274090262275771>🕗</emoji> <b>Installing updates...</b>"
-  success: "<emoji document_id=5326015457155620929>⏱</emoji> <b>Restart successful! {}</b>\n<i>But still loading modules...</i>\n<i>Restart took {}s</i>"
+  source: "<emoji document_id=5208634061085492935>📖</emoji> <b>Read the source code from</b> <a href='{}'>here</a>"
+  restarting_caption: "<emoji document_id=5208622108191506906>🕗</emoji> <b>Your {} is restarting...</b>"
+  downloading: "<emoji document_id=5208622108191506906>🕗</emoji> <b>Downloading updates...</b>"
+  installing: "<emoji document_id=5208622108191506906>🕗</emoji> <b>Installing updates...</b>"
+  success: "<emoji document_id=5208661316947955396>⏱</emoji> <b>Restart successful! {}</b>\n<i>But still loading modules...</i>\n<i>Restart took {}s</i>"
   origin_cfg_doc: "Git origin URL, for where to update from"
   btn_restart: "🔄 Restart"
   btn_update: "🧭 Update"
@@ -382,12 +375,25 @@ updater:
   no_update: "🚸 <b>You are on the latest version, pull updates anyway?</b>"
   cancel: "🚫 Cancel"
   lavhost_update: "<emoji document_id=5469986291380657759>✌️</emoji> <b>Your {} is updating...</b>"
-  full_success: "<emoji document_id=5301096082674032190>👍</emoji> <b>Userbot is fully loaded! {}</b>\n<i>Full restart took {}s</i>"
+  full_success: "<emoji document_id=6028215594707324419>👍</emoji> <b>Userbot is fully loaded! {}</b>\n<i>Full restart took {}s</i>"
   secure_boot_complete: "<emoji document_id=5472308992514464048>🔐</emoji> <b>Secure boot completed! {}</b>\n<i>Restart took {}s</i>"
+  invalid_args: "<emoji document_id=5210952531676504517>🚫</emoji> <b>You must provide number of commits to rollback!</b>"
+  rollback_too_far: "<emoji document_id=5210952531676504517>🚫</emoji> <b>You're rolling back too far!</b>"
+  rollback_confirm: "❓ <b>Are you sure you want to rollback {num} commit(-s)?</b>"
+  rollback_process: "🕗 <b>Rolling {num} commits back...</b>"
   _cmd_doc_restart: "Restarts the userbot"
   _cmd_doc_source: "Links the source code of this project"
   _cmd_doc_update: "Downloads userbot updates"
-  _cls_doc: "Updates itself"
+  _cmd_doc_rollback: "Rollbacks userbot updates"
+  _cls_doc: "Updates itself, tracks latest Heroku releases, and notifies you, if update is required"
+  update_required: "🆕 <b>Heroku Update available!</b>\n\nNew Heroku version released.\n🔮 <b>Heroku <s>{}</s> -> {}</b>\n\n{}"
+  more: "\n<i><b>🎥 And {} more...</b></i>"
+  _cfg_doc_disable_notifications: "Disable update notifications"
+  latest_disabled: "Notifications about the latest update have been suppressed"
+  update: "🔄 Update"
+  ignore: "🚫 Ignore"
+  changelog: '<emoji document_id=5434144690511290129>📰</emoji> <b>Changelog of the last major update:</b><pre><code class="language-heroku">{}</code></pre>'
+
 
 api_protection:
   name: "APILimiter"
@@ -435,17 +441,19 @@ heroku_info:
   branch: "Branch"
   cpu_usage: "CPU usage"
   ram_usage: "RAM usage"
+  non_detectable: "<emoji document_id=5210952531676504517>❌</emoji> <b>This component cannot be detected on your server!</b>"
+  ping_emoji: "emoji for ping in your info"
   send_info: "Send userbot info"
   description: "ℹ This will not compromise any sensitive info"
   up-to-date: "<emoji document_id=5370699111492229743>😌</emoji> <b>Up-to-date</b>"
-  update_required: "<emoji document_id=5424728541650494040>😕</emoji> <b>Update required</b> <code>.update</code>"
+  update_required: "<emoji document_id=5424728541650494040>😕</emoji> <b>Update required</b> <code>{prefix}update</code>"
   setinfo_no_args: "<emoji document_id=5370881342659631698>😢</emoji> <b>You need to specify text to change info to</b>"
   setinfo_success: "<emoji document_id=5436040291507247633>🎉</emoji> <b>Info changed successfully</b>"
-  _cfg_cst_msg: "Custom message for info. May contain {me}, {version}, {build}, {prefix}, {platform}, {upd}, {uptime}, {cpu_usage}, {ram_usage}, {branch} keywords"
+  _cfg_cst_msg: "Custom message for info. May contain {me}, {version}, {build}, {prefix}, {platform}, {upd}, {uptime}, {cpu_usage}, {ram_usage}, {branch}, {hostname}, {user}, {os}, {kernel}, {cpu}, {ping} keywords"
   _cfg_cst_btn: "Custom button for info. Leave empty to remove button"
   _cfg_banner: "URL to image banner"
   desc: "<emoji document_id=5188377234380954537>🪐</emoji> <b>Userbot — what is it?</b>\n\n<emoji document_id=5472238129849048175>😎</emoji> A userbot refers to a <b>third-party program</b> that interacts with the Telegram API to perform <b>automated tasks on behalf of a user</b>. These userbots can be used to automate various tasks such as <b>sending messages, joining channels, downloading media, and much more</b>.\n\n<emoji document_id=5474667187258006816>😎</emoji> Userbots are different from regular Telegram bots as <b>they run on the user's account</b> rather than a bot account. This means that userbots can access more features and have greater flexibility in terms of the actions they can perform.\n\n<emoji document_id=5472267631979405211>🚫</emoji> However, it is important to note that <b>userbots are not officially supported by Telegram</b> and their use may violate the platform's terms of service. As such, <b>users should exercise caution when using userbots</b> and ensure that they are not being used for malicious purposes.\n\n"
-  _cmd_doc_hikkainfo: "Send info aka 'What is Heroku?'"
+  _cmd_doc_herokuinfo: "Send info aka 'What is Heroku?'"
   _cmd_doc_info: "Send userbot info"
   _cmd_doc_setinfo: "<text> - Change text in .info"
   _ihandle_doc_info: "Send userbot info"
@@ -489,7 +497,7 @@ loader:
   version_incompatible: "<emoji document_id=5454225457916420314>😖</emoji> <b>This module requires Heroku {}+\nPlease, update with</b> <code>.update</code>"
   ffmpeg_required: "<emoji document_id=5454225457916420314>😖</emoji> <b>This module requires FFMPEG, which is not installed</b>"
   developer: "\n\n<emoji document_id=5287454910059654880>🫶</emoji> <b>Developer:</b> {}"
-  depends_from: "\n\n<emoji document_id=5431736674147114227>📦</emoji> <b>Dependencies:</b> \n{}"
+  depends_from: "\n\n<emoji document_id=5341492148468465410>📦</emoji> <b>Dependencies:</b> \n{}"
   by: "by"
   module_fs: "💿 <b>Would you like to save this module to filesystem, so it won't get unloaded after restart?</b>"
   save: "💿 Save"
@@ -537,7 +545,7 @@ translations:
   lang_removed: "<emoji document_id=5197474765387864959>👍</emoji> <b>Translations reset to default ones</b>"
   check_pack: "<emoji document_id=5210952531676504517>🚫</emoji> <b>Invalid pack format in url</b>"
   check_url: "<emoji document_id=5210952531676504517>🚫</emoji> <b>You need to specify valid url containing a langpack</b>"
-  too_long: "<emoji document_id=5433653135799228968>📁</emoji> <b>Command output seems to be too long, so it's sent in file.</b>"
+  too_long: "<emoji document_id=5341492148468465410>📁</emoji> <b>Command output seems to be too long, so it's sent in file.</b>"
   choose_language: "🗽 <b>Choose language</b>"
   not_official: "<emoji document_id=5312383351217201533>⚠️</emoji> <b>This language is not officially supported</b>"
   requested_join: "💫 <b>Module</b> <code>{}</code> <b>requested to join channel <a href='https://t.me/{}'>{}</a></b>\n\n<b>❓ Reason:</b> <i>{}</i>"
@@ -572,8 +580,7 @@ translate:
 
 quickstart:
   name: "Quickstart"
-  base: "🪐🇬🇧 <b>Hello.</b> You've just installed <b>Heroku</b> userbot.\n\n❓ <b>Need help?</b> Feel free to join our support chat. We help <b>everyone</b>.\n\n📼 <b>You can find and install modules using </b><code>.heta</code><b>. Simply enter your search query and click ⛩ Install on needed module</b>\n\n📣 <b>Check out community made channels with modules: <a href=\"https://t.me/hikka_ub/126\">show</a></b>\n\n💁‍♀️ <b>Quickstart:</b>\n\n1️⃣ <b>Type</b> <code>.help</code> <b>to see modules list</b>\n2️⃣ <b>Type</b> <code>.help &lt;ModuleName/command&gt;</code> <b>to see help of module ModuleName</b>\n3️⃣ <b>Type</b> <code>.dlmod &lt;link&gt;</code> <b>to load module from link</b>\n4️⃣ <b>Type</b> <code>.loadmod</code> <b>with reply to file to install module from it</b>\n5️⃣ <b>Type</b> <code>.unloadmod &lt;ModuleName&gt;</code> <b>to unload module ModuleName</b>\n\n💡 <b>Heroku supports modules from Friendly-Telegram and GeekTG, as well as its own ones.</b>"
-  railway: "🚂 <b>Your userbot is installed on Railway</b>. This platform has only <b>500 free hours per month</b>. Once this limit is reached, your <b>Heroku will be frozen</b>. Next month <b>you will need to go to https://railway.app and restart it</b>."
+  base: "🪐 <b>Hello.</b> Your <b>Heroku</b> userbot is now installed.\n\n❓ <b>Need help?</b> Join <a href=\"https://t.me/heroku_talks\">our support chat</a>. We help <b>everyone</b>.\n\n💁‍♀️ <b>Quick Guide:</b>\n\n1️⃣ <b>Write</b> <code>.help</code> <b>to see the list of modules</b>\n2️⃣ <b>Write</b> <code>.help <Module name/command></code> <b>to see the description of the module</b>\n3️⃣ <b>Write</b> <code>.dlmod <link></code> <b>to load a module from a link</b>\n4️⃣ <b>Write</b> <code>.loadmod</code> <b>in response to a file to load a module from it</b>\n5️⃣ <b>Write</b> <code>.unloadmod <Module name></code> <b>to unload a module</b>\n\n💡 <b>Heroku supports modules from Hikka, Friendly-Telegram, and GeekTG, as well as its own.</b>\n"
   lavhost: "✌️ <b>Your userbot is installed on lavHost</b>. Make sure to join @lavhost for important notifications and updates. All questions regarding the platform should be asked in @lavhostchat."
   language_saved: "🇬🇧 Language saved!"
   language: "🇬🇧 English"

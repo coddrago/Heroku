@@ -1,4 +1,21 @@
 # Heroku Changelog
+## 🪐 Heroku 1.6.9
+
+- First sex with a designer
+- added banner to ping
+- added config for emoji in config (.cfg herokuconfig)
+- fixed close button in .update
+- added several variables to info ({os}, {kernel}, {cpu}, {ping})
+- added command to rollback updates
+- merged updater & update_notifier and translations
+- added command to change bot token (ch_bot_token)
+- added first official hosting (@jamhost)
+- fixed bug with reply in info
+- fixed bug with non-working .ping and .info on arch linux
+- updated .installation command
+- Telethon has been completely updated, moving to heroku-tl
+- new website: heroku.codrago.top
+
 ## 🪐 Heroku 1.6.8
 
 - Finally renamed to Heroku and new Emoji

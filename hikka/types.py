@@ -4,6 +4,12 @@
 # You can redistribute it and/or modify it under the terms of the GNU AGPLv3
 # 🔑 https://www.gnu.org/licenses/agpl-3.0.html
 
+# ©️ Codrago, 2024-2025
+# This file is a part of Heroku Userbot
+# 🌐 https://github.com/coddrago/Heroku
+# You can redistribute it and/or modify it under the terms of the GNU AGPLv3
+# 🔑 https://www.gnu.org/licenses/agpl-3.0.html
+
 
 import ast
 import asyncio
@@ -23,9 +29,9 @@ from dataclasses import dataclass, field
 from importlib.abc import SourceLoader
 
 import requests
-from hikkatl.hints import EntityLike
-from hikkatl.tl.functions.account import UpdateNotifySettingsRequest
-from hikkatl.tl.types import (
+from herokutl.hints import EntityLike
+from herokutl.tl.functions.account import UpdateNotifySettingsRequest
+from herokutl.tl.types import (
     Channel,
     ChannelFull,
     InputPeerNotifySettings,
@@ -330,7 +336,7 @@ class Module:
                 "✖️ <b>Declined joining <a"
                 f' href="https://t.me/{channel.username}">{utils.escape_html(channel.title)}</a></b>'
             ),
-            photo="https://imgur.com/a/gWKLn7h.png",
+            photo="https://imgur.com/a/XpwmHo6.png",
         )
 
     async def request_join(
@@ -382,7 +388,7 @@ class Module:
 
         await self.inline.bot.send_photo(
             self.tg_id,
-            "https://imgur.com/a/XpwmHo6.png",
+            "https://imgur.com/a/gWKLn7h.png",
             caption=(
                 self._client.loader.lookup("translations")
                 .strings("requested_join")

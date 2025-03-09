@@ -4,6 +4,12 @@
 # You can redistribute it and/or modify it under the terms of the GNU AGPLv3
 # 🔑 https://www.gnu.org/licenses/agpl-3.0.html
 
+# ©️ Codrago, 2024-2025
+# This file is a part of Heroku Userbot
+# 🌐 https://github.com/coddrago/Heroku
+# You can redistribute it and/or modify it under the terms of the GNU AGPLv3
+# 🔑 https://www.gnu.org/licenses/agpl-3.0.html
+
 import asyncio
 import collections
 import json
@@ -20,8 +26,8 @@ except ImportError as e:
 
 import typing
 
-from hikkatl.errors.rpcerrorlist import ChannelsTooMuchError
-from hikkatl.tl.types import Message, User
+from herokutl.errors.rpcerrorlist import ChannelsTooMuchError
+from herokutl.tl.types import Message, User
 
 from . import main, utils
 from .pointers import (
@@ -117,7 +123,7 @@ class Database(dict):
                 "heroku-assets",
                 "🌆 Your Heroku assets will be stored here",
                 archive=True,
-                avatar="https://raw.githubusercontent.com/coddrago/Heroku/refs/heads/master/assets/heroku-assets.png"
+                avatar="https://raw.githubusercontent.com/coddrago/Heroku/dev-test/assets/heroku-assets.png"
             )
         except ChannelsTooMuchError:
             self._assets = None

@@ -77,26 +77,27 @@ class Web:
         self.api_set = asyncio.Event()
         self.clients_set = asyncio.Event()
 
+    async def schedule_restart():
+        # Yeah-yeah, ikr, but it's the only way to restart
+        await asyncio.sleep(1)
+        restart()
+
     @property
     def _platform_emoji(self) -> str:
         return {
-            "vds": "https://github.com/iamcal/emoji-data/raw/master/img-apple-64/1fa90.png",
+            "vds": "https://github.com/hikariatama/assets/raw/master/waning-crescent-moon_1f318.png",
             "lavhost": "https://github.com/hikariatama/assets/raw/master/victory-hand_270c-fe0f.png",
             "termux": "https://github.com/hikariatama/assets/raw/master/smiling-face-with-sunglasses_1f60e.png",
             "docker": "https://github.com/hikariatama/assets/raw/master/spouting-whale_1f433.png",
-        }[
-            (
-                "lavhost"
-                if "LAVHOST" in os.environ
-                else (
-                    "termux"
-                    if "com.termux" in os.environ.get("PREFIX", "")
-                    else "docker"
-                    if "DOCKER" in os.environ
-                    else "vds"
-                )
+        }[(
+            "lavhost"
+            if "LAVHOST" in os.environ
+            else (
+                "termux"
+                if "com.termux" in os.environ.get("PREFIX", "")
+                else "docker" if "DOCKER" in os.environ else "vds"
             )
-        ]
+        )]
 
     @aiohttp_jinja2.template("root.jinja2")
     async def root(self, _):
@@ -241,7 +242,13 @@ class Web:
 
     async def init_qr_login(self, request: web.Request) -> web.Response:
         if self.client_data and "LAVHOST" in os.environ:
-            return web.Response(status=403, body="Forbidden by host EULA")
+            return web.Response(status=403, body="Forbidden by LavHost EULA")
+
+        if "JAMHOST" in os.environ:
+            return web.Response(status=403, body="Forbidden by JamHost EULA")
+
+        if "HIKKAHOST" in os.environ:
+            return web.Response(status=403, body="Forbidden by HikkaHost EULA")
 
         if not self._check_session(request):
             return web.Response(status=401)
@@ -273,7 +280,10 @@ class Web:
             if self._2fa_needed:
                 return web.Response(status=403, body="2FA")
 
-            await main.hikka.save_client_session(self._pending_client)
+            await main.hikka.save_client_session(
+                self._pending_client, delay_restart=True
+            )
+            asyncio.ensure_future(self.schedule_restart())
             return web.Response(status=200, body="SUCCESS")
 
         if self._qr_login is None:
@@ -296,7 +306,7 @@ class Web:
             proxy=self.proxy,
             connection_retries=None,
             device_model=main.get_app_name(),
-            system_version=main.generate_random_system_version(),
+            system_version="Windows 10",
             app_version=".".join(map(str, __version__)) + " x64",
             lang_code="en",
             system_lang_code="en-US",
@@ -314,6 +324,12 @@ class Web:
 
         if self.client_data and "LAVHOST" in os.environ:
             return web.Response(status=403, body="Forbidden by host EULA")
+
+        if "JAMHOST" in os.environ:
+            return web.Response(status=403, body="Forbidden by JamHost EULA")
+
+        if "HIKKAHOST" in os.environ:
+            return web.Response(status=403, body="Forbidden by HikkaHost EULA")
 
         if self._pending_client:
             return web.Response(status=208, body="Already pending")
@@ -388,7 +404,8 @@ class Web:
             )
 
         logger.debug("2FA code accepted, logging in")
-        await main.hikka.save_client_session(self._pending_client)
+        await main.hikka.save_client_session(self._pending_client, delay_restart=True)
+        asyncio.ensure_future(self.schedule_restart())
         return web.Response()
 
     async def tg_code(self, request: web.Request) -> web.Response:
@@ -447,7 +464,8 @@ class Web:
                     body=(self._render_fw_error(e)),
                 )
 
-        await main.hikka.save_client_session(self._pending_client)
+        await main.hikka.save_client_session(self._pending_client, delay_restart=True)
+        asyncio.ensure_future(self.schedule_restart())
         return web.Response()
 
     async def finish_login(self, request: web.Request) -> web.Response:
@@ -533,7 +551,7 @@ class Web:
                 msg = await bot.send_message(
                     user[1].tg_id,
                     (
-                        "🪐🔐 <b>Click button below to confirm web application"
+                        "🌘🔐 <b>Click button below to confirm web application"
                         f" ops</b>\n\n<b>Client IP</b>: {ips}\n{cities}\n<i>If you did"
                         " not request any codes, simply ignore this message</i>"
                     ),

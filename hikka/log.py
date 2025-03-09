@@ -1,9 +1,14 @@
 """Main logging part"""
 
-# пасхалка номер 3
 # ©️ Dan Gazizullin, 2021-2023
 # This file is a part of Hikka Userbot
 # 🌐 https://github.com/hikariatama/Hikka
+# You can redistribute it and/or modify it under the terms of the GNU AGPLv3
+# 🔑 https://www.gnu.org/licenses/agpl-3.0.html
+
+# ©️ Codrago, 2024-2025
+# This file is a part of Heroku Userbot
+# 🌐 https://github.com/coddrago/Heroku
 # You can redistribute it and/or modify it under the terms of the GNU AGPLv3
 # 🔑 https://www.gnu.org/licenses/agpl-3.0.html
 
@@ -19,8 +24,9 @@ import traceback
 import typing
 from logging.handlers import RotatingFileHandler
 
-import hikkatl
+import herokutl
 from aiogram.utils.exceptions import NetworkError
+from herokutl.errors import PersistentTimestampOutdatedError
 
 from . import utils
 from .tl_cache import CustomTelegramClient
@@ -66,8 +72,10 @@ linecache.getlines = getlines
 
 def override_text(exception: Exception) -> typing.Optional[str]:
     """Returns error-specific description if available, else `None`"""
-    if isinstance(exception, NetworkError):
+    if isinstance(exception, (NetworkError, asyncio.exceptions.TimeoutError)):
         return "✈️ <b>You have problems with internet connection on your server.</b>"
+    elif isinstance(exception, PersistentTimestampOutdatedError):
+        return "✈️ <b>Telegram has problems with their datacenters.</b>"
 
     return None
 
@@ -109,7 +117,7 @@ class HikkaException:
                             dictionary[key] = "<Database>"
                         elif isinstance(
                             value,
-                            (hikkatl.TelegramClient, CustomTelegramClient),
+                            (herokutl.TelegramClient, CustomTelegramClient),
                         ):
                             dictionary[key] = f"<{value.__class__.__name__}>"
                         elif len(str(value)) > 512:
@@ -270,7 +278,7 @@ class TelegramLogsHandler(logging.Handler):
     ):
         chunks = item.message + "\n\n<b>🪐 Full traceback:</b>\n" + item.full_stack
 
-        chunks = list(utils.smart_split(*hikkatl.extensions.html.parse(chunks), 4096))
+        chunks = list(utils.smart_split(*herokutl.extensions.html.parse(chunks), 4096))
 
         await call.edit(
             chunks[0],
@@ -527,7 +535,7 @@ def init():
         TelegramLogsHandler((handler, rotating_handler), 7000)
     )
     logging.getLogger().setLevel(logging.NOTSET)
-    logging.getLogger("hikkatl").setLevel(logging.WARNING)
+    logging.getLogger("herokutl").setLevel(logging.WARNING)
     logging.getLogger("matplotlib").setLevel(logging.WARNING)
     logging.getLogger("aiohttp").setLevel(logging.WARNING)
     logging.getLogger("aiogram").setLevel(logging.WARNING)

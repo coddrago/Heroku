@@ -16,16 +16,20 @@
 #    You should have received a copy of the GNU Affero General Public License
 #    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-
 # ©️ Dan Gazizullin, 2021-2023
 # This file is a part of Hikka Userbot
 # 🌐 https://github.com/hikariatama/Hikka
 # You can redistribute it and/or modify it under the terms of the GNU AGPLv3
 # 🔑 https://www.gnu.org/licenses/agpl-3.0.html
 
+# ©️ Codrago, 2024-2025
+# This file is a part of Heroku Userbot
+# 🌐 https://github.com/coddrago/Heroku
+# You can redistribute it and/or modify it under the terms of the GNU AGPLv3
+# 🔑 https://www.gnu.org/licenses/agpl-3.0.html
+
 import argparse
 import asyncio
-import socket
 import collections
 import contextlib
 import importlib
@@ -41,9 +45,10 @@ import typing
 from getpass import getpass
 from pathlib import Path
 
-import hikkatl
-from hikkatl import events
-from hikkatl.errors import (
+import aiohttp
+import herokutl
+from herokutl import events
+from herokutl.errors import (
     ApiIdInvalidError,
     AuthKeyDuplicatedError,
     FloodWaitError,
@@ -51,14 +56,14 @@ from hikkatl.errors import (
     PhoneNumberInvalidError,
     SessionPasswordNeededError,
 )
-from hikkatl.network.connection import (
+from herokutl.network.connection import (
     ConnectionTcpFull,
     ConnectionTcpMTProxyRandomizedIntermediate,
 )
-from hikkatl.password import compute_check
-from hikkatl.sessions import MemorySession, SQLiteSession
-from hikkatl.tl.functions.account import GetPasswordRequest
-from hikkatl.tl.functions.auth import CheckPasswordRequest
+from herokutl.password import compute_check
+from herokutl.sessions import MemorySession, SQLiteSession
+from herokutl.tl.functions.account import GetPasswordRequest
+from herokutl.tl.functions.auth import CheckPasswordRequest
 
 from . import database, loader, utils, version
 from ._internal import print_banner, restart
@@ -96,10 +101,10 @@ IS_HIKKAHOST = "HIKKAHOST" in os.environ
 IS_ORACLE = "ORACLE_OS" in os.environ
 IS_AWS = "AWS_OS" in os.environ
 IS_SERV00 = "serv00" in socket.gethostname()
-IS_TOTHOST = "TOTHOST" in os.environ
 IS_AEZA = "aeza" in socket.gethostname()
-IS_DJHOST = "IS_DJHOST" in os.environ
-IS_USERLAND = "userland" in os.environ
+IS_TOTHOST = "TOTHOST" in os.environ
+IS_USERLAND = "userland" in os.environ.get("USER", "")
+IS_JAMHOST = "JAMHOST" in os.environ
 IS_WSL = False
 with contextlib.suppress(Exception):
     from platform import uname
@@ -175,16 +180,26 @@ def generate_random_system_version():
     :example: "Windows 10.0.19042.1234" or "Ubuntu 20.04.19042.1234"
     """
     os_choices = [
-        ("Windows Vista", "Vista"),
-        ("Windows XP", "XP"),
-        ("Windows 7", "7"),
-        ("Windows 8", "8"),
-        ("Windows 10", "10"),
+        ("Windows", "Vista"),
+        ("Windows", "XP"),
+        ("Windows", "7"),
+        ("Windows", "8"),
+        ("Windows", "10"),
         ("Ubuntu", "20.04"),
         ("Debian", "10"),
         ("Fedora", "33"),
         ("Arch Linux", "2021.05"),
         ("CentOS", "8"),
+        ("NixOS", "23.05"),
+        ("Puppy Linux", "9.5"),
+        ("Alpine Linux", "3.18.0"),
+        ("Android", "14"),
+        ("Android", "15"),
+        ("Android", "13"),
+        ("Solus", "4.4"),
+        ("Gentoo", "2023.0"),
+        ("Void Linux", "2023-07-01"),
+        ("IOS", "18.0.1"),
     ]
     os_name, os_version = random.choice(os_choices)
 
@@ -793,6 +808,18 @@ class Hikka:
             client._tg_id = me.id
             client.tg_id = me.id
             client.hikka_me = me
+
+            async with aiohttp.ClientSession() as session:
+                async with session.get("https://mods.codrago.top/ids/allowed_ids.txt") as response:
+                    if response.status == 200:
+                        content = await response.text()
+                        allowed_ids = [int(line.strip()) for line in content.split('\n') if line.strip()]
+                    else:
+                        logging.error(f"Exception on loading allowed beta testers ids: {response.status}")
+                        return []
+
+            await asyncio.gather(*[version.check_branch(client.tg_id, allowed_ids) for client in self.clients])
+
             while await self.amain(first, client):
                 first = False
 
@@ -967,6 +994,6 @@ class Hikka:
         self.loop.close()
 
 
-hikkatl.extensions.html.CUSTOM_EMOJIS = not get_config_key("disable_custom_emojis")
+herokutl.extensions.html.CUSTOM_EMOJIS = not get_config_key("disable_custom_emojis")
 
 hikka = Hikka()

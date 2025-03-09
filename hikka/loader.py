@@ -6,6 +6,12 @@
 # You can redistribute it and/or modify it under the terms of the GNU AGPLv3
 # 🔑 https://www.gnu.org/licenses/agpl-3.0.html
 
+# ©️ Codrago, 2024-2025
+# This file is a part of Heroku Userbot
+# 🌐 https://github.com/coddrago/Heroku
+# You can redistribute it and/or modify it under the terms of the GNU AGPLv3
+# 🔑 https://www.gnu.org/licenses/agpl-3.0.html
+
 import asyncio
 import builtins
 import contextlib
@@ -24,7 +30,7 @@ from pathlib import Path
 from types import FunctionType
 from uuid import uuid4
 
-from hikkatl.tl.tlobject import TLObject
+from herokutl.tl.tlobject import TLObject
 
 from . import security, utils, validators
 from .database import Database
@@ -138,7 +144,9 @@ native_import = builtins.__import__
 
 def patched_import(name: str, *args, **kwargs):
     if name.startswith("telethon"):
-        return native_import("hikkatl" + name[8:], *args, **kwargs)
+        return native_import("herokutl" + name[8:], *args, **kwargs)
+    elif name.startswith("hikkatl"):
+        return native_import("herokutl" + name[7:], *args, **kwargs)
 
     return native_import(name, *args, **kwargs)
 

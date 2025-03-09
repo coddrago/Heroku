@@ -84,8 +84,17 @@ class Web(root.Web):
                 url = await self.proxypasser.get_url(timeout=10)
 
         if not url:
-            # вырезана проверка на докер
-            ip = "127.0.0.1"
+            ip = (
+                "127.0.0.1"
+                if "DOCKER" not in os.environ
+                else subprocess.run(
+                    ["hostname", "-i"],
+                    stdout=subprocess.PIPE,
+                    check=True,
+                )
+                .stdout.decode("utf-8")
+                .strip()
+            )
 
             url = f"http://{ip}:{self.port}"
 

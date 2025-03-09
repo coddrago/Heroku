@@ -22,14 +22,20 @@
 # You can redistribute it and/or modify it under the terms of the GNU AGPLv3
 # 🔑 https://www.gnu.org/licenses/agpl-3.0.html
 
+# ©️ Codrago, 2024-2025
+# This file is a part of Heroku Userbot
+# 🌐 https://github.com/coddrago/Heroku
+# You can redistribute it and/or modify it under the terms of the GNU AGPLv3
+# 🔑 https://www.gnu.org/licenses/agpl-3.0.html
+
 import logging
 import time
 import typing
 
-from hikkatl.hints import EntityLike
-from hikkatl.tl.functions.messages import GetFullChatRequest
-from hikkatl.tl.types import ChatParticipantAdmin, ChatParticipantCreator, Message
-from hikkatl.utils import get_display_name
+from herokutl.hints import EntityLike
+from herokutl.tl.functions.messages import GetFullChatRequest
+from herokutl.tl.types import ChatParticipantAdmin, ChatParticipantCreator, Message
+from herokutl.utils import get_display_name
 
 from . import main, utils
 from .database import Database
@@ -385,6 +391,9 @@ class SecurityManager:
 
         if not user_id:
             user_id = message.sender_id
+
+        if not user_id:
+            user_id = message.peer_id
 
         is_channel = False
 

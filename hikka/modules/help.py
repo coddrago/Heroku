@@ -9,8 +9,8 @@ import difflib
 import inspect
 import logging
 
-from hikkatl.extensions.html import CUSTOM_EMOJIS
-from hikkatl.tl.types import Message
+from herokutl.extensions.html import CUSTOM_EMOJIS
+from herokutl.tl.types import Message
 
 from .. import loader, utils
 
@@ -44,6 +44,11 @@ class Help(loader.Module):
                 "desc_icon",
                 "<emoji document_id=5188377234380954537>🪐</emoji>",
                 lambda: "Desc emoji",
+            ),
+            loader.ConfigValue(
+                "command_emoji",
+                "<emoji document_id=5197195523794157505>▫️</emoji>",
+                lambda: "Emoji for command",
             ),
         )
 
@@ -170,7 +175,7 @@ class Help(loader.Module):
 
         for name, fun in commands.items():
             reply += (
-                "\n<emoji document_id=5197195523794157505>▫️</emoji>"
+                f'\n{self.config["command_emoji"]}'
                 " <code>{}{}</code>{} {}".format(
                     utils.escape_html(self.get_prefix()),
                     name,
