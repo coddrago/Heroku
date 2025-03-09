@@ -49,7 +49,7 @@ class Web(root.Web):
         self.ready = asyncio.Event()
         self.client_data = {}
         self.app = web.Application()
-        self.proxypasser = proxypass.ProxyPasser()
+        self.proxypasser = None
         aiohttp_jinja2.setup(
             self.app,
             filters={"getdoc": inspect.getdoc, "ascii": ascii},
@@ -81,10 +81,7 @@ class Web(root.Web):
 
         if proxy_pass:
             with contextlib.suppress(Exception):
-                url = await asyncio.wait_for(
-                    self.proxypasser.get_url(self.port),
-                    timeout=10,
-                )
+                url = await self.proxypasser.get_url(timeout=10)
 
         if not url:
             # вырезана проверка на докер
@@ -100,6 +97,7 @@ class Web(root.Web):
         await self.runner.setup()
         self.port = os.environ.get("PORT", port)
         site = web.TCPSite(self.runner, None, self.port)
+        self.proxypasser = proxypass.ProxyPasser(port=self.port)
         await site.start()
 
         await self.get_url(proxy_pass)
