@@ -15,7 +15,7 @@ RUN git clone https://github.com/coddrago/Heroku /Heroku
 # Создаем виртуальное окружение Python
 RUN python -m venv /venv
 # Устанавливаем зависимости проекта
-RUN /venv/bin/pip install --no-warn-script-location --no-cache-dir -r /Hikka/requirements.txt
+RUN /venv/bin/pip install --no-warn-script-location --no-cache-dir -r /Heroku/requirements.txt
 
 # -------------------------------
 # Используем другой базовый образ для финального контейнера
