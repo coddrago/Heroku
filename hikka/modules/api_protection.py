@@ -101,17 +101,15 @@ class APIRatelimiterMod(loader.Module):
                         "importChatInvite",
                     ]
                 ),
-                on_change=lambda: self._client.forbid_constructors(
-                    map(
-                        lambda x: CONSTRUCTORS[x],
-                        self.config["forbidden_constructors"],
-                    )
-                ),
+                on_change=self.on_forbidden_methods_update
             ),
         )
 
     async def client_ready(self):
         asyncio.ensure_future(self._install_protection())
+    
+    async def on_forbidden_methods_update(self):
+        self._client.forbid_constructors(list(map(lambda x: CONSTRUCTORS[x], self.config['forbidden_methods'], )))
 
     async def _install_protection(self):
         await asyncio.sleep(30)  # Restart lock
