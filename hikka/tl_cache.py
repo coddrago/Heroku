@@ -685,23 +685,25 @@ class CustomTelegramClient(TelegramClient):
             flood_sleep_threshold,
         )
 
+    def _internal_forbid_ctor(self, constructors: list):
+        self._forbidden_constructors.extend(constructors)
+        self._forbidden_constructors = list(set(self._forbidden_constructors))
+
     def forbid_constructor(self, constructor: int):
         """
         Forbids the given constructor to be called
 
         :param constructor: Constructor id to forbid
         """
-        self._forbidden_constructors.extend([constructor])
-        self._forbidden_constructors = list(set(self._forbidden_constructors))
+        self._internal_forbid_ctor([constructor])
 
     def forbid_constructors(self, constructors: list):
         """
         Forbids the given constructors to be called.
-        All existing forbidden constructors will be removed
 
         :param constructors: Constructor ids to forbid
         """
-        self._forbidden_constructors = list(set(constructors))
+        self._internal_forbid_ctor(constructors)
 
     def _handle_update(
         self: "CustomTelegramClient",
