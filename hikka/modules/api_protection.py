@@ -45,19 +45,12 @@ GROUPS = [
 
 
 CONSTRUCTORS = {
-    (lambda x: x[0].lower() + x[1:])(
-        method.__class__.__name__.rsplit("Request", 1)[0]
-    ): method.CONSTRUCTOR_ID
-    for method in utils.array_sum(
-        [
-            [
-                method
-                for method in dir(getattr(functions, group))
-                if isinstance(method, TLRequest)
-            ]
-            for group in GROUPS
-        ]
-    )
+    (entity_name[0].lower() + entity_name[1:]).rsplit("Request", 1)[0]: getattr(cur_entity, "CONSTRUCTOR_ID")
+    for group in GROUPS
+    for entity_name in dir(getattr(functions, group))
+    if hasattr((cur_entity := getattr(getattr(functions, group), entity_name)), "__bases__") 
+       and TLRequest in cur_entity.__bases__ 
+       and hasattr(cur_entity, "CONSTRUCTOR_ID")
 }
 
 
