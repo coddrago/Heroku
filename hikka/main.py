@@ -400,7 +400,7 @@ def raise_auth():
     raise InteractiveAuthRequired()
 
 
-class Hikka:
+class Heroku:
     """Main userbot instance, which can handle multiple clients"""
 
     def __init__(self):
@@ -551,7 +551,7 @@ class Hikka:
         session = SQLiteSession(
             os.path.join(
                 BASE_DIR,
-                f"hikka-{telegram_id}",
+                f"heroku-{telegram_id}",
             )
         )
 
@@ -996,4 +996,4 @@ class Hikka:
 
 herokutl.extensions.html.CUSTOM_EMOJIS = not get_config_key("disable_custom_emojis")
 
-hikka = Hikka()
+hikka = Heroku()
