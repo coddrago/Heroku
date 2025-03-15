@@ -457,7 +457,7 @@ class Heroku:
                 )
             )
             for session in filter(
-                lambda f: f.startswith("hikka-") and f.endswith(".session"),
+                lambda f: f.startswith("heroku-") and f.endswith(".session"),
                 os.listdir(BASE_DIR),
             )
         ]
