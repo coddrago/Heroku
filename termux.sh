@@ -24,7 +24,7 @@ printf "\r\033[K\033[0;32mPillow installed!\e[0m\n"
 echo -e "\033[0;96mDownloading source code...\033[0m"
 
 eval "rm -rf ~/Heroku 2>/dev/null"
-eval "cd && git clone https://github.com/coddrago/Heroku && cd Heroku"
+eval "export AIOHTTP_NO_EXTENSIONS=1 && cd && git clone https://github.com/coddrago/Heroku && cd Heroku"
 
 echo -e "\033[0;96mSource code downloaded!...\033[0m\n"
 printf "\r\033[0;34mInstalling requirements...\e[0m"
