@@ -818,7 +818,7 @@ class Heroku:
                         logging.error(f"Exception on loading allowed beta testers ids: {response.status}")
                         return []
 
-            await asyncio.gather(*[version.check_branch(client.tg_id, allowed_ids) for client in self.clients])
+            await asyncio.gather(*[version.check_branch((await client.get_me()).id, allowed_ids) for client in self.clients])
 
             while await self.amain(first, client):
                 first = False
