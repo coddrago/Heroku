@@ -128,9 +128,14 @@ Check out <a href="https://heroku.codrago.top/">heroku.codrago.top</a> for users
 
 <ul>
     <li><a href="https://gitlab.com/hackintosh5">Hackintosh5</a> for FTG, which is the base of project</li>
-    <li><a href="https://t.me/kazunimo">Kazunimo</a> for Turkish translation pack</li>
-    <li><a href="https://t.me/hegaNET">Hegakura</a> for Tatar translation pack</li>
-    <li><a href="https://t.me/tiefeschwarz">Aldehydesäure</a> for German translation pack</li>
-    <li><a href="https://t.me/amorescam">Amore</a> for Uzbek translation pack</li>
-    <li><a href="https://t.me/lonami">Lonami</a> for Telethon, which is the base of Hikka-TL</li>
+    <li><a href="https://t.me/GunyaKshin">Codwiz</a> for Ukrainian translation pack</li>
+    <li><a href="https://t.me/thisLyomi">Lyomi</a> for German translation pack</li>
+    <li><a href="https://t.me/lonami">Lonami</a> for Telethon, which is the base of Heroku-TL</li>
 </ul>
+
+<hr>
+<h2>Sponsors: </h2>
+<p align="center">
+    <img src="assets/aeza.svg" width="300" height="60">
+</p>
+<p align="center">Developed with support of <a href="https://aeza.net/?ref=herokugh">aeza.net</a></p>
