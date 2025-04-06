@@ -1,4 +1,4 @@
-heroku-tl-new==3.4.4
+heroku-tl-new==3.4.5
 pycloudflared==0.2.0
 
 # Python 3.9+
