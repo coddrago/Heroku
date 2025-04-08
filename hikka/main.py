@@ -40,10 +40,10 @@ import sys
 import typing
 from getpass import getpass
 from pathlib import Path
+from hikka.extensions.html import CUSTOM_EMOJIS
 
-import hikkatl
-from hikkatl import events
-from hikkatl.errors import (
+from telethon import events
+from telethon.errors import (
     ApiIdInvalidError,
     AuthKeyDuplicatedError,
     FloodWaitError,
@@ -51,14 +51,14 @@ from hikkatl.errors import (
     PhoneNumberInvalidError,
     SessionPasswordNeededError,
 )
-from hikkatl.network.connection import (
+from telethon.network.connection import (
     ConnectionTcpFull,
     ConnectionTcpMTProxyRandomizedIntermediate,
 )
-from hikkatl.password import compute_check
-from hikkatl.sessions import MemorySession, SQLiteSession
-from hikkatl.tl.functions.account import GetPasswordRequest
-from hikkatl.tl.functions.auth import CheckPasswordRequest
+from telethon.password import compute_check
+from telethon.sessions import MemorySession, SQLiteSession
+from telethon.tl.functions.account import GetPasswordRequest
+from telethon.tl.functions.auth import CheckPasswordRequest
 
 from . import database, loader, utils, version
 from ._internal import print_banner, restart
@@ -967,6 +967,6 @@ class Hikka:
         self.loop.close()
 
 
-hikkatl.extensions.html.CUSTOM_EMOJIS = not get_config_key("disable_custom_emojis")
+CUSTOM_EMOJIS = not get_config_key("disable_custom_emojis")
 
 hikka = Hikka()

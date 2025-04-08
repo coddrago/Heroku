@@ -3,7 +3,7 @@ import logging
 import re
 from pathlib import Path
 
-from hikkatl.sessions import SQLiteSession
+from telethon.sessions import SQLiteSession
 
 from ..tl_cache import CustomTelegramClient
 from .customtl import ConnectionTcpFull, MTProtoState

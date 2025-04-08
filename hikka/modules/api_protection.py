@@ -12,10 +12,10 @@ import random
 import time
 import typing
 
-from hikkatl.tl import functions
-from hikkatl.tl.tlobject import TLRequest
-from hikkatl.tl.types import Message
-from hikkatl.utils import is_list_like
+from telethon.tl import functions
+from telethon.tl.tlobject import TLRequest
+from telethon.tl.types import Message
+from telethon.utils import is_list_like
 
 from .. import loader, utils
 from ..inline.types import InlineCall

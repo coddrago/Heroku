@@ -15,10 +15,10 @@ import typing
 from aiogram import Bot, Dispatcher
 from aiogram.types import ParseMode
 from aiogram.utils.exceptions import TerminatedByOtherGetUpdates, Unauthorized
-from hikkatl.errors.rpcerrorlist import InputUserDeactivatedError, YouBlockedUserError
-from hikkatl.tl.functions.contacts import UnblockRequest
-from hikkatl.tl.types import Message
-from hikkatl.utils import get_display_name
+from telethon.errors.rpcerrorlist import InputUserDeactivatedError, YouBlockedUserError
+from telethon.tl.functions.contacts import UnblockRequest
+from telethon.tl.types import Message
+from telethon.utils import get_display_name
 
 from .. import utils
 from ..database import Database

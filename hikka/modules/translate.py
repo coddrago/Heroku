@@ -6,7 +6,9 @@
 
 import logging
 
-from hikkatl.tl.types import Message
+import telethon
+from telethon.tl.types import Message
+from telethon import types, functions, extensions
 
 from .. import loader, utils
 
@@ -48,7 +50,7 @@ class Translator(loader.Module):
         try:
             await utils.answer(
                 message,
-                await self._client.translate(
+                await self.translate(
                     message.peer_id,
                     message,
                     lang,
@@ -59,3 +61,34 @@ class Translator(loader.Module):
         except Exception:
             logger.exception("Unable to translate text")
             await utils.answer(message, self.strings("error"))
+
+    async def translate(self, peer, message, to_lang, raw_text, entities) -> str:
+        msg_id = telethon.utils.get_message_id(message) or 0
+        if not msg_id:
+            return None
+
+        if not isinstance(message, types.Message):
+            message = (await self.get_messages(peer, ids=[msg_id]))[0]
+
+        result = await self._client(
+            functions.messages.TranslateTextRequest(
+                peer=peer,
+                id=[msg_id],
+                text=[
+                    types.TextWithEntities(
+                        raw_text or message.raw_text,
+                        entities or message.entities or [],
+                    )
+                ],
+                to_lang=to_lang,
+            )
+        )
+
+        return (
+            extensions.html.unparse(
+                result.result[0].text,
+                result.result[0].entities,
+            )
+            if result and result.result
+            else ""
+        )

@@ -10,7 +10,7 @@ import functools
 import typing
 from math import ceil
 
-from hikkatl.tl.types import Message
+from telethon.tl.types import Message
 
 from .. import loader, translations, utils
 from ..inline.types import InlineCall

@@ -19,7 +19,7 @@ import traceback
 import typing
 from logging.handlers import RotatingFileHandler
 
-import hikkatl
+import telethon
 from aiogram.utils.exceptions import NetworkError
 
 from . import utils
@@ -109,7 +109,7 @@ class HikkaException:
                             dictionary[key] = "<Database>"
                         elif isinstance(
                             value,
-                            (hikkatl.TelegramClient, CustomTelegramClient),
+                            (telethon.TelegramClient, CustomTelegramClient),
                         ):
                             dictionary[key] = f"<{value.__class__.__name__}>"
                         elif len(str(value)) > 512:
@@ -270,7 +270,7 @@ class TelegramLogsHandler(logging.Handler):
     ):
         chunks = item.message + "\n\n<b>🪐 Full traceback:</b>\n" + item.full_stack
 
-        chunks = list(utils.smart_split(*hikkatl.extensions.html.parse(chunks), 4096))
+        chunks = list(utils.smart_split(*telethon.extensions.html.parse(chunks), 4096))
 
         await call.edit(
             chunks[0],
@@ -527,7 +527,7 @@ def init():
         TelegramLogsHandler((handler, rotating_handler), 7000)
     )
     logging.getLogger().setLevel(logging.NOTSET)
-    logging.getLogger("hikkatl").setLevel(logging.WARNING)
+    logging.getLogger("telethon").setLevel(logging.WARNING)
     logging.getLogger("matplotlib").setLevel(logging.WARNING)
     logging.getLogger("aiohttp").setLevel(logging.WARNING)
     logging.getLogger("aiogram").setLevel(logging.WARNING)

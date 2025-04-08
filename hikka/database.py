@@ -20,8 +20,8 @@ except ImportError as e:
 
 import typing
 
-from hikkatl.errors.rpcerrorlist import ChannelsTooMuchError
-from hikkatl.tl.types import Message, User
+from telethon.errors.rpcerrorlist import ChannelsTooMuchError
+from telethon.tl.types import Message, User
 
 from . import main, utils
 from .pointers import (

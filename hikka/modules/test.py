@@ -15,7 +15,7 @@ from io import BytesIO
 import platform as lib_platform
 import getpass
 
-from hikkatl.tl.types import Message
+from telethon.tl.types import Message
 
 from .. import loader, main, utils
 from ..inline.types import InlineCall

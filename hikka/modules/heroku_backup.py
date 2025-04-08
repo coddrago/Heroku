@@ -15,7 +15,7 @@ import time
 import zipfile
 from pathlib import Path
 
-from hikkatl.tl.types import Message
+from telethon.tl.types import Message
 
 from .. import loader, utils
 from ..inline.types import BotInlineCall

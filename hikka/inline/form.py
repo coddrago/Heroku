@@ -27,9 +27,9 @@ from aiogram.types import (
     InlineQueryResultVideo,
     InputTextMessageContent,
 )
-from hikkatl.errors.rpcerrorlist import ChatSendInlineForbiddenError
-from hikkatl.extensions.html import CUSTOM_EMOJIS
-from hikkatl.tl.types import Message
+from telethon.errors.rpcerrorlist import ChatSendInlineForbiddenError
+from telethon.extensions.html import CUSTOM_EMOJIS
+from telethon.tl.types import Message
 
 from .. import main, utils
 from ..types import HikkaReplyMarkup

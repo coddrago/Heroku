@@ -24,7 +24,7 @@ from pathlib import Path
 from types import FunctionType
 from uuid import uuid4
 
-from hikkatl.tl.tlobject import TLObject
+from telethon.tl.tlobject import TLObject
 
 from . import security, utils, validators
 from .database import Database
@@ -137,8 +137,10 @@ native_import = builtins.__import__
 
 
 def patched_import(name: str, *args, **kwargs):
-    if name.startswith("telethon"):
-        return native_import("hikkatl" + name[8:], *args, **kwargs)
+    if name.startswith("hikkatl"):
+        return native_import("telethon" + name[7:], *args, **kwargs)
+    if name.startswith("herokutl"):
+        return native_import("telethon" + name[8:], *args, **kwargs)
 
     return native_import(name, *args, **kwargs)
 

@@ -9,9 +9,9 @@ import datetime
 import time
 import typing
 
-from hikkatl.hints import EntityLike
-from hikkatl.tl.types import Message, PeerUser, User
-from hikkatl.utils import get_display_name
+from telethon.hints import EntityLike
+from telethon.tl.types import Message, PeerUser, User
+from telethon.utils import get_display_name
 
 from .. import loader, main, security, utils
 from ..inline.types import InlineCall, InlineMessage
