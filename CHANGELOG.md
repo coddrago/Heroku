@@ -4,3 +4,4 @@
 
 - Switched to Telethon (a.k.a legacy-tl)
 - Uptime cheating is allowed again for everyone
+- Rollback added
