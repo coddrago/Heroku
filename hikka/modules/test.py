@@ -383,6 +383,8 @@ class TestMod(loader.Module):
                     ),
                     hostname=lib_platform.node(),
                     user=getpass.getuser(),
+                    prefix=self.get_prefix(),
+                    
         ),
                 reply_to=getattr(message, "reply_to_msg_id", None),
             )
