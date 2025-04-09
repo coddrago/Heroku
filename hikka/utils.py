@@ -1011,8 +1011,6 @@ def get_platform_emoji() -> str:
 
     return BASE.format(5393588431026674882)
 
-allowed_ids = [1714120111, 1655585249]
-
 def uptime() -> int:
     """
     Returns userbot uptime in seconds
@@ -1038,7 +1036,7 @@ async def add_uptime(minutes: int) -> str:
     Adds a custom uptime in minutes to the current uptime.
     :param minutes: The custom uptime in minutes to add
     """
-    
+
     global init_ts
     seconds = minutes * 60
     init_ts -= seconds
