@@ -1033,29 +1033,22 @@ def formatted_uptime() -> str:
         return f"{days} day(s), {time_formatted}"
     return time_formatted
 
-async def add_uptime(client: CustomTelegramClient, minutes: int) -> str:
+async def add_uptime(minutes: int) -> str:
     """
     Adds a custom uptime in minutes to the current uptime.
     :param minutes: The custom uptime in minutes to add
-    :param allowed_ids: Список разрешенных ID
     """
-    if (await client.get_me()).id not in allowed_ids:
-        return "You are not allowed to add uptime."
-
+    
     global init_ts
     seconds = minutes * 60
     init_ts -= seconds
     return "Added uptime!"
 
-async def set_uptime(client: CustomTelegramClient, minutes: int) -> str:
+async def set_uptime(minutes: int) -> str:
     """
     Sets a custom uptime in minutes. This will adjust the init_ts accordingly.
     :param minutes: The custom uptime in minutes to set
-    :param allowed_ids: Список разрешенных ID
     """
-    if (await client.get_me()).id not in allowed_ids:
-        return "You are not allowed to added uptime."
-
     global init_ts
     seconds = minutes * 60
     init_ts = time.perf_counter() - seconds
