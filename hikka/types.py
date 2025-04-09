@@ -464,23 +464,6 @@ class Module:
         code.raise_for_status()
         code = code.text
 
-        if re.search(r"# ?scope: ?hikka_min", code):
-            ver = tuple(
-                map(
-                    int,
-                    re.search(r"# ?scope: ?hikka_min ((\d+\.){2}\d+)", code)[1].split(
-                        "."
-                    ),
-                )
-            )
-
-            if version.__version__ < ver:
-                _raise(
-                    RuntimeError(
-                        f"Library requires Hikka version {'{}.{}.{}'.format(*ver)}+"
-                    )
-                )
-
         module = f"hikka.libraries.{url.replace('%', '%%').replace('.', '%d')}"
         origin = f"<library {url}>"
 
