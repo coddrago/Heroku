@@ -217,7 +217,7 @@ settings:
 
 <emoji document_id=5787313834012184077>🔐</emoji> The <code>--root</code> argument allows you to run Heroku as a <b>root user</b>.
 
-<emoji document_id=5785209342986817408>🌎</emoji> The <code>--no-web</code> argument enables login to your account <b>directly in the terminal, rather than through a link</b> <code>{}.lhr.life</code>.
+<emoji document_id=5785209342986817408>🌎</emoji> The <code>--no-web</code> argument enables login to your account <b>directly in the terminal, rather than through a link.</b>
 
 <emoji document_id=5471895949804575096>🤲</emoji> However, if you want to migrate from hikariatama Hikka, download this module:
 
