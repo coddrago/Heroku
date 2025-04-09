@@ -34,12 +34,6 @@ class HerokuInfoMod(loader.Module):
             ),
 
             loader.ConfigValue(
-                "pp_to_banner",
-                False,
-                validator=loader.validators.Boolean(),
-            ),
-
-            loader.ConfigValue(
                 "show_heroku",
                 True,
                 validator=loader.validators.Boolean(),
@@ -141,65 +135,8 @@ class HerokuInfoMod(loader.Module):
             )
         )
 
-    async def upload_pp_to_oxo(self, photo):
-        save_path = "profile_photo.jpg"
-        await self._client.download_media(photo, file=save_path)
-
-        try:
-            with open(save_path, 'rb') as file:
-                oxo = await utils.run_sync(
-                    requests.post,
-                    "https://0x0.st",
-                    files={"file": file},
-                    data={"secret": True},
-                )
-
-            if oxo.status_code == 200:
-                return oxo.text.strip()
-            else:
-                return "https://imgur.com/a/7LBPJiq.png"
-
-        except Exception:
-            return "https://imgur.com/H56KRbM"
-
-        finally:
-            if os.path.exists(save_path):
-                os.remove(save_path)
-
-    async def get_pp_for_banner(self):
-        photos = await self._client.get_profile_photos('me')
-        if photos:
-            return await self.upload_pp_to_oxo(photos[0])
-        return "https://imgur.com/a/7LBPJiq.png"
-
-    async def info(self, _: InlineQuery) -> dict:
-        """Send userbot info"""
-
-        return {
-            "title": self.strings("send_info"),
-            "description": self.strings("description"),
-            **(
-                {"photo": self.config["banner_url"], "caption": self._render_info(True)}
-                if self.config["banner_url"]
-                else {"message": self._render_info(True)}
-            ),
-            "thumb": (
-                "https://github.com/hikariatama/Hikka/raw/master/assets/hikka_pfp.png"
-            ),
-            "reply_markup": self._get_mark(),
-        }
-
     @loader.command()
     async def infocmd(self, message: Message):
-        if self.config.get('pp_to_banner', True):
-            print(self.config['banner_url'])
-            try:
-                new_banner_url = await self.get_pp_for_banner()
-                if new_banner_url:
-                    self.config['banner_url'] = new_banner_url
-                    await self._db.set("Config", "banner_url", new_banner_url)
-            except Exception:
-                pass
         await utils.answer_file(
             message,
             self.config["banner_url"],
