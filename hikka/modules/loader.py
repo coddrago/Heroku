@@ -500,33 +500,6 @@ class LoaderMod(loader.Module):
                 await utils.answer(message, self.strings("inline_init_failed"))
             return
 
-        if re.search(r"# ?scope: ?hikka_min", doc):
-            ver = re.search(r"# ?scope: ?hikka_min ((?:\d+\.){2}\d+)", doc).group(1)
-            ver_ = tuple(map(int, ver.split(".")))
-            if main.__version__ < ver_:
-                if isinstance(message, Message):
-                    if getattr(message, "file", None):
-                        m = utils.get_chat_id(message)
-                        await message.edit("")
-                    else:
-                        m = message
-
-                    await self.inline.form(
-                        self.strings("version_incompatible").format(ver),
-                        m,
-                        reply_markup=[
-                            {
-                                "text": self.lookup("updater").strings("btn_update"),
-                                "callback": self.lookup("updater").inline_update,
-                            },
-                            {
-                                "text": self.lookup("updater").strings("cancel"),
-                                "action": "close",
-                            },
-                        ],
-                    )
-                return
-
         developer = re.search(r"# ?meta developer: ?(.+)", doc)
         developer = developer.group(1) if developer else False
 
