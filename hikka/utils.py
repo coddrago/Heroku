@@ -1636,4 +1636,4 @@ def get_version_raw() -> str:
 
 
 get_platform_name = get_named_platform
-get_version_raw = version
+version = get_version_raw
