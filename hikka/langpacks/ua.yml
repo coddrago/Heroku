@@ -365,7 +365,7 @@ updater:
   _cmd_doc_source: "Показати посилання на вихідний код проекту"
   _cmd_doc_update: "Завантажує оновлення юзербота"
   rollback_no_args: "<emoji document_id=5465665476971471368>❌</emoji> <b>Вам потрібно вказати SHA коміту</b>"
-  rollback_ok: "<emoji document_id=5215492745900077682>✅</emoji> <b>Откат виконано успішно. Після перезавантаження все готово</b>"
+  rollback_ok: "<emoji document_id=5215492745900077682>✅</emoji> <b>Відкат успішно виконаний. Будь ласка зробіть перезавантаження.</b>"
   rollback_err: "<emoji document_id=5465665476971471368>❌</emoji> <b>Не вдалося зробити відкат</b>"
 
 api_protection:
