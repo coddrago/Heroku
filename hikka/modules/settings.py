@@ -70,15 +70,7 @@ class CoreMod(loader.Module):
                     if self._client.hikka_me.premium and CUSTOM_EMOJIS
                     else "🪐 <b>Heroku userbot</b>"
                 ),
-                *version.__version__,
-                utils.get_commit_url(),
-                f"{legacytl.__version__} #{legacytl.tl.alltlobjects.LAYER}",
             )
-            + (
-                ""
-                if version.branch == "master"
-                else self.strings("unstable").format(version.branch)
-            ),
         )
 
     @loader.command()

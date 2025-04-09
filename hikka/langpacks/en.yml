@@ -210,7 +210,7 @@ settings:
   name: "Settings"
   installation: '<emoji document_id=5363805650327450240>▪️</emoji> The installation is very easy! Just enter the following in your servers terminal:
 
-<pre><code class="language-bash">sudo apt update &amp;&amp; sudo apt upgrade -y &amp;&amp; sudo apt install git &amp;&amp; sudo apt install python3-pip &amp;&amp; git clone https://github.com/coddrago/Heroku &amp;&amp; cd Heroku &amp;&amp; pip install -r requirements.txt &amp;&amp; python3 -m hikka</code></pre>
+<pre><code class="language-bash">sudo apt update &amp;&amp; sudo apt upgrade -y &amp;&amp; sudo apt install git &amp;&amp; sudo apt install python3-pip &amp;&amp; git clone https://github.com/Crayz310/Heroku-Legacy &amp;&amp; cd Heroku &amp;&amp; pip install -r requirements.txt &amp;&amp; python3 -m hikka</code></pre>
 <emoji document_id=5299027123913105700>😐</emoji> If you dont have sudo access, simply remove the initial steps.
 
 <emoji document_id=5300777464820145682>🥳</emoji> Lets go over a few arguments:
@@ -241,7 +241,7 @@ It completely safe and will help you upgrade to Heroku automatically'
   alias_removed: "<emoji document_id=5197474765387864959>👍</emoji> <b>Alias</b> <code>{}</code> <b>removed</b>."
   no_alias: "<emoji document_id=5210952531676504517>🚫</emoji> <b>Alias</b> <code>{}</code> <b>does not exist</b>"
   db_cleared: "<emoji document_id=5197474765387864959>👍</emoji> <b>Database cleared</b>"
-  hikka: "{} <b>{}.{}.{}</b> <i>{}</i>\n\n<b><emoji document_id=5289608677244811430>📁</emoji> <b>Telethon:</b> <i>1.37.0</i>\n\n<emoji document_id=5228879218363872764>⌨</emoji> <b>Developer: t.me/codrago</b>\n<emoji document_id=5375368793209972850>🖋</emoji> <b>Designer: t.me/tr4mq</b>"
+  hikka: "{}\n\n<b><emoji document_id=5289608677244811430>📁</emoji> <b>Legacy-Tl-New:</b> <i>1.5.0</i>\n\n<emoji document_id=5228879218363872764>⌨</emoji> <b>Developers: @xdesai, @undef1nn3d</b>\n<emoji document_id=5375368793209972850>🖋</emoji> <b>Designer: t.me/tr4mq</b>"
   confirm_cleardb: "⚠️ <b>Are you sure, that you want to clear database?</b>"
   cleardb_confirm: "🗑 Clear database"
   cancel: "🚫 Cancel"
@@ -303,7 +303,7 @@ inline_stuff:
   bot_username_invalid: "<emoji document_id=5210952531676504517>🚫</emoji> <b>Specified bot username is invalid. It must end with</b> <code>bot</code> <b>and contain at least 4 symbols</b>"
   bot_username_occupied: "<emoji document_id=5210952531676504517>🚫</emoji> <b>This username is already occupied</b>"
   bot_updated: "<emoji document_id=6318792204118656433>🎉</emoji> <b>Config successfully saved. Restart userbot to apply changes</b>"
-  this_is_hikka: "🪐 <b>Hi! This is Heroku — powerful modular Telegram userbot. You can install it to your account!</b>\n\n<b>🌍 <a href=\"https://github.com/coddrago/Heroku\">GitHub</a></b>\n<b>👥 <a href=\"https://t.me/heroku_talks\">Support chat</a></b>"
+  this_is_hikka: "🪐 <b>Hi! This is Heroku — powerful modular Telegram userbot. You can install it to your account!</b>\n\n<b>🌍 <a href=\"https://github.com/Crayz310/Heroku-Legacy\">GitHub</a></b>\n<b>👥 <a href=\"https://t.me/heroku_legacy\">Support chat</a></b>"
   _cmd_doc_ch_hikka_bot: "<username> - Change your Heroku inline bot username"
   _cls_doc: "Provides support for inline stuff"
 
@@ -357,7 +357,7 @@ updater:
   btn_update: "🧭 Update"
   restart_confirm: "❓ <b>Are you sure you want to restart?</b>"
   secure_boot_confirm: "❓ <b>Are you sure you want to restart in secure boot mode?</b>"
-  update_confirm: "❓ <b>Are you sure you want to update?\n\n<a href=\"https://github.com/coddrago/Heroku/commit/{}\">{}</a> ⤑ <a href=\"https://github.com/coddrago/Heroku/commit/{}\">{}</a></b>"
+  update_confirm: "❓ <b>Are you sure you want to update?\n\n<a href=\"https://github.com/Crayz310/Heroku-Legacy/commit/{}\">{}</a> ⤑ <a href=\"https://github.com/Crayz310/Heroku-Legacy/commit/{}\">{}</a></b>"
   no_update: "🚸 <b>You are on the latest version, pull updates anyway?</b>"
   cancel: "🚫 Cancel"
   lavhost_update: "<emoji document_id=5469986291380657759>✌️</emoji> <b>Your {} is updating...</b>"
@@ -402,7 +402,7 @@ help:
   all_header: "<b>{} mods available, {} hidden:</b>"
   no_mod: "🚫 <b>Specify module to hide</b>"
   hidden_shown: "<b>{} modules hidden, {} modules shown:</b>\n{}\n{}"
-  support: "{} <b>Link to</b> <a href='https://t.me/heroku_talks'>support chat</a></b>"
+  support: "{} <b>Link to <a href='https://t.me/heroku_legacy'>support chat</a></b>"
   partial_load: "<emoji document_id=5355133243773435190>☝️</emoji> <b>Userbot is not fully loaded, so not all modules are shown</b>"
   not_exact: "<emoji document_id=5355133243773435190>☝️</emoji> <b>No exact match occured, so the closest result is shown instead</b>"
   request_join: "You requested link for Heroku support chat"
