@@ -92,7 +92,7 @@ BASE_PATH = Path(BASE_DIR)
 CONFIG_PATH = BASE_PATH / "config.json"
 
 IS_TERMUX = "com.termux" in os.environ.get("PREFIX", "")
-IS_CODESPACES = "CODESPACES" in os.environ
+IS_DOCKER = "DOCKER" in os.environ
 IS_RAILWAY = "RAILWAY" in os.environ
 IS_GOORM = "GOORM" in os.environ
 IS_LAVHOST = "LAVHOST" in os.environ
