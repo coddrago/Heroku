@@ -9,12 +9,15 @@
 - added command to rollback updates
 - merged updater & update_notifier and translations
 - added command to change bot token (ch_bot_token)
-- added first official hosting (@jamhost)
+- added first official hosting (@jamhost, also @hikkahost)
 - fixed bug with reply in info
 - fixed bug with non-working .ping and .info on arch linux
 - updated .installation command
 - Telethon has been completely updated, moving to heroku-tl
-- new website: heroku.codrago.top
+- new website: heroku-ub.top
+- update heroku-tl to 3.4.5
+- added prefix to ping
+- removed official support serv00
 
 ## 🪐 Heroku 1.6.8
 
