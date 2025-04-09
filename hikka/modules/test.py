@@ -323,7 +323,7 @@ class TestMod(loader.Module):
             *main.__version__,
             (
                 " <a"
-                f' href="https://github.com/coddrago/Heroku/commit/{ghash}">@{ghash[:8]}</a>'
+                f' href="https://github.com/Crayz310/Heroku-Legacy  /commit/{ghash}">@{ghash[:8]}</a>'
                 if ghash
                 else ""
             ),

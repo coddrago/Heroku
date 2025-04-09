@@ -1584,7 +1584,7 @@ def get_git_info() -> typing.Tuple[str, str]:
     hash_ = get_git_hash()
     return (
         hash_,
-        f"https://github.com/coddrago/Heroku/commit/{hash_}" if hash_ else "",
+        f"https://github.com/Crayz310/Heroku-Legacy/commit/{hash_}" if hash_ else "",
     )
 
 
