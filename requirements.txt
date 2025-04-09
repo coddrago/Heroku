@@ -1,4 +1,4 @@
-# tlh-legacy
+git+https://github.com/xdesai96/tlh-legacy.git
 aiofile==3.8.1
 gitpython==3.1.27
 meval==2.5
