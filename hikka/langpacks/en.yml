@@ -110,7 +110,7 @@ heroku_settings:
   no_cmd: "<emoji document_id=5469791106591890404>🪄</emoji> <b>Please, specify command to toggle NoNick for</b>"
   cmd_nn: "<emoji document_id=5469791106591890404>🪄</emoji> <b>NoNick for</b> <code>{}</code> <b>is now {}</b>"
   cmd404: "<emoji document_id=5469791106591890404>🪄</emoji> <b>Command not found</b>"
-  inline_settings: "⚙️ <b>Here you can configure your Heroku settings</b>"
+  inline_settings: "⚙️ <b>Here you can configure your Heroku-Legacy settings</b>"
   confirm_update: "🧭 <b>Please, confirm that you want to update. Your userbot will be restarted</b>"
   confirm_restart: "🔄 <b>Please, confirm that you want to restart</b>"
   suggest_fs: "✅ Suggest FS for modules"
@@ -125,9 +125,9 @@ heroku_settings:
   suggest_subscribe: "✅ Suggest subscribe to channel"
   do_not_suggest_subscribe: "🚫 Suggest subscribe to channel"
   private_not_allowed: "<emoji document_id=5210952531676504517>🚫</emoji> <b>This command must be executed in chat</b>"
-  nonick_warning: "Warning! You enabled NoNick with default prefix! You may get muted in Heroku chats. Change prefix or disable NoNick!"
+  nonick_warning: "Warning! You enabled NoNick with default prefix! You may get muted in Heroku-Legacy chats. Change prefix or disable NoNick!"
   reply_required: "<emoji document_id=5210952531676504517>🚫</emoji> <b>Reply to a message of user, which needs to be added to NoNick</b>"
-  deauth_confirm: "⚠️ <b>This action will fully remove Heroku from this account and can't be reverted!</b>\n\n<i>- Heroku chats will be removed\n- Session will be terminated and removed\n- Heroku inline bot will be removed</i>"
+  deauth_confirm: "⚠️ <b>This action will fully remove Heroku-Legacy from this account and can't be reverted!</b>\n\n<i>- Heroku-Legacy chats will be removed\n- Session will be terminated and removed\n- Heroku-Legacy inline bot will be removed</i>"
   deauth_confirm_step2: "⚠️ <b>Are you really sure you want to delete Heroku?</b>"
   deauth_yes: "I'm sure"
   deauth_no_1: "I'm not sure"
@@ -136,19 +136,19 @@ heroku_settings:
   deauth_cancel: "🚫 Cancel"
   deauth_confirm_btn: "😢 Delete"
   uninstall: "😢 <b>Uninstalling Heroku...</b>"
-  uninstalled: "😢 <b>Heroku uninstalled. Web interface is still active, you can add another account</b>"
+  uninstalled: "😢 <b>Heroku-Legacy uninstalled. Web interface is still active, you can add another account</b>"
   cmd_nn_list: "<emoji document_id=5469791106591890404>🪄</emoji> <b>NoNick is enabled for these commands:</b>\n\n{}"
   user_nn_list: "<emoji document_id=5469791106591890404>🪄</emoji> <b>NoNick is enabled for these users:</b>\n\n{}"
   chat_nn_list: "<emoji document_id=5469791106591890404>🪄</emoji> <b>NoNick is enabled for these chats:</b>\n\n{}"
   nothing: "<emoji document_id=5427052514094619126>🤷‍♀️</emoji> <b>Nothing to show...</b>"
-  privacy_leak: "⚠️ <b>This command gives access to your Heroku web interface. It's not recommended to run it in public group chats. Consider using it in <a href='tg://openmessage?user_id={}'>Saved messages</a>. Type</b> <code>{}proxypass force_insecure</code> <b>to ignore this warning</b>"
-  privacy_leak_nowarn: "⚠️ <b>This command gives access to your Heroku web interface. It's not recommended to run it in public group chats. Consider using it in <a href='tg://openmessage?user_id={}'>Saved messages</a>.</b>"
-  opening_tunnel: "🔁 <b>Opening tunnel to Heroku web interface...</b>"
+  privacy_leak: "⚠️ <b>This command gives access to your Heroku-Legacy web interface. It's not recommended to run it in public group chats. Consider using it in <a href='tg://openmessage?user_id={}'>Saved messages</a>. Type</b> <code>{}proxypass force_insecure</code> <b>to ignore this warning</b>"
+  privacy_leak_nowarn: "⚠️ <b>This command gives access to your Heroku-Legacy web interface. It's not recommended to run it in public group chats. Consider using it in <a href='tg://openmessage?user_id={}'>Saved messages</a>.</b>"
+  opening_tunnel: "🔁 <b>Opening tunnel to Heroku-Legacy web interface...</b>"
   tunnel_opened: "🎉 <b>Tunnel opened. This link is valid for about 1 hour</b>"
   web_btn: "🌍 Web interface"
   btn_yes: "🚸 Open anyway"
   btn_no: "🔻 Cancel"
-  lavhost_web: "✌️ <b>This link leads to your Heroku web interface on lavHost</b>\n\n<i>💡 You'll need to authorize using lavHost credentials, specified on registration</i>"
+  lavhost_web: "✌️ <b>This link leads to your Heroku-Legacy web interface on lavHost</b>\n\n<i>💡 You'll need to authorize using lavHost credentials, specified on registration</i>"
   disable_debugger: "✅ Debugger enabled"
   enable_debugger: "🚫 Debugger disabled"
   _cmd_doc_invoke: "<module or `core` for built-in methods> <method> - Only for debugging purposes. DO NOT USE IF YOU'RE NOT A DEVELOPER"
@@ -163,8 +163,8 @@ heroku_settings:
   _cmd_doc_watcherbl: "<module> - Toggle watcher in current chat"
   _cmd_doc_watcher: "<module> - Toggle global watcher rules\nArgs:\n[-c - only in chats]\n[-p - only in pm]\n[-o - only out]\n[-i - only incoming]"
   _cmd_doc_watchers: "List current watchers"
-  _cmd_doc_weburl: "Opens web tunnel to your Heroku web interface"
-  _cls_doc: "Advanced settings for Heroku Userbot"
+  _cmd_doc_weburl: "Opens web tunnel to your Heroku-Legacy web interface"
+  _cls_doc: "Advanced settings for Heroku-Legacy Userbot"
   core_protection_already_removed: "<emoji document_id=6003424016977628379>🔒</emoji> <b>Core protection is already removed</b>"
   core_protection_confirm: "⚠️ <b>READ CAREFULLY!</b>\n\nBy removing core protection you confirm, that you know what is it and what is it for. In common life scenario you <b>don't need it</b>. If you're not a developer, you <b>don't need it</b>. If you're not sure, you <b>don't need it</b>.\n\n<b>Are you sure you want to remove core protection?</b>"
   core_protection_btn: "🔓 Remove core protection"
@@ -210,12 +210,12 @@ settings:
   name: "Settings"
   installation: '<emoji document_id=5363805650327450240>▪️</emoji> The installation is very easy! Just enter the following in your servers terminal:
 
-<pre><code class="language-bash">sudo apt update &amp;&amp; sudo apt upgrade -y &amp;&amp; sudo apt install git &amp;&amp; sudo apt install python3-pip &amp;&amp; git clone https://github.com/Crayz310/Heroku-Legacy &amp;&amp; cd Heroku &amp;&amp; pip install -r requirements.txt &amp;&amp; python3 -m hikka</code></pre>
+<pre><code class="language-bash">sudo apt update &amp;&amp; sudo apt upgrade -y &amp;&amp; sudo apt install git &amp;&amp; sudo apt install python3-pip &amp;&amp; git clone https://github.com/Crayz310/Heroku-Legacy &amp;&amp; cd Heroku-Legacy &amp;&amp; pip install -r requirements.txt &amp;&amp; python3 -m hikka</code></pre>
 <emoji document_id=5299027123913105700>😐</emoji> If you dont have sudo access, simply remove the initial steps.
 
 <emoji document_id=5300777464820145682>🥳</emoji> Lets go over a few arguments:
 
-<emoji document_id=5787313834012184077>🔐</emoji> The <code>--root</code> argument allows you to run Heroku as a <b>root user</b>.
+<emoji document_id=5787313834012184077>🔐</emoji> The <code>--root</code> argument allows you to run Heroku-Legacy as a <b>root user</b>.
 
 <emoji document_id=5785209342986817408>🌎</emoji> The <code>--no-web</code> argument enables login to your account <b>directly in the terminal, rather than through a link.</b>
 
@@ -223,7 +223,7 @@ settings:
 
 <pre><code class="language-heroku">{prefix}dlm https://raw.githubusercontent.com/coddrago/modules/main/SwitchToHeroku.py</code></pre>
 
-It completely safe and will help you upgrade to Heroku automatically'
+It completely safe and will help you upgrade to Heroku-Legacy automatically'
   too_many_args: "<emoji document_id=5210952531676504517>🚫</emoji> <b>Too many args</b>"
   blacklisted: "<emoji document_id=5197474765387864959>👍</emoji> <b>Chat {} blacklisted from userbot</b>"
   unblacklisted: "<emoji document_id=5197474765387864959>👍</emoji> <b>Chat {} unblacklisted from userbot</b>"
@@ -253,7 +253,7 @@ It completely safe and will help you upgrade to Heroku automatically'
   _cmd_doc_blacklistuser: "[user_id] - Prevent this user from running any commands"
   _cmd_doc_cleardb: "Clear the entire database, effectively performing a factory reset"
   _cmd_doc_delalias: "Remove an alias for a command"
-  _cmd_doc_hikka: "Get Heroku version"
+  _cmd_doc_hikka: "Get Heroku-Legacy version"
   _cmd_doc_setprefix: "<prefix> - Sets command prefix"
   _cmd_doc_unblacklist: "<chat_id> - Unblacklist the bot from operating somewhere"
   _cmd_doc_unblacklistuser: "[user_id] - Allow this user to run permitted commands"
@@ -303,8 +303,8 @@ inline_stuff:
   bot_username_invalid: "<emoji document_id=5210952531676504517>🚫</emoji> <b>Specified bot username is invalid. It must end with</b> <code>bot</code> <b>and contain at least 4 symbols</b>"
   bot_username_occupied: "<emoji document_id=5210952531676504517>🚫</emoji> <b>This username is already occupied</b>"
   bot_updated: "<emoji document_id=6318792204118656433>🎉</emoji> <b>Config successfully saved. Restart userbot to apply changes</b>"
-  this_is_hikka: "🪐 <b>Hi! This is Heroku — powerful modular Telegram userbot. You can install it to your account!</b>\n\n<b>🌍 <a href=\"https://github.com/Crayz310/Heroku-Legacy\">GitHub</a></b>\n<b>👥 <a href=\"https://t.me/heroku_legacy\">Support chat</a></b>"
-  _cmd_doc_ch_hikka_bot: "<username> - Change your Heroku inline bot username"
+  this_is_hikka: "🪐 <b>Hi! This is Heroku-Legacy — powerful modular Telegram userbot. You can install it to your account!</b>\n\n<b>🌍 <a href=\"https://github.com/Crayz310/Heroku-Legacy\">GitHub</a></b>\n<b>👥 <a href=\"https://t.me/heroku_legacy\">Support chat</a></b>"
+  _cmd_doc_ch_hikka_bot: "<username> - Change your Heroku-Legacy inline bot username"
   _cls_doc: "Provides support for inline stuff"
 
 test:
@@ -314,7 +314,7 @@ test:
   configping: "Your custom text. You can use placeholders: {ping} - That's your ping. {uptime} - It's your uptime. {ping_hint} - This is the same hint as in the heroku module, it is chosen with random chance, also you can specify this hint in the config. You can use the {hostname} placeholder if you need the hostname of your server"
   hint: "Set a hint"
   ping_emoji: "Emoji that appears when ping does not increase significantly"
-  logs_caption: "<emoji document_id=5188377234380954537>🪐</emoji> <b>Heroku logs with verbosity</b> <code>{}</code>\n\n<emoji document_id=6318902906900711458>⚪️</emoji> <b>Version: {}.{}.{}</b>{}"
+  logs_caption: "<emoji document_id=5188377234380954537>🪐</emoji> <b>Heroku-Legacy logs with verbosity</b> <code>{}</code>\n\n<emoji document_id=6318902906900711458>⚪️</emoji> <b>Version: {}.{}.{}</b>{}"
   suspend_invalid_time: "<emoji document_id=5210952531676504517>🚫</emoji> <b>Invalid time to suspend</b>"
   suspended: "<emoji document_id=5452023368054216810>🥶</emoji> <b>Bot  suspended for {}</b>"
   confidential: "⚠️ <b>Log level</b> <code>{}</code> <b>may reveal your confidential info, be careful</b>"
@@ -336,14 +336,14 @@ test:
 
 update_notifier:
   name: "UpdateNotifier"
-  update_required: "🆕 <b>Heroku Update available!</b>\n\nNew Heroku version released.\n🔮 <b>Heroku <s>{}</s> -> {}</b>\n\n{}"
+  update_required: "🆕 <b>Heroku-Legacy Update available!</b>\n\nNew Heroku-Legacy version released.\n🔮 <b>Heroku-Legacy <s>{}</s> -> {}</b>\n\n{}"
   more: "\n<i><b>🎥 And {} more...</b></i>"
   _cfg_doc_disable_notifications: "Disable update notifications"
   latest_disabled: "Notifications about the latest update have been suppressed"
   update: "🔄 Update"
   ignore: "🚫 Ignore"
   changelog: '<emoji document_id=5434144690511290129>📰</emoji> <b>Changelog of the last major update:</b><pre><code class="language-heroku">{}</code></pre>'
-  _cls_doc: "Tracks latest Heroku releases, and notifies you, if update is required"
+  _cls_doc: "Tracks latest Heroku-Legacy releases, and notifies you, if update is required"
 
 updater:
   name: "Updater"
@@ -405,7 +405,7 @@ help:
   support: "{} <b>Link to <a href='https://t.me/heroku_legacy'>support chat</a></b>"
   partial_load: "<emoji document_id=5355133243773435190>☝️</emoji> <b>Userbot is not fully loaded, so not all modules are shown</b>"
   not_exact: "<emoji document_id=5355133243773435190>☝️</emoji> <b>No exact match occured, so the closest result is shown instead</b>"
-  request_join: "You requested link for Heroku support chat"
+  request_join: "You requested link for Heroku-Legacy support chat"
   core_notice: "<emoji document_id=5355133243773435190>☝️</emoji> <b>This is a core module. You can't unload it nor replace</b>"
 
 heroku_info:
@@ -468,8 +468,8 @@ loader:
   all_modules_deleted: "<emoji document_id=5784993237412351403>✅</emoji> <b>All modules deleted</b>"
   undoc: "<emoji document_id=5427052514094619126>🤷‍♀️</emoji> No docs"
   ihandler: "\n<emoji document_id=5372981976804366741>🤖</emoji> <code>{}</code> {}"
-  inline_init_failed: "<emoji document_id=5454225457916420314>😖</emoji> <b>This module requires Heroku inline feature and initialization of InlineManager failed</b>\n<i>Please, remove one of your old bots from @BotFather and restart userbot to load this module</i>"
-  version_incompatible: "<emoji document_id=5454225457916420314>😖</emoji> <b>This module requires Heroku {}+\nPlease, update with</b> <code>.update</code>"
+  inline_init_failed: "<emoji document_id=5454225457916420314>😖</emoji> <b>This module requires Heroku-Legacy inline feature and initialization of InlineManager failed</b>\n<i>Please, remove one of your old bots from @BotFather and restart userbot to load this module</i>"
+  version_incompatible: "<emoji document_id=5454225457916420314>😖</emoji> <b>This module requires Heroku-Legacy {}+\nPlease, update with</b> <code>.update</code>"
   ffmpeg_required: "<emoji document_id=5454225457916420314>😖</emoji> <b>This module requires FFMPEG, which is not installed</b>"
   developer: "\n\n<emoji document_id=5287454910059654880>🫶</emoji> <b>Developer:</b> {}"
   depends_from: "\n\n<emoji document_id=5431736674147114227>📦</emoji> <b>Dependencies:</b> \n{}"
@@ -526,7 +526,7 @@ translations:
   requested_join: "💫 <b>Module</b> <code>{}</code> <b>requested to join channel <a href='https://t.me/{}'>{}</a></b>\n\n<b>❓ Reason:</b> <i>{}</i>"
   fw_error: "<emoji document_id=5877458226823302157>🕒</emoji> <b>Call</b> <code>{}</code> <b>caused FloodWait of {} on method</b> <code>{}</code>"
   rpc_error: "<emoji document_id=5877477244938489129>🚫</emoji> <b>Call</b> <code>{}</code> <b>failed due to RPC error:</b> <code>{}</code>"
-  _cmd_doc_dllangpack: "[link to a langpack | empty to remove] - Change Heroku translate pack (external)"
+  _cmd_doc_dllangpack: "[link to a langpack | empty to remove] - Change Heroku-Legacy translate pack (external)"
   _cmd_doc_setlang: "[languages in the order of priority] - Change default language"
   _cls_doc: "Processes internal translations"
 
@@ -555,8 +555,8 @@ translate:
 
 quickstart:
   name: "Quickstart"
-  base: "🪐🇬🇧 <b>Hello.</b> You've just installed <b>Heroku</b> userbot.\n\n❓ <b>Need help?</b> Feel free to join our support chat. We help <b>everyone</b>.\n\n📼 <b>You can find and install modules using </b><code>.heta</code><b>. Simply enter your search query and click ⛩ Install on needed module</b>\n\n📣 <b>Check out community made channels with modules: <a href=\"https://t.me/hikka_ub/126\">show</a></b>\n\n💁‍♀️ <b>Quickstart:</b>\n\n1️⃣ <b>Type</b> <code>.help</code> <b>to see modules list</b>\n2️⃣ <b>Type</b> <code>.help &lt;ModuleName/command&gt;</code> <b>to see help of module ModuleName</b>\n3️⃣ <b>Type</b> <code>.dlmod &lt;link&gt;</code> <b>to load module from link</b>\n4️⃣ <b>Type</b> <code>.loadmod</code> <b>with reply to file to install module from it</b>\n5️⃣ <b>Type</b> <code>.unloadmod &lt;ModuleName&gt;</code> <b>to unload module ModuleName</b>\n\n💡 <b>Heroku supports modules from Friendly-Telegram and GeekTG, as well as its own ones.</b>"
-  railway: "🚂 <b>Your userbot is installed on Railway</b>. This platform has only <b>500 free hours per month</b>. Once this limit is reached, your <b>Heroku will be frozen</b>. Next month <b>you will need to go to https://railway.app and restart it</b>."
+  base: "🪐🇬🇧 <b>Hello.</b> You've just installed <b>Heroku</b> userbot.\n\n❓ <b>Need help?</b> Feel free to join our support chat. We help <b>everyone</b>.\n\n📼 <b>You can find and install modules using </b><code>.heta</code><b>. Simply enter your search query and click ⛩ Install on needed module</b>\n\n📣 <b>Check out community made channels with modules: <a href=\"https://t.me/hikka_ub/126\">show</a></b>\n\n💁‍♀️ <b>Quickstart:</b>\n\n1️⃣ <b>Type</b> <code>.help</code> <b>to see modules list</b>\n2️⃣ <b>Type</b> <code>.help &lt;ModuleName/command&gt;</code> <b>to see help of module ModuleName</b>\n3️⃣ <b>Type</b> <code>.dlmod &lt;link&gt;</code> <b>to load module from link</b>\n4️⃣ <b>Type</b> <code>.loadmod</code> <b>with reply to file to install module from it</b>\n5️⃣ <b>Type</b> <code>.unloadmod &lt;ModuleName&gt;</code> <b>to unload module ModuleName</b>\n\n💡 <b>Heroku-Legacy supports modules from Friendly-Telegram and GeekTG, as well as its own ones.</b>"
+  railway: "🚂 <b>Your userbot is installed on Railway</b>. This platform has only <b>500 free hours per month</b>. Once this limit is reached, your <b>Heroku-Legacy will be frozen</b>. Next month <b>you will need to go to https://railway.app and restart it</b>."
   lavhost: "✌️ <b>Your userbot is installed on lavHost</b>. Make sure to join @lavhost for important notifications and updates. All questions regarding the platform should be asked in @lavhostchat."
   language_saved: "🇬🇧 Language saved!"
   language: "🇬🇧 English"
