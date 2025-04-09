@@ -388,6 +388,9 @@ updater:
   _cmd_doc_source: "Links the source code of this project"
   _cmd_doc_update: "Downloads userbot updates"
   _cls_doc: "Updates itself"
+  rollback_no_args: "<emoji document_id=5465665476971471368>❌</emoji> <b>You need to specify commit SHA</b>"
+  rollback_ok: "<emoji document_id=5215492745900077682>✅</emoji> <b>Rollback successful. After reboot everything is done</b>"
+  rollback_err: "<emoji document_id=5465665476971471368>❌</emoji> <b>Unable to rollback</b>"
 
 api_protection:
   name: "APILimiter"

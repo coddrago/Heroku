@@ -364,6 +364,9 @@ updater:
   _cmd_doc_restart: "Startet den Userbot neu"
   _cmd_doc_source: "Zeigt den Link zum Quellcode des Projekts"
   _cmd_doc_update: "Lädt Updates für den Userbot herunter"
+  rollback_no_args: "<emoji document_id=5465665476971471368>❌</emoji> <b>Sie müssen Commit SHA angeben</b>"
+  rollback_ok: "<emoji document_id=5215492745900077682>✅</emoji> <b>Rollback erfolgreich. Nach dem Neustart ist alles erledigt</b>"
+  rollback_err: "<emoji document_id=5465665476971471368>❌</emoji> <b>Rollback nicht möglich</b>"
   
 api_protection:
   warning: "⚠️ <b>ACHTUNG!</b>\n\nDas Konto hat die in der Konfiguration angegebenen Anfrageratenlimits überschritten. Um Telegram API-Fluten zu vermeiden, wurde der Userbot <b>vollständig eingefroren</b> für {} Sekunden. Weitere Informationen befinden sich in der beigefügten Datei unten. \n\nEs wird empfohlen, die Hilfe der <code>{prefix}support</code> Gruppe in Anspruch zu nehmen!\n\nWenn du davon ausgehst, dass dies ein geplantes Verhalten des Userbots ist, warte einfach, bis der Timer abläuft, und beim nächsten Mal, wenn du eine ressourcenintensive Aufgabe planst, benutze <code>{prefix}suspend_api_protect</code> Zeit in Sekunden"

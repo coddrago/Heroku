@@ -271,6 +271,21 @@ class UpdaterMod(loader.Module):
             self.strings("source").format(self.config["GIT_ORIGIN_URL"]),
         )
 
+    @loader.command()
+    async def rollback(self, message: Message):
+        args = utils.get_args_raw(message)
+
+        if not args:
+          await utils.answer(message, self.strings("rollback_no_args"))
+          return
+
+        try:
+            result = subprocess.run(f"git reset --hard {args}")
+            await utils.answer(message, self.strings("rollback_ok"))
+            await self.invoke("restart", "-f", self.inline.bot.id)
+        except subprocess.CalledProcessError:
+            await utils.answer(message, self.strings("rollback_err"))
+
     async def client_ready(self):
         if self.get("selfupdatemsg") is not None:
             try:
