@@ -924,17 +924,8 @@ def get_named_platform() -> str:
     if main.IS_JAMHOST:
         return "🧃 JamHost"
 
-    if main.IS_ORACLE:
-        return "😶‍🌫️ Oracle"
-
-    if main.IS_AWS:
-        return "😶‍🌫️ AWS"
-
     if main.IS_USERLAND:
         return "🐧 UserLand"
-
-    if main.IS_SERV00:
-        return "💎 Serv00"
 
     if main.IS_AEZA:
         return "🛡 Aeza"
@@ -953,9 +944,6 @@ def get_named_platform() -> str:
 
     if main.IS_TERMUX:
         return "🕶 Termux"
-
-    if main.IS_CODESPACES:
-        return "🐈‍⬛ Codespaces"
 
     return f"✌️ lavHost {os.environ['LAVHOST']}" if main.IS_LAVHOST else "💎 VDS"
 
@@ -988,23 +976,11 @@ def get_platform_emoji() -> str:
     if main.IS_USERLAND:
         return BASE.format(5458877818031077824)
 
-    if main.IS_ORACLE:
-        return BASE.format(5195381467047288408)
-
-    if main.IS_AWS:
-        return BASE.format(5197529358717179346)
-
-    if main.IS_SERV00:
-        return BASE.format(5192765204898783881)
-
     if main.IS_LAVHOST:
         return BASE.format(5352753797531721191)
 
     if main.IS_GOORM:
         return BASE.format(5298947740032573902)
-
-    if main.IS_CODESPACES:
-        return BASE.format(5350807743554937610)
 
     if main.IS_TERMUX:
         return BASE.format(5350588498359377932)
@@ -1166,7 +1142,7 @@ def rand(size: int, /) -> str:
     :return: Random string
     """
     return "".join(
-        [random.choice("abcdefghijklmnopqrstuvwxyz1234567890") for _ in range(size)]
+        [random.choice("abcdefghijklmnopqrstuvwxyz1234567890!@$#$%*") for _ in range(size)]
     )
 
 
@@ -1339,7 +1315,7 @@ def check_url(url: str) -> bool:
 
 def get_git_hash() -> typing.Union[str, bool]:
     """
-    Get current Hikka git hash
+    Get current Heroku git hash
     :return: Git commit hash
     """
     try:
@@ -1660,3 +1636,4 @@ def get_version_raw() -> str:
 
 
 get_platform_name = get_named_platform
+get_version_raw = version
