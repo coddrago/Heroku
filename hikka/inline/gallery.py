@@ -25,9 +25,9 @@ from aiogram.types import (
     InputMediaPhoto,
 )
 from aiogram.utils.exceptions import BadRequest, RetryAfter
-from telethon.errors.rpcerrorlist import ChatSendInlineForbiddenError
-from telethon.extensions.html import CUSTOM_EMOJIS
-from telethon.tl.types import Message
+from legacytl.errors.rpcerrorlist import ChatSendInlineForbiddenError
+from legacytl.extensions.html import CUSTOM_EMOJIS
+from legacytl.tl.types import Message
 
 from .. import main, utils
 from ..types import HikkaReplyMarkup

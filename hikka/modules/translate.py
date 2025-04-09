@@ -6,9 +6,9 @@
 
 import logging
 
-import telethon
-from telethon.tl.types import Message
-from telethon import types, functions, extensions
+import legacytl
+from legacytl.tl.types import Message
+from legacytl import types, functions, extensions
 
 from .. import loader, utils
 
@@ -63,7 +63,7 @@ class Translator(loader.Module):
             await utils.answer(message, self.strings("error"))
 
     async def translate(self, peer, message, to_lang, raw_text, entities) -> str:
-        msg_id = telethon.utils.get_message_id(message) or 0
+        msg_id = legacytl.utils.get_message_id(message) or 0
         if not msg_id:
             return None
 

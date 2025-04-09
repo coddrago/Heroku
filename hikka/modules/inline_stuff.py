@@ -7,9 +7,9 @@
 import re
 import string
 
-from telethon.errors.rpcerrorlist import YouBlockedUserError
-from telethon.tl.functions.contacts import UnblockRequest
-from telethon.tl.types import Message
+from legacytl.errors.rpcerrorlist import YouBlockedUserError
+from legacytl.tl.functions.contacts import UnblockRequest
+from legacytl.tl.types import Message
 
 from .. import loader, utils
 from ..inline.types import BotInlineMessage

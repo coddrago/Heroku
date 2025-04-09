@@ -15,10 +15,10 @@ import typing
 from aiogram import Bot, Dispatcher
 from aiogram.types import ParseMode
 from aiogram.utils.exceptions import TerminatedByOtherGetUpdates, Unauthorized
-from telethon.errors.rpcerrorlist import InputUserDeactivatedError, YouBlockedUserError
-from telethon.tl.functions.contacts import UnblockRequest
-from telethon.tl.types import Message
-from telethon.utils import get_display_name
+from legacytl.errors.rpcerrorlist import InputUserDeactivatedError, YouBlockedUserError
+from legacytl.tl.functions.contacts import UnblockRequest
+from legacytl.tl.types import Message
+from legacytl.utils import get_display_name
 
 from .. import utils
 from ..database import Database

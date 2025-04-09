@@ -34,9 +34,9 @@ import traceback
 import typing
 
 import requests
-from telethon import events
-from telethon.errors import FloodWaitError, RPCError
-from telethon.tl.types import Message
+from legacytl import events
+from legacytl.errors import FloodWaitError, RPCError
+from legacytl.tl.types import Message
 
 from . import main, security, utils
 from .database import Database

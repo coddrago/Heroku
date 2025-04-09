@@ -24,7 +24,7 @@ from pathlib import Path
 from types import FunctionType
 from uuid import uuid4
 
-from telethon.tl.tlobject import TLObject
+from legacytl.tl.tlobject import TLObject
 
 from . import security, utils, validators
 from .database import Database
@@ -138,9 +138,9 @@ native_import = builtins.__import__
 
 def patched_import(name: str, *args, **kwargs):
     if name.startswith("hikkatl"):
-        return native_import("telethon" + name[7:], *args, **kwargs)
+        return native_import("legacytl" + name[7:], *args, **kwargs)
     if name.startswith("herokutl"):
-        return native_import("telethon" + name[8:], *args, **kwargs)
+        return native_import("legacytl" + name[8:], *args, **kwargs)
 
     return native_import(name, *args, **kwargs)
 
@@ -466,7 +466,7 @@ def callback_handler(*args, **kwargs):
 
 def raw_handler(*updates: TLObject):
     """
-    Decorator that marks function as raw telethon events handler
+    Decorator that marks function as raw legacytl events handler
     Use it to prevent zombie-event-handlers, left by unloaded modules
     :param updates: Update(-s) to handle
     ⚠️ Do not try to simulate behavior of this decorator by yourself!
@@ -881,7 +881,7 @@ class Modules:
     def find_alias(
         self,
         alias: str,
-        include_legacy: bool = False,
+        include_legacytl: bool = False,
     ) -> typing.Optional[str]:
         if not alias:
             return None
@@ -903,7 +903,7 @@ class Modules:
             ):
                 return command_name
 
-        if alias in self.aliases and include_legacy:
+        if alias in self.aliases and include_legacytl:
             return self.aliases[alias]
 
         return None

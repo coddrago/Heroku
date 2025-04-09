@@ -6,7 +6,7 @@
 
 import logging
 
-from telethon.tl.types import Message
+from legacytl.tl.types import Message
 
 from .. import loader, translations, utils
 from ..inline.types import InlineCall

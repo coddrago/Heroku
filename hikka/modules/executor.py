@@ -2,7 +2,7 @@ import sys
 import traceback
 import html
 import time
-import telethon
+import legacytl
 import asyncio
 import logging
 
@@ -53,11 +53,11 @@ class Executor(loader.Module):
             "event": message,
             "chat": message.to_id,
             "me": me,
-            "telethon": telethon,
-            "telethon": telethon,
+            "legacytl": legacytl,
+            "legacytl": legacytl,
             "utils": utils,
             "loader": loader,
-            "f": telethon.tl.functions,
+            "f": legacytl.tl.functions,
             "c": self._client,
             "m": message,
             "lookup": self.lookup,

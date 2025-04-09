@@ -29,7 +29,7 @@ import os
 import re
 import typing
 
-import telethon
+import legacytl
 
 from .. import loader, utils
 
@@ -71,7 +71,7 @@ async def sleep_for_task(func: callable, data: bytes, delay: float):
 class MessageEditor:
     def __init__(
         self,
-        message: telethon.tl.types.Message,
+        message: legacytl.tl.types.Message,
         command: str,
         config,
         strings,
@@ -107,10 +107,10 @@ class MessageEditor:
         text += (self.strings("stderr") + stderr) if stderr else ""
         text += self.strings("end")
 
-        with contextlib.suppress(telethon.errors.rpcerrorlist.MessageNotModifiedError):
+        with contextlib.suppress(legacytl.errors.rpcerrorlist.MessageNotModifiedError):
             try:
                 self.message = await utils.answer(self.message, text)
-            except telethon.errors.rpcerrorlist.MessageTooLongError as e:
+            except legacytl.errors.rpcerrorlist.MessageTooLongError as e:
                 logger.error(e)
                 logger.error(text)
         # The message is never empty due to the template header
@@ -167,7 +167,7 @@ class SudoMessageEditor(MessageEditor):
 
             try:
                 await utils.answer(self.message, text)
-            except telethon.errors.rpcerrorlist.MessageNotModifiedError as e:
+            except legacytl.errors.rpcerrorlist.MessageNotModifiedError as e:
                 logger.debug(e)
 
             logger.debug("edited message with link to self")
@@ -183,7 +183,7 @@ class SudoMessageEditor(MessageEditor):
             self.message[0].client.remove_event_handler(self.on_message_edited)
             self.message[0].client.add_event_handler(
                 self.on_message_edited,
-                telethon.events.messageedited.MessageEdited(chats=["me"]),
+                legacytl.events.messageedited.MessageEdited(chats=["me"]),
             )
 
             logger.debug("registered handler")
@@ -231,7 +231,7 @@ class SudoMessageEditor(MessageEditor):
             # The user has provided interactive authentication. Send password to stdin for sudo.
             try:
                 self.authmsg = await utils.answer(message, self.strings("auth_ongoing"))
-            except telethon.errors.rpcerrorlist.MessageNotModifiedError:
+            except legacytl.errors.rpcerrorlist.MessageNotModifiedError:
                 # Try to clear personal info if the edit fails
                 await message.delete()
 
@@ -282,13 +282,13 @@ class RawMessageEditor(SudoMessageEditor):
         logger.debug(text)
 
         with contextlib.suppress(
-            telethon.errors.rpcerrorlist.MessageNotModifiedError,
-            telethon.errors.rpcerrorlist.MessageEmptyError,
+            legacytl.errors.rpcerrorlist.MessageNotModifiedError,
+            legacytl.errors.rpcerrorlist.MessageEmptyError,
             ValueError,
         ):
             try:
                 await utils.answer(self.message, text)
-            except telethon.errors.rpcerrorlist.MessageTooLongError as e:
+            except legacytl.errors.rpcerrorlist.MessageTooLongError as e:
                 logger.error(e)
                 logger.error(text)
 
@@ -333,7 +333,7 @@ class TerminalMod(loader.Module):
 
     async def run_command(
         self,
-        message: telethon.tl.types.Message,
+        message: legacytl.tl.types.Message,
         cmd: str,
         editor: typing.Optional[MessageEditor] = None,
     ):

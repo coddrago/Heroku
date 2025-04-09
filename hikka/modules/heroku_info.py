@@ -5,8 +5,8 @@
 # 🔑 https://www.gnu.org/licenses/agpl-3.0.html
 
 import git
-from telethon.tl.types import Message
-from telethon.utils import get_display_name
+from legacytl.tl.types import Message
+from legacytl.utils import get_display_name
 import requests
 import os
 from .. import loader, utils, version
@@ -32,7 +32,7 @@ class HerokuInfoMod(loader.Module):
                 "https://imgur.com/a/7LBPJiq.png",
                 lambda: self.strings("_cfg_banner"),
             ),
-            
+
             loader.ConfigValue(
                 "pp_to_banner",
                 False,
@@ -61,7 +61,7 @@ class HerokuInfoMod(loader.Module):
             utils.escape_html(get_display_name(self._client.hikka_me)),
         )
         build = utils.get_commit_url()
-        _version = f'<i>{".".join(list(map(str, list(version.__version__))))}</i>'
+        _version = f'<i>{version.__version__}</i>'
         prefix = f"«<code>{utils.escape_html(self.get_prefix())}</code>»"
 
         platform = utils.get_named_platform()

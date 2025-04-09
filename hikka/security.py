@@ -26,10 +26,10 @@ import logging
 import time
 import typing
 
-from telethon.hints import EntityLike
-from telethon.tl.functions.messages import GetFullChatRequest
-from telethon.tl.types import ChatParticipantAdmin, ChatParticipantCreator, Message
-from telethon.utils import get_display_name
+from legacytl.hints import EntityLike
+from legacytl.tl.functions.messages import GetFullChatRequest
+from legacytl.tl.types import ChatParticipantAdmin, ChatParticipantCreator, Message
+from legacytl.utils import get_display_name
 
 from . import main, utils
 from .database import Database
@@ -471,7 +471,7 @@ class SecurityManager:
             cmd = None
 
         if callable(func):
-            command = self._client.loader.find_alias(cmd, include_legacy=True) or cmd
+            command = self._client.loader.find_alias(cmd, include_legacytl=True) or cmd
 
             for info in self._sgroups.copy().values():
                 if user_id in info.users:

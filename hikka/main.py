@@ -40,10 +40,10 @@ import sys
 import typing
 from getpass import getpass
 from pathlib import Path
-from hikka.extensions.html import CUSTOM_EMOJIS
+from legacytl.extensions.html import CUSTOM_EMOJIS
 
-from telethon import events
-from telethon.errors import (
+from legacytl import events
+from legacytl.errors import (
     ApiIdInvalidError,
     AuthKeyDuplicatedError,
     FloodWaitError,
@@ -51,14 +51,14 @@ from telethon.errors import (
     PhoneNumberInvalidError,
     SessionPasswordNeededError,
 )
-from telethon.network.connection import (
+from legacytl.network.connection import (
     ConnectionTcpFull,
     ConnectionTcpMTProxyRandomizedIntermediate,
 )
-from telethon.password import compute_check
-from telethon.sessions import MemorySession, SQLiteSession
-from telethon.tl.functions.account import GetPasswordRequest
-from telethon.tl.functions.auth import CheckPasswordRequest
+from legacytl.password import compute_check
+from legacytl.sessions import MemorySession, SQLiteSession
+from legacytl.tl.functions.account import GetPasswordRequest
+from legacytl.tl.functions.auth import CheckPasswordRequest
 
 from . import database, loader, utils, version
 from ._internal import print_banner, restart
@@ -614,7 +614,7 @@ class Hikka:
                 connection_retries=None,
                 device_model=get_app_name(),
                 system_version=generate_random_system_version(),
-                app_version=".".join(map(str, __version__)) + " x64",
+                app_version=__version__,
                 lang_code="en",
                 system_lang_code="en-US",
             )
@@ -745,7 +745,7 @@ class Hikka:
                     connection_retries=None,
                     device_model=get_app_name(),
                     system_version=generate_random_system_version(),
-                    app_version=".".join(map(str, __version__)) + " x64",
+                    app_version=__version__,
                     lang_code="en",
                     system_lang_code="en-US",
                 )
@@ -814,7 +814,7 @@ class Hikka:
                 "/ __  /|  __/| |  | (_) ||   < | |_| |\n"
                 "\/ /_/  \___||_|   \___/ |_|\_\ \__,_|\n\n"
                 f"• Build: {build[:7]}\n"
-                f"• Version: {'.'.join(list(map(str, list(__version__))))}\n"
+                f"• Version: {__version__}\n"
                 f"• {upd}\n"
             )
 
@@ -827,7 +827,7 @@ class Hikka:
                 )
                 logging.debug(
                     "\n🪐 Heroku %s #%s (%s) started\n%s",
-                    ".".join(list(map(str, list(__version__)))),
+                    __version__,
                     build[:7],
                     upd,
                     web_url,
@@ -839,9 +839,9 @@ class Hikka:
                 "https://imgur.com/a/uUF9zYL.png",
                 caption=(
                     "🪐 <b>Heroku {} started!</b>\n\n⚙ <b>GitHub commit SHA: <a"
-                    ' href="https://github.com/coddrago/Heroku/commit/{}">{}</a></b>\n🔎'
+                    ' href="https://github.com/Crayz310/Heroku-Legacy/commit/{}">{}</a></b>\n🔎'
                     " <b>Update status: {}</b>\n<b>{}</b>".format(
-                        ".".join(list(map(str, list(__version__)))),
+                        __version__,
                         build,
                         build[:7],
                         upd,

@@ -34,7 +34,7 @@ from aiogram.utils.exceptions import (
     MessageNotModified,
     RetryAfter,
 )
-from telethon.utils import resolve_inline_message_id
+from legacytl.utils import resolve_inline_message_id
 
 from .. import utils
 from ..types import HikkaReplyMarkup

@@ -23,9 +23,9 @@ from dataclasses import dataclass, field
 from importlib.abc import SourceLoader
 
 import requests
-from telethon.hints import EntityLike
-from telethon.tl.functions.account import UpdateNotifySettingsRequest
-from telethon.tl.types import (
+from legacytl.hints import EntityLike
+from legacytl.tl.functions.account import UpdateNotifySettingsRequest
+from legacytl.tl.types import (
     Channel,
     ChannelFull,
     InputPeerNotifySettings,

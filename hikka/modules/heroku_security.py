@@ -9,9 +9,9 @@ import datetime
 import time
 import typing
 
-from telethon.hints import EntityLike
-from telethon.tl.types import Message, PeerUser, User
-from telethon.utils import get_display_name
+from legacytl.hints import EntityLike
+from legacytl.tl.types import Message, PeerUser, User
+from legacytl.utils import get_display_name
 
 from .. import loader, main, security, utils
 from ..inline.types import InlineCall, InlineMessage

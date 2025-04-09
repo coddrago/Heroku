@@ -9,8 +9,8 @@ import difflib
 import inspect
 import logging
 
-from telethon.extensions.html import CUSTOM_EMOJIS
-from telethon.tl.types import Message
+from legacytl.extensions.html import CUSTOM_EMOJIS
+from legacytl.tl.types import Message
 
 from .. import loader, utils
 
@@ -336,7 +336,7 @@ class Help(loader.Module):
     @loader.command(ru_doc="| Ссылка на чат помощи", ua_doc="| посилання для чату служби підтримки", de_doc="| Link zum Support-Chat")
     async def support(self, message):
         """| link for support chat"""
-       
+
         await utils.answer(
             message,
             self.strings("support").format(

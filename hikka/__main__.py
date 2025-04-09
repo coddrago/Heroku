@@ -59,14 +59,14 @@ elif __package__ != "hikka":  # In case they did python __main__.py
     print("🚫 Error: you cannot run this as a script; you must execute as a package")
 else:
     try:
-        import telethon
+        import legacytl
     except Exception:
         pass
     else:
         try:
-            import telethon  # noqa: F811
+            import legacytl  # noqa: F811
 
-            if tuple(map(int, telethon.__version__.split("."))) < (1, 35, 0):
+            if tuple(map(int, legacytl.__version__.split("."))) < (1, 0, 0):
                 raise ImportError
         except ImportError:
             print("🔄 Installing dependencies...")

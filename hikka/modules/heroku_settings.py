@@ -7,14 +7,14 @@
 import logging
 import os
 import random
-from hikka.extensions.html import CUSTOM_EMOJIS
+from legacytl.extensions.html import CUSTOM_EMOJIS
 
-from telethon.tl.functions.messages import (
+from legacytl.tl.functions.messages import (
     GetDialogFiltersRequest,
     UpdateDialogFilterRequest,
 )
-from telethon.tl.types import Message
-from telethon.utils import get_display_name
+from legacytl.tl.types import Message
+from legacytl.utils import get_display_name
 
 from .. import loader, log, main, utils
 from .._internal import fw_protect, restart

@@ -20,8 +20,8 @@ except ImportError as e:
 
 import typing
 
-from telethon.errors.rpcerrorlist import ChannelsTooMuchError
-from telethon.tl.types import Message, User
+from legacytl.errors.rpcerrorlist import ChannelsTooMuchError
+from legacytl.tl.types import Message, User
 
 from . import main, utils
 from .pointers import (

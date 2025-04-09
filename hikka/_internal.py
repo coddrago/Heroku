@@ -45,7 +45,7 @@ def restart():
         print(
             "Got in a loop, exiting\nYou probably need to manually remove existing"
             " packages and then restart Heroku. Run `pip uninstall -y telethon"
-            " telethon-mod hikka-tl-new`, then restart Heroku."
+            " telethon-mod legacy-tl-new`, then restart Heroku."
         )
         sys.exit(0)
 

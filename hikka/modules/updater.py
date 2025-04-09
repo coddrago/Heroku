@@ -15,12 +15,12 @@ import typing
 
 import git
 from git import GitCommandError, Repo
-from telethon.extensions.html import CUSTOM_EMOJIS
-from telethon.tl.functions.messages import (
+from legacytl.extensions.html import CUSTOM_EMOJIS
+from legacytl.tl.functions.messages import (
     GetDialogFiltersRequest,
     UpdateDialogFilterRequest,
 )
-from telethon.tl.types import DialogFilter, Message
+from legacytl.tl.types import DialogFilter, Message
 
 from .. import loader, main, utils, version
 from .._internal import restart
@@ -39,7 +39,7 @@ class UpdaterMod(loader.Module):
         self.config = loader.ModuleConfig(
             loader.ConfigValue(
                 "GIT_ORIGIN_URL",
-                "https://github.com/coddrago/Heroku",
+                "https://github.com/Crayz310/Heroku-Legacy",
                 lambda: self.strings("origin_cfg_doc"),
                 validator=loader.validators.Link(),
             )
@@ -216,7 +216,7 @@ class UpdaterMod(loader.Module):
                 raise
         except Exception:
             await self.inline_update(message)
-            
+
     async def inline_update(
         self,
         msg_obj: typing.Union[InlineCall, Message],

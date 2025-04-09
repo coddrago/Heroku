@@ -3,12 +3,12 @@ import logging
 import struct
 import time
 
-from telethon.errors import InvalidBufferError, SecurityError
-from telethon.extensions import BinaryReader
-from telethon.network.connection import ConnectionTcpFull as ConnectionTcpFullOrig
-from telethon.network.mtprotostate import MTProtoState as MTProtoStateOrig
-from telethon.tl.core import TLMessage
-from telethon.tl.types import BadMsgNotification, BadServerSalt
+from legacytl.errors import InvalidBufferError, SecurityError
+from legacytl.extensions import BinaryReader
+from legacytl.network.connection import ConnectionTcpFull as ConnectionTcpFullOrig
+from legacytl.network.mtprotostate import MTProtoState as MTProtoStateOrig
+from legacytl.tl.core import TLMessage
+from legacytl.tl.types import BadMsgNotification, BadServerSalt
 
 MSG_TOO_NEW_DELTA = 30
 MSG_TOO_OLD_DELTA = 300

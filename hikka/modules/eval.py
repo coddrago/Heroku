@@ -13,10 +13,10 @@ import tempfile
 import typing
 from types import ModuleType
 
-import telethon
-from telethon.errors.rpcerrorlist import MessageIdInvalidError
-from telethon.sessions import StringSession
-from telethon.tl.types import Message
+import legacytl
+from legacytl.errors.rpcerrorlist import MessageIdInvalidError
+from legacytl.sessions import StringSession
+from legacytl.tl.types import Message
 from meval import meval
 
 from .. import loader, main, utils
@@ -462,16 +462,16 @@ class Evaluator(loader.Module):
             "client": self._client,
             "reply": reply,
             "r": reply,
-            **self.get_sub(telethon.tl.types),
-            **self.get_sub(telethon.tl.functions),
+            **self.get_sub(legacytl.tl.types),
+            **self.get_sub(legacytl.tl.functions),
             "event": message,
             "chat": message.to_id,
-            "telethon": telethon,
-            "telethon": telethon,
+            "legacytl": legacytl,
+            "legacytl": legacytl,
             "utils": utils,
             "main": main,
             "loader": loader,
-            "f": telethon.tl.functions,
+            "f": legacytl.tl.functions,
             "c": self._client,
             "m": message,
             "lookup": self.lookup,
@@ -498,7 +498,7 @@ class Evaluator(loader.Module):
                             lambda x: x[0][0] != "_"
                             and isinstance(x[1], ModuleType)
                             and x[1] != obj
-                            and x[1].__package__.rsplit(".", _depth)[0] == "telethon.tl",
+                            and x[1].__package__.rsplit(".", _depth)[0] == "legacytl.tl",
                             obj.__dict__.items(),
                         )
                     ]

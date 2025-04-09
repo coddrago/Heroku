@@ -15,7 +15,7 @@ from io import BytesIO
 import platform as lib_platform
 import getpass
 
-from telethon.tl.types import Message
+from legacytl.tl.types import Message
 
 from .. import loader, main, utils
 from ..inline.types import InlineCall
@@ -72,7 +72,7 @@ class TestMod(loader.Module):
             loader.ConfigValue(
                 "ignore_common",
                 True,
-                "Ignore common errors (e.g. 'TypeError' in telethon)",
+                "Ignore common errors (e.g. 'TypeError' in legacytl)",
                 validator=loader.validators.Boolean(),
                 on_change=self._pass_config_to_logger,
             ),

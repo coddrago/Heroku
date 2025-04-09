@@ -10,20 +10,20 @@ import logging
 import time
 import typing
 
-from telethon import TelegramClient
-from telethon import __name__ as __base_name__
-from telethon import helpers
-from telethon._updates import ChannelState, Entity, EntityType, SessionState
-from telethon.errors import RPCError
-from telethon.errors.rpcerrorlist import TopicDeletedError
-from telethon.hints import EntityLike
-from telethon.network import MTProtoSender
-from telethon.tl import functions
-from telethon.tl.alltlobjects import LAYER
-from telethon.tl.functions.channels import GetFullChannelRequest
-from telethon.tl.functions.users import GetFullUserRequest
-from telethon.tl.tlobject import TLRequest
-from telethon.tl.types import (
+from legacytl import TelegramClient
+from legacytl import __name__ as __base_name__
+from legacytl import helpers
+from legacytl._updates import ChannelState, Entity, EntityType, SessionState
+from legacytl.errors import RPCError
+from legacytl.errors.rpcerrorlist import TopicDeletedError
+from legacytl.hints import EntityLike
+from legacytl.network import MTProtoSender
+from legacytl.tl import functions
+from legacytl.tl.alltlobjects import LAYER
+from legacytl.tl.functions.channels import GetFullChannelRequest
+from legacytl.tl.functions.users import GetFullUserRequest
+from legacytl.tl.tlobject import TLRequest
+from legacytl.tl.types import (
     ChannelFull,
     Message,
     Pong,
@@ -32,7 +32,7 @@ from telethon.tl.types import (
     UpdateShort,
     UserFull,
 )
-from telethon.utils import is_list_like
+from legacytl.utils import is_list_like
 
 from .types import (
     CacheRecordEntity,
@@ -247,7 +247,7 @@ class CustomTelegramClient(TelegramClient):
                 )
             except StopIteration:
                 logger.debug(
-                    "Can't parse hashable from entity %s, using legacy resolve",
+                    "Can't parse hashable from entity %s, using legacytl resolve",
                     entity,
                 )
                 return await super().get_entity(entity)
@@ -327,7 +327,7 @@ class CustomTelegramClient(TelegramClient):
                 )
             except StopIteration:
                 logger.debug(
-                    "Can't parse hashable from entity %s, using legacy method",
+                    "Can't parse hashable from entity %s, using legacytl method",
                     entity,
                 )
                 return await self.get_permissions(entity, user)
@@ -340,7 +340,7 @@ class CustomTelegramClient(TelegramClient):
                 )
             except StopIteration:
                 logger.debug(
-                    "Can't parse hashable from user %s, using legacy method",
+                    "Can't parse hashable from user %s, using legacytl method",
                     user,
                 )
                 return await self.get_permissions(entity, user)
@@ -435,7 +435,7 @@ class CustomTelegramClient(TelegramClient):
             except StopIteration:
                 logger.debug(
                     (
-                        "Can't parse hashable from entity %s, using legacy fullchannel"
+                        "Can't parse hashable from entity %s, using legacytl fullchannel"
                         " request"
                     ),
                     entity,
@@ -487,7 +487,7 @@ class CustomTelegramClient(TelegramClient):
             except StopIteration:
                 logger.debug(
                     (
-                        "Can't parse hashable from entity %s, using legacy fulluser"
+                        "Can't parse hashable from entity %s, using legacytl fulluser"
                         " request"
                     ),
                     entity,

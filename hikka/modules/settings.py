@@ -4,9 +4,9 @@
 # You can redistribute it and/or modify it under the terms of the GNU AGPLv3
 # 🔑 https://www.gnu.org/licenses/agpl-3.0.html
 
-import telethon
-from telethon.extensions.html import CUSTOM_EMOJIS
-from telethon.tl.types import Message
+import legacytl
+from legacytl.extensions.html import CUSTOM_EMOJIS
+from legacytl.tl.types import Message
 
 from .. import loader, main, utils, version
 from ..inline.types import InlineCall
@@ -99,7 +99,7 @@ class CoreMod(loader.Module):
                 ),
                 *version.__version__,
                 utils.get_commit_url(),
-                f"{telethon.__version__} #{telethon.tl.alltlobjects.LAYER}",
+                f"{legacytl.__version__} #{legacytl.tl.alltlobjects.LAYER}",
             )
             + (
                 ""
@@ -294,5 +294,5 @@ class CoreMod(loader.Module):
             message.peer_id,
             "https://imgur.com/a/HrrFair.png",
             caption=self.strings["installation"].format('{}', prefix=self.get_prefix()), reply_to=getattr(message, "reply_to_msg_id", None),)
-    
+
         await message.delete()

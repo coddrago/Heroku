@@ -19,7 +19,7 @@ import aiohttp_jinja2
 import requests
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from aiohttp import web
-from telethon.errors import (
+from legacytl.errors import (
     FloodWaitError,
     PasswordHashInvalidError,
     PhoneCodeExpiredError,
@@ -27,12 +27,12 @@ from telethon.errors import (
     SessionPasswordNeededError,
     YouBlockedUserError,
 )
-from telethon.password import compute_check
-from telethon.sessions import MemorySession
-from telethon.tl.functions.account import GetPasswordRequest
-from telethon.tl.functions.auth import CheckPasswordRequest
-from telethon.tl.functions.contacts import UnblockRequest
-from telethon.utils import parse_phone
+from legacytl.password import compute_check
+from legacytl.sessions import MemorySession
+from legacytl.tl.functions.account import GetPasswordRequest
+from legacytl.tl.functions.auth import CheckPasswordRequest
+from legacytl.tl.functions.contacts import UnblockRequest
+from legacytl.utils import parse_phone
 
 from .. import database, main, utils
 from .._internal import restart
@@ -297,7 +297,7 @@ class Web:
             connection_retries=None,
             device_model=main.get_app_name(),
             system_version=main.generate_random_system_version(),
-            app_version=".".join(map(str, __version__)) + " x64",
+            app_version=__version__,
             lang_code="en",
             system_lang_code="en-US",
         )

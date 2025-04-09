@@ -8,8 +8,8 @@ import asyncio
 import logging
 import re
 
-from telethon.errors.rpcerrorlist import YouBlockedUserError
-from telethon.tl.functions.contacts import UnblockRequest
+from legacytl.errors.rpcerrorlist import YouBlockedUserError
+from legacytl.tl.functions.contacts import UnblockRequest
 
 from .. import utils
 from .._internal import fw_protect

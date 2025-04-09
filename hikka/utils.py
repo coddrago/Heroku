@@ -43,24 +43,24 @@ from urllib.parse import urlparse
 
 import git
 import grapheme
-import telethon
+import legacytl
 import requests
 from aiogram.types import Message as AiogramMessage
-from telethon import hints
-from telethon.tl.custom.message import Message
-from telethon.tl.functions.account import UpdateNotifySettingsRequest
-from telethon.tl.functions.channels import (
+from legacytl import hints
+from legacytl.tl.custom.message import Message
+from legacytl.tl.functions.account import UpdateNotifySettingsRequest
+from legacytl.tl.functions.channels import (
     CreateChannelRequest,
     EditAdminRequest,
     EditPhotoRequest,
     InviteToChannelRequest,
 )
-from telethon.tl.functions.messages import (
+from legacytl.tl.functions.messages import (
     GetDialogFiltersRequest,
     SetHistoryTTLRequest,
     UpdateDialogFilterRequest,
 )
-from telethon.tl.types import (
+from legacytl.tl.types import (
     Channel,
     Chat,
     ChatAdminRights,
@@ -130,7 +130,7 @@ emoji_pattern = re.compile(
     flags=re.UNICODE,
 )
 
-parser = telethon.utils.sanitize_parse_mode("html")
+parser = legacytl.utils.sanitize_parse_mode("html")
 logger = logging.getLogger(__name__)
 
 
@@ -222,7 +222,7 @@ def get_chat_id(message: typing.Union[Message, AiogramMessage]) -> int:
     :param message: Message to get chat ID from
     :return: Chat ID
     """
-    return telethon.utils.resolve_id(
+    return legacytl.utils.resolve_id(
         getattr(message, "chat_id", None)
         or getattr(getattr(message, "chat", None), "id", None)
     )[0]
@@ -234,7 +234,7 @@ def get_entity_id(entity: hints.Entity) -> int:
     :param entity: Entity to get ID from
     :return: Entity ID
     """
-    return telethon.utils.get_peer_id(entity)
+    return legacytl.utils.get_peer_id(entity)
 
 
 def escape_html(text: str, /) -> str:  # sourcery skip
@@ -331,7 +331,7 @@ def censor(
 ):
     """
     May modify the original object, but don't rely on it
-    :param obj: Object to censor, preferrably telethon
+    :param obj: Object to censor, preferrably legacytl
     :param to_censor: Iterable of strings to censor
     :param replace_with: String to replace with, {count} will be replaced with the number of characters
     :return: Censored object
@@ -493,7 +493,7 @@ async def answer(
     elif "reply_to" in kwargs:
         kwargs.pop("reply_to")
 
-    parse_mode = telethon.utils.sanitize_parse_mode(
+    parse_mode = legacytl.utils.sanitize_parse_mode(
         kwargs.pop(
             "parse_mode",
             message.client.parse_mode,
@@ -754,7 +754,7 @@ async def asset_channel(
     ):
         return client._channels_cache[title]["peer"], False
 
-    # legacy heroku / hikka chats conversion to heroku
+    # legacytl heroku / hikka chats conversion to heroku
     if title.startswith("hikka-"):
         title = title.replace("hikka-", "heroku-")
 
@@ -1011,7 +1011,7 @@ def get_platform_emoji() -> str:
 
     return BASE.format(5393588431026674882)
 
-allowed_ids = [1714120111, 1655585249] 
+allowed_ids = [1714120111, 1655585249]
 
 def uptime() -> int:
     """
@@ -1061,7 +1061,7 @@ async def set_uptime(client: CustomTelegramClient, minutes: int) -> str:
     init_ts = time.perf_counter() - seconds
 
     return " Uptime is on offer!"
-    
+
 def ascii_face() -> str:
     """
     Returnes cute ASCII-art face
@@ -1184,7 +1184,7 @@ def smart_split(
 
     :example:
         >>> utils.smart_split(
-            *telethon.extensions.html.parse(
+            *legacytl.extensions.html.parse(
                 "<b>Hello, world!</b>"
             )
         )
@@ -1542,8 +1542,8 @@ def validate_html(html: str) -> str:
     :param html: HTML to validate
     :return: Valid HTML
     """
-    text, entities = telethon.extensions.html.parse(html)
-    return telethon.extensions.html.unparse(escape_html(text), entities)
+    text, entities = legacytl.extensions.html.parse(html)
+    return legacytl.extensions.html.unparse(escape_html(text), entities)
 
 
 def iter_attrs(obj: typing.Any, /) -> typing.List[typing.Tuple[str, typing.Any]]:
@@ -1650,7 +1650,7 @@ def get_version_raw() -> str:
     """
     from . import version
 
-    return ".".join(map(str, list(version.__version__)))
+    return version.__version__
 
 
 get_platform_name = get_named_platform

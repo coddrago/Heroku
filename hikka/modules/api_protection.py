@@ -12,10 +12,10 @@ import random
 import time
 import typing
 
-from telethon.tl import functions
-from telethon.tl.tlobject import TLRequest
-from telethon.tl.types import Message
-from telethon.utils import is_list_like
+from legacytl.tl import functions
+from legacytl.tl.tlobject import TLRequest
+from legacytl.tl.types import Message
+from legacytl.utils import is_list_like
 
 from .. import loader, utils
 from ..inline.types import InlineCall
