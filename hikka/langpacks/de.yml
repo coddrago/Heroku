@@ -197,38 +197,20 @@ heroku_backup:
   _cmd_doc_restoremods: "<Antwort auf die Datei> - Module aus Sicherung wiederherstellen"
   _cmd_doc_set_backup_period: "<Zeit in Stunden> - Häufigkeit der Sicherungen festlegen"
 
-presets:
-  _fun_title: "🪩 Unterhaltsame Module"
-  _fun_desc: "Lustige Module – Animationen, Spam, Spiele und mehr."
-  _chat_title: "👥 Chat-Administrationsmodule"
-  _chat_desc: "Sammlung von Modulen, die Ihnen bei der Chat-Administration helfen – Filter, Notizen, Spracherkennung und mehr."
-  _service_title: "⚙️ Nützliche Module"
-  _service_desc: "Tatsächlich nützliche Module – Kontoverwaltung, Linkverkürzer, Suchmaschine und mehr."
-  _downloaders_title: "📥 Downloader"
-  _downloaders_desc: "Sammlung von Modulen, die Ihnen helfen, Dateien aus verschiedenen Quellen hoch-/herunterzuladen – YouTube, TikTok, Instagram, Spotify, VK Musik und mehr."
-  welcome: "👋 <b>Hallo! Müde vom Durchblättern endloser Modullisten in Kanälen? Ich kann Ihnen einige vorgefertigte Sets anbieten. Wenn Sie dieses Menü erneut aufrufen müssen, senden Sie mir den Befehl /presets</b>"
-  preset: "<b>{}:</b>\nℹ️ <i>{}</i>\n\n⚒ <b>Module in diesem Set:</b>\n\n{}"
-  back: "🔙 Zurück"
-  install: "📦 Installieren"
-  installing: "<emoji document_id=5451732530048802485>⏳</emoji> <b>Installation des Sets </b><code>{}</code><b>...</b>"
-  installing_module: "<emoji document_id=5451732530048802485>⏳</emoji> <b>Installation des Sets</b> <code>{}</code> <b>({}/{} Module)...</b>\n\n<emoji document_id=5188377234380954537>🪐</emoji> <i>Installation des Moduls {}...</i>"
-  installed: "<emoji document_id=5436040291507247633>🎉</emoji> <b>Set</b> <code>{}</code> <b>wurde installiert!</b>"
-  already_installed: "✅ [Installiert]"
-
 settings:
   installation: '<emoji document_id=5363805650327450240>▪️</emoji> Die Installation ist wirklich einfach! Schreibe einfach folgendes in das Terminal deines Servers:
   <pre><code class="language-bash">sudo apt update && sudo apt upgrade -y && sudo apt install git && sudo apt install python3-pip && git clone https://github.com/coddrago/Heroku && cd Heroku && pip install -r requirements.txt && python3 -m hikka</code></pre>
-  
+
   <emoji document_id=5299027123913105700>😐</emoji> Wenn du keinen Zugriff auf sudo hast, kannst du einfach die Anfangsbefehle weglassen.
-  
+
   <emoji document_id=5300777464820145682>🥳</emoji> Lass uns die Argumente ein wenig erklären:
-  
+
   <emoji document_id=5787313834012184077>🔐</emoji> Argument <code>--root</code> - erlaubt dir, Hikka als <b>Root-Benutzer</b> zu starten.
-  
+
   <emoji document_id=5785209342986817408>🌎</emoji> Argument <code>--no-web</code> - öffnet den Login-Prozess in deinem <b>Terminal statt über einen Link</b> <code>{}.lhr.life</code>.
-  
+
   <emoji document_id=5471895949804575096>🤲</emoji> Wenn du jedoch von Hikka von hikariatama wechseln möchtest, solltest du dieses Modul herunterladen:
-  
+
   <pre><code class="language-hikka">{prefix}dlm https://raw.githubusercontent.com/coddrago/modules/main/SwitchToHeroku.py</code></pre>
   Es ist völlig sicher und hilft dir, von Hikka zu Heroku zu wechseln.'
   too_many_args: "<emoji document_id=5210952531676504517>🚫</emoji> <b>Zu viele Argumente</b>"
@@ -342,7 +324,7 @@ update_notifier:
   update: "🔄 Aktualisieren"
   ignore: "🚫 Ignorieren"
   changelog: '<emoji document_id=5434144690511290129>📰</emoji> <b>Änderungsprotokoll des letzten großen Updates:</b><pre><code class="language-heroku">{}</code></pre>'
-  
+
 updater:
   source: "<emoji document_id=5456255401194429832>📖</emoji> <b>Den Quellcode kannst du <a href='{}'>hier</a> einsehen</b>"
   restarting_caption: "<emoji document_id=5328274090262275771>🕗</emoji> <b>Dein {} wird neu gestartet...</b>"
@@ -367,7 +349,8 @@ updater:
   rollback_no_args: "<emoji document_id=5465665476971471368>❌</emoji> <b>Sie müssen Commit SHA angeben</b>"
   rollback_ok: "<emoji document_id=5215492745900077682>✅</emoji> <b>Rollback erfolgreich. Nach dem Neustart ist alles erledigt</b>"
   rollback_err: "<emoji document_id=5465665476971471368>❌</emoji> <b>Rollback nicht möglich</b>"
-  
+  _cmd_doc_rollback: "Rollback zum angegebenen Commit"
+
 api_protection:
   warning: "⚠️ <b>ACHTUNG!</b>\n\nDas Konto hat die in der Konfiguration angegebenen Anfrageratenlimits überschritten. Um Telegram API-Fluten zu vermeiden, wurde der Userbot <b>vollständig eingefroren</b> für {} Sekunden. Weitere Informationen befinden sich in der beigefügten Datei unten. \n\nEs wird empfohlen, die Hilfe der <code>{prefix}support</code> Gruppe in Anspruch zu nehmen!\n\nWenn du davon ausgehst, dass dies ein geplantes Verhalten des Userbots ist, warte einfach, bis der Timer abläuft, und beim nächsten Mal, wenn du eine ressourcenintensive Aufgabe planst, benutze <code>{prefix}suspend_api_protect</code> Zeit in Sekunden"
   args_invalid: "<emoji document_id=5210952531676504517>🚫</emoji> <b>Ungültige Argumente</b>"
@@ -505,7 +488,7 @@ loader:
   _cmd_doc_addrepo: "Füge ein zusätzliches Repository hinzu"
   _cmd_doc_delrepo: "Lösche ein zusätzliches Repository"
   basic_auth_doc: "Authentifizierung für den Zugriff auf das Repository"
- 
+
 translations:
   lang_saved: "{} <b>Sprache gespeichert!</b>"
   pack_saved: "<emoji document_id=5197474765387864959>👍</emoji> <b>Übersetzungspaket gespeichert!</b>"

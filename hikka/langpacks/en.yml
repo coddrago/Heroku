@@ -206,27 +206,6 @@ heroku_backup:
   mods_restored: "<emoji document_id=5774134533590880843>🔄</emoji> <b>Mods restored, restarting</b>"
   backup_sent: "<emoji document_id=5431736674147114227>🗂</emoji> <b>Backup has been sent to saved messages</b>"
 
-presets:
-  name: "Presets"
-  _fun_title: "🪩 Entertainment modules"
-  _fun_desc: "Fun modules — animations, spam, entertainment, etc."
-  _chat_title: "👥 Group Administration Helpers"
-  _chat_desc: "The collection of tools which will help to moderate your group chat — filters, notes, voice recognition, etc."
-  _service_title: "⚙️ Useful modules"
-  _service_desc: "Really useful modules — account management, link shortener, search engine, etc."
-  _downloaders_title: "📥 Downloaders"
-  _downloaders_desc: "The collection of tools which will help you download/upload files from/to different sources — YouTube, TikTok, Instagram, Spotify, VK Music, etc."
-  welcome: "👋 <b>Hi there! Tired of scrolling through endless modules in channels? Let me suggest you some pre-made collections. If you need to call this menu again, simply send /presets to this bot!</b>"
-  preset: "<b>{}:</b>\nℹ️ <i>{}</i>\n\n⚒ <b>Modules in this collection:</b>\n\n{}"
-  back: "🔙 Back"
-  install: "📦 Install"
-  installing: "<emoji document_id=5451732530048802485>⏳</emoji> <b>Installing preset</b> <code>{}</code><b>...</b>"
-  installing_module: "<emoji document_id=5451732530048802485>⏳</emoji> <b>Installing preset</b> <code>{}</code> <b>({}/{} modules)...</b>\n\n<emoji document_id=5188377234380954537>🪐</emoji> <i>Installing module {}...</i>"
-  installed: "<emoji document_id=5436040291507247633>🎉</emoji> <b>Preset</b> <code>{}</code> <b>installed!</b>"
-  already_installed: "✅ [Installed]"
-  _cls_doc: "Suggests new Heroku
-  users a packs of modules to load"
-
 settings:
   name: "Settings"
   installation: '<emoji document_id=5363805650327450240>▪️</emoji> The installation is very easy! Just enter the following in your servers terminal:
@@ -391,6 +370,7 @@ updater:
   rollback_no_args: "<emoji document_id=5465665476971471368>❌</emoji> <b>You need to specify commit SHA</b>"
   rollback_ok: "<emoji document_id=5215492745900077682>✅</emoji> <b>Rollback successful. After reboot everything is done</b>"
   rollback_err: "<emoji document_id=5465665476971471368>❌</emoji> <b>Unable to rollback</b>"
+  _cmd_doc_rollback: "Rollback to the specified commit"
 
 api_protection:
   name: "APILimiter"
