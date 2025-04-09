@@ -948,6 +948,7 @@ def get_platform_emoji() -> str:
             "<emoji document_id=5456573499357297413>😀</emoji>",
         )
     )
+    return BASE
 
     # if main.IS_HIKKAHOST:
     #     return BASE.format(5395745114494624362)
