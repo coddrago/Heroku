@@ -223,7 +223,7 @@ class Utils(InlineUnit):
     generate_markup = _generate_markup
 
     async def _close_unit_handler(self, call: InlineCall):
-        return await self._delete_unit_message(
+        return self._delete_unit_message(
             call,
             unit_id=call.unit_id,
         )
