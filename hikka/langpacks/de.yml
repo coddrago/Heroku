@@ -100,6 +100,7 @@ heroku_settings:
   cmd_nn: "<emoji document_id=5469791106591890404>🪄</emoji> <b>NoNick-Status für</b> <code>{}</code><b>: {}</b>"
   cmd404: "<emoji document_id=5469791106591890404>🪄</emoji> <b>Befehl nicht gefunden</b>"
   inline_settings: "⚙️ <b>Hier kannst du die Heroku-Einstellungen verwalten</b>"
+  web_disabled: "<emoji document_id=5312353505489472514>🌐</emoji> <b>Das Web ist deaktiviert</b>"
   confirm_update: "🧭 <b>Bestätige das Update. Der Userbot wird neu gestartet</b>"
   confirm_restart: "🔄 <b>Bestätige den Neustart</b>"
   suggest_fs: "✅ Module speichern vorschlagen"

@@ -111,6 +111,7 @@ heroku_settings:
   cmd_nn: "<emoji document_id=5469791106591890404>🪄</emoji> <b>NoNick for</b> <code>{}</code> <b>is now {}</b>"
   cmd404: "<emoji document_id=5469791106591890404>🪄</emoji> <b>Command not found</b>"
   inline_settings: "⚙️ <b>Here you can configure your Heroku-Legacy settings</b>"
+  web_disabled: "<emoji document_id=5312353505489472514>🌐</emoji> <b>Web is disabled</b>"
   confirm_update: "🧭 <b>Please, confirm that you want to update. Your userbot will be restarted</b>"
   confirm_restart: "🔄 <b>Please, confirm that you want to restart</b>"
   suggest_fs: "✅ Suggest FS for modules"

@@ -732,18 +732,9 @@ class HerokuSettingsMod(loader.Module):
 
     @loader.command()
     async def weburl(self, message: Message, force: bool = False):
-        if "LAVHOST" in os.environ:
-            form = await self.inline.form(
-                self.strings("lavhost_web"),
-                message=message,
-                reply_markup={
-                    "text": self.strings("web_btn"),
-                    "url": await main.hikka.web.get_url(proxy_pass=False),
-                },
-                photo="https://imgur.com/a/yOoHsa2.png",
-            )
-            return
-
+        arguments = main.parse_arguments()
+        if getattr(arguments, "disable_web", False):
+            return await utils.answer(message, self.strings("web_disabled"))
         if (
             not force
             and not message.is_private

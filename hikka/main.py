@@ -838,7 +838,7 @@ class Hikka:
                         build,
                         build[:7],
                         upd,
-                        self.web.url,
+                        self.web.url if self.web else "",
                     )
                 ),
             )
