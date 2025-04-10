@@ -320,7 +320,7 @@ class TestMod(loader.Module):
         ghash = utils.get_git_hash()
 
         other = (
-            *main.__version__,
+            utils.get_version_raw(),
             (
                 " <a"
                 f' href="https://github.com/Crayz310/Heroku-Legacy/commit/{ghash}">@{ghash[:8]}</a>'
