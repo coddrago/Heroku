@@ -44,6 +44,7 @@ logger = logging.getLogger(__name__)
 class Web(root.Web):
     def __init__(self, **kwargs):
         self.runner = None
+        self.url = None
         self.port = None
         self.running = asyncio.Event()
         self.ready = asyncio.Event()
