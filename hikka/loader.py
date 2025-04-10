@@ -119,11 +119,6 @@ inline_everyone = security.inline_everyone
 async def stop_placeholder() -> bool:
     return True
 
-
-class Placeholder:
-    """Placeholder"""
-
-
 VALID_PIP_PACKAGES = re.compile(
     r"^\s*# ?requires:(?: ?)((?:{url} )*(?:{url}))\s*$".format(
         url=r"[-[\]_.~:/?#@!$&'()*+,;%<=>a-zA-Z0-9]+"
@@ -694,12 +689,6 @@ class Modules:
                     handler.id,
                 )
 
-    @property
-    def _remove_core_protection(self) -> bool:
-        from . import main
-
-        return self._db.get(main.__name__, "remove_core_protection", False)
-
     def register_commands(self, instance: Module):
         """Register commands from instance"""
         with contextlib.suppress(AttributeError):
@@ -713,8 +702,7 @@ class Modules:
         for _command, cmd in instance.hikka_commands.items():
             # Restrict overwriting core modules' commands
             if (
-                not self._remove_core_protection
-                and _command.lower() in self._core_commands
+                _command.lower() in self._core_commands
                 and not instance.__origin__.startswith("<core")
             ):
                 with contextlib.suppress(Exception):
@@ -854,9 +842,7 @@ class Modules:
 
         for module in self.modules:
             if module.__class__.__name__ == instance.__class__.__name__:
-                if not self._remove_core_protection and module.__origin__.startswith(
-                    "<core"
-                ):
+                if module.__origin__.startswith("<core"):
                     raise CoreOverwriteError(
                         module=(
                             module.__class__.__name__[:-3]
@@ -1078,9 +1064,7 @@ class Modules:
                 module.name.lower(),
                 module.__class__.__name__.lower(),
             ):
-                if not self._remove_core_protection and module.__origin__.startswith(
-                    "<core"
-                ):
+                if module.__origin__.startswith("<core"):
                     raise CoreUnloadError(module.__class__.__name__)
 
                 worked += [module.__class__.__name__]

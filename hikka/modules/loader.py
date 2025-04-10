@@ -1173,11 +1173,6 @@ class LoaderMod(loader.Module):
         if self._secure_boot:
             self._db.set(loader.__name__, "secure_boot", True)
 
-        if not self._db.get(main.__name__, "remove_core_protection", False):
-            for module in self.allmodules.modules:
-                if module.__origin__.startswith("<core"):
-                    module.__origin__ = "<reload-core>"
-
         loaded = await self.allmodules.register_all(no_external=True)
         for instance in loaded:
             self.allmodules.send_config_one(instance)

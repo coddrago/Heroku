@@ -118,14 +118,19 @@ class HerokuInfoMod(loader.Module):
 
     @loader.command()
     async def infocmd(self, message: Message):
-        await utils.answer_file(
-            message,
-            self.config["banner_url"],
-            self._render_info(False),
-        )
+        if self.config["banner_url"]:
+            await utils.answer_file(
+                message,
+                self.config["banner_url"],
+                self._render_info(False),
+            )
+        else:
+            await utils.answer(
+                message, self._render_info(False)
+            )
 
     @loader.command()
-    async def herokuinfo(self, message: Message):
+    async def ubinfo(self, message: Message):
         await utils.answer(message, self.strings("desc"))
 
     @loader.command()
