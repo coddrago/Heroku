@@ -6,3 +6,4 @@
 - Uptime cheating is allowed again for everyone
 - Rollback added
 - CPU usage fixed
+- Removed some platforms
