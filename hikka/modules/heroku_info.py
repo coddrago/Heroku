@@ -68,7 +68,7 @@ class HerokuInfoMod(loader.Module):
             ("🐳", "<emoji document_id=5431815452437257407>🐳</emoji>"),
             ("🕶", "<emoji document_id=5407025283456835913>📱</emoji>"),
             ("💎", "<emoji document_id=5471952986970267163>💎</emoji>"),
-            ("🛡", "<emoji document_id=5282731554135615450>🌩</emoji>"),
+            ("🛡", "<emoji document_id=5422712776059534305>🌩</emoji>"),
             ("🌼", "<emoji document_id=5224219153077914783>❤️</emoji>"),
             ("🎡", "<emoji document_id=5226711870492126219>🎡</emoji>"),
             ("🐧", "<emoji document_id=5361541227604878624>🐧</emoji>")
