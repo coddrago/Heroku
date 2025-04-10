@@ -327,7 +327,7 @@ update_notifier:
 
 updater:
   source: "<emoji document_id=5456255401194429832>📖</emoji> <b>Den Quellcode kannst du <a href='{}'>hier</a> einsehen</b>"
-  restarting_caption: "<emoji document_id=5328274090262275771>🕗</emoji> <b>Dein {} wird neu gestartet...</b>"
+  restarting_caption: "<emoji document_id=5328274090262275771>🕗</emoji> <b>Ihr {} wird neu gestartet...</b>"
   downloading: "<emoji document_id=5328274090262275771>🕗</emoji> <b>Updates werden heruntergeladen...</b>"
   installing: "<emoji document_id=5328274090262275771>🕗</emoji> <b>Updates werden installiert...</b>"
   success: "<emoji document_id=5326015457155620929>⏱</emoji> <b>Neustart erfolgreich! {}</b>\n<i>Die Module werden jedoch noch geladen...</i>\n<i>Der Neustart dauerte {} Sekunden</i>"
