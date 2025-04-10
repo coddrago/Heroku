@@ -88,7 +88,7 @@ class HerokuInfoMod(loader.Module):
                 platform=platform,
                 upd=upd,
                 uptime=utils.formatted_uptime(),
-                cpu_usage=utils.get_cpu_usage(),
+                cpu_usage=f"{utils.get_cpu_usage()}%",
                 ram_usage=f"{utils.get_ram_usage()} MB",
                 branch=version.branch,
                 hostname=lib_platform.node(),
