@@ -53,10 +53,6 @@ def restart():
 
     print("🔄 Restarting...")
 
-    if "LAVHOST" in os.environ:
-        os.system("lavhost restart")
-        return
-
     if "HIKKA_DO_NOT_RESTART" not in os.environ:
         os.environ["HIKKA_DO_NOT_RESTART"] = "1"
     else:

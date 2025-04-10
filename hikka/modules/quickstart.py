@@ -56,7 +56,7 @@ class Quickstart(loader.Module):
                 + (
                     self.strings("railway")
                     if "RAILWAY" in os.environ
-                    else (self.strings("lavhost") if "LAVHOST" in os.environ else "")
+                    else ("")
                 )
             ).rstrip()
         )
