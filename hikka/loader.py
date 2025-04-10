@@ -141,6 +141,8 @@ def patched_import(name: str, *args, **kwargs):
         return native_import("legacytl" + name[7:], *args, **kwargs)
     if name.startswith("herokutl"):
         return native_import("legacytl" + name[8:], *args, **kwargs)
+    if name.startswith("telethon"):
+        return native_import("legacytl" + name[8:], *args, **kwargs)
 
     return native_import(name, *args, **kwargs)
 
