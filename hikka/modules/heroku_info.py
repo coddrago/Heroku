@@ -32,12 +32,6 @@ class HerokuInfoMod(loader.Module):
                 "https://imgur.com/a/7LBPJiq.png",
                 lambda: self.strings("_cfg_banner"),
             ),
-
-            loader.ConfigValue(
-                "show_heroku",
-                True,
-                validator=loader.validators.Boolean(),
-            ),
         )
 
     def _render_info(self, inline: bool) -> str:
@@ -74,13 +68,7 @@ class HerokuInfoMod(loader.Module):
             ("🐧", "<emoji document_id=5361541227604878624>🐧</emoji>")
         ]:
             platform = platform.replace(emoji, icon)
-        return (
-            (
-                "<b>🪐 Heroku</b>\n"
-                if self.config["show_heroku"]
-                else ""
-            )
-            + self.config["custom_message"].format(
+        return (self.config["custom_message"].format(
                 me=me,
                 version=_version,
                 build=build,
@@ -93,8 +81,7 @@ class HerokuInfoMod(loader.Module):
                 branch=version.branch,
                 hostname=lib_platform.node(),
                 user=getpass.getuser(),
-            )
-            if self.config["custom_message"]
+            ) if self.config["custom_message"]
             else (
                 f'<b>{{}}</b>\n\n<b>{{}} {self.strings("owner")}:</b> {me}\n\n<b>{{}}'
                 f' {self.strings("version")}:</b> {_version} {build}\n<b>{{}}'

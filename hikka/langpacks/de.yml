@@ -209,9 +209,6 @@ settings:
 
   <emoji document_id=5785209342986817408>🌎</emoji> Argument <code>--no-web</code> - öffnet den Login-Prozess in deinem <b>Terminal statt über einen Link.</b>
 
-  <emoji document_id=5471895949804575096>🤲</emoji> Wenn du jedoch von Hikka von hikariatama wechseln möchtest, solltest du dieses Modul herunterladen:
-
-  <pre><code class="language-hikka">{prefix}dlm https://raw.githubusercontent.com/coddrago/modules/main/SwitchToHeroku.py</code></pre>
   Es ist völlig sicher und hilft dir, von Hikka zu Heroku-Legacy zu wechseln.'
   too_many_args: "<emoji document_id=5210952531676504517>🚫</emoji> <b>Zu viele Argumente</b>"
   blacklisted: "<emoji document_id=5197474765387864959>👍</emoji> <b>Chat {} wurde zur Blacklist des Userbots hinzugefügt</b>"
@@ -526,7 +523,7 @@ translate:
   _cmd_doc_tr: "[Sprache] [Text] - Übersetzt den Text"
 
 quickstart:
-  base: "🪐🇩🇪 <b>Hallo.</b> Dein Userbot <b>Heroku</b> ist installiert.\n\n❓ <b>Brauchst du Hilfe?</b> Trete unserem Support-Chat bei. Wir helfen <b>jedem</b>.\n\n📼 <b>Du kannst nach Modulen suchen und sie mit </b><code>.heta</code><b> installieren. Gib einfach deine Suchanfrage ein und klicke auf ⛩ Install bei dem gewünschten Modul</b>\n\n📣 <b>Schau dir Kanäle mit von der Community erstellten Modulen an: <a href=\"https://t.me/hikka_ub/126\">zeigen</a></b>\n\n💁‍♀️ <b>Kurzanleitung:</b>\n\n1️⃣ <b>Schreib</b> <code>.help</code> <b>um eine Liste der Module zu sehen</b>\n2️⃣ <b>Schreib</b> <code>.help [Modulname/Befehl]</code> <b>um die Modulbeschreibung zu sehen</b>\n3️⃣ <b>Schreib</b> <code>.dlmod [Link]</code> <b>um ein Modul von einem Link zu laden</b>\n4️⃣ <b>Schreib</b> <code>.loadmod</code> <b>als Antwort auf eine Datei, um ein Modul aus der Datei zu laden</b>\n5️⃣ <b>Schreib</b> <code>.unloadmod [Modulname]</code>"
+  base: "🪐🇩🇪 <b>Hallo.</b> Dein Userbot <b>Heroku-Legacy</b> ist installiert.\n\n❓ <b>Brauchst du Hilfe?</b> Trete unserem Support-Chat bei. Wir helfen <b>jedem</b>.\n\n📼 <b>Du kannst nach Modulen suchen und sie mit </b><code>.heta</code><b> installieren. Gib einfach deine Suchanfrage ein und klicke auf ⛩ Install bei dem gewünschten Modul</b>\n\n📣 <b>Schau dir Kanäle mit von der Community erstellten Modulen an: <a href=\"https://t.me/hikka_ub/126\">zeigen</a></b>\n\n💁‍♀️ <b>Kurzanleitung:</b>\n\n1️⃣ <b>Schreib</b> <code>.help</code> <b>um eine Liste der Module zu sehen</b>\n2️⃣ <b>Schreib</b> <code>.help [Modulname/Befehl]</code> <b>um die Modulbeschreibung zu sehen</b>\n3️⃣ <b>Schreib</b> <code>.dlmod [Link]</code> <b>um ein Modul von einem Link zu laden</b>\n4️⃣ <b>Schreib</b> <code>.loadmod</code> <b>als Antwort auf eine Datei, um ein Modul aus der Datei zu laden</b>\n5️⃣ <b>Schreib</b> <code>.unloadmod [Modulname]</code>"
   railway: "🚂 <b>Dein Userbot ist auf Railway installiert</b>. Auf dieser Plattform erhältst du nur <b>500 kostenlose Stunden pro Monat</b>. Wenn das Limit erreicht ist, wird dein <b>Userbot eingefroren</b>. Im nächsten Monat <b>musst du zu https://railway.app gehen und ihn neu starten</b>."
   language_saved: "🇩🇪 Sprache gespeichert!"
   language: "🇩🇪 Deutsch"

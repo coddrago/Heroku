@@ -129,14 +129,14 @@ heroku_settings:
   nonick_warning: "Warning! You enabled NoNick with default prefix! You may get muted in Heroku-Legacy chats. Change prefix or disable NoNick!"
   reply_required: "<emoji document_id=5210952531676504517>🚫</emoji> <b>Reply to a message of user, which needs to be added to NoNick</b>"
   deauth_confirm: "⚠️ <b>This action will fully remove Heroku-Legacy from this account and can't be reverted!</b>\n\n<i>- Heroku-Legacy chats will be removed\n- Session will be terminated and removed\n- Heroku-Legacy inline bot will be removed</i>"
-  deauth_confirm_step2: "⚠️ <b>Are you really sure you want to delete Heroku?</b>"
+  deauth_confirm_step2: "⚠️ <b>Are you really sure you want to delete Heroku-Legacy?</b>"
   deauth_yes: "I'm sure"
   deauth_no_1: "I'm not sure"
   deauth_no_2: "I'm uncertain"
   deauth_no_3: "I'm struggling to answer"
   deauth_cancel: "🚫 Cancel"
   deauth_confirm_btn: "😢 Delete"
-  uninstall: "😢 <b>Uninstalling Heroku...</b>"
+  uninstall: "😢 <b>Uninstalling Heroku-Legacy...</b>"
   uninstalled: "😢 <b>Heroku-Legacy uninstalled. Web interface is still active, you can add another account</b>"
   cmd_nn_list: "<emoji document_id=5469791106591890404>🪄</emoji> <b>NoNick is enabled for these commands:</b>\n\n{}"
   user_nn_list: "<emoji document_id=5469791106591890404>🪄</emoji> <b>NoNick is enabled for these users:</b>\n\n{}"
@@ -159,7 +159,7 @@ heroku_settings:
   _cmd_doc_nonickuser: "Allow no nickname for certain user"
   _cmd_doc_nonickusers: "Returns the list of NoNick users"
   _cmd_doc_settings: "Show settings menu"
-  _cmd_doc_uninstall_hikka: "Uninstall Heroku"
+  _cmd_doc_uninstall_hikka: "Uninstall Heroku-Legacy"
   _cmd_doc_watcherbl: "<module> - Toggle watcher in current chat"
   _cmd_doc_watcher: "<module> - Toggle global watcher rules\nArgs:\n[-c - only in chats]\n[-p - only in pm]\n[-o - only out]\n[-i - only incoming]"
   _cmd_doc_watchers: "List current watchers"
@@ -219,11 +219,7 @@ settings:
 
 <emoji document_id=5785209342986817408>🌎</emoji> The <code>--no-web</code> argument enables login to your account <b>directly in the terminal, rather than through a link.</b>
 
-<emoji document_id=5471895949804575096>🤲</emoji> However, if you want to migrate from hikariatama Hikka, download this module:
-
-<pre><code class="language-heroku">{prefix}dlm https://raw.githubusercontent.com/coddrago/modules/main/SwitchToHeroku.py</code></pre>
-
-It completely safe and will help you upgrade to Heroku-Legacy automatically'
+It is completely safe and will help you upgrade to Heroku-Legacy automatically'
   too_many_args: "<emoji document_id=5210952531676504517>🚫</emoji> <b>Too many args</b>"
   blacklisted: "<emoji document_id=5197474765387864959>👍</emoji> <b>Chat {} blacklisted from userbot</b>"
   unblacklisted: "<emoji document_id=5197474765387864959>👍</emoji> <b>Chat {} unblacklisted from userbot</b>"
@@ -554,7 +550,7 @@ translate:
 
 quickstart:
   name: "Quickstart"
-  base: "🪐🇬🇧 <b>Hello.</b> You've just installed <b>Heroku</b> userbot.\n\n❓ <b>Need help?</b> Feel free to join our support chat. We help <b>everyone</b>.\n\n📼 <b>You can find and install modules using </b><code>.heta</code><b>. Simply enter your search query and click ⛩ Install on needed module</b>\n\n📣 <b>Check out community made channels with modules: <a href=\"https://t.me/hikka_ub/126\">show</a></b>\n\n💁‍♀️ <b>Quickstart:</b>\n\n1️⃣ <b>Type</b> <code>.help</code> <b>to see modules list</b>\n2️⃣ <b>Type</b> <code>.help &lt;ModuleName/command&gt;</code> <b>to see help of module ModuleName</b>\n3️⃣ <b>Type</b> <code>.dlmod &lt;link&gt;</code> <b>to load module from link</b>\n4️⃣ <b>Type</b> <code>.loadmod</code> <b>with reply to file to install module from it</b>\n5️⃣ <b>Type</b> <code>.unloadmod &lt;ModuleName&gt;</code> <b>to unload module ModuleName</b>\n\n💡 <b>Heroku-Legacy supports modules from Friendly-Telegram and GeekTG, as well as its own ones.</b>"
+  base: "🪐🇬🇧 <b>Hello.</b> You've just installed <b>Heroku-Legacy</b> userbot.\n\n❓ <b>Need help?</b> Feel free to join our support chat. We help <b>everyone</b>.\n\n📣 <b>Check out community made channels with modules: <a href=\"https://t.me/hikka_ub/126\">show</a></b>\n\n💁‍♀️ <b>Quickstart:</b>\n\n1️⃣ <b>Type</b> <code>.help</code> <b>to see modules list</b>\n2️⃣ <b>Type</b> <code>.help &lt;ModuleName/command&gt;</code> <b>to see help of module ModuleName</b>\n3️⃣ <b>Type</b> <code>.dlmod &lt;link&gt;</code> <b>to load module from link</b>\n4️⃣ <b>Type</b> <code>.loadmod</code> <b>with reply to file to install module from it</b>\n5️⃣ <b>Type</b> <code>.unloadmod &lt;ModuleName&gt;</code> <b>to unload module ModuleName</b>\n\n💡 <b>Heroku-Legacy supports modules from Friendly-Telegram and GeekTG, as well as its own ones.</b>"
   railway: "🚂 <b>Your userbot is installed on Railway</b>. This platform has only <b>500 free hours per month</b>. Once this limit is reached, your <b>Heroku-Legacy will be frozen</b>. Next month <b>you will need to go to https://railway.app and restart it</b>."
   language_saved: "🇬🇧 Language saved!"
   language: "🇬🇧 English"
