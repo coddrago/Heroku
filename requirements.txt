@@ -1,6 +1,5 @@
 git+https://github.com/xdesai96/tlh-legacy.git
 aiofile==3.8.1
-gitpython==3.1.27
 meval==2.5
 aiohttp_jinja2==1.5
 aiohttp==3.8.3
@@ -11,8 +10,6 @@ grapheme==0.6.0
 emoji==2.1.0
 werkzeug==2.2.2
 psutil==6.0.0
-tgcrypto==1.2.5
-rsa==4.9
 ruamel.yaml==0.17.21
 
 # Python 3.8+
