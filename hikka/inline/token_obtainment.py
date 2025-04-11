@@ -221,7 +221,7 @@ class TokenObtainment(InlineUnit):
                         from .. import main
 
                         m = await conv.send_file(
-                            main.BASE_PATH / "assets" / "heroku-ava.png"
+                            "https://raw.githubusercontent.com/Crayz310/Heroku-Legacy/refs/heads/master/assets/heroku-ava.png"
                         )
                         r = await conv.get_response()
 
