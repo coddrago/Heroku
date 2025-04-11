@@ -223,7 +223,7 @@ class Utils(InlineUnit):
     generate_markup = _generate_markup
 
     async def _close_unit_handler(self, call: InlineCall):
-        return await self._client.delete_messages(call._units.get(call.unit_id).get('chat'), call._units.get(call.unit_id).get('message_id'))
+        await call.delete()
 
     async def _unload_unit_handler(self, call: InlineCall):
         await call.unload()
