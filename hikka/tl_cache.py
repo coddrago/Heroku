@@ -515,99 +515,14 @@ class CustomTelegramClient(TelegramClient):
         )
         return result
 
-    @staticmethod
-    def _find_message_obj_in_frame(
-        chat_id: int,
-        frame: inspect.FrameInfo,
-    ) -> typing.Optional[Message]:
-        """
-        Finds the message object from the frame
-        """
-        logger.debug("Finding message object in frame %s", frame)
-        return next(
-            (
-                obj
-                for obj in frame.frame.f_locals.values()
-                if isinstance(obj, Message)
-                and getattr(obj.reply_to, "forum_topic", False)
-                and chat_id == getattr(obj.peer_id, "channel_id", None)
-            ),
-            None,
-        )
-
-    async def _find_message_obj_in_stack(
-        self,
-        chat: EntityLike,
-        stack: typing.List[inspect.FrameInfo],
-    ) -> typing.Optional[Message]:
-        """
-        Finds the message object from the stack
-        """
-        chat_id = (await self.get_entity(chat, exp=0)).id
-        logger.debug("Finding message object in stack for chat %s", chat_id)
-        return next(
-            (
-                self._find_message_obj_in_frame(chat_id, frame_info)
-                for frame_info in stack
-                if self._find_message_obj_in_frame(chat_id, frame_info)
-            ),
-            None,
-        )
-
-    async def _find_topic_in_stack(
-        self,
-        chat: EntityLike,
-        stack: typing.List[inspect.FrameInfo],
-    ) -> typing.Optional[Message]:
-        """
-        Finds the message object from the stack
-        """
-        message = await self._find_message_obj_in_stack(chat, stack)
-        return (
-            (message.reply_to.reply_to_top_id or message.reply_to.reply_to_msg_id)
-            if message
-            else None
-        )
-
-    async def _topic_guesser(
-        self,
-        native_method: typing.Callable[..., typing.Awaitable[Message]],
-        stack: typing.List[inspect.FrameInfo],
-        *args,
-        **kwargs,
-    ):
-        no_retry = kwargs.pop("_topic_no_retry", False)
-        try:
-            return await native_method(*args, **kwargs)
-        except TopicDeletedError:
-            if no_retry:
-                raise
-
-            logger.debug("Topic deleted, trying to guess topic id")
-
-            topic = await self._find_topic_in_stack(args[0], stack)
-
-            logger.debug("Guessed topic id: %s", topic)
-
-            if not topic:
-                raise
-
-            kwargs["reply_to"] = topic
-            kwargs["_topic_no_retry"] = True
-            return await self._topic_guesser(native_method, stack, *args, **kwargs)
-
     async def send_file(self, *args, **kwargs) -> Message:
-        return await self._topic_guesser(
-            super().send_file,
-            inspect.stack(),
+        return await super().send_file(
             *args,
             **kwargs,
         )
 
     async def send_message(self, *args, **kwargs) -> Message:
-        return await self._topic_guesser(
-            super().send_message,
-            inspect.stack(),
+        return await super().send_message(
             *args,
             **kwargs,
         )
