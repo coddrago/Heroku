@@ -1,4 +1,4 @@
-git+https://github.com/xdesai96/tlh-legacy.git
+git+https://github.com/xdesai96/legacytl.git
 aiofile==3.8.1
 meval==2.5
 aiohttp_jinja2==1.5
