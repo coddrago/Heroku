@@ -7,3 +7,6 @@
 - Rollback added
 - CPU usage fixed
 - Removed some platforms
+- Known bugs have been fixed
+- Close button fixed
+- Legacy code has been removed
