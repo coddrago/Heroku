@@ -522,9 +522,9 @@ class Modules:
             callback_handlers = {}
             watchers = []
             for module in self.modules:
-                commands.update(module.hikka_commands)
-                inline_handlers.update(module.hikka_inline_handlers)
-                callback_handlers.update(module.hikka_callback_handlers)
+                commands.update(module.commands)
+                inline_handlers.update(module.inline_handlers)
+                callback_handlers.update(module.callback_handlers)
                 watchers.extend(module.hikka_watchers.values())
 
             self.commands = commands
@@ -696,10 +696,10 @@ class Modules:
 
         if instance.__origin__.startswith("<core"):
             self._core_commands += list(
-                map(lambda x: x.lower(), list(instance.hikka_commands))
+                map(lambda x: x.lower(), list(instance.commands))
             )
 
-        for _command, cmd in instance.hikka_commands.items():
+        for _command, cmd in instance.commands.items():
             # Restrict overwriting core modules' commands
             if (
                 _command.lower() in self._core_commands
@@ -713,13 +713,13 @@ class Modules:
             self.commands.update({_command.lower(): cmd})
 
         for alias, cmd in self.aliases.copy().items():
-            if cmd in instance.hikka_commands:
+            if cmd in instance.commands:
                 self.add_alias(alias, cmd)
 
         self.register_inline_stuff(instance)
 
     def register_inline_stuff(self, instance: Module):
-        for name, func in instance.hikka_inline_handlers.copy().items():
+        for name, func in instance.inline_handlers.copy().items():
             if name.lower() in self.inline_handlers:
                 if (
                     hasattr(func, "__self__")
@@ -743,7 +743,7 @@ class Modules:
 
             self.inline_handlers.update({name.lower(): func})
 
-        for name, func in instance.hikka_callback_handlers.copy().items():
+        for name, func in instance.callback_handlers.copy().items():
             if name.lower() in self.callback_handlers and (
                 hasattr(func, "__self__")
                 and hasattr(self.callback_handlers[name], "__self__")
@@ -759,7 +759,7 @@ class Modules:
             self.callback_handlers.update({name.lower(): func})
 
     def unregister_inline_stuff(self, instance: Module, purpose: str):
-        for name, func in instance.hikka_inline_handlers.copy().items():
+        for name, func in instance.inline_handlers.copy().items():
             if name.lower() in self.inline_handlers and (
                 hasattr(func, "__self__")
                 and hasattr(self.inline_handlers[name], "__self__")
@@ -774,7 +774,7 @@ class Modules:
                     purpose,
                 )
 
-        for name, func in instance.hikka_callback_handlers.copy().items():
+        for name, func in instance.callback_handlers.copy().items():
             if name.lower() in self.callback_handlers and (
                 hasattr(func, "__self__")
                 and hasattr(self.callback_handlers[name], "__self__")
@@ -798,7 +798,6 @@ class Modules:
             if _watcher.__self__.__class__.__name__ == instance.__class__.__name__:
                 logger.debug("Removing watcher %s for update", _watcher)
                 self.watchers.remove(_watcher)
-
         for _watcher in instance.hikka_watchers.values():
             self.watchers += [_watcher]
 

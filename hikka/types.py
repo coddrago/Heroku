@@ -177,17 +177,7 @@ class Module:
         return get_commands(self)
 
     @property
-    def hikka_commands(self) -> typing.Dict[str, Command]:
-        """List of commands that module supports"""
-        return get_commands(self)
-
-    @property
     def inline_handlers(self) -> typing.Dict[str, Command]:
-        """List of inline handlers that module supports"""
-        return get_inline_handlers(self)
-
-    @property
-    def hikka_inline_handlers(self) -> typing.Dict[str, Command]:
         """List of inline handlers that module supports"""
         return get_inline_handlers(self)
 
@@ -197,14 +187,10 @@ class Module:
         return get_callback_handlers(self)
 
     @property
-    def hikka_callback_handlers(self) -> typing.Dict[str, Command]:
-        """List of callback handlers that module supports"""
-        return get_callback_handlers(self)
-
-    @property
     def watchers(self) -> typing.Dict[str, Command]:
         """List of watchers that module supports"""
         return get_watchers(self)
+
 
     @property
     def hikka_watchers(self) -> typing.Dict[str, Command]:
@@ -215,24 +201,12 @@ class Module:
     def commands(self, _):
         pass
 
-    @hikka_commands.setter
-    def hikka_commands(self, _):
-        pass
-
     @inline_handlers.setter
     def inline_handlers(self, _):
         pass
 
-    @hikka_inline_handlers.setter
-    def hikka_inline_handlers(self, _):
-        pass
-
     @callback_handlers.setter
     def callback_handlers(self, _):
-        pass
-
-    @hikka_callback_handlers.setter
-    def hikka_callback_handlers(self, _):
         pass
 
     @watchers.setter
