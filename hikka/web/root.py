@@ -103,7 +103,6 @@ class Web:
         return {
             "skip_creds": self.api_token is not None,
             "tg_done": bool(self.client_data),
-            "lavhost": "LAVHOST" in os.environ,
             "platform_emoji": self._platform_emoji,
         }
 
