@@ -90,7 +90,7 @@ class TestMod(loader.Module):
             ),
             loader.ConfigValue(
                 "ping_emoji",
-                "🌙",
+                "<emoji document_id=5253521692008917018>🌙</emoji>",
                 lambda: self.strings["ping_emoji"],
                 validator=loader.validators.String(),
             ),
