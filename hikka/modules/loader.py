@@ -396,7 +396,7 @@ class LoaderMod(loader.Module):
         ):
             if message.file:
                 await message.edit("")
-                message = await message.respond("🪐", reply_to=utils.get_topic(message))
+                message = await message.respond("🌙", reply_to=utils.get_topic(message))
 
             if await self.inline.form(
                 self.strings("module_fs"),

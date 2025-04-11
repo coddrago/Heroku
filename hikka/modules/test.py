@@ -90,7 +90,7 @@ class TestMod(loader.Module):
             ),
             loader.ConfigValue(
                 "ping_emoji",
-                "🪐",
+                "🌙",
                 lambda: self.strings["ping_emoji"],
                 validator=loader.validators.String(),
             ),
@@ -381,7 +381,7 @@ class TestMod(loader.Module):
         chat, _ = await utils.asset_channel(
             self._client,
             "legacy-logs",
-            "🪐 Your Legacy logs will appear in this chat",
+            "🌙 Your Legacy logs will appear in this chat",
             silent=True,
             invite_bot=True,
             avatar=" https://raw.githubusercontent.com/coddrago/Heroku/refs/heads/master/assets/heroku-logs.png",

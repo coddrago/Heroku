@@ -820,7 +820,7 @@ class Hikka:
                     else ""
                 )
                 logging.debug(
-                    f"\n🪐 {__version__} #{build[:7]} ({upd}) started\n{web_url}"
+                    f"\n🌙 {__version__} #{build[:7]} ({upd}) started\n{web_url}"
                 )
 
                 self.omit_log = True
@@ -829,7 +829,7 @@ class Hikka:
                 logging.getLogger().handlers[0].get_logid_by_client(client.tg_id),
                 "https://imgur.com/a/uUF9zYL.png",
                 caption=(
-                    '🪐 <b>{} started!</b>\n'
+                    '🌙 <b>{} started!</b>\n'
                     '⚙ <b>GitHub commit SHA: <a href="https://github.com/Crayz310/Legacy/commit/{}">{}</a></b>\n'
                     '🔎 <b>Update status: {}</b>\n<b>{}</b>'
                     ).format(
