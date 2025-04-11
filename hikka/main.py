@@ -820,27 +820,18 @@ class Hikka:
                     else ""
                 )
                 logging.debug(
-                    "\n🪐 Heroku %s #%s (%s) started\n%s",
-                    __version__,
-                    build[:7],
-                    upd,
-                    web_url,
+                    f"\n🪐 Heroku {__version__} #{build[:7]} ({upd}) started\n{web_url}"
                 )
+
                 self.omit_log = True
 
             await client.hikka_inline.bot.send_photo(
                 logging.getLogger().handlers[0].get_logid_by_client(client.tg_id),
                 "https://imgur.com/a/uUF9zYL.png",
                 caption=(
-                    "🪐 <b>Heroku {} started!</b>\n\n⚙ <b>GitHub commit SHA: <a"
-                    ' href="https://github.com/Crayz310/Heroku-Legacy/commit/{}">{}</a></b>\n🔎'
-                    " <b>Update status: {}</b>\n<b>{}</b>".format(
-                        __version__,
-                        build,
-                        build[:7],
-                        upd,
-                        self.web.url if self.web else "",
-                    )
+                    f"🪐 <b>Heroku {__version__} started!</b>\n\n⚙ <b>GitHub commit SHA: <a"
+                    f' href="https://github.com/Crayz310/Heroku-Legacy/commit/{build}">{build[:7]}</a></b>\n🔎'
+                    f" <b>Update status: {upd}</b>\n<b>{self.web.url if self.web else ""}</b>"
                 ),
             )
 
