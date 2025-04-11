@@ -835,7 +835,7 @@ class HerokuConfigMod(loader.Module):
                 "args": (mod, param),
                 "kwargs": {"obj_type": obj_type},
             }
-            for param in self.lookup(mod).config if self.lookup(mod) is not False
+            for param in self.lookup(mod).config
         ]
 
         await call.edit(
@@ -934,7 +934,7 @@ class HerokuConfigMod(loader.Module):
                     "args": (btn,),
                     "kwargs": {"obj_type": obj_type},
                 }
-                for btn in mod_row
+                for btn in mod_row if self.lookup(btn) is not False
             ]
             kb += [row]
 
