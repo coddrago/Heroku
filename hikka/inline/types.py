@@ -47,9 +47,6 @@ class InlineMessage:
             **kwargs,
         )
 
-    async def delete(self) -> bool:
-        return await self._client.delete_messages(self._units.get(self.unit_id).get('chat'), self._units.get(self.unit_id).get('message_id'))
-
     async def unload(self) -> bool:
         return await self.inline_manager._unload_unit(unit_id=self.unit_id)
 
