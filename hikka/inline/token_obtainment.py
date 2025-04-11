@@ -72,7 +72,7 @@ class TokenObtainment(InlineUnit):
                 await fw_protect()
                 from .. import main
 
-                m = await conv.send_file("https://raw.githubusercontent.com/Crayz310/Heroku-Legacy/refs/heads/master/assets/heroku-ava.png")
+                m = await conv.send_file(main.AVATAR_PATH)
                 r = await conv.get_response()
 
                 logger.debug(">> <Photo>")
@@ -220,9 +220,7 @@ class TokenObtainment(InlineUnit):
                         await fw_protect()
                         from .. import main
 
-                        m = await conv.send_file(
-                            "https://raw.githubusercontent.com/Crayz310/Heroku-Legacy/refs/heads/master/assets/heroku-ava.png"
-                        )
+                        m = await conv.send_file(main.AVATAR_PATH)
                         r = await conv.get_response()
 
                         logger.debug(">> <Photo>")

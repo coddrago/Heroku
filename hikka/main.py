@@ -84,6 +84,7 @@ BASE_DIR = (
 )
 
 BASE_PATH = Path(BASE_DIR)
+AVATAR_PATH = Path(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "assets", "heroku-ava.png")))
 CONFIG_PATH = BASE_PATH / "config.json"
 
 IS_TERMUX = "com.termux" in os.environ.get("PREFIX", "")
