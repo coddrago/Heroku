@@ -712,7 +712,7 @@ async def invite_inline_bot(
                 channel=peer,
                 user_id=client.loader.inline.bot_username,
                 admin_rights=ChatAdminRights(ban_users=True),
-                rank="Heroku",
+                rank="Legacy",
             )
         )
 
@@ -754,9 +754,9 @@ async def asset_channel(
     ):
         return client._channels_cache[title]["peer"], False
 
-    # legacytl heroku / hikka chats conversion to heroku
+    # legacytl heroku / hikka chats conversion to legacy
     if title.startswith("hikka-"):
-        title = title.replace("hikka-", "heroku-")
+        title = title.replace("hikka-", "legacy-")
 
     async for d in client.iter_dialogs():
         if d.title == title:
@@ -1293,12 +1293,12 @@ def get_git_hash() -> typing.Union[str, bool]:
 
 def get_commit_url() -> str:
     """
-    Get current Heroku git commit url
+    Get current Legacy git commit url
     :return: Git commit url
     """
     try:
         hash_ = get_git_hash()
-        return f'<a href="https://github.com/Crayz310/Heroku-Legacy/commit/{hash_}">#{hash_[:7]}</a>'
+        return f'<a href="https://github.com/Crayz310/Legacy/commit/{hash_}">#{hash_[:7]}</a>'
     except Exception:
         return "Unknown"
 
@@ -1584,7 +1584,7 @@ def get_git_info() -> typing.Tuple[str, str]:
     hash_ = get_git_hash()
     return (
         hash_,
-        f"https://github.com/Crayz310/Heroku-Legacy/commit/{hash_}" if hash_ else "",
+        f"https://github.com/Crayz310/Legacy/commit/{hash_}" if hash_ else "",
     )
 
 

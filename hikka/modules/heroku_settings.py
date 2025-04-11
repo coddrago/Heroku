@@ -38,7 +38,7 @@ ALL_INVOKES = [
 
 @loader.tds
 class HerokuSettingsMod(loader.Module):
-    """Advanced settings for Heroku Userbot"""
+    """Advanced settings for Legacy Userbot"""
 
     strings = {"name": "HerokuSettings"}
 
@@ -77,18 +77,18 @@ class HerokuSettingsMod(loader.Module):
             if (
                 dialog.name
                 in {
-                    "heroku-logs",
-                    "heroku-onload",
-                    "heroku-assets",
-                    "heroku-backups",
-                    "heroku-acc-switcher",
+                    "legacy-logs",
+                    "legacy-onload",
+                    "legacy-assets",
+                    "legacy-backups",
+                    "legacy-acc-switcher",
                     "silent-tags",
                 }
                 and dialog.is_channel
                 and (
                     dialog.entity.participants_count == 1
                     or dialog.entity.participants_count == 2
-                    and dialog.name in {"heroku-logs", "silent-tags"}
+                    and dialog.name in {"legacy-logs", "silent-tags"}
                 )
                 or (
                     self._client.loader.inline.init_complete
@@ -102,7 +102,7 @@ class HerokuSettingsMod(loader.Module):
 
         folders = await self._client(GetDialogFiltersRequest())
 
-        if any(folder.title == "heroku" for folder in folders):
+        if any(folder.title == "legacy" for folder in folders):
             folder_id = max(
                 folders,
                 key=lambda x: x.id,

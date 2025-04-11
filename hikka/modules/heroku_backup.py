@@ -61,12 +61,12 @@ class HerokuBackupMod(loader.Module):
 
         self._backup_channel, _ = await utils.asset_channel(
             self._client,
-            "heroku-backups",
+            "legacy-backups",
             "📼 Your database backups will appear here",
             silent=True,
             archive=True,
             avatar="https://raw.githubusercontent.com/coddrago/Heroku/refs/heads/master/assets/heroku-backups.png",
-            _folder="heroku",
+            _folder="legacy",
             invite_bot=True,
         )
 
@@ -125,7 +125,7 @@ class HerokuBackupMod(loader.Module):
 
             backup = io.BytesIO(json.dumps(self._db).encode())
             backup.name = (
-                f"heroku-db-backup-{datetime.datetime.now():%d-%m-%Y-%H-%M}.json"
+                f"legacy-db-backup-{datetime.datetime.now():%d-%m-%Y-%H-%M}.json"
             )
 
             await self.inline.bot.send_document(
@@ -147,7 +147,7 @@ class HerokuBackupMod(loader.Module):
         except loader.StopLoop:
             raise
         except Exception:
-            logger.exception("HerokuBackup failed")
+            logger.exception("LegacyBackup failed")
             await asyncio.sleep(60)
 
     @loader.callback_handler()

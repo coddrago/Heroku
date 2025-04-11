@@ -82,7 +82,7 @@ class InlineStuff(loader.Module):
                     return True
 
     @loader.command()
-    async def ch_heroku_bot(self, message: Message):
+    async def ch_legacy_bot(self, message: Message):
         args = utils.get_args_raw(message).strip("@")
         if (
             not args

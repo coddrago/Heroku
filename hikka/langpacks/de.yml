@@ -99,7 +99,7 @@ heroku_settings:
   no_cmd: "<emoji document_id=5469791106591890404>🪄</emoji> <b>Gib den Befehl an, für den NoNick aktiviert oder deaktiviert werden soll</b>"
   cmd_nn: "<emoji document_id=5469791106591890404>🪄</emoji> <b>NoNick-Status für</b> <code>{}</code><b>: {}</b>"
   cmd404: "<emoji document_id=5469791106591890404>🪄</emoji> <b>Befehl nicht gefunden</b>"
-  inline_settings: "⚙️ <b>Hier kannst du die Heroku-Einstellungen verwalten</b>"
+  inline_settings: "⚙️ <b>Hier kannst du die Einstellungen verwalten</b>"
   web_disabled: "<emoji document_id=5312353505489472514>🌐</emoji> <b>Das Web ist deaktiviert</b>"
   confirm_update: "🧭 <b>Bestätige das Update. Der Userbot wird neu gestartet</b>"
   confirm_restart: "🔄 <b>Bestätige den Neustart</b>"
@@ -115,26 +115,26 @@ heroku_settings:
   suggest_subscribe: "✅ Abonnement für den Kanal vorschlagen"
   do_not_suggest_subscribe: "🚫 Abonnement für den Kanal nicht vorschlagen"
   private_not_allowed: "<emoji document_id=5210952531676504517>🚫</emoji> <b>Dieser Befehl muss im Chat ausgeführt werden</b>"
-  _cls_doc: "Zusätzliche Heroku-Einstellungen"
-  nonick_warning: "Achtung! Du hast NoNick mit dem Standardpräfix aktiviert! Du könntest in Heroku-Chats gemutet werden. Ändere das Präfix oder deaktiviere globales NoNick!"
+  _cls_doc: "Zusätzliche Einstellungen"
+  nonick_warning: "Achtung! Du hast NoNick mit dem Standardpräfix aktiviert! Du könntest in Chats gemutet werden. Ändere das Präfix oder deaktiviere globales NoNick!"
   reply_required: "<emoji document_id=5210952531676504517>🚫</emoji> <b>Antworte auf eine Nachricht des Benutzers, für den NoNick aktiviert werden soll</b>"
-  deauth_confirm: "⚠️ <b>Diese Aktion entfernt Heroku-Legacy vollständig von diesem Konto! Dies kann nicht rückgängig gemacht werden</b>\n\n<i>- Alle mit Heroku-Legacy verbundenen Chats werden gelöscht\n- Die Heroku-Sitzung wird zurückgesetzt\n- Der Inline-Bot von Heroku-Legacy wird entfernt</i>"
-  deauth_confirm_step2: "⚠️ <b>Bist du sicher, dass du Heroku-Legacy entfernen möchtest?</b>"
+  deauth_confirm: "⚠️ <b>Diese Aktion entfernt Legacy vollständig von diesem Konto! Dies kann nicht rückgängig gemacht werden</b>\n\n<i>- Alle mit Legacy verbundenen Chats werden gelöscht\n- Die Sitzung wird zurückgesetzt\n- Der Inline-Bot von Legacy wird entfernt</i>"
+  deauth_confirm_step2: "⚠️ <b>Bist du sicher, dass du Legacy entfernen möchtest?</b>"
   deauth_yes: "Ich bin sicher"
   deauth_no_1: "Ich bin unsicher"
   deauth_no_2: "Nicht wirklich"
   deauth_no_3: "Nein"
   deauth_cancel: "🚫 Abbrechen"
   deauth_confirm_btn: "😢 Entfernen"
-  uninstall: "😢 <b>Heroku-Legacy wird entfernt...</b>"
-  uninstalled: "😢 <b>Heroku-Legacy wurde entfernt. Die Web-Oberfläche ist weiterhin aktiv, und andere Konten können hinzugefügt werden!</b>"
+  uninstall: "😢 <b>Legacy wird entfernt...</b>"
+  uninstalled: "😢 <b>Legacy wurde entfernt. Die Web-Oberfläche ist weiterhin aktiv, und andere Konten können hinzugefügt werden!</b>"
   cmd_nn_list: "<emoji document_id=5469791106591890404>🪄</emoji> <b>NoNick ist für folgende Befehle aktiviert:</b>\n\n{}"
   user_nn_list: "<emoji document_id=5469791106591890404>🪄</emoji> <b>NoNick ist für folgende Benutzer aktiviert:</b>\n\n{}"
   chat_nn_list: "<emoji document_id=5469791106591890404>🪄</emoji> <b>NoNick ist für folgende Chats aktiviert:</b>\n\n{}"
   nothing: "<emoji document_id=5427052514094619126>🤷‍♀️</emoji> <b>Nichts zu zeigen...</b>"
-  privacy_leak: "⚠️ <b>Dieser Befehl gewährt Zugriff auf die Heroku-Weboberfläche. Die Ausführung in öffentlichen Chats stellt ein Sicherheitsrisiko dar. Es wird empfohlen, dies in den <a href='tg://openmessage?user_id={}'>Gespeicherten Nachrichten</a> auszuführen. Führe</b> <code>{}proxypass force_insecure</code> <b>aus, um diese Warnung zu deaktivieren</b>"
-  privacy_leak_nowarn: "⚠️ <b>Dieser Befehl gewährt Zugriff auf die Heroku-Weboberfläche. Die Ausführung in öffentlichen Chats stellt ein Sicherheitsrisiko dar. Es wird empfohlen, dies in den <a href='tg://openmessage?user_id={}'>Gespeicherten Nachrichten</a> auszuführen.</b>"
-  opening_tunnel: "🔁 <b>Öffne Tunnel zur Heroku-Weboberfläche...</b>"
+  privacy_leak: "⚠️ <b>Dieser Befehl gewährt Zugriff auf die Weboberfläche. Die Ausführung in öffentlichen Chats stellt ein Sicherheitsrisiko dar. Es wird empfohlen, dies in den <a href='tg://openmessage?user_id={}'>Gespeicherten Nachrichten</a> auszuführen. Führe</b> <code>{}proxypass force_insecure</code> <b>aus, um diese Warnung zu deaktivieren</b>"
+  privacy_leak_nowarn: "⚠️ <b>Dieser Befehl gewährt Zugriff auf die Weboberfläche. Die Ausführung in öffentlichen Chats stellt ein Sicherheitsrisiko dar. Es wird empfohlen, dies in den <a href='tg://openmessage?user_id={}'>Gespeicherten Nachrichten</a> auszuführen.</b>"
+  opening_tunnel: "🔁 <b>Öffne Tunnel zur Weboberfläche...</b>"
   tunnel_opened: "🎉 <b>Der Tunnel ist geöffnet. Dieser Link bleibt maximal eine Stunde aktiv</b>"
   web_btn: "🌍 Web-Oberfläche"
   btn_yes: "🚸 Trotzdem öffnen"
@@ -199,7 +199,7 @@ heroku_backup:
 
 settings:
   installation: '<emoji document_id=5363805650327450240>▪️</emoji> Die Installation ist wirklich einfach! Schreibe einfach folgendes in das Terminal deines Servers:
-  <pre><code class="language-bash">sudo apt update && sudo apt upgrade -y && sudo apt install git && sudo apt install python3-pip && git clone https://github.com/Crayz310/Heroku-Legacy && cd Heroku-Legacy && pip install -r requirements.txt && python3 -m hikka</code></pre>
+  <pre><code class="language-bash">sudo apt update && sudo apt upgrade -y && sudo apt install git && sudo apt install python3-pip && git clone https://github.com/Crayz310/Legacy && cd Legacy && pip install -r requirements.txt && python3 -m hikka</code></pre>
 
   <emoji document_id=5299027123913105700>😐</emoji> Wenn du keinen Zugriff auf sudo hast, kannst du einfach die Anfangsbefehle weglassen.
 
@@ -209,7 +209,7 @@ settings:
 
   <emoji document_id=5785209342986817408>🌎</emoji> Argument <code>--no-web</code> - öffnet den Login-Prozess in deinem <b>Terminal statt über einen Link.</b>
 
-  Es ist völlig sicher und hilft dir, von Hikka zu Heroku-Legacy zu wechseln.'
+  Es ist völlig sicher und hilft dir, von Hikka zu Legacy zu wechseln.'
   too_many_args: "<emoji document_id=5210952531676504517>🚫</emoji> <b>Zu viele Argumente</b>"
   blacklisted: "<emoji document_id=5197474765387864959>👍</emoji> <b>Chat {} wurde zur Blacklist des Userbots hinzugefügt</b>"
   unblacklisted: "<emoji document_id=5197474765387864959>👍</emoji> <b>Chat {} wurde aus der Blacklist des Userbots entfernt</b>"
@@ -217,7 +217,7 @@ settings:
   user_unblacklisted: "<emoji document_id=5197474765387864959>👍</emoji> <b>Benutzer {} wurde aus der Blacklist des Userbots entfernt</b>"
   what_prefix: "<emoji document_id=5382187118216879236>❓</emoji> <b>Welchen Präfix möchtest du verwenden?</b>"
   prefix_incorrect: "<emoji document_id=5210952531676504517>🚫</emoji> <b>Der Präfix muss aus nur einem Zeichen bestehen</b>"
-  prefix_set: "{} <b>Der Befehlspräfix wurde aktualisiert. Verwende den folgenden Befehl, um ihn zurückzusetzen:</b>\n<pre><code class=\"language-heroku\">{newprefix}setprefix {oldprefix}</code></pre>"
+  prefix_set: "{} <b>Der Befehlspräfix wurde aktualisiert. Verwende den folgenden Befehl, um ihn zurückzusetzen:</b>\n<pre><code class=\"language-legacy\">{newprefix}setprefix {oldprefix}</code></pre>"
   alias_created: "<emoji document_id=5197474765387864959>👍</emoji> <b>Alias wurde erstellt. Verwende ihn mit</b> <code>{}</code>"
   aliases: "<b>🔗 Aliase:</b>\n"
   no_command: "<emoji document_id=5210952531676504517>🚫</emoji> <b>Der Befehl</b> <code>{}</code> <b>existiert nicht</b>"
@@ -286,7 +286,7 @@ inline_stuff:
   bot_username_invalid: "<emoji document_id=5210952531676504517>🚫</emoji> <b>Ungültiger Bot-Benutzername. Er muss auf</b> <code>bot</code> <b>enden und mindestens 5 Zeichen lang sein</b>"
   bot_username_occupied: "<emoji document_id=5210952531676504517>🚫</emoji> <b>Dieser Bot-Benutzername ist bereits vergeben</b>"
   bot_updated: "<emoji document_id=6318792204118656433>🎉</emoji> <b>Einstellungen gespeichert. Um sie anzuwenden, starte den Userbot neu</b>"
-  this_is_hikka: "🪐 <b>Hallo! Das ist Heroku-Legacy — ein leistungsstarker modularer Telegram-Userbot. Du kannst ihn auf deinem Account installieren!</b>\n\n<b>🌍 <a href=\"https://github.com/Crayz310/Heroku-Legacy\">GitHub</a></b>\n<b>👥 <a href=\"https://t.me/heroku_legacy\">Support-Chat</a></b>"
+  this_is_hikka: "🪐 <b>Hallo! Das ist Legacy — ein leistungsstarker modularer Telegram-Userbot. Du kannst ihn auf deinem Account installieren!</b>\n\n<b>🌍 <a href=\"https://github.com/Crayz310/Legacy\">GitHub</a></b>\n<b>👥 <a href=\"https://t.me/heroku_legacy\">Support-Chat</a></b>"
   _cmd_doc_ch_hikka_bot: "<Benutzername> - Ändert den Benutzernamen des Inline-Bots"
 
 test:
@@ -295,7 +295,7 @@ test:
   configping: "Ihr benutzerdefinierter Text. Platzhalter können verwendet werden: {ping} - Ihr Ping, {uptime} - Ihre Uptime, {ping_hint} - Hinweis. Sie können den Platzhaltername {hostname} verwenden, wenn Sie den Hostname Ihres Servers benötigen"
   hint: "Geben Sie einen Hinweis an"
   ping_emoji: "Emoji, das bei einer leichten Ping-Erhöhung angezeigt wird."
-  logs_caption: "<emoji document_id=5188377234380954537>🪐</emoji> <b>Heroku-Logs des Levels</b> <code>{}</code>\n\n<emoji document_id=6318902906900711458>⚪️</emoji> <b>Version: {}</b>{}"
+  logs_caption: "<emoji document_id=5188377234380954537>🪐</emoji> <b>Logs des Levels</b> <code>{}</code>\n\n<emoji document_id=6318902906900711458>⚪️</emoji> <b>Version: {}</b>{}"
   debugging_enabled: "<emoji document_id=5332533929020761310>✅</emoji> <b>Der Entwicklermodus wurde für das Modul</b> <code>{0}</code> <b>aktiviert</b>\n<i>Gehe zum Ordner `debug_modules`, ändere die Datei `{0}.py` und beobachte die Änderungen in Echtzeit</i>"
   debugging_disabled: "<emoji document_id=5332533929020761310>✅</emoji> <b>Der Entwicklermodus wurde deaktiviert</b>"
   suspend_invalid_time: "<emoji document_id=5210952531676504517>🚫</emoji> <b>Ungültige Zeitdauer für das Einfrieren</b>"
@@ -314,13 +314,13 @@ test:
   _cmd_doc_clearlogs: "Löscht die Logs"
 
 update_notifier:
-  update_required: "🆕 <b>Ein Heroku-Update ist verfügbar!</b>\n\nEine neue Version von Heroku-Legacy wurde veröffentlicht.\n🔮 <b>Heroku-Legacy <s>{}</s> -> {}</b>\n\n{}"
+  update_required: "🆕 <b>Ein Update ist verfügbar!</b>\n\nEine neue Version von Legacy wurde veröffentlicht.\n🔮 <b>Legacy <s>{}</s> -> {}</b>\n\n{}"
   more: "\n<i><b>🎥 Und noch {}...</b></i>"
   _cfg_doc_disable_notifications: "Update-Benachrichtigungen deaktivieren"
   latest_disabled: "Benachrichtigungen über das neueste Update wurden deaktiviert"
   update: "🔄 Aktualisieren"
   ignore: "🚫 Ignorieren"
-  changelog: '<emoji document_id=5434144690511290129>📰</emoji> <b>Änderungsprotokoll des letzten großen Updates:</b><pre><code class="language-heroku">{}</code></pre>'
+  changelog: '<emoji document_id=5434144690511290129>📰</emoji> <b>Änderungsprotokoll des letzten großen Updates:</b><pre><code class="language-legacy">{}</code></pre>'
 
 updater:
   source: "<emoji document_id=5456255401194429832>📖</emoji> <b>Den Quellcode kannst du <a href='{}'>hier</a> einsehen</b>"
@@ -335,7 +335,7 @@ updater:
   btn_update: "🧭 Aktualisieren"
   restart_confirm: "❓ <b>Bist du sicher, dass du neu starten möchtest?</b>"
   secure_boot_confirm: "❓ <b>Bist du sicher, dass du den sicheren Startmodus aktivieren möchtest?</b>"
-  update_confirm: "❓ <b>Bist du sicher, dass du aktualisieren möchtest?\n\n<a href=\"https://github.com/Crayz310/Heroku-Legacy/commit/{}\">{}</a> ⤑ <a href=\"https://github.com/Crayz310/Heroku-Legacy/commit/{}\">{}</a></b>"
+  update_confirm: "❓ <b>Bist du sicher, dass du aktualisieren möchtest?\n\n<a href=\"https://github.com/Crayz310/Legacy/commit/{}\">{}</a> ⤑ <a href=\"https://github.com/Crayz310/Legacy/commit/{}\">{}</a></b>"
   no_update: "🚸 <b>Du hast bereits die neueste Version. Möchtest du trotzdem ein Update erzwingen?</b>"
   cancel: "🚫 Abbrechen"
   _cls_doc: "Aktualisiert den Userbot"
@@ -378,7 +378,7 @@ help:
   _cls_doc: "Zeigt Hilfe zu Modulen an"
   partial_load: "<emoji document_id=5355133243773435190>☝️</emoji> <b>Der Userbot ist noch nicht vollständig geladen, daher werden nicht alle Module angezeigt</b>"
   not_exact: "<emoji document_id=5355133243773435190>☝️</emoji> <b>Es wurde keine exakte Übereinstimmung gefunden, daher wurde die passendste Auswahl getroffen</b>"
-  request_join: "Du hast nach einem Link zum Hilfe-Chat von Heroku-Legacy gefragt"
+  request_join: "Du hast nach einem Link zum Hilfe-Chat von Legacy gefragt"
   core_notice: "<emoji document_id=5355133243773435190>☝️</emoji> <b>Dies ist ein eingebautes Modul. Du kannst es nicht entladen oder ersetzen</b>"
   _cmd_doc_help: "[Modul] [-f] - Zeigt Hilfe an"
   _cmd_doc_helphide: "<Modul oder Module> - Versteckt das Modul(-e) aus der Hilfe\n*Trenne die Module mit Leerzeichen"
@@ -404,7 +404,7 @@ heroku_info:
   setinfo_no_args: "<emoji document_id=5370881342659631698>😢</emoji> <b>Du musst den Text für benutzerdefiniertes Info angeben</b>"
   setinfo_success: "<emoji document_id=5436040291507247633>🎉</emoji> <b>Der Info-Text wurde erfolgreich geändert</b>"
   desc: "Userbots können verwendet werden, um verschiedene Aufgaben zu automatisieren, wie <b>Nachrichten senden, Kanälen beitreten, Mediendateien hochladen und vieles mehr</b>.\n\n<emoji document_id=5474667187258006816>😎</emoji> Userbots unterscheiden sich von normalen Telegram-Bots, da <b>sie auf dem Benutzerkonto</b> und nicht auf einem Bot-Konto arbeiten. Das bedeutet, dass sie auf mehr Funktionen zugreifen können und eine größere Flexibilität bei der Ausführung von Aktionen bieten.\n\n<emoji document_id=5472267631979405211>🚫</emoji> Es ist jedoch wichtig zu beachten, dass <b>Userbots offiziell von Telegram nicht unterstützt werden</b> und ihre Nutzung gegen die Nutzungsbedingungen der Plattform verstoßen kann. Daher <b>sollten Benutzer vorsichtig sein</b> und sicherstellen, dass auf ihrem Konto kein schadhafter Code ausgeführt wird.\n\n"
-  _cmd_doc_hikkainfo: "Sende Informationen im Stil von 'Was ist Heroku?'"
+  _cmd_doc_hikkainfo: "Sende Informationen im Stil von 'Was ist Legacy?'"
   _cmd_doc_info: "Sendet Informationen über den Bot"
   _cmd_doc_setinfo: "<Text> - Ändere den Text in .info"
 
@@ -523,7 +523,7 @@ translate:
   _cmd_doc_tr: "[Sprache] [Text] - Übersetzt den Text"
 
 quickstart:
-  base: "🪐🇩🇪 <b>Hallo.</b> Dein Userbot <b>Heroku-Legacy</b> ist installiert.\n\n❓ <b>Brauchst du Hilfe?</b> Trete unserem Support-Chat bei. Wir helfen <b>jedem</b>.\n\n📣 <b>Schau dir Kanäle mit von der Community erstellten Modulen an: <a href=\"https://t.me/hikka_ub/126\">zeigen</a></b>\n\n💁‍♀️ <b>Kurzanleitung:</b>\n\n1️⃣ <b>Schreib</b> <code>.help</code> <b>um eine Liste der Module zu sehen</b>\n2️⃣ <b>Schreib</b> <code>.help [Modulname/Befehl]</code> <b>um die Modulbeschreibung zu sehen</b>\n3️⃣ <b>Schreib</b> <code>.dlmod [Link]</code> <b>um ein Modul von einem Link zu laden</b>\n4️⃣ <b>Schreib</b> <code>.loadmod</code> <b>als Antwort auf eine Datei, um ein Modul aus der Datei zu laden</b>\n5️⃣ <b>Schreib</b> <code>.unloadmod [Modulname]</code>"
+  base: "🪐🇩🇪 <b>Hallo.</b> Dein Userbot <b>Legacy</b> ist installiert.\n\n❓ <b>Brauchst du Hilfe?</b> Trete unserem Support-Chat bei. Wir helfen <b>jedem</b>.\n\n📣 <b>Schau dir Kanäle mit von der Community erstellten Modulen an: <a href=\"https://t.me/hikka_ub/126\">zeigen</a></b>\n\n💁‍♀️ <b>Kurzanleitung:</b>\n\n1️⃣ <b>Schreib</b> <code>.help</code> <b>um eine Liste der Module zu sehen</b>\n2️⃣ <b>Schreib</b> <code>.help [Modulname/Befehl]</code> <b>um die Modulbeschreibung zu sehen</b>\n3️⃣ <b>Schreib</b> <code>.dlmod [Link]</code> <b>um ein Modul von einem Link zu laden</b>\n4️⃣ <b>Schreib</b> <code>.loadmod</code> <b>als Antwort auf eine Datei, um ein Modul aus der Datei zu laden</b>\n5️⃣ <b>Schreib</b> <code>.unloadmod [Modulname]</code>"
   railway: "🚂 <b>Dein Userbot ist auf Railway installiert</b>. Auf dieser Plattform erhältst du nur <b>500 kostenlose Stunden pro Monat</b>. Wenn das Limit erreicht ist, wird dein <b>Userbot eingefroren</b>. Im nächsten Monat <b>musst du zu https://railway.app gehen und ihn neu starten</b>."
   language_saved: "🇩🇪 Sprache gespeichert!"
   language: "🇩🇪 Deutsch"

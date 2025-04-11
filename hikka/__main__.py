@@ -19,7 +19,7 @@ if (
     and all(trigger not in os.environ for trigger in {"DOCKER", "GOORM", "NO_SUDO"})
 ):
     print("🚫" * 15)
-    print("You attempted to run Heroku on behalf of root user")
+    print("You attempted to run Legacy on behalf of root user")
     print("Please, create a new user and restart script")
     print("If this action was intentional, pass --root argument instead")
     print("🚫" * 15)

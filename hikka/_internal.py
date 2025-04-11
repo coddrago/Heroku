@@ -44,8 +44,8 @@ def restart():
     if "HIKKA_DO_NOT_RESTART2" in os.environ:
         print(
             "Got in a loop, exiting\nYou probably need to manually remove existing"
-            " packages and then restart Heroku. Run `pip uninstall -y telethon"
-            " telethon-mod heroku-tl-new hikka-tl-new`, then restart Heroku."
+            " packages and then restart Legacy. Run `pip uninstall -y telethon"
+            " telethon-mod heroku-tl-new hikka-tl-new`, then restart Legacy."
         )
         sys.exit(0)
 

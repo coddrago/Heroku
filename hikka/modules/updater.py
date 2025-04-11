@@ -39,7 +39,7 @@ class UpdaterMod(loader.Module):
         self.config = loader.ModuleConfig(
             loader.ConfigValue(
                 "GIT_ORIGIN_URL",
-                "https://github.com/Crayz310/Heroku-Legacy",
+                "https://github.com/Crayz310/Legacy",
                 lambda: self.strings("origin_cfg_doc"),
                 validator=loader.validators.Link(),
             )
@@ -328,11 +328,11 @@ class UpdaterMod(loader.Module):
                             )
                             if dialog.name
                             in {
-                                "heroku-logs",
-                                "heroku-onload",
-                                "heroku-assets",
-                                "heroku-backups",
-                                "heroku-acc-switcher",
+                                "legacy-logs",
+                                "legacy-onload",
+                                "legacy-assets",
+                                "legacy-backups",
+                                "legacy-acc-switcher",
                                 "silent-tags",
                             }
                             and dialog.is_channel
@@ -352,7 +352,7 @@ class UpdaterMod(loader.Module):
                                 1697279580,
                                 1679998924,
                                 2410964167,
-                            ]  # official heroku chats
+                            ]  # official legacy chats
                         ],
                         emoticon="🐱",
                         exclude_peers=[],
@@ -369,7 +369,7 @@ class UpdaterMod(loader.Module):
             )
         except Exception:
             logger.critical(
-                "Can't create Heroku folder. Possible reasons are:\n"
+                "Can't create Legacy folder. Possible reasons are:\n"
                 "- User reached the limit of folders in Telegram\n"
                 "- User got floodwait\n"
                 "Ignoring error and adding folder addition to ignore list"

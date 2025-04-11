@@ -534,7 +534,7 @@ label {
     background: #ffffffcc
 }
 
-.heroku_label {
+.legacy_label {
     display: inline-block;
     background: #fff;
     padding: 10px 15px;
