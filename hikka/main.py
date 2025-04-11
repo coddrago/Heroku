@@ -829,10 +829,10 @@ class Hikka:
                 logging.getLogger().handlers[0].get_logid_by_client(client.tg_id),
                 "https://imgur.com/a/uUF9zYL.png",
                 caption=(
-                    f"🪐 <b>Heroku {__version__} started!</b>\n\n⚙ <b>GitHub commit SHA: ",
-                    f"<a href='https://github.com/Crayz310/Heroku-Legacy/commit/{build}'>{build[:7]}</a></b>\n🔎",
-                    f" <b>Update status: {upd}</b>\n<b>{self.web.url if self.web else ''}</b>",
-                )
+                    f'🪐 <b>Heroku {__version__} started!</b>\n',
+                    f'⚙ <b>GitHub commit SHA: <a href="https://github.com/Crayz310/Heroku-Legacy/commit/{build}">{build[:7]}</a></b>\n',
+                    f'🔎 <b>Update status: {upd}</b>\n<b>{self.web.url if self.web else ""}</b>'
+                    )
             )
 
             logging.debug(
