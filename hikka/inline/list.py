@@ -188,7 +188,7 @@ class List(InlineUnit):
                     (
                         utils.get_platform_emoji()
                         if self._client.hikka_me.premium and CUSTOM_EMOJIS
-                        else "🪐"
+                        else "🌙"
                     )
                     + self.translator.getkey("inline.opening_list"),
                     **({"reply_to": utils.get_topic(message)} if message.out else {}),

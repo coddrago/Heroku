@@ -532,7 +532,7 @@ class Web:
                 msg = await bot.send_message(
                     user[1].tg_id,
                     (
-                        "🪐🔐 <b>Click button below to confirm web application"
+                        "🌙🔐 <b>Click button below to confirm web application"
                         f" ops</b>\n\n<b>Client IP</b>: {ips}\n{cities}\n<i>If you did"
                         " not request any codes, simply ignore this message</i>"
                     ),

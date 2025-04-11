@@ -52,7 +52,7 @@ class TokenObtainment(InlineUnit):
                 username = f"@legacy_{uid}_bot"
 
             for msg in [
-                f"🪐 Legacy userbot"[:64],
+                f"🌙 Legacy userbot"[:64],
                 username,
                 "/setuserpic",
                 username,
