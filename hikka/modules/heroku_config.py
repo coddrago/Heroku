@@ -835,7 +835,7 @@ class HerokuConfigMod(loader.Module):
                 "args": (mod, param),
                 "kwargs": {"obj_type": obj_type},
             }
-            for param in self.lookup(mod).config
+            for param in self.lookup(mod).config if self.lookup(mod) is not False
         ]
 
         await call.edit(
