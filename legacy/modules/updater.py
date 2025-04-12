@@ -48,21 +48,17 @@ class UpdaterMod(loader.Module):
     @loader.command()
     async def restart(self, message: Message):
         args = utils.get_args_raw(message)
-        secure_boot = any(trigger in args for trigger in {"--secure-boot", "-sb"})
         try:
             if (
                 "-f" in args
                 or not self.inline.init_complete
                 or not await self.inline.form(
                     message=message,
-                    text=self.strings(
-                        "secure_boot_confirm" if secure_boot else "restart_confirm"
-                    ),
+                    text=self.strings("restart_confirm"),
                     reply_markup=[
                         {
                             "text": self.strings("btn_restart"),
                             "callback": self.inline_restart,
-                            "args": (secure_boot,),
                         },
                         {"text": self.strings("cancel"), "action": "close"},
                     ],
@@ -70,10 +66,10 @@ class UpdaterMod(loader.Module):
             ):
                 raise
         except Exception:
-            await self.restart_common(message, secure_boot)
+            await self.restart_common(message)
 
-    async def inline_restart(self, call: InlineCall, secure_boot: bool = False):
-        await self.restart_common(call, secure_boot=secure_boot)
+    async def inline_restart(self, call: InlineCall):
+        await self.restart_common(call)
 
     async def process_restart_message(self, msg_obj: typing.Union[InlineCall, Message]):
         self.set(
@@ -88,7 +84,6 @@ class UpdaterMod(loader.Module):
     async def restart_common(
         self,
         msg_obj: typing.Union[InlineCall, Message],
-        secure_boot: bool = False,
     ):
         if (
             hasattr(msg_obj, "form")
@@ -100,9 +95,6 @@ class UpdaterMod(loader.Module):
             message = self.inline._units[msg_obj.form["uid"]]["message"]
         else:
             message = msg_obj
-
-        if secure_boot:
-            self._db.set(loader.__name__, "secure_boot", True)
 
         msg_obj = await utils.answer(
             msg_obj,
@@ -397,7 +389,7 @@ class UpdaterMod(loader.Module):
             text=self.inline.sanitise_text(msg),
         )
 
-    async def full_restart_complete(self, secure_boot: bool = False):
+    async def full_restart_complete(self):
         start = self.get("restart_ts")
 
         try:
@@ -408,9 +400,7 @@ class UpdaterMod(loader.Module):
         self.set("restart_ts", None)
 
         ms = self.get("selfupdatemsg")
-        msg = self.strings(
-            "secure_boot_complete" if secure_boot else "full_success"
-        ).format(utils.ascii_face(), took)
+        msg = self.strings("full_success").format(utils.ascii_face(), took)
 
         if ms is None:
             return
