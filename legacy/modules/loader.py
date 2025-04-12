@@ -1132,24 +1132,23 @@ class LoaderMod(loader.Module):
     async def _update_modules(self):
         todo = await self._get_modules_to_load()
 
-        else:
-            for mod in todo.values():
-                await self.download_and_install(mod)
+        for mod in todo.values():
+            await self.download_and_install(mod)
 
-            self.update_modules_in_db()
+        self.update_modules_in_db()
 
-            aliases = {
-                alias: cmd
-                for alias, cmd in self.lookup("settings").get("aliases", {}).items()
-                if self.allmodules.add_alias(alias, cmd)
-            }
+        aliases = {
+            alias: cmd
+            for alias, cmd in self.lookup("settings").get("aliases", {}).items()
+            if self.allmodules.add_alias(alias, cmd)
+        }
 
-            self.lookup("settings").set("aliases", aliases)
+        self.lookup("settings").set("aliases", aliases)
 
         self.fully_loaded = True
 
         with contextlib.suppress(AttributeError):
-            await self.lookup("Updater").full_restart_complete()
+            await self.lookup("Updater").full_restart_complete(self._secure_boot)
 
     def flush_cache(self) -> int:
         """Flush the cache of links to modules"""
@@ -1164,6 +1163,9 @@ class LoaderMod(loader.Module):
     async def reload_core(self) -> int:
         """Forcefully reload all core modules"""
         self.fully_loaded = False
+
+        if self._secure_boot:
+            self._db.set(loader.__name__, "secure_boot", True)
 
         loaded = await self.allmodules.register_all(no_external=True)
         for instance in loaded:
