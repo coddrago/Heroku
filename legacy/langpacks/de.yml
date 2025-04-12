@@ -198,18 +198,7 @@ heroku_backup:
   _cmd_doc_set_backup_period: "<Zeit in Stunden> - Häufigkeit der Sicherungen festlegen"
 
 settings:
-  installation: '<emoji document_id=5363805650327450240>▪️</emoji> Die Installation ist wirklich einfach! Schreibe einfach folgendes in das Terminal deines Servers:
-  <pre><code class="language-bash">sudo apt update && sudo apt upgrade -y && sudo apt install git && sudo apt install python3-pip && git clone https://github.com/Crayz310/Legacy && cd Legacy && pip install -r requirements.txt && python3 -m hikka</code></pre>
-
-  <emoji document_id=5299027123913105700>😐</emoji> Wenn du keinen Zugriff auf sudo hast, kannst du einfach die Anfangsbefehle weglassen.
-
-  <emoji document_id=5300777464820145682>🥳</emoji> Lass uns die Argumente ein wenig erklären:
-
-  <emoji document_id=5787313834012184077>🔐</emoji> Argument <code>--root</code> - erlaubt dir, Hikka als <b>Root-Benutzer</b> zu starten.
-
-  <emoji document_id=5785209342986817408>🌎</emoji> Argument <code>--no-web</code> - öffnet den Login-Prozess in deinem <b>Terminal statt über einen Link.</b>
-
-  Es ist völlig sicher und hilft dir, von Hikka zu Legacy zu wechseln.'
+  installation: '<emoji document_id=5363805650327450240>▪️</emoji> Die Installation ist wirklich einfach! Schreibe einfach folgendes in das Terminal deines Servers:\n<pre><code class="language-bash">sudo apt update && sudo apt upgrade -y && sudo apt install git && sudo apt install python3-pip && git clone https://github.com/Crayz310/Legacy && cd Legacy && pip install -r requirements.txt && python3 -m legacy</code></pre>\n\n<emoji document_id=5299027123913105700>😐</emoji> Wenn du keinen Zugriff auf sudo hast, kannst du einfach die Anfangsbefehle weglassen.\n\n<emoji document_id=5300777464820145682>🥳</emoji> Lass uns die Argumente ein wenig erklären:\n\n<emoji document_id=5787313834012184077>🔐</emoji> Argument <code>--root</code> - erlaubt dir, Hikka als <b>Root-Benutzer</b> zu starten.\n\n<emoji document_id=5785209342986817408>🌎</emoji> Argument <code>--no-web</code> - öffnet den Login-Prozess in deinem <b>Terminal statt über einen Link.</b>'
   too_many_args: "<emoji document_id=5210952531676504517>🚫</emoji> <b>Zu viele Argumente</b>"
   blacklisted: "<emoji document_id=5197474765387864959>👍</emoji> <b>Chat {} wurde zur Blacklist des Userbots hinzugefügt</b>"
   unblacklisted: "<emoji document_id=5197474765387864959>👍</emoji> <b>Chat {} wurde aus der Blacklist des Userbots entfernt</b>"
