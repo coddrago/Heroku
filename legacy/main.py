@@ -87,7 +87,7 @@ BASE_PATH = Path(BASE_DIR)
 ASSETS_PATH = Path(utils.get_base_dir(), "..", "assets", "legacy-assets.png")
 BACKUPS_PATH = Path(utils.get_base_dir(), "..", "assets", "legacy-backups.png")
 LOGS_PATH = Path(utils.get_base_dir(), "..", "assets", "legacy-logs.png")
-AVATAR_PATH = Path(utils.get_base_dir(), "..", "assets", "legacy-ava.png")
+AVATAR_PATH = Path(utils.get_base_dir(), "..", "assets", "legacy-pfp.png")
 CONFIG_PATH = BASE_PATH / "config.json"
 
 IS_TERMUX = "com.termux" in os.environ.get("PREFIX", "")
