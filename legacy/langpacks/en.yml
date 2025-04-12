@@ -299,7 +299,7 @@ inline_stuff:
   bot_username_invalid: "<emoji document_id=5210952531676504517>🚫</emoji> <b>Specified bot username is invalid. It must end with</b> <code>bot</code> <b>and contain at least 4 symbols</b>"
   bot_username_occupied: "<emoji document_id=5210952531676504517>🚫</emoji> <b>This username is already occupied</b>"
   bot_updated: "<emoji document_id=6318792204118656433>🎉</emoji> <b>Config successfully saved. Restart userbot to apply changes</b>"
-  this_is_legacy: "🌙 <b>Hi! This is Legacy — powerful modular Telegram userbot. You can install it to your account!</b>\n\n<b>🌍 <a href=\"https://github.com/Crayz310/Legacy\">GitHub</a></b>\n<b>👥 <a href=\"https://t.me/heroku_legacy\">Support chat</a></b>"
+  this_is_legacy: "🌙 <b>Hi! This is Legacy — powerful modular Telegram userbot. You can install it to your account!</b>\n\n<b>🌍 <a href=\"https://github.com/Crayz310/Legacy\">GitHub</a></b>\n<b>👥 <a href=\"https://t.me/legacy_sup\">Support chat</a></b>"
   _cmd_doc_ch_legacy_bot: "<username> - Change your Legacy inline bot username"
   _cls_doc: "Provides support for inline stuff"
 
@@ -395,7 +395,7 @@ help:
   all_header: "<b>{} mods available, {} hidden:</b>"
   no_mod: "🚫 <b>Specify module to hide</b>"
   hidden_shown: "<b>{} modules hidden, {} modules shown:</b>\n{}\n{}"
-  support: "{} <b>Link to <a href='https://t.me/heroku_legacy'>support chat</a></b>"
+  support: "{} <b>Link to <a href='https://t.me/legacy_sup'>support chat</a></b>"
   partial_load: "<emoji document_id=5355133243773435190>☝️</emoji> <b>Userbot is not fully loaded, so not all modules are shown</b>"
   not_exact: "<emoji document_id=5355133243773435190>☝️</emoji> <b>No exact match occured, so the closest result is shown instead</b>"
   request_join: "You requested link for Legacy support chat"
