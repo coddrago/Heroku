@@ -507,7 +507,6 @@ class Modules:
         self._db = db
         self.db = db
         self.translator = translator
-        self.secure_boot = False
         asyncio.ensure_future(self._junk_collector())
         self.inline = InlineManager(self.client, self._db, self)
         self.client.legacy_inline = self.inline
@@ -564,12 +563,8 @@ class Modules:
                 )
             ]
 
-            self.secure_boot = self._db.get(__name__, "secure_boot", False)
-
             external_mods = (
-                []
-                if self.secure_boot
-                else [
+                [
                     (LOADED_MODULES_PATH / mod).resolve()
                     for mod in filter(
                         lambda x: (

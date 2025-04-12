@@ -157,9 +157,6 @@ class LoaderMod(loader.Module):
         self._db.save()
 
     def update_modules_in_db(self):
-        if self.allmodules.secure_boot:
-            return
-
         self.set(
             "loaded_modules",
             {
@@ -1021,15 +1018,14 @@ class LoaderMod(loader.Module):
             )
             return
 
-        if not self.allmodules.secure_boot:
-            self.set(
-                "loaded_modules",
-                {
-                    mod: link
-                    for mod, link in self.get("loaded_modules", {}).items()
-                    if mod not in worked
-                },
-            )
+        self.set(
+            "loaded_modules",
+            {
+                mod: link
+                for mod, link in self.get("loaded_modules", {}).items()
+                if mod not in worked
+            },
+        )
 
         msg = (
             self.strings("unloaded").format(
@@ -1163,9 +1159,6 @@ class LoaderMod(loader.Module):
     async def reload_core(self) -> int:
         """Forcefully reload all core modules"""
         self.fully_loaded = False
-
-        if self._secure_boot:
-            self._db.set(loader.__name__, "secure_boot", True)
 
         loaded = await self.allmodules.register_all(no_external=True)
         for instance in loaded:
