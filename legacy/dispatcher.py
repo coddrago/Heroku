@@ -137,8 +137,6 @@ class CommandDispatcher:
         self.raw_handlers = []
         self._external_bl: typing.List[int] = []
 
-        asyncio.ensure_future(self._external_bl_reload_loop())
-
     async def _handle_ratelimit(self, message: Message, func: callable) -> bool:
         if await self.security.check(message, security.OWNER):
             return True
@@ -711,15 +709,3 @@ class CommandDispatcher:
             await func(message)
         except Exception as e:
             await exception_handler(e, message, *args)
-
-    async def _external_bl_reload_loop(self):
-        while True:
-            with contextlib.suppress(Exception):
-                self._external_bl = (
-                    await utils.run_sync(
-                        requests.get,
-                        "https://ubguard.dan.tatar/blacklist.json",
-                    )
-                ).json()["blacklist"]
-
-            await asyncio.sleep(60)

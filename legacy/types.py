@@ -32,7 +32,6 @@ from legacytl.tl.types import (
     UserFull,
 )
 
-from . import version
 from ._reference_finder import replace_all_refs
 from .inline.types import (
     BotInlineCall,
