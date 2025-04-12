@@ -1148,7 +1148,7 @@ class LoaderMod(loader.Module):
         self.fully_loaded = True
 
         with contextlib.suppress(AttributeError):
-            await self.lookup("Updater").full_restart_complete(self._secure_boot)
+            await self.lookup("Updater").full_restart_complete()
 
     def flush_cache(self) -> int:
         """Flush the cache of links to modules"""
