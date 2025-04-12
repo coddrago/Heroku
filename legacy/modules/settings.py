@@ -255,6 +255,7 @@ class CoreMod(loader.Module):
     async def _main_installation(self, call: InlineCall):
         reply_markup = [
             [{"text": self.strings("vds"), "callback": self._vds_installation}, {"text": self.strings("termux"), "callback": self._termux_installation}],
+            [{"text": self.strings("railway"), "callback": self._railway_installation}],
             [{"text": self.strings("close_btn"), "action": "close"}]
         ]
         await utils.answer(call, self.strings("choose_installation"), reply_markup=reply_markup)
@@ -275,11 +276,28 @@ class CoreMod(loader.Module):
         ]
         await utils.answer(call, self.strings("vds_install"), reply_markup=reply_markup)
 
+    async def _railway_installation(self, call: InlineCall):
+        reply_markup = [
+            [{
+                "text": self.strings("main_menu"), "callback": self._main_installation
+            }]
+        ]
+        await utils.answer(call, self.strings("railway_install"), reply_markup=reply_markup)
+
     @loader.command()
     async def installation(self, message: Message):
         """| Guide of installation"""
-        reply_markup = [
-            [{"text": self.strings("vds"), "callback": self._vds_installation}, {"text": self.strings("termux"), "callback": self._termux_installation}],
-            [{"text": self.strings("close_btn"), "action": "close"}]
-        ]
-        await utils.answer(message, self.strings("choose_installation"), reply_markup=reply_markup)
+        args = utils.get_args(message)
+        if "-t" in args or "--termux" in args:
+            return await utils.answer(message, self.strings("termux_install"))
+        elif "-v" in args or "--vds" in args:
+            return await utils.answer(message, self.strings("vds_install"))
+        elif "-r" in args or "--railway" in args:
+            return await utils.answer(message, self.strings("railway_install"))
+        else:
+            reply_markup = [
+                [{"text": self.strings("vds"), "callback": self._vds_installation}, {"text": self.strings("termux"), "callback": self._termux_installation}],
+                [{"text": self.strings("railway"), "callback": self._railway_installation}],
+                [{"text": self.strings("close_btn"), "action": "close"}]
+            ]
+            await utils.answer(message, self.strings("choose_installation"), reply_markup=reply_markup)

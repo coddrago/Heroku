@@ -39,13 +39,6 @@ class Validator:
                     "en": "docstring",
                     "ru": "докстрингом",
                     "ua": "докстрінгом",
-                    "fr": "chaîne de documentation",
-                    "it": "docstring",
-                    "de": "Dokumentation",
-                    "tr": "dökümantasyon",
-                    "uz": "hujjat",
-                    "es": "documentación",
-                    "kk": "құжат",
                 }
                 Use instrumental case with lowercase
     :param _internal_id: Do not pass anything here, or things will break
