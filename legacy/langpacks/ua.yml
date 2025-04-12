@@ -198,16 +198,12 @@ heroku_backup:
   _cmd_doc_set_backup_period: "<час в годинах> - Встановити частоту бекапів"
 
 settings:
-  installation: '<emoji document_id=5363805650327450240>▪️</emoji> Установка дуже легка! Достатньо написати в термінал твого сервера:
-
-<pre><code class="language-bash">sudo apt update &amp;&amp; sudo apt upgrade -y &amp;&amp; sudo apt install git &amp;&amp; sudo apt install python3-pip &amp;&amp; git clone https://github.com/Crayz310/Legacy &amp;&amp; cd Legacy &amp;&amp; pip install -r requirements.txt &amp;&amp; python3 -m legacy</code></pre>
-<emoji document_id=5299027123913105700>😐</emoji> Якщо у вас немає доступу до sudo, просто приберіть початкові дії.
-
-<emoji document_id=5300777464820145682>🥳</emoji> Розберемося трохи з аргументами:
-
-<emoji document_id=5787313834012184077>🔐</emoji> Аргумент <code>--root</code> дозволяє запустити Хікку від <b>root користувача</b>.
-
-<emoji document_id=5785209342986817408>🌎</emoji> Аргумент <code>--no-web</code> відкриває процес входу в ваш обліковий запис <b>прямо в терміналі, а не через посилання.</b>'
+  choose_installation: "<emoji document_id=5363805650327450240>🪐</emoji> <b>Choose your Heroku installation option:</b>"
+  vds: "💎 VDS"
+  termux: "📱 Termux"
+  main_menu: "🌍 Main"
+  vds_install: "🪐 <b>Installation on 💎 VDS:</b>\n<pre><code class=\"language-bash\">sudo apt update &amp;&amp; sudo apt upgrade -y &amp;&amp; sudo apt install git &amp;&amp; sudo apt install python3-pip &amp;&amp; git clone https://github.com/Crayz310/Legacy &amp;&amp; cd Legacy &amp;&amp; pip install -r requirements.txt &amp;&amp; python3 -m legacy</code></pre>"
+  termux_install: "🪐 <b>Installation on 🕶 Termux:</b>\n\n⬜️ <b>Download Termux from</b> <a href=\"https://f-droid.org/repo/com.termux_118.apk\"><b>the link</b></a><b>. ⚠️ The version from Play Market will not work!</b>\n<b>⬜️ Copy the command into it:</b> \n<pre><code class=\"language-bash\">termux-wake-lock &amp;&amp; export AIOHTTP_NO_EXTENSIONS=1 &amp;&amp; pkg upgr -y &amp;&amp; pkg install tur-repo &amp;&amp; pkg update &amp;&amp; pkg install python3.10 &amp;&amp; pkg i wget ncurses-utils python3.10 -y &amp;&amp; pkg update &amp;&amp; pkg install openssl -y &amp;&amp; pkg install git &amp;&amp; clear &amp;&amp; git clone https://github.com/Crayz310/Legacy &amp;&amp; cd Legacy &amp;&amp; pip install -r requirements.txt &amp;&amp; python3.10 -m legacy --no-web</code></pre>\n\n⬜️ <b>Answer \"y\" to everything the script asks</b>\n⬜️ <b>Follow the instructions in the script.</b>\n\n⬜️ <b>Where to get API_ID and API_HASH?</b> 🎬 <a href=\"https://youtu.be/DcqDA249Lhg?t=24\">Video</a>"
   too_many_args: "<emoji document_id=5210952531676504517>🚫</emoji> <bЗанадто багато аргументів</b>"
   blacklisted: "<emoji document_id=5197474765387864959>👍</emoji> <b>Чат {} додано до чорного списку юзербота</b>"
   unblacklisted: "<emoji document_id=5197474765387864959>👍</emoji> <b>Чат {} видалено з чорного списку юзербота</b>"

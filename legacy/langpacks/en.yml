@@ -208,17 +208,12 @@ heroku_backup:
 
 settings:
   name: "Settings"
-  installation: '<emoji document_id=5363805650327450240>▪️</emoji> The installation is very easy! Just enter the following in your servers terminal:
-
-<pre><code class="language-bash">sudo apt update &amp;&amp; sudo apt upgrade -y &amp;&amp; sudo apt install git &amp;&amp; sudo apt install python3-pip &amp;&amp; git clone https://github.com/Crayz310/Legacy &amp;&amp; cd Legacy &amp;&amp; pip install -r requirements.txt &amp;&amp; python3 -m legacy</code></pre>
-<emoji document_id=5299027123913105700>😐</emoji> If you dont have sudo access, simply remove the initial steps.
-
-<emoji document_id=5300777464820145682>🥳</emoji> Lets go over a few arguments:
-
-<emoji document_id=5787313834012184077>🔐</emoji> The <code>--root</code> argument allows you to run Legacy as a <b>root user</b>.
-
-<emoji document_id=5785209342986817408>🌎</emoji> The <code>--no-web</code> argument enables login to your account <b>directly in the terminal, rather than through a link.</b>'
-  too_many_args: "<emoji document_id=5210952531676504517>🚫</emoji> <b>Too many args</b>"
+  choose_installation: "<emoji document_id=5363805650327450240>🪐</emoji> <b>Choose your Heroku installation option:</b>"
+  vds: "💎 VDS"
+  termux: "📱 Termux"
+  main_menu: "🌍 Main"
+  vds_install: "🪐 <b>Installation on 💎 VDS:</b>\n<pre><code class=\"language-bash\">sudo apt update &amp;&amp; sudo apt upgrade -y &amp;&amp; sudo apt install git &amp;&amp; sudo apt install python3-pip &amp;&amp; git clone https://github.com/Crayz310/Legacy &amp;&amp; cd Legacy &amp;&amp; pip install -r requirements.txt &amp;&amp; python3 -m legacy</code></pre>"
+  termux_install: "🪐 <b>Installation on 🕶 Termux:</b>\n\n⬜️ <b>Download Termux from</b> <a href=\"https://f-droid.org/repo/com.termux_118.apk\"><b>the link</b></a><b>. ⚠️ The version from Play Market will not work!</b>\n<b>⬜️ Copy the command into it:</b> \n<pre><code class=\"language-bash\">termux-wake-lock &amp;&amp; export AIOHTTP_NO_EXTENSIONS=1 &amp;&amp; pkg upgr -y &amp;&amp; pkg install tur-repo &amp;&amp; pkg update &amp;&amp; pkg install python3.10 &amp;&amp; pkg i wget ncurses-utils python3.10 -y &amp;&amp; pkg update &amp;&amp; pkg install openssl -y &amp;&amp; pkg install git &amp;&amp; clear &amp;&amp; git clone https://github.com/Crayz310/Legacy &amp;&amp; cd Legacy &amp;&amp; pip install -r requirements.txt &amp;&amp; python3.10 -m legacy --no-web</code></pre>\n\n⬜️ <b>Answer \"y\" to everything the script asks</b>\n⬜️ <b>Follow the instructions in the script.</b>\n\n⬜️ <b>Where to get API_ID and API_HASH?</b> 🎬 <a href=\"https://youtu.be/DcqDA249Lhg?t=24\">Video</a>"
   blacklisted: "<emoji document_id=5197474765387864959>👍</emoji> <b>Chat {} blacklisted from userbot</b>"
   unblacklisted: "<emoji document_id=5197474765387864959>👍</emoji> <b>Chat {} unblacklisted from userbot</b>"
   user_blacklisted: "<emoji document_id=5197474765387864959>👍</emoji> <b>User {} blacklisted from userbot</b>"

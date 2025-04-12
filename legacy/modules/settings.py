@@ -59,7 +59,7 @@ class CoreMod(loader.Module):
         module = self.allmodules.get_classname(module)
         return f"{str(chatid)}.{module}" if module else chatid
 
-    @loader.command(ru_doc="Информация о Легаси", en_doc="Information of Legacy", ua_doc="Інформація про Хероку", de_doc="Informationen über Legacy")
+    @loader.command(ru_doc="Информация о Legacy", en_doc="Information of Legacy", ua_doc="Інформація про Хероку", de_doc="Informationen über Legacy")
     async def legacycmd(self, message: Message):
         await utils.answer_file(
             message,
@@ -252,12 +252,34 @@ class CoreMod(loader.Module):
         self._db.save()
         await utils.answer(call, self.strings("db_cleared"))
 
-    async def installationcmd(self, message: Message):
+    async def _main_installation(self, call: InlineCall):
+        reply_markup = [
+            [{"text": self.strings("vds"), "callback": self._vds_installation}, {"text": self.strings("termux"), "callback": self._termux_installation}],
+            [{"text": self.strings("close_btn"), "action": "close"}]
+        ]
+        await utils.answer(call, self.strings("choose_installation"), reply_markup=reply_markup)
+
+    async def _termux_installation(self, call: InlineCall):
+        reply_markup = [
+            [{
+                "text": self.strings("main_menu"), "callback": self._main_installation
+            }]
+        ]
+        await utils.answer(call, self.strings("termux_install"), reply_markup=reply_markup)
+
+    async def _vds_installation(self, call: InlineCall):
+        reply_markup = [
+            [{
+                "text": self.strings("main_menu"), "callback": self._main_installation
+            }]
+        ]
+        await utils.answer(call, self.strings("vds_install"), reply_markup=reply_markup)
+
+    @loader.command()
+    async def installation(self, message: Message):
         """| Guide of installation"""
-
-        await self.client.send_file(
-            message.peer_id,
-            "https://imgur.com/a/HrrFair.png",
-            caption=self.strings["installation"].format('{}', prefix=self.get_prefix()), reply_to=getattr(message, "reply_to_msg_id", None),)
-
-        await message.delete()
+        reply_markup = [
+            [{"text": self.strings("vds"), "callback": self._vds_installation}, {"text": self.strings("termux"), "callback": self._termux_installation}],
+            [{"text": self.strings("close_btn"), "action": "close"}]
+        ]
+        await utils.answer(message, self.strings("choose_installation"), reply_markup=reply_markup)
