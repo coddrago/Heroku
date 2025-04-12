@@ -1132,11 +1132,6 @@ class LoaderMod(loader.Module):
     async def _update_modules(self):
         todo = await self._get_modules_to_load()
 
-        self._secure_boot = False
-
-        if self._db.get(loader.__name__, "secure_boot", False):
-            self._db.set(loader.__name__, "secure_boot", False)
-            self._secure_boot = True
         else:
             for mod in todo.values():
                 await self.download_and_install(mod)
@@ -1154,7 +1149,7 @@ class LoaderMod(loader.Module):
         self.fully_loaded = True
 
         with contextlib.suppress(AttributeError):
-            await self.lookup("Updater").full_restart_complete(self._secure_boot)
+            await self.lookup("Updater").full_restart_complete()
 
     def flush_cache(self) -> int:
         """Flush the cache of links to modules"""
@@ -1169,9 +1164,6 @@ class LoaderMod(loader.Module):
     async def reload_core(self) -> int:
         """Forcefully reload all core modules"""
         self.fully_loaded = False
-
-        if self._secure_boot:
-            self._db.set(loader.__name__, "secure_boot", True)
 
         loaded = await self.allmodules.register_all(no_external=True)
         for instance in loaded:
