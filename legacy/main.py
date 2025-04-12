@@ -88,7 +88,7 @@ ASSETS_PATH = "https://raw.githubusercontent.com/Crayz310/Legacy/refs/heads/mast
 BACKUPS_PATH = "https://raw.githubusercontent.com/Crayz310/Legacy/refs/heads/master/assets/legacy-backups.png"
 LOGS_PATH = "https://raw.githubusercontent.com/Crayz310/Legacy/refs/heads/master/assets/legacy-logs.png"
 AVATAR_PATH = "https://raw.githubusercontent.com/Crayz310/Legacy/refs/heads/master/assets/legacy-pfp.png"
-CONFIG_PATH = BASE_PATH / "assets" / "config.json"
+CONFIG_PATH = BASE_PATH / "config.json"
 
 IS_TERMUX = "com.termux" in os.environ.get("PREFIX", "")
 IS_DOCKER = "DOCKER" in os.environ
