@@ -20,7 +20,7 @@ from legacytl.tl.functions.messages import (
     GetDialogFiltersRequest,
     UpdateDialogFilterRequest,
 )
-from legacytl.tl.types import DialogFilter, Message
+from legacytl.tl.types import DialogFilter, Message, TextWithEntities, DialogFilterDefault
 
 from .. import loader, main, utils, version
 from .._internal import restart
@@ -282,13 +282,13 @@ class UpdaterMod(loader.Module):
     async def _add_folder(self):
         folders = await self._client(GetDialogFiltersRequest())
 
-        if any(getattr(folder, "title", None) == "legacy" for folder in folders):
+        if any(not isinstance(folder, DialogFilterDefault) and getattr(folder, "title", None) == "legacy" for folder in folders.filters):
             return
 
         try:
             folder_id = (
                 max(
-                    (folder for folder in folders if hasattr(folder, "id")),
+                    (folder for folder in folders.filters if hasattr(folder, "id")),
                     key=lambda x: x.id,
                 ).id
                 + 1
@@ -302,7 +302,10 @@ class UpdaterMod(loader.Module):
                     folder_id,
                     DialogFilter(
                         folder_id,
-                        title="legacy",
+                        title=TextWithEntities(
+                                    text='legacy',
+                                    entities=[]
+                                ),
                         pinned_peers=(
                             [
                                 await self._client.get_input_entity(
@@ -316,15 +319,14 @@ class UpdaterMod(loader.Module):
                             await self._client.get_input_entity(dialog.entity)
                             async for dialog in self._client.iter_dialogs(
                                 None,
-                                ignore_migrated=True,
+                                archived=True,
+                                ignore_migrated=False,
                             )
                             if dialog.name
                             in {
                                 "legacy-logs",
-                                "legacy-onload",
                                 "legacy-assets",
                                 "legacy-backups",
-                                "legacy-acc-switcher",
                                 "silent-tags",
                             }
                             and dialog.is_channel
@@ -340,11 +342,8 @@ class UpdaterMod(loader.Module):
                             )
                             or dialog.entity.id
                             in [
-                                1554874075,
-                                1697279580,
-                                1679998924,
-                                2410964167,
-                            ]  # official legacy chats
+                                2577311568
+                            ]  # official legacy chat
                         ],
                         emoticon="🐱",
                         exclude_peers=[],
@@ -359,7 +358,8 @@ class UpdaterMod(loader.Module):
                     ),
                 )
             )
-        except Exception:
+        except Exception as e:
+            logger.critical(e)
             logger.critical(
                 "Can't create Legacy folder. Possible reasons are:\n"
                 "- User reached the limit of folders in Telegram\n"
