@@ -1,10 +1,10 @@
-<a href="https://www.codacy.com/gh/coddrago/Heroku/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=coddrago/Heroku&amp;utm_campaign=Badge_Grade"><img src="https://app.codacy.com/project/badge/Grade/97e3ea868f9344a5aa6e4d874f83db14"/></a>
-<a href="#"><img src="https://img.shields.io/github/languages/code-size/coddrago/Heroku"/></a>
-<a href="#"><img src="https://img.shields.io/github/issues-raw/coddrago/Heroku"/></a>
-<a href="#"><img src="https://img.shields.io/github/license/coddrago/Heroku"/></a>
-<a href="#"><img src="https://img.shields.io/github/commit-activity/m/coddrago/Heroku"/></a><br>
-<a href="#"><img src="https://img.shields.io/github/forks/coddrago/Heroku?style=flat"/></a>
-<a href="#"><img src="https://img.shields.io/github/stars/coddrago/Heroku"/></a>&nbsp;<a href="https://github.com/psf/black"><img src="https://img.shields.io/badge/code%20style-black-000000.svg" alt="Code style: black"></a><br>
+<a href="https://www.codacy.com/gh/Crayz310/Legacy/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=Crayz310/Legacy&amp;utm_campaign=Badge_Grade"><img src="https://app.codacy.com/project/badge/Grade/97e3ea868f9344a5aa6e4d874f83db14"/></a>
+<a href="#"><img src="https://img.shields.io/github/languages/code-size/Crayz310/Legacy"/></a>
+<a href="#"><img src="https://img.shields.io/github/issues-raw/Crayz310/Legacy"/></a>
+<a href="#"><img src="https://img.shields.io/github/license/Crayz310/Legacy"/></a>
+<a href="#"><img src="https://img.shields.io/github/commit-activity/m/Crayz310/Legacy"/></a><br>
+<a href="#"><img src="https://img.shields.io/github/forks/Crayz310/Legacy?style=flat"/></a>
+<a href="#"><img src="https://img.shields.io/github/stars/Crayz310/Legacy"/></a>&nbsp;<a href="https://github.com/psf/black"><img src="https://img.shields.io/badge/code%20style-black-000000.svg" alt="Code style: black"></a><br>
 
 ### Disclaimer
 
@@ -127,6 +127,5 @@ Check out <a href="https://web.archive.org/dev.hikka.pw">dev.hikka.pw</a> for de
 <ul>
     <li><a href="https://gitlab.com/hackintosh5">Hackintosh5</a> for FTG, which is the base of project</li>
     <li><a href="https://t.me/GunyaKshin">Codwiz</a> for Ukrainian translation pack</li>
-    <li><a href="https://t.me/thisLyomi">Lyomi</a> for German translation pack</li>
     <li><a href="https://t.me/lonami">Lonami</a> for Telethon, which is the base of Legacy-TL-New</li>
 </ul>
