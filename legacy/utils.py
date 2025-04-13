@@ -944,10 +944,10 @@ def get_platform_emoji() -> str:
 
     BASE = "".join(
         (
-            "<emoji document_id={}>😀</emoji>",
-            "<emoji document_id=5456453854453327393>😀</emoji>",
-            "<emoji document_id=5458918203608563276>😀</emoji>",
-            "<emoji document_id=5456290924868954389>😀</emoji>",
+            "<emoji document_id={}>🌙</emoji>",
+            "<emoji document_id=5456453854453327393>🌙</emoji>",
+            "<emoji document_id=5458918203608563276>🌙</emoji>",
+            "<emoji document_id=5456290924868954389>🌙</emoji>",
         )
     )
 
@@ -969,7 +969,7 @@ def get_platform_emoji() -> str:
     if main.IS_DOCKER:
         return BASE.format(5456574628933693253)
 
-    return BASE.format(5458562236719064774)
+    return BASE.format(5467541303938019154)
 
 def uptime() -> int:
     """
