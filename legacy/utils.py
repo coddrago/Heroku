@@ -1562,6 +1562,18 @@ def get_ram_usage() -> float:
     except Exception:
         return 0
 
+async def get_cpu_usage_async() -> float:
+    from . import main
+    if main.IS_DOCKER:
+        import psutil
+        import asyncio
+
+        process = psutil.Process()
+        process.cpu_percent(interval=None)
+        await asyncio.sleep(1)
+        cpu_usage = process.cpu_percent(interval=None)
+        return cpu_usage
+    return get_cpu_usage()
 
 def get_cpu_usage() -> float:
     try:
@@ -1570,7 +1582,7 @@ def get_cpu_usage() -> float:
         cpu_usage = float(result.stdout.splitlines()[1].strip())
         return round(cpu_usage, 2)
     except Exception as e:
-        print(f"Ошибка: {e}")
+        logging.error(f"{e}")
         return 0.0
 
 

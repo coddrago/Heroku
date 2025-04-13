@@ -34,7 +34,7 @@ class LegacyInfoMod(loader.Module):
             ),
         )
 
-    def _render_info(self, inline: bool) -> str:
+    async def _render_info(self, inline: bool) -> str:
         try:
             repo = git.Repo(search_parent_directories=True)
             diff = repo.git.log([f"HEAD..origin/{version.branch}", "--oneline"])
@@ -76,7 +76,7 @@ class LegacyInfoMod(loader.Module):
                 platform=platform,
                 upd=upd,
                 uptime=utils.formatted_uptime(),
-                cpu_usage=f"{utils.get_cpu_usage()}%",
+                cpu_usage=f"{await utils.get_cpu_usage_async()}%",
                 ram_usage=f"{utils.get_ram_usage()} MB",
                 branch=version.branch,
                 hostname=lib_platform.node(),
@@ -122,11 +122,11 @@ class LegacyInfoMod(loader.Module):
             await utils.answer_file(
                 message,
                 self.config["banner_url"],
-                self._render_info(False),
+                await self._render_info(False),
             )
         else:
             await utils.answer(
-                message, self._render_info(False)
+                message, await self._render_info(False)
             )
 
     @loader.command()
