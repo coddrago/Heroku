@@ -27,17 +27,17 @@ class Help(loader.Module):
         self.config = loader.ModuleConfig(
             loader.ConfigValue(
                 "core_emoji",
-                "<emoji document_id=4974681956907221809>▪️</emoji>",
+                "<emoji document_id=6030550768426159669>🛡</emoji>",
                 lambda: "Core module bullet",
             ),
             loader.ConfigValue(
                 "plain_emoji",
-                "<emoji document_id=4974508259839836856>▪️</emoji>",
+                "<emoji document_id=5861640841524680405>✅</emoji>",
                 lambda: "Plain module bullet",
             ),
             loader.ConfigValue(
                 "empty_emoji",
-                "<emoji document_id=5100652175172830068>🟠</emoji>",
+                "<emoji document_id=5251741320690551495>👎</emoji>",
                 lambda: "Empty modules bullet",
             ),
             loader.ConfigValue(
@@ -254,9 +254,8 @@ class Help(loader.Module):
                 name = getattr(mod, "name", "ERROR")
 
             if (
-                not getattr(mod, "commands", None)
-                and not getattr(mod, "inline_handlers", None)
-                and not getattr(mod, "callback_handlers", None)
+                len(mod.commands) == 0
+                and len(mod.inline_handlers) == 0
             ):
                 no_commands_ += [
                     "\n{} <code>{}</code>".format(self.config["empty_emoji"], name)
