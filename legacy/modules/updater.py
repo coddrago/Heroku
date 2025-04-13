@@ -282,8 +282,11 @@ class UpdaterMod(loader.Module):
     async def _add_folder(self):
         folders = await self._client(GetDialogFiltersRequest())
 
-        if any(not isinstance(folder, DialogFilterDefault) and getattr(folder, "title", None) == "legacy" for folder in folders.filters):
-            return
+        for folder in folders.filters:
+            if isinstance(folder, DialogFilterDefault):
+                continue
+            if folder.title.text == "legacy":
+                return
 
         try:
             folder_id = (
