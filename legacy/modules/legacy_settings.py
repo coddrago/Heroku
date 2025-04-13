@@ -35,10 +35,10 @@ ALL_INVOKES = [
 
 
 @loader.tds
-class HerokuSettingsMod(loader.Module):
+class LegacySettingsMod(loader.Module):
     """Advanced settings for Legacy Userbot"""
 
-    strings = {"name": "HerokuSettings"}
+    strings = {"name": "LegacySettings"}
 
     def get_watchers(self) -> tuple:
         return [

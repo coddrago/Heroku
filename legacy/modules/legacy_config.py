@@ -26,10 +26,10 @@ NUM_ROWS = 5
 
 
 @loader.tds
-class HerokuConfigMod(loader.Module):
+class LegacyConfigMod(loader.Module):
     """Interactive configurator for Hikka Userbot"""
 
-    strings = {"name": "HerokuConfig"}
+    strings = {"name": "LegacyConfig"}
 
     @staticmethod
     def prep_value(value: typing.Any) -> typing.Any:

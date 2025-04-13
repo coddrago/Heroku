@@ -15,10 +15,10 @@ import platform as lib_platform
 import getpass
 
 @loader.tds
-class HerokuInfoMod(loader.Module):
+class LegacyInfoMod(loader.Module):
     """Show userbot info"""
 
-    strings = {"name": "HerokuInfo"}
+    strings = {"name": "LegacyInfo"}
 
     def __init__(self):
         self.config = loader.ModuleConfig(

@@ -24,10 +24,10 @@ logger = logging.getLogger(__name__)
 
 
 @loader.tds
-class HerokuBackupMod(loader.Module):
+class LegacyBackupMod(loader.Module):
     """Handles database and modules backups"""
 
-    strings = {"name": "HerokuBackup"}
+    strings = {"name": "LegacyBackup"}
 
     async def client_ready(self):
         if not self.get("period"):
