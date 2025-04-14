@@ -23,7 +23,7 @@ legacy_security:
   owner_removed: '<emoji document_id="5386399931378440814">😎</emoji> <b><a href="tg://user?id={}">{}</a> removed from group</b> <code>owner</code>'
   no_user: "<emoji document_id=5210952531676504517>🚫</emoji> <b>Specify user to permit</b>"
   not_a_user: "<emoji document_id=5447644880824181073>⚠️</emoji> <b>Specified entity is not a user</b>"
-  li: '<emoji document_id=4974307891025543730>▫️</emoji> <b><a href="tg://user?id={}">{}</a></b>'
+  li: '<emoji document_id=4974307891025543730>▫️</emoji> <b><a href="{}">{}</a></b>'
   warning: "⚠️ <b>Please, confirm, that you want to add <a href=\"tg://user?id={}\">{}</a> to group</b> <code>{}</code><b>!\nThis action may reveal personal info and grant full or partial access to userbot to this user</b>"
   cancel: "🚫 Cancel"
   confirm: "👑 Confirm"
