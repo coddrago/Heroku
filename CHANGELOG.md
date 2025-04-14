@@ -12,3 +12,4 @@
 - Legacy code has been removed
 - SECURITY GROUPS FINNALY FIXED (sgroups/tsec)
 - Minor redesign
+- German language pack removed
