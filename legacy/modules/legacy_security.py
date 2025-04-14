@@ -1060,15 +1060,15 @@ class LegacySecurityMod(loader.Module):
             return
 
         if args[0] == "sgroup":
-            if len(args) < 3 or args[1] not in self._sgroups:
+            if len(args) < 3 or args[1] not in self._db.get(self.__class__.__name__, "sgroups").keys():
                 await utils.answer(message, self.strings("no_target"))
                 return
 
-            group = self._sgroups[args[1]]
+            group = self._db.get(self.__class__.__name__, "sgroups").get(args[1])
             _any = False
-            for rule in group.permissions:
+            for rule in group.get("permissions"):
                 if rule["rule"] == args[2]:
-                    group.permissions.remove(rule)
+                    group.get("permissions").remove(rule)
                     _any = True
 
             if not _any:
