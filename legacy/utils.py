@@ -1563,17 +1563,27 @@ def get_ram_usage() -> float:
         return 0
 
 async def get_cpu_usage_async() -> float:
-    from . import main
-    if main.IS_DOCKER:
-        import psutil
-        import asyncio
+    from aiopsutil import AsyncPSUtil
 
-        process = psutil.Process()
-        process.cpu_percent(interval=None)
-        await asyncio.sleep(1)
-        cpu_usage = process.cpu_percent(interval=None)
-        return cpu_usage
-    return get_cpu_usage()
+    aiops = AsyncPSUtil()
+
+    cpu_usage = await aiops.cpu_percent(interval=1)
+
+    return cpu_usage
+
+
+# async def get_cpu_usage_async() -> float:
+#     from . import main
+#     if main.IS_DOCKER:
+#         import psutil
+#         import asyncio
+
+#         process = psutil.Process()
+#         process.cpu_percent(interval=None)
+#         await asyncio.sleep(1)
+#         cpu_usage = process.cpu_percent(interval=None)
+#         return cpu_usage
+#     return get_cpu_usage()
 
 def get_cpu_usage() -> float:
     try:
