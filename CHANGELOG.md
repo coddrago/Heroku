@@ -10,3 +10,4 @@
 - Known bugs have been fixed
 - Close button fixed
 - Legacy code has been removed
+- SECURITY GROUPS FINNALY FIXED (sgroups/tsec)
