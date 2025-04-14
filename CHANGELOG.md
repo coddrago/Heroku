@@ -1,5 +1,5 @@
-# Heroku Legacy Changelog
-## 🪐 Heroku Legacy
+# Legacy Userbot Changelog
+## 🌙 Legacy
 # 💸 Financed by: @xdesai @ebed_tg - paid with souls, psyche, time and body (telethon fucked us in all holes)
 
 - Switched to Telethon (a.k.a legacy-tl)
@@ -11,3 +11,4 @@
 - Close button fixed
 - Legacy code has been removed
 - SECURITY GROUPS FINNALY FIXED (sgroups/tsec)
+- Minor redesign
