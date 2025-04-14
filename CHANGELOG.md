@@ -13,3 +13,4 @@
 - SECURITY GROUPS FINNALY FIXED (sgroups/tsec)
 - Minor redesign
 - German language pack removed
+- Removed sandbox mode
