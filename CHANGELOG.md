@@ -14,3 +14,5 @@
 - Minor redesign
 - German language pack removed
 - Removed sandbox mode
+- Bugged configs fixed
+- All references to Unit Heta have been removed
