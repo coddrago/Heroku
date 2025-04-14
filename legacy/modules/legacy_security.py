@@ -1013,18 +1013,11 @@ class LegacySecurityMod(loader.Module):
 
     @loader.command()
     async def tsecrm(self, message: Message):
-        if (
-            not self._client.dispatcher.security.tsec_chat
-            and not self._client.dispatcher.security.tsec_user
-        ):
-            await utils.answer(message, self.strings("no_rules"))
-            return
-
-        if not (args := utils.get_args(message)) or args[0] not in {
+        if not (args := utils.get_args(message)) or args[0] not in [
             "user",
             "chat",
             "sgroup",
-        }:
+        ]:
             await utils.answer(message, self.strings("no_target"))
             return
 
@@ -1060,15 +1053,18 @@ class LegacySecurityMod(loader.Module):
             return
 
         if args[0] == "sgroup":
-            if len(args) < 3 or args[1] not in self._db.get(self.__class__.__name__, "sgroups").keys():
+            if len(args) < 3 or args[1] not in self._sgroups:
                 await utils.answer(message, self.strings("no_target"))
                 return
 
-            group = self._db.get(self.__class__.__name__, "sgroups").get(args[1])
+            group = self._sgroups[args[1]]
+            print(f"{group}\n\n")
+            permissions = group.permissions
+            print(f"{permissions}\n\n")
             _any = False
-            for rule in group.get("permissions"):
+            for rule in permissions:
                 if rule["rule"] == args[2]:
-                    group.get("permissions").remove(rule)
+                    permissions.remove(rule)
                     _any = True
 
             if not _any:
@@ -1108,13 +1104,6 @@ class LegacySecurityMod(loader.Module):
 
     @loader.command()
     async def tsecclr(self, message: Message):
-        if (
-            not self._client.dispatcher.security.tsec_chat
-            and not self._client.dispatcher.security.tsec_user
-        ):
-            await utils.answer(message, self.strings("no_rules"))
-            return
-
         if (
             not (args := utils.get_args(message))
             or not (args := args[0])
