@@ -91,7 +91,7 @@ class LegacyInfoMod(loader.Module):
                 f' {self.strings("uptime")}:'
                 f"</b> {utils.formatted_uptime()}\n\n<b>{{}}"
                 f' {self.strings("cpu_usage")}:'
-                f"</b> <i>~{utils.get_cpu_usage_async()} %</i>\n<b>{{}}"
+                f"</b> <i>~{await utils.get_cpu_usage_async()} %</i>\n<b>{{}}"
                 f' {self.strings("ram_usage")}:'
                 f"</b> <i>~{utils.get_ram_usage()} MB</i>\n<b>{{}}</b>"
             ).format(
