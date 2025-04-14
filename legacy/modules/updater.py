@@ -47,7 +47,7 @@ class UpdaterMod(loader.Module):
 
     @loader.command()
     async def restart(self, message: Message):
-        args = utils.get_args_raw(message)
+        args = utils.get_args(message)
         try:
             if (
                 "-f" in args
@@ -175,7 +175,7 @@ class UpdaterMod(loader.Module):
     @loader.command()
     async def update(self, message: Message):
         try:
-            args = utils.get_args_raw(message)
+            args = utils.get_args(message)
             current = utils.get_git_hash()
             upcoming = next(
                 git.Repo().iter_commits(f"origin/{version.branch}", max_count=1)
