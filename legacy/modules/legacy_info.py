@@ -29,7 +29,7 @@ class LegacyInfoMod(loader.Module):
 
             loader.ConfigValue(
                 "banner_url",
-                "https://imgur.com/a/7LBPJiq.png",
+                "https://i.postimg.cc/NfKrrv54/41-2807-ED0.gif",
                 lambda: self.strings("_cfg_banner"),
             ),
         )

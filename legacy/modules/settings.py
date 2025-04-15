@@ -4,13 +4,11 @@
 # You can redistribute it and/or modify it under the terms of the GNU AGPLv3
 # 🔑 https://www.gnu.org/licenses/agpl-3.0.html
 
-import legacytl
 from legacytl.extensions.html import CUSTOM_EMOJIS
 from legacytl.tl.types import Message
 
-from .. import loader, main, utils, version
+from .. import loader, main, utils
 from ..inline.types import InlineCall
-import random
 
 
 @loader.tds
@@ -60,10 +58,10 @@ class CoreMod(loader.Module):
         return f"{str(chatid)}.{module}" if module else chatid
 
     @loader.command(ru_doc="Информация о Legacy", en_doc="Information of Legacy", ua_doc="Інформація про Хероку", de_doc="Informationen über Legacy")
-    async def legacycmd(self, message: Message):
+    async def legacy(self, message: Message):
         await utils.answer_file(
             message,
-            "https://imgur.com/a/i0Mq22X.png",
+            "https://i.postimg.cc/VsxbMHnP/41-368214-A.gif",
             self.strings("legacy").format(
                 (
                     utils.get_platform_emoji()

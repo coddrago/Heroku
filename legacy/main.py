@@ -828,7 +828,7 @@ class Legacy:
 
             await client.legacy_inline.bot.send_photo(
                 logging.getLogger().handlers[0].get_logid_by_client(client.tg_id),
-                "https://imgur.com/a/uUF9zYL.png",
+                "https://i.postimg.cc/13x4nnxm/41-9-D6-DF8-E.gif",
                 caption=(
                     '🌙 <b>{} started!</b>\n'
                     '⚙ <b>GitHub commit SHA: <a href="https://github.com/Crayz310/Legacy/commit/{}">{}</a></b>\n'
