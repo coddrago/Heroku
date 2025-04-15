@@ -91,6 +91,8 @@ from legacytl.tl.types import (
     PeerUser,
     UpdateNewChannelMessage,
     User,
+    ReactionEmoji,
+    ReactionCustomEmoji,
 )
 
 from ._internal import fw_protect
@@ -1607,5 +1609,18 @@ def get_version_raw() -> str:
 
     return version.__version__
 
+async def send_reaction(client: CustomTelegramClient, message: Message, emoji: typing.Union[int, str]) -> str:
+    """
+    Send reaction to specified message
+    """
+    try:
+        me = await client.get_me()
+        if isinstance(emoji, int) and me.premium:
+            await client(SendReactionRequest(peer=message.chat_id, msg_id=message.id, reaction=[ReactionCustomEmoji(document_id=emoji)]))
+        elif isinstance(emoji, str):
+            await client(SendReactionRequest(peer=message.chat_id, msg_id=message.id, reaction=[ReactionEmoji(emoticon=emoji)]))
+    except Exception as e:
+        logger.error(f"Unable to send reaction to the specified message: {e}")
+        return
 
 get_platform_name = get_named_platform
