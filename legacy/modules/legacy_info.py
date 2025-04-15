@@ -34,7 +34,7 @@ class LegacyInfoMod(loader.Module):
             ),
         )
 
-    async def _render_info(self, inline: bool) -> str:
+    async def _render_info(self, inline: bool, args: list) -> str:
         try:
             repo = git.Repo(search_parent_directories=True)
             diff = repo.git.log([f"HEAD..origin/{version.branch}", "--oneline"])
@@ -81,7 +81,7 @@ class LegacyInfoMod(loader.Module):
                 branch=version.branch,
                 hostname=lib_platform.node(),
                 user=getpass.getuser(),
-            ) if self.config["custom_message"]
+            ) if self.config["custom_message"] and "-d" not in args
             else (
                 f'<b>{{}}</b>\n\n<b>{{}} {self.strings("owner")}:</b> {me}\n\n<b>{{}}'
                 f' {self.strings("version")}:</b> {_version} {build}\n<b>{{}}'
@@ -118,15 +118,16 @@ class LegacyInfoMod(loader.Module):
 
     @loader.command()
     async def infocmd(self, message: Message):
+        args = utils.get_args(message)
         if self.config["banner_url"]:
             await utils.answer_file(
                 message,
                 self.config["banner_url"],
-                await self._render_info(False),
+                await self._render_info(False, args),
             )
         else:
             await utils.answer(
-                message, await self._render_info(False)
+                message, await self._render_info(False, args)
             )
 
     @loader.command()
