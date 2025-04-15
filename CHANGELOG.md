@@ -16,3 +16,4 @@
 - Removed sandbox mode
 - Bugged configs fixed
 - All references to Unit Heta have been removed
+- No more shit in logs
