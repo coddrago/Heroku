@@ -59,6 +59,7 @@ from legacytl.tl.functions.messages import (
     GetDialogFiltersRequest,
     SetHistoryTTLRequest,
     UpdateDialogFilterRequest,
+    SendReactionRequest,
 )
 from legacytl.tl.types import (
     Channel,
