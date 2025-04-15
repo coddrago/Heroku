@@ -1630,5 +1630,3 @@ async def send_reaction(client: CustomTelegramClient, message: Message, emoji: t
     except Exception as e:
         logger.error(f"Unable to send reaction to the specified message: {e}")
         return
-
-get_platform_name = get_named_platform
