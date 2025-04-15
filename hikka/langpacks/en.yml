@@ -518,6 +518,7 @@ loader:
   clearmodules: "🗑 Clear modules"
   cancel: "🚫 Cancel"
   overwrite_module: "<emoji document_id=5454225457916420314>😖</emoji> <b>This module attempted to override the core one (</b><code>{}</code><b>)</b>\n\n<emoji document_id=5472146462362048818>💡</emoji><i> Don't report it as bug. It's a security measure to prevent replacing core modules with some junk</i>"
+  scam_module: "<emoji document_id=5454225457916420314>😖</emoji> <b>The module</b> <code>{name}</code> <b>is a scam, please report it to the support group (</b><code>{prefix}support</code><b>)</b>\n\n<tg-spoiler><i>Protection has stopped its loading.</i></tg-spoiler>"
   overwrite_command: "<emoji document_id=5454225457916420314>😖</emoji> <b>This module attempted to override the core command (</b><code>{}{}</code><b>)</b>\n\n<emoji document_id=5472146462362048818>💡</emoji><i> Don't report it as bug. It's a security measure to prevent replacing core modules' commands with some junk</i>"
   unload_core: "<emoji document_id=5454225457916420314>😖</emoji> <b>You can't unload core module</b> <code>{}</code><b></b>\n\n<emoji document_id=5472146462362048818>💡</emoji><i> Don't report it as bug. It's a security measure to prevent replacing core modules with some junk</i>"
   cannot_unload_lib: "<emoji document_id=5454225457916420314>😖</emoji> <b>You can't unload library</b>"

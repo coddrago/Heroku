@@ -36,6 +36,7 @@ import requests
 from herokutl.errors.rpcerrorlist import MediaCaptionTooLongError
 from herokutl.tl.functions.channels import JoinChannelRequest
 from herokutl.tl.types import Channel, Message, PeerUser
+from herokutl.errors.common import ScamDetectionError
 
 from .. import loader, main, utils
 from .._local_storage import RemoteStorage
@@ -700,7 +701,7 @@ class LoaderMod(loader.Module):
             except CoreOverwriteError as e:
                 await core_overwrite(e)
                 return
-            except loader.LoadError as e:
+            except (loader.LoadError, ScamDetectionError) as e:
                 with contextlib.suppress(Exception):
                     await self.allmodules.unload_module(instance.__class__.__name__)
 
@@ -708,13 +709,24 @@ class LoaderMod(loader.Module):
                     self.allmodules.modules.remove(instance)
 
                 if message:
-                    await utils.answer(
-                        message,
-                        (
-                            "<emoji document_id=5454225457916420314>😖</emoji>"
-                            f" <b>{utils.escape_html(str(e))}</b>"
-                        ),
-                    )
+                    if isinstance(e, loader.LoadError):
+                        await utils.answer(
+                            message,
+                            (
+                                "<emoji document_id=5454225457916420314>😖</emoji>"
+                                f" <b>{utils.escape_html(str(e))}</b>"
+                            ),
+                        )
+                    elif isinstance(e, ScamDetectionError):
+                        await utils.answer(
+                            message,
+                            (
+                                self.strings('scam_module').format(
+                                    name=instance.__class__.__name__,
+                                    prefix=self.get_prefix(),
+                                )
+                            )
+                        )
                 return
         except Exception as e:
             logger.exception("Loading external module failed due to %s", e)
@@ -770,7 +782,7 @@ class LoaderMod(loader.Module):
             except CoreOverwriteError as e:
                 await core_overwrite(e)
                 return
-            except loader.LoadError as e:
+            except (loader.LoadError, ScamDetectionError) as e:
                 with contextlib.suppress(Exception):
                     await self.allmodules.unload_module(instance.__class__.__name__)
 
@@ -778,13 +790,24 @@ class LoaderMod(loader.Module):
                     self.allmodules.modules.remove(instance)
 
                 if message:
-                    await utils.answer(
-                        message,
-                        (
-                            "<emoji document_id=5454225457916420314>😖</emoji>"
-                            f" <b>{utils.escape_html(str(e))}</b>"
-                        ),
-                    )
+                    if isinstance(e, loader.LoadError):
+                        await utils.answer(
+                            message,
+                            (
+                                "<emoji document_id=5454225457916420314>😖</emoji>"
+                                f" <b>{utils.escape_html(str(e))}</b>"
+                            ),
+                        )
+                    elif isinstance(e, ScamDetectionError):
+                        await utils.answer(
+                            message,
+                            (
+                                self.strings('scam_module').format(
+                                    name=instance.__class__.__name__,
+                                    prefix=self.get_prefix(),
+                                )
+                            )
+                        )
                 return
             except loader.SelfUnload as e:
                 logger.debug("Unloading %s, because it raised `SelfUnload`", instance)
