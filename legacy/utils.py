@@ -1610,9 +1610,16 @@ def get_version_raw() -> str:
 
     return version.__version__
 
-async def send_reaction(client: CustomTelegramClient, message: Message, emoji: typing.Union[int, str]) -> str:
+async def send_reaction(client: CustomTelegramClient, message: Message, emoji: typing.Union[int, str]) -> None:
     """
     Send reaction to specified message
+
+    Parameters:
+    - client (CustomTelegramClient): An instance of the CustomTelegramClient used to interact with the Telegram API
+    - message (Message): The message to which the reaction will be sent. This should contain the chat ID and message ID
+    - emoji (Union[int, str]): The emoji to be used as a reaction. This can be either an integer representing a custom emoji's document ID (if the user has a premium account) or a string representing a standard emoji
+
+    Returns: None
     """
     try:
         me = await client.get_me()
