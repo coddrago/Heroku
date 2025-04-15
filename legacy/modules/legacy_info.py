@@ -101,7 +101,7 @@ class LegacyInfoMod(loader.Module):
                         (
                             utils.get_platform_emoji()
                             if self._client.legacy_me.premium
-                            else ""
+                            else "🌙 Legacy"
                         ),
                         "<emoji document_id=5373141891321699086>😎</emoji>",
                         "<emoji document_id=5469741319330996757>💫</emoji>",
