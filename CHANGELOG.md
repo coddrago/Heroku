@@ -17,3 +17,4 @@
 - Bugged configs fixed
 - All references to Unit Heta has been removed
 - No more shit in logs
+- New log levels added
