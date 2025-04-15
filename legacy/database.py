@@ -308,10 +308,11 @@ class Database(dict):
     ) -> typing.Union[JSONSerializable, PointerList, PointerDict]:
         """Get a pointer to database key"""
         value = self.get(owner, key, default)
+        if isinstance(value, collections.abc.Hashable) and not isinstance(value, (list, dict)):
+            return value
         mapping = {
             list: PointerList,
             dict: PointerDict,
-            collections.abc.Hashable: lambda v: v,
         }
 
         pointer_constructor = next(
