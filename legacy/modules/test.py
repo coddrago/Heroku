@@ -236,6 +236,7 @@ class TestMod(loader.Module):
                                 ("🚫 Error", 40),
                                 ("⚠️ Warning", 30),
                                 ("ℹ️ Info", 20),
+                                ("🐞 Debug", 10),
                                 ("🧑‍💻 All", 0),
                             ]
                         ],
