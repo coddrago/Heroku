@@ -132,10 +132,10 @@ dmypy.json
 
 *__pycache__
 *.pyc
-hikka/api_token.py
-hikka/loaded_modules
+legacy/api_token.py
+legacy/loaded_modules
 loaded_modules
-hikka/debug_modules
+legacy/debug_modules
 *.session
 *.session-journal
 database-*.json
@@ -173,7 +173,7 @@ config.json
 vendor/
 Pipfile.lock
 
-hikka.log.*
+legacy.log.*
 unknown_errors.txt
 
 *.sock
