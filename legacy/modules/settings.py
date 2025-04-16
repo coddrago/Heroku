@@ -298,4 +298,12 @@ class CoreMod(loader.Module):
                 [{"text": self.strings("railway"), "callback": self._railway_installation}],
                 [{"text": self.strings("close_btn"), "action": "close"}]
             ]
-            await utils.answer(message, self.strings("choose_installation"), reply_markup=reply_markup)
+            await message.delete()
+            await self.inline.form(
+                message=message,
+                text=self.strings("choose_installation"),
+                reply_markup=reply_markup,
+                **(
+                    {"photo": "https://i.postimg.cc/NfKrrv54/41-2807-ED0.gif"}
+                ),
+            )
