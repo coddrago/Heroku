@@ -11,7 +11,9 @@ import os
 import subprocess
 import sys
 
+from . import main
 from ._internal import restart
+from . import log
 
 if (
     getpass.getuser() == "root"
@@ -71,16 +73,8 @@ else:
         except ImportError:
             deps()
             restart()
+    log.init()
 
-    try:
-        from . import log
-
-        log.init()
-
-        from . import main
-    except ImportError as e:
-        deps()
-        restart()
 
     if "HIKKA_DO_NOT_RESTART" in os.environ:
         del os.environ["HIKKA_DO_NOT_RESTART"]

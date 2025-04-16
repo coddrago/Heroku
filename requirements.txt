@@ -12,5 +12,6 @@ werkzeug==2.2.2
 psutil==6.0.0
 ruamel.yaml==0.17.21
 aiopsutil
+GitPython
 
 # Python 3.8+
