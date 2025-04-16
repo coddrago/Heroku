@@ -13,5 +13,6 @@ psutil==6.0.0
 ruamel.yaml==0.17.21
 aiopsutil
 GitPython
+redis
 
 # Python 3.8+
