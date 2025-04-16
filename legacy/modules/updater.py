@@ -258,7 +258,7 @@ class UpdaterMod(loader.Module):
                 f"{args}"
             ])
             await utils.answer(message, self.strings("rollback_ok"))
-            await self.invoke("restart", "-f", self.inline.bot.id)
+            await self.invoke("restart", "-f", peer=message.peer_id)
         except subprocess.CalledProcessError:
             await utils.answer(message, self.strings("rollback_err"))
 
