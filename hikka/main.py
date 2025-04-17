@@ -835,15 +835,19 @@ class Heroku:
                 first = False
 
     async def _badge(self, client: CustomTelegramClient):
-        """Call the badge in shell"""
+        """Displays a badge with build information and sends a photo with details."""
         try:
             import git
 
-            repo = git.Repo()
-
-            build = utils.get_git_hash()
-            diff = repo.git.log([f"HEAD..origin/{version.branch}", "--oneline"])
-            upd = "Update required" if diff else "Up-to-date"
+            try:
+                repo = git.Repo()
+                build = utils.get_git_hash()
+                diff = repo.git.log([f"HEAD..origin/{version.branch}", "--oneline"])
+                upd = "Update required" if diff else "Up-to-date"
+            except (git.InvalidGitRepositoryError, git.NoSuchPathError):
+                build = "Unknown"
+                upd = "Git info unavailable"
+                logging.warning("Not a valid git repository or path not found.")
 
             logo = (
                 "                          _           \n"
@@ -852,7 +856,7 @@ class Heroku:
                 "/ __  /|  __/| |  | (_) ||   < | |_| |\n"
                 "\/ /_/  \___||_|   \___/ |_|\_\ \__,_|\n\n"
                 f"• Build: {build[:7]}\n"
-                f"• Version: {'.'.join(list(map(str, list(__version__))))}\n"
+                f"• Version: {'.'.join(map(str, __version__))}\n"
                 f"• {upd}\n"
             )
 
@@ -865,28 +869,42 @@ class Heroku:
                 )
                 logging.debug(
                     "\n🪐 Heroku %s #%s (%s) started\n%s",
-                    ".".join(list(map(str, list(__version__)))),
+                    ".".join(map(str, __version__)),
                     build[:7],
                     upd,
                     web_url,
                 )
                 self.omit_log = True
 
-            await client.hikka_inline.bot.send_photo(
-                logging.getLogger().handlers[0].get_logid_by_client(client.tg_id),
-                "https://imgur.com/a/uUF9zYL.png",
-                caption=(
-                    "🪐 <b>Heroku {} started!</b>\n\n⚙ <b>GitHub commit SHA: <a"
-                    ' href="https://github.com/coddrago/Heroku/commit/{}">{}</a></b>\n🔎'
-                    " <b>Update status: {}</b>\n<b>{}</b>".format(
-                        ".".join(list(map(str, list(__version__)))),
-                        build,
-                        build[:7],
-                        upd,
-                        web_url,
-                    )
-                ),
-            )
+            try:
+                commit_url = (
+                    f"https://github.com/coddrago/Heroku/commit/{build}"
+                    if build != "Unknown"
+                    else ""
+                )
+                commit_link = (
+                    f'<a href="{commit_url}">{build[:7]}</a>'
+                    if commit_url
+                    else "Unknown"
+                )
+
+                await client.hikka_inline.bot.send_photo(
+                    logging.getLogger().handlers[0].get_logid_by_client(client.tg_id),
+                    "https://imgur.com/a/uUF9zYL.png",
+                    caption=(
+                        "🪐 <b>Heroku {} started!</b>\n\n"
+                        "⚙️ <b>GitHub commit SHA: {}</b>\n"
+                        "🔎 <b>Update status: {}</b>\n"
+                        "<b>{}</b>".format(
+                            ".".join(map(str, __version__)),
+                            commit_link,
+                            upd,
+                            web_url,
+                        )
+                    ),
+                )
+            except Exception as e:
+                logging.error(f"Failed to send badge photo: {e}")  # Specific logging
 
             logging.debug(
                 "· Started for %s · Prefix: «%s» ·",
