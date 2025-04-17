@@ -487,23 +487,6 @@ def raw_handler(*updates: TLObject):
 
     return inner
 
-    """
-    Decorator for commands that require specific configuration settings in the module.
-    If a key is missing or its value is "None", the command will not execute.
-
-    Args:
-        *keys: Names of configuration keys to be checked.
-        text: Key in `self.strings` containing the error message to be sent.
-                           If None, a default message will be used.
-
-    Example:
-        @loader.require_config("token", text="no_token")
-        @loader.command(ru_doc="Пример команды")
-        async def example_command(self, message: Message):
-            ...
-    """
-
-
 def require_config(*keys, text=None):
     """
     If a required configuration key is missing or its value is "None", the command execution will be prevented
