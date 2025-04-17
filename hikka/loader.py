@@ -487,16 +487,142 @@ def raw_handler(*updates: TLObject):
 
     return inner
 
-
-def require_config(*keys):
     """
-    Декоратор для команд, которые требуют определённых настроек в конфиге.
-    Если ключа нет — команда не будет работать.
+    Decorator for commands that require specific configuration settings in the module.
+    If a key is missing or its value is "None", the command will not execute.
+
+    Args:
+        *keys: Names of configuration keys to be checked.
+        text: Key in `self.strings` containing the error message to be sent.
+                           If None, a default message will be used.
+
+    Example:
+        @loader.require_config("token", text="no_token")
+        @loader.command(ru_doc="Пример команды")
+        async def example_command(self, message: Message):
+            ...
+    """
+
+
+def require_config(*keys, text=None):
+    """
+    If a required configuration key is missing or its value is "None", the command execution will be prevented
+    and an error message will be shown to the user.
+        *keys: Variable number of string arguments representing the names of required configuration keys
+        text (str, optional): Key in `self.strings` containing custom error message. If not provided or
+                             key doesn't exist, a default error message will be shown
+    Returns:
+        callable: Decorated function that checks configuration before execution
+        Basic usage:
+        ```
+        @loader.require_config("api_key")
+        async def testcmd(self, message):
+            # Command code here
+            pass
+        ```
+        With custom error message:
+        ```
+        @loader.require_config("token", text="missing_token_error")
+        async def testcmd(self, message):
+            # Command code here
+            pass
+        ```
+    Note:
+        - The decorator must be used on methods of classes that have `config` and `strings` attributes
+        - Error messages support HTML formatting and emoji
+        - Default error message will list all missing configuration parameters
     """
 
     def decorator(func):
-        func.required_config = keys
-        return func
+        async def wrapper(self, message, *args, **kwargs):
+            missing_keys = []
+            for key in keys:
+                if (
+                    not hasattr(self.config, "__getitem__")
+                    or self.config[key] == "None"
+                ):
+                    missing_keys.append(key)
+
+            if missing_keys:
+                if text and text in self.strings:
+                    error_message = self.strings[text]
+                else:
+                    missing_keys_str = ", ".join(
+                        f"<code>{key}</code>" for key in missing_keys
+                    )
+                    error_message = f"<emoji document_id=5872829476143894491>🚫</emoji> <b>Необходимы следующие параметры конфигурации:</b> {missing_keys_str}.\n<emoji document_id=5879785854284599288>ℹ️</emoji> <b>Пожалуйста, настройте модуль.</b>"
+
+                await utils.answer(message, error_message)
+                return
+
+            return await func(self, message, *args, **kwargs)
+
+        return wrapper
+
+    return decorator
+
+
+def retry(
+    times: int = 3,
+    interval: float = 1.0,
+    exceptions: tuple = (Exception,),
+):
+    """Retries execution of an asynchronous function when specified exceptions occur.
+
+    This decorator automatically retries function execution when specified exceptions
+    are raised, with a configurable delay between attempts.
+
+    Args:
+        times (int): Maximum number of execution attempts. Defaults to 3.
+        interval (float): Delay between retry attempts in seconds. Defaults to 1.0.
+        exceptions (tuple): Tuple of exception classes that trigger retries.
+            Defaults to (Exception,).
+
+    Returns:
+        Callable: A decorated async function with retry logic implemented.
+
+    Raises:
+        Exception: The last encountered exception if all retry attempts fail.
+
+    Basic usage:
+        ```
+        @retry(times=3, interval=1.5, exceptions=(ConnectionError,))
+        async def fetch_data(self, message):
+            # Will retry up to 3 times on ConnectionError,
+            # waiting 1.5 seconds between attempts
+            response = await make_request()
+            return response.json()
+        ```
+
+    Note:
+        - Decorated function must be async/awaitable
+        - Last exception is re-raised if all retries fail
+        - Each failed attempt is logged at debug level
+    """
+
+    def decorator(func):
+        async def wrapper(*args, **kwargs):
+            for attempt in range(times):
+                try:
+                    return await func(*args, **kwargs)
+                except exceptions as e:
+                    if attempt == times - 1:
+                        raise
+
+                    logger.debug(
+                        "Attempt %d/%d for %s failed with error: %s. Retrying in %s seconds...",
+                        attempt + 1,
+                        times,
+                        func.__name__,
+                        str(e),
+                        interval,
+                    )
+
+                    await asyncio.sleep(interval)
+
+            return None
+
+        return wrapper
 
     return decorator
 
