@@ -112,8 +112,8 @@ class InlineStuff(loader.Module):
     @loader.command()
     async def ch_bot_token(self, message: Message):
         args = utils.get_args_raw(message)
-        if not args or not re.match(r'[0-9]{8,10}:[a-zA-Z0-9_-]{34,36}', args):
-            await utils.answer(message, self.strings('token_invalid'))
+        if not args or not re.match(r"[0-9]{8,10}:[a-zA-Z0-9_-]{34,36}", args):
+            await utils.answer(message, self.strings("token_invalid"))
             return
         self._db.set("hikka.inline", "bot_token", args)
         await utils.answer(message, self.strings("bot_updated"))

@@ -73,9 +73,13 @@ class TokenObtainment(InlineUnit):
                 from .. import main
 
                 if "DOCKER" in os.environ():
-                    m = await conv.send_file("https://raw.githubusercontent.com/coddrago/Heroku/refs/heads/master/assets/heroku-ava.png")
+                    m = await conv.send_file(
+                        "https://raw.githubusercontent.com/coddrago/Heroku/refs/heads/master/assets/heroku-ava.png"
+                    )
                 else:
-                    m = await conv.send_file(main.BASE_PATH / "assets" / "heroku-ava.png")
+                    m = await conv.send_file(
+                        main.BASE_PATH / "assets" / "heroku-ava.png"
+                    )
                 r = await conv.get_response()
 
                 logger.debug(">> <Photo>")

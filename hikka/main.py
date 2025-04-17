@@ -453,7 +453,9 @@ class Heroku:
                 )
             )
             for session in filter(
-                lambda f: f.startswith("heroku-") or f.startswith("hikka-") and f.endswith(".session"),
+                lambda f: f.startswith("heroku-")
+                or f.startswith("hikka-")
+                and f.endswith(".session"),
                 os.listdir(BASE_DIR),
             )
         ]
@@ -806,15 +808,28 @@ class Heroku:
             client.hikka_me = me
 
             async with aiohttp.ClientSession() as session:
-                async with session.get("https://mods.codrago.top/ids/allowed_ids.txt") as response:
+                async with session.get(
+                    "https://mods.codrago.top/ids/allowed_ids.txt"
+                ) as response:
                     if response.status == 200:
                         content = await response.text()
-                        allowed_ids = [int(line.strip()) for line in content.split('\n') if line.strip()]
+                        allowed_ids = [
+                            int(line.strip())
+                            for line in content.split("\n")
+                            if line.strip()
+                        ]
                     else:
-                        logging.error(f"Exception on loading allowed beta testers ids: {response.status}")
+                        logging.error(
+                            f"Exception on loading allowed beta testers ids: {response.status}"
+                        )
                         return []
 
-            await asyncio.gather(*[version.check_branch((await client.get_me()).id, allowed_ids) for client in self.clients])
+            await asyncio.gather(
+                *[
+                    version.check_branch((await client.get_me()).id, allowed_ids)
+                    for client in self.clients
+                ]
+            )
 
             while await self.amain(first, client):
                 first = False

@@ -24,11 +24,11 @@ const Sakura = function (t, e) {
         },
       ],
     }),
-    (n = e),
-    Object.keys(i).forEach((t) => {
-      n && Object.prototype.hasOwnProperty.call(n, t) && (i[t] = n[t]);
-    }),
-    i)),
+      (n = e),
+      Object.keys(i).forEach((t) => {
+        n && Object.prototype.hasOwnProperty.call(n, t) && (i[t] = n[t]);
+      }),
+      i)),
     (this.el.style.overflowX = "hidden");
   const o = ["webkit", "moz", "MS", "o", ""];
   function r(t, e, i) {
@@ -43,7 +43,7 @@ const Sakura = function (t, e) {
       e.top >= 0 &&
       e.left >= 0 &&
       e.bottom <=
-        (window.innerHeight || document.documentElement.clientHeight) &&
+      (window.innerHeight || document.documentElement.clientHeight) &&
       e.right <= (window.innerWidth || document.documentElement.clientWidth)
     );
   }
@@ -53,16 +53,16 @@ const Sakura = function (t, e) {
         window.requestAnimationFrame(this.createPetal);
       }, this.settings.delay);
     const t = [
-        "sway-0",
-        "sway-1",
-        "sway-2",
-        "sway-3",
-        "sway-4",
-        "sway-5",
-        "sway-6",
-        "sway-7",
-        "sway-8",
-      ],
+      "sway-0",
+      "sway-1",
+      "sway-2",
+      "sway-3",
+      "sway-4",
+      "sway-5",
+      "sway-6",
+      "sway-7",
+      "sway-8",
+    ],
       e = a([
         "blow-soft-left",
         "blow-medium-left",
@@ -92,9 +92,8 @@ const Sakura = function (t, e) {
         this.settings.maxSize + Math.floor(10 * Math.random()),
       )}px ${s(1, Math.floor(h / 4))}px`),
       (d.style.height = `${m}px`),
-      (d.style.left = `${
-        Math.random() * document.documentElement.clientWidth - 100
-      }px`),
+      (d.style.left = `${Math.random() * document.documentElement.clientWidth - 100
+        }px`),
       (d.style.marginTop = `${-(Math.floor(20 * Math.random()) + 15)}px`),
       (d.style.width = `${h}px`),
       r(d, "AnimationEnd", () => {
@@ -122,10 +121,10 @@ const Sakura = function (t, e) {
     const e = this.el.dataset.sakuraAnimId;
     e &&
       (window.cancelAnimationFrame(e),
-      this.el.setAttribute("data-sakura-anim-id", "")),
+        this.el.setAttribute("data-sakura-anim-id", "")),
       t ||
-        setTimeout(() => {
-          const t = document.getElementsByClassName(this.settings.className);
-          for (; t.length > 0; ) t[0].parentNode.removeChild(t[0]);
-        }, this.settings.delay + 50);
+      setTimeout(() => {
+        const t = document.getElementsByClassName(this.settings.className);
+        for (; t.length > 0;) t[0].parentNode.removeChild(t[0]);
+      }, this.settings.delay + 50);
   });

@@ -722,7 +722,9 @@ class HerokuSettingsMod(loader.Module):
                     {
                         "text": self.strings("disable_debugger"),
                         "callback": self.inline__setting,
-                        "args": (lambda: self._db.set(log.__name__, "debugger", False),),
+                        "args": (
+                            lambda: self._db.set(log.__name__, "debugger", False),
+                        ),
                     }
                     if self._db.get(log.__name__, "debugger", False)
                     else {
@@ -819,18 +821,14 @@ class HerokuSettingsMod(loader.Module):
             await form.edit(
                 self.strings("opening_tunnel"),
                 reply_markup={"text": "🕔 Wait...", "data": "empty"},
-                photo=(
-                    "https://imgur.com/a/MQJGI0w.png"
-                ),
+                photo=("https://imgur.com/a/MQJGI0w.png"),
             )
         else:
             form = await self.inline.form(
                 self.strings("opening_tunnel"),
                 message=message,
                 reply_markup={"text": "🕔 Wait...", "data": "empty"},
-                photo=(
-                    "https://imgur.com/a/MQJGI0w.png"
-                ),
+                photo=("https://imgur.com/a/MQJGI0w.png"),
             )
 
         url = await main.hikka.web.get_url(proxy_pass=True)

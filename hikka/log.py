@@ -22,6 +22,7 @@ import re
 import sys
 import traceback
 import typing
+from datetime import datetime
 from logging.handlers import RotatingFileHandler
 
 import herokutl
@@ -33,24 +34,27 @@ from .tl_cache import CustomTelegramClient
 from .types import BotInlineCall, Module
 from .web.debugger import WebDebugger
 
-# Monkeypatch linecache to make interactive line debugger available
-# in werkzeug web debugger
-# This is weird, but the only adequate approach
-# https://github.com/pallets/werkzeug/blob/3115aa6a6276939f5fd6efa46282e0256ff21f1a/src/werkzeug/debug/tbtools.py#L382-L416
+COLORS = {
+    "DEBUG": "\033[36m",      # Cyan
+    "INFO": "\033[32m",       # Green
+    "WARNING": "\033[33m",    # Yellow
+    "ERROR": "\033[31m",      # Red
+    "CRITICAL": "\033[31;1m", # Bright Red
+    "RESET": "\033[0m",       # Reset
+}
 
-old = linecache.getlines
+EMOJIS = {
+    "DEBUG": "🐛",
+    "INFO": "ℹ️",
+    "WARNING": "⚠️",
+    "ERROR": "❌",
+    "CRITICAL": "💥",
+}
 
+old_getlines = linecache.getlines
 
 def getlines(filename: str, module_globals=None) -> str:
-    """
-    Get the lines for a Python source file from the cache.
-    Update the cache if it doesn't contain an entry for this file already.
-
-    Modified version of original `linecache.getlines`, which returns the
-    source code of Heroku modules properly. This is needed for
-    interactive line debugger in werkzeug web debugger.
-    """
-
+    """Enhanced version of linecache.getlines with Heroku modules support"""
     try:
         if filename.startswith("<") and filename.endswith(">"):
             module = filename[1:-1].split(maxsplit=1)[-1]
@@ -64,23 +68,21 @@ def getlines(filename: str, module_globals=None) -> str:
     except Exception:
         logging.debug("Can't get lines for %s", filename, exc_info=True)
 
-    return old(filename, module_globals)
-
+    return old_getlines(filename, module_globals)
 
 linecache.getlines = getlines
 
-
 def override_text(exception: Exception) -> typing.Optional[str]:
-    """Returns error-specific description if available, else `None`"""
+    """Returns user-friendly error descriptions for specific exceptions"""
     if isinstance(exception, (NetworkError, asyncio.exceptions.TimeoutError)):
-        return "✈️ <b>You have problems with internet connection on your server.</b>"
+        return "🌐 <b>Connection Error:</b> Problems with internet connection on your server."
     elif isinstance(exception, PersistentTimestampOutdatedError):
-        return "✈️ <b>Telegram has problems with their datacenters.</b>"
-
+        return "⚡ <b>Telegram DC Issue:</b> Problems with Telegram datacenters."
     return None
 
-
-class HikkaException:
+class EnhancedException:
+    """Enhanced exception formatting with rich traceback information"""
+    
     def __init__(
         self,
         message: str,
@@ -93,6 +95,7 @@ class HikkaException:
         self.full_stack = full_stack
         self.sysinfo = sysinfo
         self.debug_url = None
+        self.timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
     @classmethod
     def from_exc_info(
@@ -102,48 +105,46 @@ class HikkaException:
         tb: traceback.TracebackException,
         stack: typing.Optional[typing.List[inspect.FrameInfo]] = None,
         comment: typing.Optional[typing.Any] = None,
-    ) -> "HikkaException":
-        def to_hashable(dictionary: dict) -> dict:
-            dictionary = dictionary.copy()
-            for key, value in dictionary.items():
-                if isinstance(value, dict):
-                    dictionary[key] = to_hashable(value)
-                else:
-                    try:
-                        if (
-                            getattr(getattr(value, "__class__", None), "__name__", None)
-                            == "Database"
-                        ):
-                            dictionary[key] = "<Database>"
-                        elif isinstance(
-                            value,
-                            (herokutl.TelegramClient, CustomTelegramClient),
-                        ):
-                            dictionary[key] = f"<{value.__class__.__name__}>"
-                        elif len(str(value)) > 512:
-                            dictionary[key] = f"{str(value)[:512]}..."
-                        else:
-                            dictionary[key] = str(value)
-                    except Exception:
-                        dictionary[key] = f"<{value.__class__.__name__}>"
+    ) -> "EnhancedException":
+        """Create EnhancedException from exception info"""
+        
+        def sanitize_value(value: typing.Any) -> str:
+            """Sanitize values for safe logging"""
+            if value is None:
+                return "None"
+            elif isinstance(value, (str, int, float, bool)):
+                return str(value)
+            elif isinstance(value, dict):
+                return "{...}" 
+            elif hasattr(value, "__class__"):
+                return f"<{value.__class__.__name__}>"
+            return str(value)[:512] + "..." if len(str(value)) > 512 else str(value)
 
-            return dictionary
-
+      
         full_traceback = traceback.format_exc().replace(
-            "Traceback (most recent call last):\n",
-            "",
+            "Traceback (most recent call last):\n", ""
         )
 
+      
         line_regex = re.compile(r'  File "(.*?)", line ([0-9]+), in (.+)')
 
-        def format_line(line: str) -> str:
+        def format_traceback_line(line: str) -> str:
+            """Format a single traceback line with HTML"""
+            if not line_regex.search(line):
+                return f"<code>{utils.escape_html(line)}</code>"
+                
             filename_, lineno_, name_ = line_regex.search(line).groups()
-
             return (
-                f"👉 <code>{utils.escape_html(filename_)}:{lineno_}</code> <b>in</b>"
-                f" <code>{utils.escape_html(name_)}</code>"
+                f"🔹 <code>{utils.escape_html(filename_)}:{lineno_}</code> "
+                f"<b>in</b> <code>{utils.escape_html(name_)}</code>"
             )
 
+      
+        formatted_traceback = "\n".join(
+            format_traceback_line(line) for line in full_traceback.splitlines()
+        )
+
+   
         filename, lineno, name = next(
             (
                 line_regex.search(line).groups()
@@ -153,70 +154,51 @@ class HikkaException:
             (None, None, None),
         )
 
-        full_traceback = "\n".join(
-            [
-                (
-                    format_line(line)
-                    if line_regex.search(line)
-                    else f"<code>{utils.escape_html(line)}</code>"
-                )
-                for line in full_traceback.splitlines()
-            ]
+       
+        caller = utils.find_caller(stack or inspect.stack())
+        caller_info = ""
+        if caller and hasattr(caller, "__self__") and hasattr(caller, "__name__"):
+            caller_info = (
+                f"🔮 <b>Called by:</b> <code>{utils.escape_html(caller.__name__)}</code> "
+                f"in <code>{utils.escape_html(caller.__self__.__class__.__name__)}</code>\n\n"
+            )
+
+        
+        error_msg = override_text(exc_value) or (
+            f"{caller_info}"
+            f"📌 <b>Location:</b> <code>{utils.escape_html(filename)}:{lineno}</code> "
+            f"in <code>{utils.escape_html(name)}</code>\n"
+            f"🚨 <b>Error:</b> <code>{utils.escape_html(''.join(traceback.format_exception_only(exc_type, exc_value))).strip()}</code>"
+            f"{f'\n💬 <b>Note:</b> <code>{utils.escape_html(str(comment))}</code>' if comment else ''}"
         )
 
-        caller = utils.find_caller(stack or inspect.stack())
-
         return cls(
-            message=override_text(exc_value)
-            or (
-                "{}<b>🎯 Source:</b> <code>{}:{}</code><b> in"
-                " </b><code>{}</code>\n<b>❓ Error:</b> <code>{}</code>{}"
-            ).format(
-                (
-                    (
-                        "🔮 <b>Cause: method </b><code>{}</code><b> of"
-                        " </b><code>{}</code>\n\n"
-                    ).format(
-                        utils.escape_html(caller.__name__),
-                        utils.escape_html(caller.__self__.__class__.__name__),
-                    )
-                    if (
-                        caller
-                        and hasattr(caller, "__self__")
-                        and hasattr(caller, "__name__")
-                    )
-                    else ""
-                ),
-                utils.escape_html(filename),
-                lineno,
-                utils.escape_html(name),
-                utils.escape_html(
-                    "".join(
-                        traceback.format_exception_only(exc_type, exc_value)
-                    ).strip()
-                ),
-                (
-                    "\n💭 <b>Message:</b>"
-                    f" <code>{utils.escape_html(str(comment))}</code>"
-                    if comment
-                    else ""
-                ),
-            ),
-            full_stack=full_traceback,
+            message=error_msg,
+            full_stack=formatted_traceback,
             sysinfo=(exc_type, exc_value, tb),
         )
 
+class ColorFormatter(logging.Formatter):
+    """Log formatter that adds colors and emojis to terminal output"""
+    
+    def format(self, record):
+        levelname = record.levelname
+        emoji = EMOJIS.get(levelname, "🔹")
+        color = COLORS.get(levelname, COLORS["RESET"])
+        
+    
+        record.levelname = f"{color}{emoji} {levelname}{COLORS['RESET']}"
+        record.name = f"\033[35m{record.name}{COLORS['RESET']}" 
+        
+        # Add timestamp with dim color
+        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        record.msg = f"\033[2m{timestamp}\033[0m {record.levelname} {record.name}: {record.msg}"
+        
+        return super().format(record)
 
 class TelegramLogsHandler(logging.Handler):
-    """
-    Keeps 2 buffers.
-    One for dispatched messages.
-    One for unused messages.
-    When the length of the 2 together is 100
-    truncate to make them 100 together,
-    first trimming handled then unused.
-    """
-
+    """Handler for sending logs to Telegram with rich formatting"""
+    
     def __init__(self, targets: list, capacity: int):
         super().__init__(0)
         self.buffer = []
@@ -225,16 +207,18 @@ class TelegramLogsHandler(logging.Handler):
         self._mods = {}
         self.tg_buff = []
         self.force_send_all = False
-        self.tg_level = 20
+        self.tg_level = logging.WARNING
         self.ignore_common = False
         self.web_debugger = None
         self.targets = targets
         self.capacity = capacity
         self.lvl = logging.NOTSET
         self._send_lock = asyncio.Lock()
+        self._task = None
 
     def install_tg_log(self, mod: Module):
-        if getattr(self, "_task", False):
+        """Install Telegram logging for a module"""
+        if self._task:
             self._task.cancel()
 
         self._mods[mod.tg_id] = mod
@@ -245,24 +229,24 @@ class TelegramLogsHandler(logging.Handler):
         self._task = asyncio.ensure_future(self.queue_poller())
 
     async def queue_poller(self):
+        """Periodically send logs to Telegram"""
         while True:
-            with contextlib.suppress(Exception):
+            try:
                 await self.sender()
+            except Exception as e:
+                logging.error("Error in queue_poller: %s", e)
             await asyncio.sleep(3)
 
     def setLevel(self, level: int):
+        """Set the minimum logging level"""
         self.lvl = level
 
     def dump(self):
-        """Return a list of logging entries"""
+        """Return all log records"""
         return self.handledbuffer + self.buffer
 
-    def dumps(
-        self,
-        lvl: int = 0,
-        client_id: typing.Optional[int] = None,
-    ) -> typing.List[str]:
-        """Return all entries of minimum level as list of strings"""
+    def dumps(self, lvl: int = 0, client_id: typing.Optional[int] = None) -> typing.List[str]:
+        """Return formatted log messages"""
         return [
             self.targets[0].format(record)
             for record in (self.buffer + self.handledbuffer)
@@ -273,10 +257,16 @@ class TelegramLogsHandler(logging.Handler):
     async def _show_full_trace(
         self,
         call: BotInlineCall,
-        bot: "aiogram.Bot",  # type: ignore  # noqa: F821
-        item: HikkaException,
+        bot: "aiogram.Bot", # type: ignore
+        item: EnhancedException,
     ):
-        chunks = item.message + "\n\n<b>🪐 Full traceback:</b>\n" + item.full_stack
+        """Show full traceback in Telegram"""
+        chunks = (
+            f"⏰ <b>Time:</b> <code>{item.timestamp}</code>\n"
+            f"{item.message}\n\n"
+            f"📜 <b>Full traceback:</b>\n"
+            f"{item.full_stack}"
+        )
 
         chunks = list(utils.smart_split(*herokutl.extensions.html.parse(chunks), 4096))
 
@@ -288,38 +278,29 @@ class TelegramLogsHandler(logging.Handler):
         for chunk in chunks[1:]:
             await bot.send_message(chat_id=call.chat_id, text=chunk)
 
-    def _gen_web_debug_button(self, item: HikkaException) -> list:
+    def _gen_web_debug_button(self, item: EnhancedException) -> list:
+        """Generate web debugger button for Telegram"""
         if not item.sysinfo:
             return []
 
         if not (url := item.debug_url):
             try:
-                url = self.web_debugger.feed(*item.sysinfo)
+                url = self.web_debugger.feed(*item.sysinfo) if self.web_debugger else None
             except Exception:
                 url = None
-
             item.debug_url = url
 
-        return [
-            (
-                {
-                    "text": "🐞 Web debugger",
-                    "url": url,
-                }
-                if self.web_debugger
-                else {
-                    "text": "🪲 Start debugger",
-                    "callback": self._start_debugger,
-                    "args": (item,),
-                }
-            )
-        ]
+        return [{
+            "text": "🐞 Web Debugger" if url else "🪲 Start Debugger",
+            "url": url,
+        }] if url else [{
+            "text": "🪲 Start Debugger",
+            "callback": self._start_debugger,
+            "args": (item,),
+        }]
 
-    async def _start_debugger(
-        self,
-        call: "InlineCall",  # type: ignore  # noqa: F821
-        item: HikkaException,
-    ):
+    async def _start_debugger(self, call: "BotInlineCall", item: EnhancedException):
+        """Start web debugger and update message"""
         if not self.web_debugger:
             self.web_debugger = WebDebugger()
             await self.web_debugger.proxy_ready.wait()
@@ -333,150 +314,152 @@ class TelegramLogsHandler(logging.Handler):
         )
 
         await call.answer(
-            (
-                "Web debugger started. You can get PIN using .debugger command. \n⚠️"
-                " !DO NOT GIVE IT TO ANYONE! ⚠️"
-            ),
+            "Web debugger started. Use .debugger command to get PIN.\n"
+            "⚠️ DO NOT SHARE THE PIN WITH ANYONE! ⚠️",
             show_alert=True,
         )
 
     def get_logid_by_client(self, client_id: int) -> int:
+        """Get log chat ID for a client"""
         return self._mods[client_id].logchat
 
     async def sender(self):
+        """Send buffered logs to Telegram"""
         async with self._send_lock:
+            if not self._mods:
+                return
+
+           
             self._queue = {
                 client_id: utils.chunks(
-                    utils.escape_html(
-                        "".join(
-                            [
-                                item[0]
-                                for item in self.tg_buff
-                                if isinstance(item[0], str)
-                                and (
-                                    not item[1]
-                                    or item[1] == client_id
-                                    or self.force_send_all
-                                )
-                            ]
-                        )
+                    "\n".join(
+                        f"⏰ <b>{datetime.now().strftime('%H:%M:%S')}</b> | "
+                        f"{EMOJIS.get(record.levelname, '🔹')} "
+                        f"<code>{utils.escape_html(self.targets[1].format(record))}</code>"
+                        for record in [
+                            item[0] for item in self.tg_buff 
+                            if isinstance(item[0], logging.LogRecord)
+                            and (not item[1] or item[1] == client_id or self.force_send_all)
+                        ]
                     ),
                     4096,
                 )
                 for client_id in self._mods
             }
 
+            
             self._exc_queue = {
                 client_id: [
                     self._mods[client_id].inline.bot.send_message(
                         self._mods[client_id].logchat,
-                        item[0].message,
-                        reply_markup=self._mods[client_id].inline.generate_markup(
-                            [
-                                {
-                                    "text": "🪐 Full traceback",
-                                    "callback": self._show_full_trace,
-                                    "args": (
-                                        self._mods[client_id].inline.bot,
-                                        item[0],
-                                    ),
-                                    "disable_security": True,
-                                },
-                                *self._gen_web_debug_button(item[0]),
-                            ],
-                        ),
+                        f"⏰ <b>Time:</b> <code>{item[0].timestamp}</code>\n"
+                        f"{item[0].message}",
+                        reply_markup=self._mods[client_id].inline.generate_markup([
+                            {
+                                "text": "📜 Full Traceback",
+                                "callback": self._show_full_trace,
+                                "args": (self._mods[client_id].inline.bot, item[0]),
+                                "disable_security": True,
+                            },
+                            *self._gen_web_debug_button(item[0]),
+                        ]),
                     )
                     for item in self.tg_buff
-                    if isinstance(item[0], HikkaException)
+                    if isinstance(item[0], EnhancedException)
                     and (not item[1] or item[1] == client_id or self.force_send_all)
                 ]
                 for client_id in self._mods
             }
 
+            
             for exceptions in self._exc_queue.values():
                 for exc in exceptions:
-                    await exc
+                    try:
+                        await exc
+                    except Exception as e:
+                        logging.error("Failed to send exception to Telegram: %s", e)
 
+            
             self.tg_buff = []
 
+           
             for client_id in self._mods:
-                if client_id not in self._queue:
+                if not self._queue.get(client_id):
                     continue
 
                 if len(self._queue[client_id]) > 5:
+                    
                     logfile = io.BytesIO(
-                        "".join(self._queue[client_id]).encode("utf-8")
+                        "\n".join(self._queue[client_id]).encode("utf-8")
                     )
-                    logfile.name = "heroku-logs.txt"
+                    logfile.name = f"heroku-logs-{datetime.now().strftime('%Y-%m-%d')}.txt"
                     logfile.seek(0)
-                    await self._mods[client_id].inline.bot.send_document(
-                        self._mods[client_id].logchat,
-                        logfile,
-                        caption=(
-                            "<b>🧳 Journals are too big to be sent as separate"
-                            " messages</b>"
-                        ),
-                    )
-
+                    
+                    try:
+                        await self._mods[client_id].inline.bot.send_document(
+                            self._mods[client_id].logchat,
+                            logfile,
+                            caption="📁 <b>Logs are too large for messages</b>",
+                        )
+                    except Exception as e:
+                        logging.error("Failed to send log file: %s", e)
+                    
                     self._queue[client_id] = []
                     continue
 
-                while self._queue[client_id]:
-                    if chunk := self._queue[client_id].pop(0):
-                        asyncio.ensure_future(
-                            self._mods[client_id].inline.bot.send_message(
+                
+                for chunk in self._queue[client_id]:
+                    if chunk:
+                        try:
+                            await self._mods[client_id].inline.bot.send_message(
                                 self._mods[client_id].logchat,
                                 f"<code>{chunk}</code>",
                                 disable_notification=True,
                             )
-                        )
+                        except Exception as e:
+                            logging.error("Failed to send log message: %s", e)
 
     def emit(self, record: logging.LogRecord):
+        """Handle a log record"""
         try:
+            
             caller = next(
                 (
                     frame_info.frame.f_locals["_hikka_client_id_logging_tag"]
                     for frame_info in inspect.stack()
                     if isinstance(
-                        getattr(getattr(frame_info, "frame", None), "f_locals", {}).get(
-                            "_hikka_client_id_logging_tag"
-                        ),
+                        frame_info.frame.f_locals.get("_hikka_client_id_logging_tag"),
                         int,
                     )
                 ),
-                False,
+                None,
             )
-
-            if not isinstance(caller, int):
-                caller = None
         except Exception:
             caller = None
 
         record.hikka_caller = caller
 
-        if record.levelno >= self.tg_level:
-            if record.exc_info:
-                exc = HikkaException.from_exc_info(
-                    *record.exc_info,
-                    stack=record.__dict__.get("stack", None),
-                    comment=record.msg % record.args,
-                )
-
-                if not self.ignore_common or all(
-                    field not in exc.message
-                    for field in [
-                        "InputPeerEmpty() does not have any entity type",
-                        "https://docs.telethon.dev/en/stable/concepts/entities.html",
-                    ]
-                ):
-                    self.tg_buff += [(exc, caller)]
-            else:
-                self.tg_buff += [
-                    (
-                        _tg_formatter.format(record),
-                        caller,
-                    )
+        
+        if record.levelno >= self.tg_level and record.exc_info:
+            exc = EnhancedException.from_exc_info(
+                *record.exc_info,
+                stack=record.__dict__.get("stack", None),
+                comment=record.msg % record.args,
+            )
+            
+            if not self.ignore_common or all(
+                field not in exc.message
+                for field in [
+                    "InputPeerEmpty() does not have any entity type",
+                    "https://docs.telethon.dev/en/stable/concepts/entities.html",
                 ]
+            ):
+                self.tg_buff.append((exc, caller))
+        elif record.levelno >= self.tg_level:
+            self.tg_buff.append((
+                record,
+                caller,
+            ))
 
         if len(self.buffer) + len(self.handledbuffer) >= self.capacity:
             if self.handledbuffer:
@@ -495,21 +478,26 @@ class TelegramLogsHandler(logging.Handler):
                             target.handle(precord)
 
                 self.handledbuffer = (
-                    self.handledbuffer[-(self.capacity - len(self.buffer)) :]
-                    + self.buffer
+                    self.handledbuffer[-(self.capacity - len(self.buffer)) :] + self.buffer
                 )
                 self.buffer = []
             finally:
                 self.release()
 
+_main_formatter = ColorFormatter(
+    fmt="%(levelname)s %(name)s: %(message)s",
+    datefmt=None,
+    style="%",
+)
 
-_main_formatter = logging.Formatter(
+_plain_formatter = logging.Formatter(
     fmt="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
     datefmt="%Y-%m-%d %H:%M:%S",
     style="%",
 )
+
 _tg_formatter = logging.Formatter(
-    fmt="[%(levelname)s] %(name)s: %(message)s\n",
+    fmt="[%(levelname)s] %(name)s: %(message)s",
     datefmt=None,
     style="%",
 )
@@ -518,25 +506,27 @@ rotating_handler = RotatingFileHandler(
     filename="heroku.log",
     mode="a",
     maxBytes=10 * 1024 * 1024,
-    backupCount=1,
+    backupCount=3,
     encoding="utf-8",
-    delay=0,
+    delay=False,
 )
-
-rotating_handler.setFormatter(_main_formatter)
-
+rotating_handler.setFormatter(_plain_formatter)
 
 def init():
-    handler = logging.StreamHandler()
-    handler.setLevel(logging.INFO)
-    handler.setFormatter(_main_formatter)
+    """Initialize the logging system"""
+    console_handler = logging.StreamHandler()
+    console_handler.setLevel(logging.DEBUG)
+    console_handler.setFormatter(_main_formatter)
+    
     logging.getLogger().handlers = []
     logging.getLogger().addHandler(
-        TelegramLogsHandler((handler, rotating_handler), 7000)
+        TelegramLogsHandler((console_handler, rotating_handler), 7000)
     )
     logging.getLogger().setLevel(logging.NOTSET)
+    
     logging.getLogger("herokutl").setLevel(logging.WARNING)
     logging.getLogger("matplotlib").setLevel(logging.WARNING)
     logging.getLogger("aiohttp").setLevel(logging.WARNING)
     logging.getLogger("aiogram").setLevel(logging.WARNING)
+    
     logging.captureWarnings(True)
