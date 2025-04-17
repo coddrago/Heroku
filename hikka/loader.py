@@ -488,6 +488,19 @@ def raw_handler(*updates: TLObject):
     return inner
 
 
+def require_config(*keys):
+    """
+    Декоратор для команд, которые требуют определённых настроек в конфиге.
+    Если ключа нет — команда не будет работать.
+    """
+
+    def decorator(func):
+        func.required_config = keys
+        return func
+
+    return decorator
+
+
 class Modules:
     """Stores all registered modules"""
 

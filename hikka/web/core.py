@@ -1,27 +1,5 @@
 """Responsible for web init and mandatory ops"""
 
-#    Friendly Telegram (telegram userbot)
-#    Copyright (C) 2018-2021 The Authors
-
-#    This program is free software: you can redistribute it and/or modify
-#    it under the terms of the GNU Affero General Public License as published by
-#    the Free Software Foundation, either version 3 of the License, or
-#    (at your option) any later version.
-
-#    This program is distributed in the hope that it will be useful,
-#    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#    GNU Affero General Public License for more details.
-
-#    You should have received a copy of the GNU Affero General Public License
-#    along with this program.  If not, see <https://www.gnu.org/licenses/>.
-
-# ©️ Dan Gazizullin, 2021-2023
-# This file is a part of Hikka Userbot
-# 🌐 https://github.com/hikariatama/Hikka
-# You can redistribute it and/or modify it under the terms of the GNU AGPLv3
-# 🔑 https://www.gnu.org/licenses/agpl-3.0.html
-
 import asyncio
 import contextlib
 import inspect
@@ -43,8 +21,8 @@ logger = logging.getLogger(__name__)
 
 class Web(root.Web):
     def __init__(self, **kwargs):
-        self.runner = None
-        self.port = None
+        self.runner: web.AppRunner = None
+        self.port: int = None
         self.running = asyncio.Event()
         self.ready = asyncio.Event()
         self.client_data = {}
@@ -67,57 +45,90 @@ class Web(root.Web):
         port: int,
         proxy_pass: bool = False,
     ):
+        """
+        Запускает веб, если все клиенты добавлены.
+        """
         if total_count <= len(self.client_data):
             if not self.running.is_set():
                 await self.start(port, proxy_pass=proxy_pass)
-
             self.ready.set()
 
     async def get_url(self, proxy_pass: bool) -> str:
+        """
+        Получить URL веб-интерфейса.
+        """
         url = None
 
         if all(option in os.environ for option in {"LAVHOST", "USER", "SERVER"}):
-            return f"https://{os.environ['USER']}.{os.environ['SERVER']}.lavhost.ml"
+            url = f"https://{os.environ['USER']}.{os.environ['SERVER']}.lavhost.ml"
+            self.url = url
+            return url
 
-        if proxy_pass:
+        if proxy_pass and self.proxypasser:
             with contextlib.suppress(Exception):
                 url = await self.proxypasser.get_url(timeout=10)
 
         if not url:
-            ip = (
-                "127.0.0.1"
-                if "DOCKER" not in os.environ
-                else subprocess.run(
-                    ["hostname", "-i"],
-                    stdout=subprocess.PIPE,
-                    check=True,
-                )
-                .stdout.decode("utf-8")
-                .strip()
-            )
+            if "DOCKER" in os.environ:
+                try:
+                    ip = (
+                        subprocess.run(
+                            ["hostname", "-I"],
+                            stdout=subprocess.PIPE,
+                            check=True,
+                        )
+                        .stdout.decode("utf-8")
+                        .strip()
+                        .split()[0]
+                    )
+                except Exception:
+                    ip = "127.0.0.1"
+            else:
+                try:
+                    ip = (
+                        subprocess.run(
+                            ["hostname", "-i"],
+                            stdout=subprocess.PIPE,
+                            check=True,
+                        )
+                        .stdout.decode("utf-8")
+                        .strip()
+                    )
+                except Exception:
+                    ip = "127.0.0.1"
 
             url = f"http://{ip}:{self.port}"
 
         self.url = url
+        logger.info(f"Web interface available at: {url}")
         return url
 
     async def start(self, port: int, proxy_pass: bool = False):
+        """
+        Запуск веб-сервера.
+        """
         self.runner = web.AppRunner(self.app)
         await self.runner.setup()
-        self.port = os.environ.get("PORT", port)
+        self.port = int(os.environ.get("PORT", port))
         site = web.TCPSite(self.runner, None, self.port)
         self.proxypasser = proxypass.ProxyPasser(port=self.port)
         await site.start()
 
         await self.get_url(proxy_pass)
-
         self.running.set()
+        logger.info("Web server started on port %s", self.port)
 
     async def stop(self):
-        await self.runner.shutdown()
-        await self.runner.cleanup()
+        """
+        Остановка веб-сервера.
+        """
+        if self.runner:
+            await self.runner.shutdown()
+            await self.runner.cleanup()
+            self.runner = None
         self.running.clear()
         self.ready.clear()
+        logger.info("Web server stopped")
 
     async def add_loader(
         self,
@@ -125,10 +136,17 @@ class Web(root.Web):
         loader: Modules,
         db: Database,
     ):
+        """
+        Добавить клиента и его загрузчик в веб-интерфейс.
+        """
         self.client_data[client.tg_id] = (loader, client, db)
+        logger.debug("Added loader for client %s", client.tg_id)
 
     @staticmethod
     async def favicon(_):
+        """
+        Редирект на фавикон.
+        """
         return web.Response(
             status=301,
             headers={"Location": "https://i.imgur.com/IRAiWBo.jpeg"},

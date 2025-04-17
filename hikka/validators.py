@@ -59,24 +59,22 @@ class Validator:
 
     def __init__(
         self,
-        validator: callable,
+        validator: typing.Callable,
         doc: typing.Optional[typing.Union[str, dict]] = None,
         _internal_id: typing.Optional[int] = None,
     ):
         self.validate = validator
-
         if isinstance(doc, str):
             doc = {lang: doc for lang in SUPPORTED_LANGUAGES}
-
         self.doc = doc
         self.internal_id = _internal_id
 
 
 class Boolean(Validator):
-    """
-    Any logical value to be passed
-    `1`, `"1"` etc. will be automatically converted to bool
-    """
+    """Any logical value to be passed. Converts common true/false representations."""
+
+    TRUE_VALUES = {"True", "true", "1", 1, True, "yes", "Yes", "on", "On", "y", "Y"}
+    FALSE_VALUES = {"False", "false", "0", 0, False, "no", "No", "off", "Off", "n", "N"}
 
     def __init__(self):
         super().__init__(
@@ -85,14 +83,13 @@ class Boolean(Validator):
             _internal_id="Boolean",
         )
 
-    @staticmethod
-    def _validate(value: ConfigAllowedTypes, /) -> bool:
-        true = ["True", "true", "1", 1, True, "yes", "Yes", "on", "On", "y", "Y"]
-        false = ["False", "false", "0", 0, False, "no", "No", "off", "Off", "n", "N"]
-        if value not in true + false:
-            raise ValidationError("Passed value must be a boolean")
-
-        return value in true
+    @classmethod
+    def _validate(cls, value: ConfigAllowedTypes) -> bool:
+        if value in cls.TRUE_VALUES:
+            return True
+        if value in cls.FALSE_VALUES:
+            return False
+        raise ValidationError("Passed value must be a boolean")
 
 
 class Integer(Validator):
@@ -218,12 +215,10 @@ class Choice(Validator):
         possible_values: typing.List[ConfigAllowedTypes],
         /,
     ):
+        possible_str = " / ".join(map(str, possible_values))
         super().__init__(
-            functools.partial(self._validate, possible_values=possible_values),
-            translator.getdict(
-                "validators.choice",
-                possible=" / ".join(list(map(str, possible_values))),
-            ),
+            functools.partial(self._validate, possible_values=set(possible_values)),
+            translator.getdict("validators.choice", possible=possible_str),
             _internal_id="Choice",
         )
 
@@ -232,14 +227,12 @@ class Choice(Validator):
         value: ConfigAllowedTypes,
         /,
         *,
-        possible_values: typing.List[ConfigAllowedTypes],
+        possible_values: typing.Set[ConfigAllowedTypes],
     ) -> ConfigAllowedTypes:
         if value not in possible_values:
             raise ValidationError(
-                f"Passed value ({value}) is not one of the following:"
-                f" {' / '.join(list(map(str, possible_values)))}"
+                f"Passed value ({value}) is not one of the following: {' / '.join(map(str, possible_values))}"
             )
-
         return value
 
 

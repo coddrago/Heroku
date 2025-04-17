@@ -83,8 +83,8 @@ class Web:
         self.api_set = asyncio.Event()
         self.clients_set = asyncio.Event()
 
-    async def schedule_restart():
-        # Yeah-yeah, ikr, but it's the only way to restart
+    async def schedule_restart(self):
+        """Перезапуск приложения с задержкой"""
         await asyncio.sleep(1)
         restart()
 
@@ -113,7 +113,7 @@ class Web:
     async def root(self, _):
         return {
             "skip_creds": self.api_token is not None,
-            "tg_done": bool(self.client_data),
+            "tg_done": bool(getattr(self, "client_data", {})),
             "lavhost": "LAVHOST" in os.environ,
             "platform_emoji": self._platform_emoji,
         }
@@ -130,7 +130,7 @@ class Web:
     def _check_session(self, request: web.Request) -> bool:
         return (
             request.cookies.get("session", None) in self._sessions
-            if main.hikka.clients
+            if getattr(main.hikka, "clients", None)
             else True
         )
 
@@ -171,12 +171,10 @@ class Web:
         if not self._check_session(request):
             return web.Response(status=401)
 
-        text = await request.text()
+        text = (await request.text()).strip("@")
         client = self._pending_client
         db = database.Database(client)
         await db.init()
-
-        text = text.strip("@")
 
         if any(
             litera not in (string.ascii_letters + string.digits + "_")
@@ -251,7 +249,7 @@ class Web:
         self._qr_login = True
 
     async def init_qr_login(self, request: web.Request) -> web.Response:
-        if self.client_data and "LAVHOST" in os.environ:
+        if getattr(self, "client_data", None) and "LAVHOST" in os.environ:
             return web.Response(status=403, body="Forbidden by LavHost EULA")
 
         if "JAMHOST" in os.environ:
@@ -323,7 +321,7 @@ class Web:
         )
 
     async def can_add(self, request: web.Request) -> web.Response:
-        if self.client_data and "LAVHOST" in os.environ:
+        if getattr(self, "client_data", None) and "LAVHOST" in os.environ:
             return web.Response(status=403, body="Forbidden by host EULA")
 
         return web.Response(status=200, body="Yes")
@@ -332,7 +330,7 @@ class Web:
         if not self._check_session(request):
             return web.Response(status=401, body="Authorization required")
 
-        if self.client_data and "LAVHOST" in os.environ:
+        if getattr(self, "client_data", None) and "LAVHOST" in os.environ:
             return web.Response(status=403, body="Forbidden by host EULA")
 
         if "JAMHOST" in os.environ:
@@ -434,7 +432,7 @@ class Web:
 
         code = split[0]
         phone = parse_phone(split[1])
-        password = split[2]
+        password = split[2] if len(split) == 3 else None
 
         if (
             (len(code) != 5 and not password)
@@ -485,10 +483,12 @@ class Web:
         if not self._pending_client:
             return web.Response(status=400)
 
-        first_session = not bool(main.hikka.clients)
+        first_session = not bool(getattr(main.hikka, "clients", []))
 
         # Client is ready to pass in to dispatcher
-        main.hikka.clients = list(set(main.hikka.clients + [self._pending_client]))
+        main.hikka.clients = list(
+            set(getattr(main.hikka, "clients", []) + [self._pending_client])
+        )
         self._pending_client = None
 
         self.clients_set.set()
@@ -555,7 +555,7 @@ class Web:
 
         ops = []
 
-        for user in self.client_data.values():
+        for user in getattr(self, "client_data", {}).values():
             try:
                 bot = user[0].inline.bot
                 msg = await bot.send_message(
@@ -581,9 +581,6 @@ class Web:
         session = f"hikka_{utils.rand(16)}"
 
         if not ops:
-            # If no auth message was sent, just leave it empty
-            # probably, request was a bug and user doesn't have
-            # inline bot or did not authorize any sessions
             return web.Response(body=session)
 
         if not await main.hikka.wait_for_web_auth(token):
