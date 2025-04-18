@@ -249,7 +249,7 @@ class List(InlineUnit):
         unit_id: str = None,
     ):
         if page == "close":
-            return await self._client.delete_messages(call._units.get(unit_id).get('chat'), call._units.get(unit_id).get('message_id'))
+            await call.delete()
 
         if self._units[unit_id]["current_index"] < 0 or page >= len(
             self._units[unit_id]["strings"]

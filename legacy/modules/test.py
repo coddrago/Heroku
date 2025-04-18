@@ -331,10 +331,7 @@ class TestMod(loader.Module):
             ),
         )
 
-        if getattr(message, "out", True) and not isinstance(message, InlineCall):
-            await message.delete()
-        else:
-            await self._client.delete_messages(message._units.get(message.unit_id).get('chat'), message._units.get(message.unit_id).get('message_id'))
+        await message.delete()
 
         if isinstance(message, Message):
             await utils.answer(
