@@ -303,19 +303,20 @@ class Evaluator(loader.Module):
 
     async def getattrs(self, message: Message) -> dict:
         reply = await message.get_reply_message()
+        me = await self._client.get_me()
         return {
             "message": message,
             "client": self._client,
             "reply": reply,
             "r": reply,
-            **self.get_sub(legacytl.tl.types),
-            **self.get_sub(legacytl.tl.functions),
             "event": message,
             "chat": message.to_id,
+            "me": me,
             "legacytl": legacytl,
-            "legacytl": legacytl,
+            "herokutl": legacytl,
+            "telethon": legacytl,
+            "hikkatl": legacytl,
             "utils": utils,
-            "main": main,
             "loader": loader,
             "f": legacytl.tl.functions,
             "c": self._client,
@@ -323,6 +324,9 @@ class Evaluator(loader.Module):
             "lookup": self.lookup,
             "self": self,
             "db": self.db,
+            "os": os,
+            "sys": sys,
+            "subprocess": subprocess,
         }
 
     def get_sub(self, obj: typing.Any, _depth: int = 1) -> dict:

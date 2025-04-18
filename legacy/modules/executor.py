@@ -1,16 +1,15 @@
 import sys
 import traceback
-import html
 import time
 import legacytl
-import asyncio
+import os
+import subprocess
 import logging
 
 from meval import meval
 from io import StringIO
 
 from .. import loader, utils
-from ..log import HikkaException
 
 logger = logging.getLogger(__name__)
 
@@ -54,7 +53,9 @@ class Executor(loader.Module):
             "chat": message.to_id,
             "me": me,
             "legacytl": legacytl,
-            "legacytl": legacytl,
+            "herokutl": legacytl,
+            "telethon": legacytl,
+            "hikkatl": legacytl,
             "utils": utils,
             "loader": loader,
             "f": legacytl.tl.functions,
@@ -63,6 +64,9 @@ class Executor(loader.Module):
             "lookup": self.lookup,
             "self": self,
             "db": self.db,
+            "os": os,
+            "sys": sys,
+            "subprocess": subprocess,
         }
         result = sys.stdout = StringIO()
         try:
