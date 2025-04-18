@@ -13,17 +13,6 @@ from ..inline.types import BotInlineCall
 
 logger = logging.getLogger(__name__)
 
-imgs = [
-    "https://i.gifer.com/GmUB.gif",
-    "https://i.gifer.com/Afdn.gif",
-    "https://i.gifer.com/3uvT.gif",
-    "https://i.gifer.com/2qQQ.gif",
-    "https://i.gifer.com/Lym6.gif",
-    "https://i.gifer.com/IjT4.gif",
-    "https://i.gifer.com/A9H.gif",
-]
-
-
 @loader.tds
 class Quickstart(loader.Module):
     """Notifies user about userbot installation"""
@@ -64,7 +53,6 @@ class Quickstart(loader.Module):
         if self.get("no_msg"):
             return
 
-        await self.inline.bot.send_animation(self._client.tg_id, animation=choice(imgs))
         await self.inline.bot.send_message(
             self._client.tg_id,
             self.text(),
