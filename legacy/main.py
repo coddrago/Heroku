@@ -802,15 +802,6 @@ class Legacy:
             diff = repo.git.log([f"HEAD..origin/{version.branch}", "--oneline"])
             upd = "Update required" if diff else "Up-to-date"
 
-
-
-
-
-
-
-
-
-
             logo = (
                 "██╗     ███████╗ ██████╗  █████╗  ██████╗██╗   ██╗\n"
                 "██║     ██╔════╝██╔════╝ ██╔══██╗██╔════╝╚██╗ ██╔╝\n"

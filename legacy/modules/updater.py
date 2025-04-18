@@ -250,13 +250,7 @@ class UpdaterMod(loader.Module):
           return
 
         try:
-            subprocess.run([
-                sys.executable,
-                f"git",
-                "reset",
-                "--hard",
-                f"{args}"
-            ])
+            subprocess.run(["git", "reset", "--hard", f"{args}"], cwd=f"{os.getcwd()}",)
             await utils.answer(message, self.strings("rollback_ok"))
             await self.invoke("restart", "-f", peer=message.peer_id)
         except subprocess.CalledProcessError:
