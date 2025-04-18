@@ -146,7 +146,7 @@ class Help(loader.Module):
         )
 
         reply = "{} <b>{}</b>:".format(
-            "<emoji document_id=5134452506935427991>🪐</emoji>", _name, ""
+            "<emoji document_id=5134452506935427991>🪐</emoji>", _name
         )
         if module.__doc__:
             reply += (

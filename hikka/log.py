@@ -261,7 +261,7 @@ class TelegramLogsHandler(logging.Handler):
     async def _show_full_trace(
         self,
         call: BotInlineCall,
-        bot: "aiogram.Bot",  # type: ignore
+        bot: "aiogram.Bot",  # type: ignore  # noqa: F821
         item: EnhancedException,
     ):
         """Show full traceback in Telegram"""

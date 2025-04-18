@@ -6,6 +6,7 @@
 
 import asyncio
 import logging
+import os
 import re
 
 from herokutl.errors.rpcerrorlist import YouBlockedUserError
@@ -52,7 +53,7 @@ class TokenObtainment(InlineUnit):
                 username = f"@heroku_{uid}_bot"
 
             for msg in [
-                f"🪐 Heroku userbot"[:64],
+                "🪐 Heroku userbot"[:64],
                 username,
                 "/setuserpic",
                 username,
