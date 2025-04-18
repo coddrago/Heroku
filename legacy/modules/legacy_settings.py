@@ -498,7 +498,7 @@ class LegacySettingsMod(loader.Module):
             return
 
         await call.answer("You userbot is being updated...", show_alert=True)
-        await call.delete()
+        await self._client.delete_messages(call._units.get(call.unit_id).get('chat'), call._units.get(call.unit_id).get('message_id'))
         await self.invoke("update", "-f", peer="me")
 
     async def inline__restart(
@@ -517,7 +517,7 @@ class LegacySettingsMod(loader.Module):
             return
 
         await call.answer("You userbot is being restarted...", show_alert=True)
-        await call.delete()
+        await self._client.delete_messages(call._units.get(call.unit_id).get('chat'), call._units.get(call.unit_id).get('message_id'))
         await self.invoke("restart", "-f", peer="me")
 
     def _get_settings_markup(self) -> list:
