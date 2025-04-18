@@ -87,7 +87,7 @@ BASE_PATH = Path(BASE_DIR)
 ASSETS_PATH = "https://raw.githubusercontent.com/Crayz310/Legacy/refs/heads/master/assets/legacy-assets.png"
 BACKUPS_PATH = "https://raw.githubusercontent.com/Crayz310/Legacy/refs/heads/master/assets/legacy-backups.png"
 LOGS_PATH = "https://raw.githubusercontent.com/Crayz310/Legacy/refs/heads/master/assets/legacy-logs.png"
-AVATAR_PATH = BASE_PATH / "assets" / "legacy-pfp.png"
+AVATAR_PATH = os.getcwd() / "assets" / "legacy-pfp.png"
 CONFIG_PATH = BASE_PATH / "config.json"
 
 IS_TERMUX = "com.termux" in os.environ.get("PREFIX", "")
@@ -172,11 +172,11 @@ def generate_random_system_version():
     :example: "Windows 10.0.19042.1234" or "Ubuntu 20.04.19042.1234"
     """
     os_choices = [
-        ("Windows Vista", "Vista"),
-        ("Windows XP", "XP"),
-        ("Windows 7", "7"),
-        ("Windows 8", "8"),
-        ("Windows 10", "10"),
+        ("Windows", "Vista"),
+        ("Windows", "XP"),
+        ("Windows", "7"),
+        ("Windows", "8"),
+        ("Windows", "10"),
         ("Ubuntu", "20.04"),
         ("Debian", "10"),
         ("Fedora", "33"),
@@ -803,12 +803,6 @@ class Legacy:
             upd = "Update required" if diff else "Up-to-date"
 
             logo = (
-                "██╗     ███████╗ ██████╗  █████╗  ██████╗██╗   ██╗\n"
-                "██║     ██╔════╝██╔════╝ ██╔══██╗██╔════╝╚██╗ ██╔╝\n"
-                "██║     █████╗  ██║  ███╗███████║██║      ╚████╔╝\n"
-                "██║     ██╔══╝  ██║   ██║██╔══██║██║       ╚██╔╝\n"
-                "███████╗███████╗╚██████╔╝██║  ██║╚██████╗   ██║\n"
-                "╚══════╝╚══════╝ ╚═════╝ ╚═╝  ╚═╝ ╚═════╝   ╚═╝\n\n"
                 f"• Build: {build[:7]}\n"
                 f"• Version: {__version__}\n"
                 f"• {upd}\n"

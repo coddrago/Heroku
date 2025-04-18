@@ -7,6 +7,7 @@
 import asyncio
 import logging
 import re
+import os
 
 from legacytl.errors.rpcerrorlist import YouBlockedUserError
 from legacytl.tl.functions.contacts import UnblockRequest
