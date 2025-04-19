@@ -358,32 +358,33 @@ class TelegramLogsHandler(logging.Handler):
                 for client_id in self._mods
             }
 
-            self._exc_queue = {
-                await client_id: [
-                    self._mods[client_id].inline.bot.send_message(
-                        self._mods[client_id].logchat,
-                        item[0].message,
-                        reply_markup=self._mods[client_id].inline.generate_markup(
-                            [
-                                {
-                                    "text": "🌙 Full traceback",
-                                    "callback": self._show_full_trace,
-                                    "args": (
-                                        self._mods[client_id].inline.bot,
-                                        item[0],
-                                    ),
-                                    "disable_security": True,
-                                },
-                                *self._gen_web_debug_button(item[0]),
-                            ],
-                        ),
-                    )
-                    for item in self.tg_buff
-                    if isinstance(item[0], HikkaException)
-                    and (not item[1] or item[1] == client_id or self.force_send_all)
-                ]
-                for client_id in self._mods
-            }
+            self._exc_queue = {}
+            for client_id in self._mods:
+                messages = []
+                for item in self.tg_buff:
+                    if isinstance(item[0], HikkaException) and (
+                        not item[1] or item[1] == client_id or self.force_send_all
+                        ):
+                        msg = await self._mods[client_id].inline.bot.send_message(
+                            self._mods[client_id].logchat,
+                            item[0].message,
+                            reply_markup=self._mods[client_id].inline.generate_markup(
+                                [
+                                    {
+                                        "text": "🌙 Full traceback",
+                                        "callback": self._show_full_trace,
+                                        "args": (
+                                            self._mods[client_id].inline.bot,
+                                            item[0],
+                                        ),
+                                        "disable_security": True,
+                                    },
+                                    *self._gen_web_debug_button(item[0]),
+                                ]
+                            ),
+                        )
+                        messages.append(msg)
+                    self._exc_queue[client_id] = messages
 
             for exceptions in self._exc_queue.values():
                 for exc in exceptions:
