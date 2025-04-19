@@ -114,6 +114,6 @@ class InlineStuff(loader.Module):
             return
 
         await message.answer_photo(
-            "https://imgur.com/a/0gmlFYI.png",
+            "https://i.postimg.cc/bN4tXwwK/info.png",
             caption=self.strings("this_is_legacy"),
         )
