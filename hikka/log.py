@@ -163,11 +163,11 @@ class EnhancedException:
 
         error_msg = override_text(exc_value) or (
             f"{caller_info}"
-            f"📌 <b>Location:</b> <code>{utils.escape_html(filename)}:{lineno}</code> "
-            f"in <code>{utils.escape_html(name)}</code>\n"
-            f"🚨 <b>Error:</b> <code>{utils.escape_html(''.join(traceback.format_exception_only(exc_type, exc_value))).strip()}</code>"
-            f"{f'\n💬 <b>Note:</b> <code>{utils.escape_html(str(comment))}</code>' if comment else ''}"
-            )
+            f"📌 Location: {utils.escape_html(filename)}:{lineno} "
+            f"in {utils.escape_html(name)}\n"
+            f"🚨 Error: {utils.escape_html(''.join(traceback.format_exception_only(exc_type, exc_value)).strip())}"
+            f"{f'\n💬 Note: {utils.escape_html(str(comment))}' if comment else ''}"
+        )
 
         return cls(
             message=error_msg,
