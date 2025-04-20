@@ -811,6 +811,7 @@ class Heroku:
                 async with session.get(
                     "https://mods.codrago.top/ids/allowed_ids.txt"
                 ) as response:
+                async with session.get("https://raw.githubusercontent.com/coddrago/modules-web/main/mods/ids/allowed_ids.txt") as response:
                     if response.status == 200:
                         content = await response.text()
                         allowed_ids = [
