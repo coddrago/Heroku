@@ -42,7 +42,7 @@ class HerokuInfoMod(loader.Module):
             ),
 
             loader.ConfigValue(
-                "bannerUrl",
+                "banner_url",
                 "https://imgur.com/a/7LBPJiq.png",
                 lambda: self.strings("_cfg_banner"),
             ),
@@ -179,7 +179,7 @@ class HerokuInfoMod(loader.Module):
         )
     
     def _get_info_photo(self, start: float) -> Optional[Path]:
-        imgform = self.config['bannerUrl'].split('.')[-1]
+        imgform = self.config['banner_url'].split('.')[-1]
         imgset = self.config['imgSettings']
         if imgform in ['jpg', 'jpeg', 'png', 'bmp', 'webp']:
             response = requests.get(self.config['bannerUrl'], stream=True)
