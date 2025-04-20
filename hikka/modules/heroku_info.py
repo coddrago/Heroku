@@ -4,11 +4,25 @@
 # You can redistribute it and/or modify it under the terms of the GNU AGPLv3
 # 🔑 https://www.gnu.org/licenses/agpl-3.0.html
 
+# ©️ Codrago, 2024-2025
+# This file is a part of Heroku Userbot
+# 🌐 https://github.com/coddrago/Heroku
+# You can redistribute it and/or modify it under the terms of the GNU AGPLv3
+# 🔑 https://www.gnu.org/licenses/agpl-3.0.html
+
 import git
 import time
-
+import git
 import psutil
-from herokutl.tl.types import Message
+import os
+import glob
+import requests
+
+from typing import Optional
+from pathlib import Path
+from PIL import Image, ImageDraw, ImageFont
+from io import BytesIO
+from herokutl.tl.types import Message 
 from herokutl.utils import get_display_name
 from .. import loader, utils, version
 import platform as lib_platform
@@ -28,7 +42,7 @@ class HerokuInfoMod(loader.Module):
             ),
 
             loader.ConfigValue(
-                "banner_url",
+                "bannerUrl",
                 "https://imgur.com/a/7LBPJiq.png",
                 lambda: self.strings("_cfg_banner"),
             ),
@@ -44,6 +58,20 @@ class HerokuInfoMod(loader.Module):
                 lambda: self.strings["ping_emoji"],
                 validator=loader.validators.String(),
             ),
+            loader.ConfigValue(
+                "switchInfo",
+                False,
+                "Switch info to mode photo",
+                validator=loader.validators.Boolean(),
+            ),
+            loader.ConfigValue(
+                "imgSettings",
+                ["Лапокапканот", 30, '#000', '0|0', "mm", 0, '#000'],
+                "Image settings\n1. Дополнительный ник (если прежний ник не отображается)\n2. Размер шрифта\n3. Цвет шрифта в HEX формате '#000'\n4. Координаты текста '100|100', по умолчания в центре фотографии\n5. Якорь текста -> https://pillow.readthedocs.io/en/stable/_images/anchor_horizontal.svg\n6. Размер обводки, по умолчанию 0\n7. Цвет обводки в HEX формате '#000'",
+                validator=loader.validators.Series(
+                    fixed_len=7,
+                ),
+            ),
         )
 
     def _get_os_name(self):
@@ -56,7 +84,7 @@ class HerokuInfoMod(loader.Module):
             return self.strings['non_detectable']
 
 
-    def _render_info(self, inline: bool, start: float) -> str:
+    def _render_info(self, start: float) -> str:
         try:
             repo = git.Repo(search_parent_directories=True)
             diff = repo.git.log([f"HEAD..origin/{version.branch}", "--oneline"])
@@ -66,7 +94,7 @@ class HerokuInfoMod(loader.Module):
         except Exception:
             upd = ""
 
-        me = '<b><a href="tg://user?id={}">{}</a></b>'.format(
+        me = self.config['imgSettings'][0] if (self.config['imgSettings'][0] != "Лапокапканот") and self.config['switchInfo'] else '<b><a href="tg://user?id={}">{}</a></b>'.format(
             self._client.hikka_me.id,
             utils.escape_html(get_display_name(self._client.hikka_me)),
         ).replace('{', '').replace('}', '')
@@ -134,51 +162,117 @@ class HerokuInfoMod(loader.Module):
                 f' {self.strings("ram_usage")}:'
                 f"</b> <i>~{utils.get_ram_usage()} MB</i>\n<b>{{}}</b>"
             ).format(
-                *map(
-                    lambda x: utils.remove_html(x) if inline else x,
-                    (
-                        (
-                            utils.get_platform_emoji()
-                            if self._client.hikka_me.premium and self.config["show_heroku"]
-                            else ""
-                        ),
-                        "<emoji document_id=5373141891321699086>😎</emoji>",
-                        "<emoji document_id=5469741319330996757>💫</emoji>",
-                        "<emoji document_id=5449918202718985124>🌳</emoji>",
-                        "<emoji document_id=5472111548572900003>⌨️</emoji>",
-                        "<emoji document_id=5451646226975955576>⌛️</emoji>",
-                        "<emoji document_id=5431449001532594346>⚡️</emoji>",
-                        "<emoji document_id=5359785904535774578>💼</emoji>",
-                        platform,
-                    ),
-                )
+                (
+                    utils.get_platform_emoji()
+                    if self._client.hikka_me.premium and self.config["show_heroku"]
+                    else ""
+                ),
+                "<emoji document_id=5373141891321699086>😎</emoji>",
+                "<emoji document_id=5469741319330996757>💫</emoji>",
+                "<emoji document_id=5449918202718985124>🌳</emoji>",
+                "<emoji document_id=5472111548572900003>⌨️</emoji>",
+                "<emoji document_id=5451646226975955576>⌛️</emoji>",
+                "<emoji document_id=5431449001532594346>⚡️</emoji>",
+                "<emoji document_id=5359785904535774578>💼</emoji>",
+                platform,
             )
         )
-
+    
+    def _get_info_photo(self, start: float) -> Optional[Path]:
+        imgform = self.config['bannerUrl'].split('.')[-1]
+        imgset = self.config['imgSettings']
+        if imgform in ['jpg', 'jpeg', 'png', 'bmp', 'webp']:
+            response = requests.get(self.config['bannerUrl'])
+            img = Image.open(BytesIO(response.content))
+            font = ImageFont.truetype(
+                glob.glob(f'{os.getcwd()}/assets/font.*')[0], 
+                size=int(imgset[1]), 
+                encoding='unic'
+            )
+            w, h = img.size
+            draw = ImageDraw.Draw(img)
+            draw.text(
+                (int(w/2), int(h/2)) if imgset[3] == '0|0' else tuple([int(i) for i in imgset[3].split('|')]),
+                f'{utils.remove_html(self._render_info(start))}', 
+                anchor=imgset[4],
+                font=font,
+                fill=imgset[2] if imgset[2].startswith('#') else '#000',
+                stroke_width=int(imgset[5]),
+                stroke_fill=imgset[6] if imgset[6].startswith('#') else '#000',
+                embedded_color=True
+            )
+            path = f'{os.getcwd()}/assets/imginfo.{imgform}'
+            img.save(path)
+            return Path(path).absolute()
+        return None
+    
+    @loader.command()
+    async def insfont(self, message: Message):
+        "Install font"
+        if message.is_reply:
+            reply = await message.get_reply_message()
+            fontform = reply.document.mime_type.split("/")[1]
+            if not fontform in ['ttf', 'otf']:
+                await utils.answer(
+                    message,
+                    '<b>Incorrect font format</b>\n<blockquote>Поддерживаемые форматы -> otf, ttf</blockquote>'
+                )
+                return
+            origpath = f'{os.getcwd()}/assets/font.{fontform}'
+            ptf = f'{os.getcwd()}/font.{fontform}'
+            os.rename(origpath, ptf)
+            photo = await reply.download_media(origpath)
+            if photo is None:
+                os.rename(ptf, origpath)
+                await utils.answer(
+                    message,
+                    'Reply to font!'
+                )
+                return
+        os.remove(ptf)
+        await utils.answer(
+            message,
+            '<b>Font installed</b><emoji document_id=5436040291507247633>🎉</emoji>\nТеперь вы с удовольствием можете пользоваться им'
+        )
 
     @loader.command()
     async def infocmd(self, message: Message):
         start = time.perf_counter_ns()
+        
         if self.config["custom_message"] is None:
             await utils.answer_file(
                 message,
-                self.config["banner_url"],
-                self._render_info(False, start),
+                self.config["bannerUrl"],
+                self._render_info(start),
                 reply_to=getattr(message, "reply_to_msg_id", None),
             )
         elif '{ping}' in self.config["custom_message"]:
             message = await utils.answer(message, self.config["ping_emoji"])
             await utils.answer_file(
                 message,
-                self.config["banner_url"],
-                self._render_info(False, start),
+                self.config["bannerUrl"],
+                self._render_info(start),
+                reply_to=getattr(message, "reply_to_msg_id", None),
+            )
+        elif self.config['switchInfo']:
+            if self._get_info_photo(start) is None:
+                await utils.answer(
+                    message, 
+                    '<b>Incorrect image format</b>\n<blockquote>Поддерживаемые форматы -> jpg, jpeg, png, bmp, webp</blockquote>'
+                )
+                return
+            if '{ping}' in self.config["custom_message"]:
+                message = await utils.answer(message, self.config["ping_emoji"])
+            await utils.answer_file(
+                message,
+                f'{utils.os.getcwd()}/assets/imginfo.{self.config["bannerUrl"].split(".")[-1]}',
                 reply_to=getattr(message, "reply_to_msg_id", None),
             )
         else:
             await utils.answer_file(
                 message,
-                self.config["banner_url"],
-                self._render_info(False, start),
+                self.config["bannerUrl"],
+                self._render_info(start),
                 reply_to=getattr(message, "reply_to_msg_id", None),
             )
 
