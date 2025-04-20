@@ -182,7 +182,7 @@ class HerokuInfoMod(loader.Module):
         imgform = self.config['bannerUrl'].split('.')[-1]
         imgset = self.config['imgSettings']
         if imgform in ['jpg', 'jpeg', 'png', 'bmp', 'webp']:
-            response = requests.get(self.config['bannerUrl'])
+            response = requests.get(self.config['bannerUrl'], stream=True)
             img = Image.open(BytesIO(response.content))
             font = ImageFont.truetype(
                 glob.glob(f'{os.getcwd()}/assets/font.*')[0], 
@@ -238,23 +238,7 @@ class HerokuInfoMod(loader.Module):
     @loader.command()
     async def infocmd(self, message: Message):
         start = time.perf_counter_ns()
-        
-        if self.config["custom_message"] is None:
-            await utils.answer_file(
-                message,
-                self.config["bannerUrl"],
-                self._render_info(start),
-                reply_to=getattr(message, "reply_to_msg_id", None),
-            )
-        elif '{ping}' in self.config["custom_message"]:
-            message = await utils.answer(message, self.config["ping_emoji"])
-            await utils.answer_file(
-                message,
-                self.config["bannerUrl"],
-                self._render_info(start),
-                reply_to=getattr(message, "reply_to_msg_id", None),
-            )
-        elif self.config['switchInfo']:
+        if self.config['switchInfo']:
             if self._get_info_photo(start) is None:
                 await utils.answer(
                     message, 
@@ -268,7 +252,18 @@ class HerokuInfoMod(loader.Module):
                 f'{utils.os.getcwd()}/assets/imginfo.{self.config["bannerUrl"].split(".")[-1]}',
                 reply_to=getattr(message, "reply_to_msg_id", None),
             )
+        elif self.config["custom_message"] is None:
+            if '{ping}' in self.config["custom_message"]:
+                message = await utils.answer(message, self.config["ping_emoji"])
+            await utils.answer_file(
+                message,
+                self.config["bannerUrl"],
+                self._render_info(start),
+                reply_to=getattr(message, "reply_to_msg_id", None),
+            )
         else:
+            if '{ping}' in self.config["custom_message"]:
+                message = await utils.answer(message, self.config["ping_emoji"])
             await utils.answer_file(
                 message,
                 self.config["bannerUrl"],
