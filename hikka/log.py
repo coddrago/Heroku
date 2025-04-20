@@ -167,7 +167,7 @@ class EnhancedException:
             f"in <code>{utils.escape_html(name)}</code>\n"
             f"🚨 <b>Error:</b> <code>{utils.escape_html(''.join(traceback.format_exception_only(exc_type, exc_value))).strip()}</code>"
             f"{f'\n💬 <b>Note:</b> <code>{utils.escape_html(str(comment))}</code>' if comment else ''}"
-        )
+            )
 
         return cls(
             message=error_msg,
