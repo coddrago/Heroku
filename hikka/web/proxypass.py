@@ -19,7 +19,7 @@ class ProxyPasser:
         self,
         port: int,
         change_url_callback: typing.Callable[[str], None] = None,
-        verbose: bool = False
+        verbose: bool = False,
     ):
         self._tunnel_url = None
         self._port = port
@@ -27,27 +27,27 @@ class ProxyPasser:
         self._verbose = verbose
         self._tunnels = [
             SSHTunnel(port=port, change_url_callback=self._on_url_change),
-            CloudflareTunnel(port=port, verbose=verbose, change_url_callback=self._on_url_change)
+            CloudflareTunnel(
+                port=port, verbose=verbose, change_url_callback=self._on_url_change
+            ),
         ]
-
 
     def _on_url_change(self, url: str):
         self._tunnel_url = url
         if self._change_url_callback:
             self._change_url_callback(url)
-    
+
     def set_port(self, port: int):
         self.port = port
 
     async def get_url(self, timeout: float = 25) -> typing.Optional[str]:
-        
         if "DOCKER" in os.environ:
             # We're in a Docker container, so we can't use ssh
             # Also, the concept of Docker is to keep
             # everything isolated, so we can't proxy-pass to
             # open web.
             return None
-        
+
         for tunnel in self._tunnels:
             try:
                 await tunnel.start()
@@ -55,7 +55,9 @@ class ProxyPasser:
                 if self._tunnel_url:
                     return self._tunnel_url
                 else:
-                    logger.warning(f"{tunnel.__class__.__name__} failed to provide URL.")
+                    logger.warning(
+                        f"{tunnel.__class__.__name__} failed to provide URL."
+                    )
             except Exception as e:
                 logger.warning(f"{tunnel.__class__.__name__} failed: {e}")
 

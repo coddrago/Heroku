@@ -303,7 +303,7 @@ class CommandDispatcher:
             # Allow escaping commands using .'s
             if not watcher:
                 await message.edit(
-                    message.message[len(prefix):],
+                    message.message[len(prefix) :],
                     parse_mode=lambda s: (
                         s,
                         utils.relocate_entities(message.entities, -1, message.message)
@@ -353,7 +353,7 @@ class CommandDispatcher:
 
         initiator = getattr(event, "sender_id", 0)
 
-        command = message.message[len(prefix):].strip().split(maxsplit=1)[0]
+        command = message.message[len(prefix) :].strip().split(maxsplit=1)[0]
         tag = command.split("@", maxsplit=1)
 
         if len(tag) == 2:

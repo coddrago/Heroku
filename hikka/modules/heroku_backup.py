@@ -96,13 +96,18 @@ class HerokuBackupMod(loader.Module):
 
         if not int(args):
             self.set("period", "disabled")
-            await utils.answer(message, f"<b>{self.strings('never').format(prefix=self.get_prefix())}</b>")
+            await utils.answer(
+                message,
+                f"<b>{self.strings('never').format(prefix=self.get_prefix())}</b>",
+            )
             return
 
         period = int(args) * 60 * 60
         self.set("period", period)
         self.set("last_backup", round(time.time()))
-        await utils.answer(message, f"<b>{self.strings('saved').format(prefix=self.get_prefix())}</b>")
+        await utils.answer(
+            message, f"<b>{self.strings('saved').format(prefix=self.get_prefix())}</b>"
+        )
 
     @loader.loop(interval=1, autostart=True)
     async def handler(self):

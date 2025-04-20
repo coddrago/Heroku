@@ -20,6 +20,7 @@ import hashlib
 
 from ._internal import restart
 
+
 def get_file_hash(filename):
     hasher = hashlib.sha256()
     try:
@@ -28,6 +29,7 @@ def get_file_hash(filename):
         return hasher.hexdigest()
     except FileNotFoundError:
         return None
+
 
 def deps():
     subprocess.run(
@@ -48,20 +50,21 @@ def deps():
     with open(".requirements_hash", "w") as f:
         f.write(get_file_hash("requirements.txt"))
 
+
 if (
     getpass.getuser() == "root"
     and "--root" not in " ".join(sys.argv)
     and all(trigger not in os.environ for trigger in {"DOCKER", "GOORM", "NO_SUDO"})
 ):
-    print("\U0001F6AB" * 15)
+    print("\U0001f6ab" * 15)
     print("You attempted to run Heroku on behalf of root user")
     print("Please, create a new user and restart script")
     print("If this action was intentional, pass --root argument instead")
-    print("\U0001F6AB" * 15)
+    print("\U0001f6ab" * 15)
     print()
     print("Type force_insecure to ignore this warning")
     print("Type no_sudo if your system has no sudo (Debian vibes)")
-    inp = input('> ').lower()
+    inp = input("> ").lower()
     if inp != "force_insecure":
         sys.exit(1)
     elif inp == "no_sudo":
@@ -70,9 +73,11 @@ if (
         restart()
 
 if sys.version_info < (3, 8, 0):
-    print("\U0001F6AB Error: you must use at least Python version 3.8.0")
+    print("\U0001f6ab Error: you must use at least Python version 3.8.0")
 elif __package__ != "hikka":
-    print("\U0001F6AB Error: you cannot run this as a script; you must execute as a package")
+    print(
+        "\U0001f6ab Error: you cannot run this as a script; you must execute as a package"
+    )
 else:
     try:
         import herokutl
@@ -81,19 +86,23 @@ else:
     else:
         try:
             import herokutl  # noqa: F811
+
             if tuple(map(int, herokutl.__version__.split("."))) < (2, 0, 8):
                 raise ImportError
         except ImportError:
-            print("\U0001F504 Installing dependencies...")
+            print("\U0001f504 Installing dependencies...")
             deps()
             restart()
 
     try:
         from . import log
+
         log.init()
         from . import main
     except ImportError as e:
-        print(f"{str(e)}\n\U0001F504 Attempting dependencies installation... Just wait ⏱")
+        print(
+            f"{str(e)}\n\U0001f504 Attempting dependencies installation... Just wait ⏱"
+        )
         deps()
         restart()
 
@@ -108,8 +117,10 @@ else:
             prev_hash = f.read().strip()
 
     if prev_hash != get_file_hash("requirements.txt"):
-        print("\U0001F504 Detected changes in requirements.txt, updating dependencies...")
+        print(
+            "\U0001f504 Detected changes in requirements.txt, updating dependencies..."
+        )
         deps()
         restart()
-    
+
     main.hikka.main()

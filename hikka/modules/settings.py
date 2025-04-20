@@ -42,7 +42,7 @@ class CoreMod(loader.Module):
                 ),
                 validator=loader.validators.Boolean(),
                 on_change=self._process_config_changes,
-                ),
+            ),
         )
 
     async def client_ready(self):
@@ -53,11 +53,16 @@ class CoreMod(loader.Module):
                     "callback": self._inline__choose__installation,
                     "args": (platform,),
                 }
-                for platform in ['vds', 'termux',
-                                 'userland', 'railway',
-                                 'jamhost', 'module_switch']
+                for platform in [
+                    "vds",
+                    "termux",
+                    "userland",
+                    "railway",
+                    "jamhost",
+                    "module_switch",
+                ]
             ],
-            2
+            2,
         )
 
     def _process_config_changes(self):
@@ -101,7 +106,12 @@ class CoreMod(loader.Module):
         module = self.allmodules.get_classname(module)
         return f"{str(chatid)}.{module}" if module else chatid
 
-    @loader.command(ru_doc="Информация о Хероку", en_doc="Information of Heroku", ua_doc="Інформація про Хероку", de_doc="Informationen über Heroku")
+    @loader.command(
+        ru_doc="Информация о Хероку",
+        en_doc="Information of Heroku",
+        ua_doc="Інформація про Хероку",
+        de_doc="Informationen über Heroku",
+    )
     async def herokucmd(self, message: Message):
         await utils.answer_file(
             message,
@@ -307,20 +317,21 @@ class CoreMod(loader.Module):
 
         args = utils.get_args_raw(message)
 
-        if (not args or args not in {'-t', '-v', '-r', '-jh', '-ms', '-u'}) and \
-            not (await self.inline.form(
+        if (not args or args not in {"-t", "-v", "-r", "-jh", "-ms", "-u"}) and not (
+            await self.inline.form(
                 self.strings("choose_installation"),
                 message,
                 reply_markup=self._markup,
                 photo="https://imgur.com/a/HrrFair.png",
-                disable_security=True
-        )
-            ):
-
+                disable_security=True,
+            )
+        ):
             await self.client.send_file(
                 message.peer_id,
                 "https://imgur.com/a/HrrFair.png",
-                caption=self.strings["installation"], reply_to=getattr(message, "reply_to_msg_id", None),)
+                caption=self.strings["installation"],
+                reply_to=getattr(message, "reply_to_msg_id", None),
+            )
         elif "-t" in args:
             await utils.answer(message, self.strings["termux_install"])
         elif "-v" in args:
@@ -336,7 +347,6 @@ class CoreMod(loader.Module):
 
     async def _inline__choose__installation(self, call: InlineCall, platform: str):
         await call.edit(
-            text=self.strings(f'{platform}_install'),
+            text=self.strings(f"{platform}_install"),
             reply_markup=self._markup,
         )
-

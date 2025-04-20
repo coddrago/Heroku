@@ -23,18 +23,18 @@ function auth(c) {
           .then((a) =>
             "TIMEOUT" == a
               ? (error_message(
-                  "Code waiting timeout exceeded. Reload page and try again.",
-                ),
+                "Code waiting timeout exceeded. Reload page and try again.",
+              ),
                 void $(".auth").fadeOut(250))
               : a.startsWith("hikka_")
-              ? ($.cookie("session", a),
-                (auth_required = !1),
-                $(".authorized").hide().fadeIn(100),
-                $(".auth").fadeOut(250, () => {
-                  $(".installation").fadeIn(250);
-                }),
-                void c())
-              : void 0,
+                ? ($.cookie("session", a),
+                  (auth_required = !1),
+                  $(".authorized").hide().fadeIn(100),
+                  $(".auth").fadeOut(250, () => {
+                    $(".installation").fadeIn(250);
+                  }),
+                  void c())
+                : void 0,
           );
     }, 250);
 }
@@ -89,8 +89,8 @@ $("#get_started").click(() => {
     b.ok
       ? auth_required
         ? auth(() => {
-            $("#get_started").click();
-          })
+          $("#get_started").click();
+        })
         : void ($("#continue_btn").hide().fadeIn(250),
           $("#denyqr").hide(),
           $("#enter_api").fadeOut(250),
@@ -103,8 +103,8 @@ $("#get_started").click(() => {
   $("#enter_api").click(() =>
     auth_required
       ? auth(() => {
-          $("#enter_api").click();
-        })
+        $("#enter_api").click();
+      })
       : void ($("#get_started").fadeOut(250),
         $("#enter_api").fadeOut(250, () => {
           $("#continue_btn").hide().fadeIn(250), switch_block("api_id");
@@ -192,38 +192,38 @@ function show_eula() {
 function tg_code(b = !1) {
   return b && qr_login
     ? void fetch("/qr_2fa", {
-        method: "POST",
-        credentials: "include",
-        body: _2fa_pass,
-      }).then((b) => {
+      method: "POST",
+      credentials: "include",
+      body: _2fa_pass,
+    }).then((b) => {
+      b.ok
+        ? ($(".auth-code-form").fadeOut(),
+          $("#block_phone").fadeOut(),
+          switch_block("custom_bot"))
+        : ($(".code-input").removeAttr("disabled"),
+          b.text().then((b) => {
+            error_state(), Swal.fire("Error", b, "error");
+          }));
+    })
+    : void fetch("/tg_code", {
+      method: "POST",
+      body: `${_tg_pass}\n${_phone}\n${_2fa_pass}`,
+    })
+      .then((b) => {
         b.ok
           ? ($(".auth-code-form").fadeOut(),
             $("#block_phone").fadeOut(),
             switch_block("custom_bot"))
-          : ($(".code-input").removeAttr("disabled"),
-            b.text().then((b) => {
-              error_state(), Swal.fire("Error", b, "error");
-            }));
-      })
-    : void fetch("/tg_code", {
-        method: "POST",
-        body: `${_tg_pass}\n${_phone}\n${_2fa_pass}`,
-      })
-        .then((b) => {
-          b.ok
-            ? ($(".auth-code-form").fadeOut(),
-              $("#block_phone").fadeOut(),
-              switch_block("custom_bot"))
-            : 401 == b.status
+          : 401 == b.status
             ? show_2fa()
             : ($(".code-input").removeAttr("disabled"),
               b.text().then((b) => {
                 error_state(), Swal.fire("Error", b, "error");
               }));
-        })
-        .catch((b) => {
-          Swal.showValidationMessage(`Auth failed: ${b.toString()}`);
-        });
+      })
+      .catch((b) => {
+        Swal.showValidationMessage(`Auth failed: ${b.toString()}`);
+      });
 }
 function switch_block(b) {
   cnt_btn.setAttribute("current-step", b);
@@ -302,23 +302,23 @@ function process_next() {
         .then((b) => {
           b.ok
             ? ($(".auth-code-form")
-                .hide()
-                .fadeIn(250, () => {
-                  $("#monkey").html(""),
-                    (anim2 = bodymovin.loadAnimation({
-                      container: document.getElementById("monkey"),
-                      renderer: "canvas",
-                      loop: !1,
-                      autoplay: !0,
-                      path: "https://assets8.lottiefiles.com/private_files/lf30_t52znxni.json",
-                      rendererSettings: { clearCanvas: !0 },
-                    })),
-                    anim2.addEventListener("complete", () => {
-                      setTimeout(() => {
-                        anim2.goToAndPlay(0);
-                      }, 2e3);
-                    });
-                }),
+              .hide()
+              .fadeIn(250, () => {
+                $("#monkey").html(""),
+                  (anim2 = bodymovin.loadAnimation({
+                    container: document.getElementById("monkey"),
+                    renderer: "canvas",
+                    loop: !1,
+                    autoplay: !0,
+                    path: "https://assets8.lottiefiles.com/private_files/lf30_t52znxni.json",
+                    rendererSettings: { clearCanvas: !0 },
+                  })),
+                  anim2.addEventListener("complete", () => {
+                    setTimeout(() => {
+                      anim2.goToAndPlay(0);
+                    }, 2e3);
+                  });
+              }),
               $(".code-input").removeAttr("disabled"),
               $(".enter").addClass("tgcode"),
               $(".code-caption").text(
@@ -332,8 +332,8 @@ function process_next() {
               cnt_btn.setAttribute("current-step", "code"),
               (_current_block = "code"))
             : 403 == b.status
-            ? show_eula()
-            : b.text().then((b) => {
+              ? show_eula()
+              : b.text().then((b) => {
                 error_state(), error_message(b);
               });
         })
@@ -349,13 +349,13 @@ function process_next() {
     let b = document.querySelector("#custom_bot").value;
     return "" != b && (!b.toLowerCase().endsWith("bot") || 5 > b.length)
       ? void Swal.fire({
-          icon: "error",
-          title: "Bot username invalid",
-          text: "It must end with `bot` and be at least 5 symbols in length",
-        })
+        icon: "error",
+        title: "Bot username invalid",
+        text: "It must end with `bot` and be at least 5 symbols in length",
+      })
       : "" == b
-      ? void finish_login()
-      : void fetch("/custom_bot", {
+        ? void finish_login()
+        : void fetch("/custom_bot", {
           method: "POST",
           credentials: "include",
           body: b,
@@ -364,9 +364,9 @@ function process_next() {
           .then((b) =>
             "OCCUPIED" == b
               ? void Swal.fire({
-                  icon: "error",
-                  title: "This bot username is already occupied!",
-                })
+                icon: "error",
+                title: "This bot username is already occupied!",
+              })
               : void finish_login(),
           )
           .catch((b) => {
@@ -379,10 +379,10 @@ function process_next() {
   cnt_btn.disabled
     ? void 0
     : auth_required
-    ? auth(() => {
+      ? auth(() => {
         cnt_btn.click();
       })
-    : void process_next()),
+      : void process_next()),
   $("#denyqr").on("click", () => {
     qr_interval && clearInterval(qr_interval),
       $("#denyqr").fadeOut(250),
@@ -393,10 +393,10 @@ function process_next() {
     cnt_btn.disabled
       ? void 0
       : auth_required
-      ? auth(() => {
+        ? auth(() => {
           cnt_btn.click();
         })
-      : void (("Enter" === b.key || 13 === b.keyCode) && process_next()),
+        : void (("Enter" === b.key || 13 === b.keyCode) && process_next()),
   ),
   $(".code-input").on("keyup", (b) => {
     if ("code" == _current_block && 5 == $(".code-input").val().length)

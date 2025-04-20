@@ -39,6 +39,7 @@ logger = logging.getLogger(__name__)
 def hash_msg(message):
     return f"{str(utils.get_chat_id(message))}/{str(message.id)}"
 
+
 async def read_stream(func: callable, stream, delay: float):
     last_task = None
     data = b""
@@ -312,14 +313,14 @@ class TerminalMod(loader.Module):
     @loader.command()
     async def terminalcmd(self, message):
         await self.run_command(message, utils.get_args_raw(message))
-        
+
     @loader.command()
     async def pipcmd(self, message):
         await self.run_command(
             message,
             ("pip " if os.geteuid() == 0 else "sudo -S pip ")
-            + utils.get_args_raw(message)
-            )
+            + utils.get_args_raw(message),
+        )
 
     @loader.command()
     async def aptcmd(self, message):

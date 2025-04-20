@@ -48,7 +48,7 @@ class UpdaterMod(loader.Module):
                 "disable_notifications",
                 doc=lambda: self.strings("_cfg_doc_disable_notifications"),
                 validator=loader.validators.Boolean(),
-            )
+            ),
         )
 
     def get_changelog(self) -> str:
@@ -150,12 +150,15 @@ class UpdaterMod(loader.Module):
     @loader.command()
     async def changelog(self, message: Message):
         """Shows the changelog of the last major update"""
-        with open('CHANGELOG.md', mode='r', encoding='utf-8') as f:
-            changelog = f.read().split('##')[1].strip()
+        with open("CHANGELOG.md", mode="r", encoding="utf-8") as f:
+            changelog = f.read().split("##")[1].strip()
         if (await self._client.get_me()).premium:
-            changelog.replace('🌑 Heroku', '<emoji document_id=5192765204898783881>🌘</emoji><emoji document_id=5195311729663286630>🌘</emoji><emoji document_id=5195045669324201904>🌘</emoji>')
+            changelog.replace(
+                "🌑 Heroku",
+                "<emoji document_id=5192765204898783881>🌘</emoji><emoji document_id=5195311729663286630>🌘</emoji><emoji document_id=5195045669324201904>🌘</emoji>",
+            )
 
-        await utils.answer(message, self.strings('changelog').format(changelog))
+        await utils.answer(message, self.strings("changelog").format(changelog))
 
     @loader.command()
     async def restart(self, message: Message):
@@ -328,7 +331,7 @@ class UpdaterMod(loader.Module):
                 raise
         except Exception:
             await self.inline_update(message)
-            
+
     async def inline_update(
         self,
         msg_obj: typing.Union[InlineCall, Message],
@@ -557,14 +560,14 @@ class UpdaterMod(loader.Module):
     @loader.command()
     async def rollback(self, message: Message):
         if not (args := utils.get_args_raw(message)).isdigit():
-            await utils.answer(message, self.strings('invalid_args'))
+            await utils.answer(message, self.strings("invalid_args"))
             return
         if int(args) > 10:
-            await utils.answer(message, self.strings('rollback_too_far'))
+            await utils.answer(message, self.strings("rollback_too_far"))
             return
         form = await self.inline.form(
             message=message,
-            text=self.strings('rollback_confirm').format(num=args),
+            text=self.strings("rollback_confirm").format(num=args),
             reply_markup=[
                 [
                     {
@@ -578,12 +581,13 @@ class UpdaterMod(loader.Module):
                         "text": "❌",
                         "action": "close",
                     }
-                ]
-            ]
+                ],
+            ],
         )
 
     async def rollback_confirm(self, call: InlineCall, number: int):
-        await utils.answer(call, self.strings('rollback_process').format(num=number))
-        await asyncio.create_subprocess_shell(f'git reset --hard HEAD~{number}', stdout=asyncio.subprocess.PIPE)
+        await utils.answer(call, self.strings("rollback_process").format(num=number))
+        await asyncio.create_subprocess_shell(
+            f"git reset --hard HEAD~{number}", stdout=asyncio.subprocess.PIPE
+        )
         await self.restart_common(call)
-

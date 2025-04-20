@@ -52,7 +52,11 @@ class Help(loader.Module):
             ),
         )
 
-    @loader.command(ru_doc="[args] | Спрячет ваши модули", ua_doc="[args] | Сховає ваші модулі", de_doc="[args] | Versteckt Ihre Module")
+    @loader.command(
+        ru_doc="[args] | Спрячет ваши модули",
+        ua_doc="[args] | Сховає ваші модулі",
+        de_doc="[args] | Versteckt Ihre Module",
+    )
     async def helphide(self, message: Message):
         """[args] | hide your modules"""
         if not (modules := utils.get_args(message)):
@@ -142,9 +146,7 @@ class Help(loader.Module):
         )
 
         reply = "{} <b>{}</b>:".format(
-            "<emoji document_id=5134452506935427991>🪐</emoji>",
-            _name,
-            ""
+            "<emoji document_id=5134452506935427991>🪐</emoji>", _name
         )
         if module.__doc__:
             reply += (
@@ -175,7 +177,7 @@ class Help(loader.Module):
 
         for name, fun in commands.items():
             reply += (
-                f'\n{self.config["command_emoji"]}'
+                f"\n{self.config['command_emoji']}"
                 " <code>{}{}</code>{} {}".format(
                     utils.escape_html(self.get_prefix()),
                     name,
@@ -211,7 +213,11 @@ class Help(loader.Module):
             ),
         )
 
-    @loader.command(ru_doc="[args] | Помощь с вашими модулями!", ua_doc="[args] | допоможіть з вашими модулями!", de_doc="[args] | Hilfe mit deinen Modulen!")
+    @loader.command(
+        ru_doc="[args] | Помощь с вашими модулями!",
+        ua_doc="[args] | допоможіть з вашими модулями!",
+        de_doc="[args] | Hilfe mit deinen Modulen!",
+    )
     async def help(self, message: Message):
         """[args] | help with your modules!"""
         args = utils.get_args_raw(message)
@@ -318,7 +324,9 @@ class Help(loader.Module):
                 shown_warn = True
 
         def extract_name(line):
-            match = re.search(r'[\U0001F300-\U0001FAFF\U0001F900-\U0001F9FF]*\s*(name.*)', line)
+            match = re.search(
+                r"[\U0001F300-\U0001FAFF\U0001F900-\U0001F9FF]*\s*(name.*)", line
+            )
             return match.group(1) if match else line
 
         plain_.sort(key=extract_name)
@@ -327,7 +335,10 @@ class Help(loader.Module):
 
         await utils.answer(
             message,
-            (self.config["desc_icon"] + " {}\n <blockquote>{}</blockquote><blockquote>{}</blockquote>").format(
+            (
+                self.config["desc_icon"]
+                + " {}\n <blockquote>{}</blockquote><blockquote>{}</blockquote>"
+            ).format(
                 reply,
                 "".join(core_ + plain_ + (no_commands_ if force else [])),
                 (
@@ -338,10 +349,14 @@ class Help(loader.Module):
             ),
         )
 
-    @loader.command(ru_doc="| Ссылка на чат помощи", ua_doc="| посилання для чату служби підтримки", de_doc="| Link zum Support-Chat")
+    @loader.command(
+        ru_doc="| Ссылка на чат помощи",
+        ua_doc="| посилання для чату служби підтримки",
+        de_doc="| Link zum Support-Chat",
+    )
     async def support(self, message):
         """| link for support chat"""
-       
+
         await utils.answer(
             message,
             self.strings("support").format(

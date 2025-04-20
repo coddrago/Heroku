@@ -9,54 +9,35 @@ import re
 
 def compat(code: str) -> str:
     """
-    Reformats modules, built for GeekTG to work with Hikka
+    Reformats modules, built for GeekTG to work with Hikka.
     :param code: code to reformat
     :return: reformatted code
     :rtype: str
-    :example:
-    ```python
-        code = '''
-            from ..inline import GeekInlineQuery, rand
-            from ..inline import rand, InlineQueryResultArticle
-            from ..inline import InlineQueryResultArticle, rand
-            from ..inline import rand, InlineQueryResultArticle, InputTextMessageContent
-        '''
-        print(compat(code))
-    ```
     """
-    return "\n".join(
-        [
-            re.sub(
-                r"^( *)from \.\.inline import (.+)$",
-                r"\1from ..inline.types import \2",
-                re.sub(
-                    r"^( *)from \.\.inline import rand[^,]*$",
-                    r"\1from ..utils import rand",
-                    re.sub(
-                        r"^( *)from \.\.inline import rand, ?(.+)$",
-                        r"\1from ..inline.types import \2\n\1from ..utils import rand",
-                        re.sub(
-                            r"^( *)from \.\.inline import (.+), ?rand[^,]*$",
-                            r"\1from ..inline.types import \2\n\1from ..utils import"
-                            r" rand",
-                            re.sub(
-                                r"^( *)from \.\.inline import (.+), ?rand, ?(.+)$",
-                                r"\1from ..inline.types import \2, \3\n\1from ..utils"
-                                r" import rand",
-                                line.replace("GeekInlineQuery", "InlineQuery").replace(
-                                    "self.inline._bot",
-                                    "self.inline.bot",
-                                ),
-                                flags=re.M,
-                            ),
-                            flags=re.M,
-                        ),
-                        flags=re.M,
-                    ),
-                    flags=re.M,
-                ),
-                flags=re.M,
-            )
-            for line in code.splitlines()
-        ]
+    code = code.replace("GeekInlineQuery", "InlineQuery").replace(
+        "self.inline._bot", "self.inline.bot"
     )
+
+    def repl_imports(match):
+        indent, imports = match.groups()
+        imports = [i.strip() for i in imports.split(",")]
+        if "rand" in imports:
+            imports_wo_rand = [i for i in imports if i != "rand"]
+            lines = []
+            if imports_wo_rand:
+                lines.append(
+                    f"{indent}from ..inline.types import {', '.join(imports_wo_rand)}"
+                )
+            lines.append(f"{indent}from ..utils import rand")
+            return "\n".join(lines)
+        else:
+            return f"{indent}from ..inline.types import {', '.join(imports)}"
+
+    code = re.sub(
+        r"^( *)from \.\.inline import (.+)$",
+        repl_imports,
+        code,
+        flags=re.M,
+    )
+
+    return code

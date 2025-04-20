@@ -969,7 +969,7 @@ def get_platform_emoji() -> str:
 
     if main.IS_TOTHOST:
         return BASE.format(5116472489639150735)
-    
+
     if main.IS_JAMHOST:
         return BASE.format(5242536621659678947)
 
@@ -993,7 +993,9 @@ def get_platform_emoji() -> str:
 
     return BASE.format(5393588431026674882)
 
-allowed_ids = [1714120111, 1655585249] 
+
+allowed_ids = [1714120111, 1655585249]
+
 
 def uptime() -> int:
     """
@@ -1015,6 +1017,7 @@ def formatted_uptime() -> str:
         return f"{days} day(s), {time_formatted}"
     return time_formatted
 
+
 async def add_uptime(client: CustomTelegramClient, minutes: int) -> str:
     """
     Adds a custom uptime in minutes to the current uptime.
@@ -1028,6 +1031,7 @@ async def add_uptime(client: CustomTelegramClient, minutes: int) -> str:
     seconds = minutes * 60
     init_ts -= seconds
     return "Added uptime!"
+
 
 async def set_uptime(client: CustomTelegramClient, minutes: int) -> str:
     """
@@ -1043,7 +1047,8 @@ async def set_uptime(client: CustomTelegramClient, minutes: int) -> str:
     init_ts = time.perf_counter() - seconds
 
     return " Uptime is on offer!"
-    
+
+
 def ascii_face() -> str:
     """
     Returnes cute ASCII-art face
@@ -1142,7 +1147,10 @@ def rand(size: int, /) -> str:
     :return: Random string
     """
     return "".join(
-        [random.choice("abcdefghijklmnopqrstuvwxyz1234567890!@$#$%*") for _ in range(size)]
+        [
+            random.choice("abcdefghijklmnopqrstuvwxyz1234567890!@$#$%*")
+            for _ in range(size)
+        ]
     )
 
 

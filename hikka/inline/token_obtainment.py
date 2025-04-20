@@ -6,6 +6,7 @@
 
 import asyncio
 import logging
+import os
 import re
 
 from herokutl.errors.rpcerrorlist import YouBlockedUserError
@@ -52,7 +53,7 @@ class TokenObtainment(InlineUnit):
                 username = f"@heroku_{uid}_bot"
 
             for msg in [
-                f"🪐 Heroku userbot"[:64],
+                "🪐 Heroku userbot"[:64],
                 username,
                 "/setuserpic",
                 username,
@@ -73,9 +74,13 @@ class TokenObtainment(InlineUnit):
                 from .. import main
 
                 if "DOCKER" in os.environ():
-                    m = await conv.send_file("https://raw.githubusercontent.com/coddrago/Heroku/refs/heads/master/assets/heroku-ava.png")
+                    m = await conv.send_file(
+                        "https://raw.githubusercontent.com/coddrago/Heroku/refs/heads/master/assets/heroku-ava.png"
+                    )
                 else:
-                    m = await conv.send_file(main.BASE_PATH / "assets" / "heroku-ava.png")
+                    m = await conv.send_file(
+                        main.BASE_PATH / "assets" / "heroku-ava.png"
+                    )
                 r = await conv.get_response()
 
                 logger.debug(">> <Photo>")

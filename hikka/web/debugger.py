@@ -5,9 +5,12 @@
 # 🔑 https://www.gnu.org/licenses/agpl-3.0.html
 
 import asyncio
+import contextlib
 import logging
 import os
 import random
+import sys
+import traceback
 from threading import Thread
 
 from werkzeug import Request, Response
@@ -22,16 +25,20 @@ logger = logging.getLogger(__name__)
 
 class ServerThread(Thread):
     def __init__(self, server: BaseWSGIServer):
-        Thread.__init__(self)
+        super().__init__(daemon=True)
         self.server = server
 
     def run(self):
         logger.debug("Starting werkzeug debug server")
-        self.server.serve_forever()
+        try:
+            self.server.serve_forever()
+        except Exception as e:
+            logger.error("Werkzeug server error: %s", e)
 
     def shutdown(self):
         logger.debug("Shutting down werkzeug debug server")
-        self.server.shutdown()
+        with contextlib.suppress(Exception):
+            self.server.shutdown()
 
 
 class WebDebugger:
@@ -42,19 +49,24 @@ class WebDebugger:
         self.port = main.gen_port("werkzeug_port", True)
         main.save_config_key("werkzeug_port", self.port)
         self._proxypasser = proxypass.ProxyPasser(self._url_changed)
+        self.proxy_ready = asyncio.Event()
         asyncio.ensure_future(self._getproxy())
-        self._create_server()
+        self._server = self._create_server()
         self._controller = ServerThread(self._server)
         logging.getLogger("werkzeug").setLevel(logging.WARNING)
         self._controller.start()
         utils.atexit(self._controller.shutdown)
-        self.proxy_ready = asyncio.Event()
 
     async def _getproxy(self):
-        self._url = await self._proxypasser.get_url(self.port)
+        try:
+            self._url = await self._proxypasser.get_url(self.port)
+        except Exception as e:
+            logger.warning("Failed to get proxy URL: %s", e)
+            self._url = f"http://127.0.0.1:{self.port}"
         self.proxy_ready.set()
 
     def _url_changed(self, url: str):
+        logger.info("WebDebugger URL changed: %s", url)
         self._url = url
 
     def _create_server(self) -> BaseWSGIServer:
@@ -71,16 +83,20 @@ class WebDebugger:
                 self._server._BaseServer__shutdown_request = True
                 return Response("Shutdown!")
 
-            raise self.exceptions.get(request.args.get("ex_id"), Exception("idk"))
+            ex_id = request.args.get("ex_id")
+            if ex_id and ex_id in self.exceptions:
+                exc = self.exceptions[ex_id]
+                raise exc
+            return Response("No exception found", status=404)
 
         app = DebuggedApplication(app, evalex=True, pin_security=True)
 
         try:
-            fd = int(os.environ["WERKZEUG_SERVER_FD"])
-        except (LookupError, ValueError):
+            fd = int(os.environ.get("WERKZEUG_SERVER_FD", ""))
+        except (TypeError, ValueError):
             fd = None
 
-        self._server = make_server(
+        server = make_server(
             "localhost",
             self.port,
             app,
@@ -92,7 +108,7 @@ class WebDebugger:
             fd=fd,
         )
 
-        return self._server
+        return server
 
     @property
     def url(self) -> str:
@@ -100,6 +116,13 @@ class WebDebugger:
 
     def feed(self, exc_type, exc_value, exc_traceback) -> str:
         logger.debug("Feeding exception %s to werkzeug debugger", exc_type)
-        id_ = utils.rand(8)
-        self.exceptions[id_] = exc_type(exc_value).with_traceback(exc_traceback)
-        return self.url.strip("/") + f"?ex_id={id_}"
+        ex_id = utils.rand(8)
+        # Восстанавливаем исключение с трейсбеком
+        try:
+            exc = exc_type(exc_value)
+            if hasattr(exc, "with_traceback"):
+                exc = exc.with_traceback(exc_traceback)
+        except Exception:
+            exc = Exception(str(exc_value))
+        self.exceptions[ex_id] = exc
+        return self.url.rstrip("/") + f"?ex_id={ex_id}"

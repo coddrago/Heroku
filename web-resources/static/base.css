@@ -73,8 +73,7 @@ body {
   height: 100vw;
   position: fixed;
   overflow: hidden;
-  transform: translatex(calc(50vw - 50%)) translatey(calc(50vh - 50%))
-    rotate(120deg);
+  transform: translatex(calc(50vw - 50%)) translatey(calc(50vh - 50%)) rotate(120deg);
 }
 
 .wish {
@@ -447,8 +446,7 @@ label {
 }
 
 .gg-smartphone {
-  background: linear-gradient(to left, currentColor 5px, transparent 0)
-    no-repeat 5px 12px/1px 1px;
+  background: linear-gradient(to left, currentColor 5px, transparent 0) no-repeat 5px 12px/1px 1px;
   box-sizing: border-box;
   position: relative;
   display: block;
@@ -644,6 +642,7 @@ label {
 }
 
 @media screen and (max-width: 736px) {
+
   .auth-code-form,
   .eula-form {
     width: 100%;

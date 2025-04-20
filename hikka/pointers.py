@@ -12,6 +12,8 @@
 
 import typing
 
+from hikka.types import JSONSerializable
+
 
 class PointerList(list):
     """Pointer to list saved in database"""
@@ -174,15 +176,27 @@ class PointerDict(dict):
         return self._db.get(self._module, self._key, self._default)
 
 
-class BaseSerializingMiddlewareDict:
-    def __init__(self, pointer: PointerDict):
+class BaseSerializingMiddleware:
+    """Базовый класс для сериализации данных"""
+
+    def __init__(self, pointer: typing.Union[PointerList, PointerDict]):
         self._pointer = pointer
 
-    def serialize(self, item: typing.Any) -> "JSONSerializable":  # type: ignore  # noqa: F821
+    def serialize(self, item: typing.Any) -> "JSONSerializable":
         raise NotImplementedError
 
-    def deserialize(self, item: "JSONSerializable") -> typing.Any:  # type: ignore  # noqa: F821
+    def deserialize(self, item: "JSONSerializable") -> typing.Any:
         raise NotImplementedError
+
+    def __str__(self) -> str:
+        return f"{self.__class__.__name__}({self._pointer})"
+
+    def __repr__(self) -> str:
+        return self.__str__()
+
+
+class BaseSerializingMiddlewareDict(BaseSerializingMiddleware):
+    """Миддлвар для работы со словарями"""
 
     def __getitem__(self, key: typing.Any) -> typing.Any:
         return self.deserialize(self._pointer[key])
@@ -193,9 +207,8 @@ class BaseSerializingMiddlewareDict:
     def __delitem__(self, key: typing.Any) -> None:
         del self._pointer[key]
 
-    def __iter__(self) -> typing.Iterator[typing.Any]:
-        for key, value in self._pointer.items():
-            yield (key, self.deserialize(value))
+    def __iter__(self) -> typing.Iterator[typing.Tuple[typing.Any, typing.Any]]:
+        return ((key, self.deserialize(value)) for key, value in self._pointer.items())
 
     def __len__(self) -> int:
         return len(self._pointer)
@@ -203,114 +216,56 @@ class BaseSerializingMiddlewareDict:
     def __contains__(self, item: typing.Any) -> bool:
         return item in self._pointer
 
-    def __str__(self) -> str:
-        return f"{self.__class__.__name__}({self._pointer})"
-
-    def __repr__(self) -> str:
-        return f"{self.__class__.__name__}({self._pointer})"
-
-    def pop(self, key: typing.Any) -> typing.Any:
-        return self.deserialize(self._pointer.pop(key))
-
-    def popitem(self) -> typing.Any:
-        return self.deserialize(self._pointer.popitem())
-
-    def get(self, key: typing.Any, default: typing.Any = None) -> typing.Any:
-        return self.deserialize(self._pointer[key]) if key in self._pointer else default
-
-    def setdefault(self, key: typing.Any, default: typing.Any = None) -> typing.Any:
-        return self.deserialize(self._pointer.setdefault(key, self.serialize(default)))
-
-    def clear(self) -> None:
-        self._pointer.clear()
-
     def todict(self) -> dict:
         return {
             key: self.deserialize(value) for key, value in self._pointer.data.items()
         }
 
-    def keys(self) -> typing.KeysView:
-        return self._pointer.keys()
 
-    def values(self) -> typing.Iterable[typing.Any]:
-        return (self.deserialize(value) for value in self._pointer.values())
+class BaseSerializingMiddlewareList(BaseSerializingMiddleware):
+    """Миддлвар для работы со списками"""
 
+    def __iter__(self) -> typing.Iterator[typing.Any]:
+        return (self.deserialize(item) for item in self._pointer)
 
-class BaseSerializingMiddlewareList:
-    def __init__(self, pointer: PointerList):
-        self._pointer = pointer
-
-    def serialize(self, item: typing.Any) -> "JSONSerializable":  # type: ignore  # noqa: F821
-        raise NotImplementedError
-
-    def deserialize(self, item: "JSONSerializable") -> typing.Any:  # type: ignore  # noqa: F821
-        raise NotImplementedError
-
-    def remove(self, item: typing.Any) -> None:
-        self._pointer.remove(self.serialize(item))
-
-    def pop(self, index: int) -> typing.Any:
-        return self.deserialize(self._pointer.pop(index))
-
-    def insert(self, index: int, item: typing.Any) -> None:
-        self._pointer.insert(index, self.serialize(item))
+    def __reversed__(self) -> typing.Iterator[typing.Any]:
+        return (self.deserialize(item) for item in reversed(self._pointer))
 
     def append(self, item: typing.Any) -> None:
         self._pointer.append(self.serialize(item))
 
     def extend(self, items: typing.Iterable[typing.Any]) -> None:
-        self._pointer.extend([self.serialize(item) for item in items])
-
-    def __getitem__(self, key: typing.Any) -> typing.Any:
-        return self.deserialize(self._pointer[key])
-
-    def __setitem__(self, key: typing.Any, value: typing.Any) -> None:
-        self._pointer[key] = self.serialize(value)
-
-    def __delitem__(self, key: typing.Any) -> None:
-        del self._pointer[key]
-
-    def __iter__(self) -> typing.Iterator[typing.Any]:
-        return (self.deserialize(item) for item in self._pointer)
-
-    def __len__(self) -> int:
-        return len(self._pointer)
-
-    def __contains__(self, item: typing.Any) -> bool:
-        return self.serialize(item) in self._pointer
-
-    def __reversed__(self) -> typing.Iterator[typing.Any]:
-        return (self.deserialize(item) for item in reversed(self._pointer))
-
-    def __str__(self) -> str:
-        return f"{self.__class__.__name__}({self._pointer})"
-
-    def __repr__(self) -> str:
-        return f"{self.__class__.__name__}({self._pointer})"
+        self._pointer.extend(map(self.serialize, items))
 
     def tolist(self) -> list:
         return [self.deserialize(item) for item in self._pointer.data]
 
 
-class NamedTupleMiddlewareList(BaseSerializingMiddlewareList):
-    def __init__(self, pointer: PointerList, item_type: typing.Type[typing.Any]):
+class NamedTupleMiddleware(BaseSerializingMiddleware):
+    """Базовый миддлвар для именованных кортежей"""
+
+    def __init__(
+        self,
+        pointer: typing.Union[PointerList, PointerDict],
+        item_type: typing.Type[typing.Any],
+    ):
         super().__init__(pointer)
         self._item_type = item_type
 
-    def serialize(self, item: typing.Any) -> "JSONSerializable":  # type: ignore  # noqa: F821
+    def serialize(self, item: typing.Any) -> "JSONSerializable":
         return item._asdict()
 
-    def deserialize(self, item: "JSONSerializable") -> typing.Any:  # type: ignore  # noqa: F821
+    def deserialize(self, item: "JSONSerializable") -> typing.Any:
         return self._item_type(**item)
 
 
-class NamedTupleMiddlewareDict(BaseSerializingMiddlewareDict):
-    def __init__(self, pointer: PointerList, item_type: typing.Type[typing.Any]):
-        super().__init__(pointer)
-        self._item_type = item_type
+class NamedTupleMiddlewareList(NamedTupleMiddleware, BaseSerializingMiddlewareList):
+    """Миддлвар для работы со списками именованных кортежей"""
 
-    def serialize(self, item: typing.Any) -> "JSONSerializable":  # type: ignore  # noqa: F821
-        return item._asdict()
+    pass
 
-    def deserialize(self, item: "JSONSerializable") -> typing.Any:  # type: ignore  # noqa: F821
-        return self._item_type(**item)
+
+class NamedTupleMiddlewareDict(NamedTupleMiddleware, BaseSerializingMiddlewareDict):
+    """Миддлвар для работы со словарями именованных кортежей"""
+
+    pass

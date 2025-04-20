@@ -20,6 +20,7 @@ import os
 import typing
 
 import requests
+import urllib.parse
 
 from . import utils
 from .tl_cache import CustomTelegramClient
@@ -114,27 +115,49 @@ class RemoteStorage:
 
             await asyncio.sleep(5)
 
-
     @staticmethod
     def _parse_url(url: str) -> typing.Tuple[str, str, str]:
         """
         Parses a URL into a repository and module name.
+         Handles raw.githubusercontent.com, github.com, and generic URLs.
         :param url: URL to parse.
         :return: Tuple of (url, repo, module_name).
         """
-        domain_name = url.split("/")[2]
+        parsed_url = urllib.parse.urlparse(url)
+        domain_name = parsed_url.netloc
 
         if domain_name == "raw.githubusercontent.com":
-            owner, repo, branch = url.split("/")[3:6]
-            module_name = url.split("/")[-1].split(".")[0]
-            repo = f"git+{owner}/{repo}:{branch}"
+            path_segments = parsed_url.path.split("/")
+            if len(path_segments) >= 6:
+                owner, repo, branch = path_segments[1:4]
+                module_name = path_segments[-1].split(".")[0]
+                repo = f"git+{owner}/{repo}:{branch}"
+            else:
+                raise ValueError(f"Invalid raw.githubusercontent.com URL: {url}")
         elif domain_name == "github.com":
-            owner, repo, _, branch = url.split("/")[3:7]
-            module_name = url.split("/")[-1].split(".")[0]
-            repo = f"git+{owner}/{repo}:{branch}"
+            path_segments = parsed_url.path.split("/")
+            if len(path_segments) >= 5 and path_segments[2] == "blob":
+                owner, repo, _, branch = path_segments[1:5]
+                module_name = path_segments[-1].split(".")[0]
+                repo = f"git+{owner}/{repo}:{branch}"
+            elif len(path_segments) >= 3:
+                owner, repo = path_segments[1:3]
+                module_name = (
+                    ""
+                )
+                repo = (
+                    f"git+{owner}/{repo}:main"
+                )
+            else:
+                raise ValueError(f"Invalid github.com URL: {url}")
+
         else:
-            repo, module_name = url.rsplit("/", maxsplit=1)
-            repo = repo.strip("/")
+            path = parsed_url.path
+            module_name = path.split("/")[-1].split(".")[0]
+            repo = path.rsplit("/", maxsplit=1)[0]
+            if not repo:
+                repo = "/"
+            repo = parsed_url.scheme + "://" + parsed_url.netloc + repo
 
         return url, repo, module_name
 
@@ -147,16 +170,18 @@ class RemoteStorage:
         """
         url, repo, module_name = self._parse_url(url)
         try:
+            git_hash = utils.get_git_hash()
+            headers = {
+                "User-Agent": "Heroku Userbot",
+                "X-Hikka-Version": ".".join(map(str, __version__)),
+                "X-Hikka-Commit-SHA": str(git_hash) if git_hash else "Unknown",
+                "X-Hikka-User": str(self._client.tg_id),
+            }
             r = await utils.run_sync(
                 requests.get,
                 url,
                 auth=(tuple(auth.split(":", 1)) if auth else None),
-                headers={
-                    "User-Agent": "Heroku Userbot",
-                    "X-Hikka-Version": ".".join(map(str, __version__)),
-                    "X-Hikka-Commit-SHA": utils.get_git_hash(),
-                    "X-Hikka-User": str(self._client.tg_id),
-                },
+                headers=headers,
             )
             r.raise_for_status()
         except Exception:

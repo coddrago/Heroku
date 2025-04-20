@@ -67,4 +67,3 @@ class Translator(loader.Module):
         except Exception:
             logger.exception("Unable to translate text")
             await utils.answer(message, self.strings("error"))
-

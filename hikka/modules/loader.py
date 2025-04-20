@@ -188,9 +188,7 @@ class LoaderMod(loader.Module):
         if args := utils.get_args(message):
             args = args[0]
 
-            await utils.answer(
-                message, self.strings("finding_module_in_repos")
-            )
+            await utils.answer(message, self.strings("finding_module_in_repos"))
 
             if (
                 await self.download_and_install(args, message, force_pm)
@@ -271,7 +269,7 @@ class LoaderMod(loader.Module):
     ) -> dict:
         return {
             repo: {
-                f"Mod/{repo_id}/{i}": f'{repo.strip("/")}/{link}.py'
+                f"Mod/{repo_id}/{i}": f"{repo.strip('/')}/{link}.py"
                 for i, link in enumerate(set(await self._get_repo(repo)))
             }
             for repo_id, repo in enumerate(
@@ -384,9 +382,7 @@ class LoaderMod(loader.Module):
             await utils.answer(message, self.strings("provide_module"))
             return
 
-        await utils.answer(
-            message, self.strings("loading_module_via_file")
-        )
+        await utils.answer(message, self.strings("loading_module_via_file"))
 
         path_ = None
         doc = await msg.download_media(bytes)
@@ -655,8 +651,7 @@ class LoaderMod(loader.Module):
                         message,
                         self.strings("requirements_installing").format(
                             "\n".join(
-                                f"{self.config['command_emoji']}"
-                                f" {req}"
+                                f"{self.config['command_emoji']} {req}"
                                 for req in requirements
                             )
                         ),
@@ -721,11 +716,11 @@ class LoaderMod(loader.Module):
                         await utils.answer(
                             message,
                             (
-                                self.strings('scam_module').format(
+                                self.strings("scam_module").format(
                                     name=instance.__class__.__name__,
                                     prefix=self.get_prefix(),
                                 )
-                            )
+                            ),
                         )
                 return
         except Exception as e:
@@ -802,11 +797,11 @@ class LoaderMod(loader.Module):
                         await utils.answer(
                             message,
                             (
-                                self.strings('scam_module').format(
+                                self.strings("scam_module").format(
                                     name=instance.__class__.__name__,
                                     prefix=self.get_prefix(),
                                 )
-                            )
+                            ),
                         )
                 return
             except loader.SelfUnload as e:
@@ -1257,9 +1252,7 @@ class LoaderMod(loader.Module):
             await utils.answer(message, self.strings("args"))
             return
 
-        await utils.answer(
-            message, self.strings("ml_load_module")
-        )
+        await utils.answer(message, self.strings("ml_load_module"))
 
         exact = True
         if not (
@@ -1318,7 +1311,7 @@ class LoaderMod(loader.Module):
             else (
                 f'📼 <b><a href="{link}">Link</a> for'
                 f" {utils.escape_html(class_name)}:</b>"
-                f' <code>{link}</code>\n\n{self.strings("not_exact") if not exact else ""}'
+                f" <code>{link}</code>\n\n{self.strings('not_exact') if not exact else ''}"
             )
         )
 
