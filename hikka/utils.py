@@ -46,6 +46,7 @@ import time
 import typing
 from datetime import timedelta
 from urllib.parse import urlparse
+import emoji
 
 import git
 import grapheme
@@ -1446,6 +1447,16 @@ def remove_html(text: str, escape: bool = False, keep_emojis: bool = False) -> s
         )
     )
 
+def remove_emoji(text: str) -> str:
+
+    """
+    Removes all emoji from text
+    """
+
+    allchars = [str for str in text]
+    emoji_list = [c for c in allchars if c in emoji.EMOJI_DATA]
+    clean_text = ' '.join([str for str in text.split() if not any(i in str for i in emoji_list)])
+    return clean_text
 
 def get_kwargs() -> typing.Dict[str, typing.Any]:
     """
