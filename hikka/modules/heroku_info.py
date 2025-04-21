@@ -249,7 +249,7 @@ class HerokuInfoMod(loader.Module):
                 message = await utils.answer(message, self.config["ping_emoji"])
             await utils.answer_file(
                 message,
-                f'{utils.os.getcwd()}/assets/imginfo.{self.config["bannerUrl"].split(".")[-1]}',
+                f'{utils.os.getcwd()}/assets/imginfo.{self.config["banner_url"].split(".")[-1]}',
                 reply_to=getattr(message, "reply_to_msg_id", None),
             )
         elif self.config["custom_message"] is None:
@@ -257,7 +257,7 @@ class HerokuInfoMod(loader.Module):
                 message = await utils.answer(message, self.config["ping_emoji"])
             await utils.answer_file(
                 message,
-                self.config["bannerUrl"],
+                self.config["banner_url"],
                 self._render_info(start),
                 reply_to=getattr(message, "reply_to_msg_id", None),
             )
@@ -266,7 +266,7 @@ class HerokuInfoMod(loader.Module):
                 message = await utils.answer(message, self.config["ping_emoji"])
             await utils.answer_file(
                 message,
-                self.config["bannerUrl"],
+                self.config["banner_url"],
                 self._render_info(start),
                 reply_to=getattr(message, "reply_to_msg_id", None),
             )
