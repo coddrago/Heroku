@@ -17,12 +17,15 @@ import psutil
 import os
 import glob
 import requests
+import re
+import emoji
 
+from bs4 import BeautifulSoup
 from typing import Optional
 from pathlib import Path
 from PIL import Image, ImageDraw, ImageFont
 from io import BytesIO
-from herokutl.tl.types import Message 
+from herokutl.tl.types import Message
 from herokutl.utils import get_display_name
 from .. import loader, utils, version
 import platform as lib_platform
@@ -82,7 +85,20 @@ class HerokuInfoMod(loader.Module):
                         return line.split("=")[1].strip().strip('"')
         except FileNotFoundError:
             return self.strings['non_detectable']
-
+        
+    def remove_emoji_and_html(self, text: str) -> str:
+        reg = r'<[^<]+?>'
+        text = f"{re.sub(reg, '', text)}"
+        allchars = [str for str in text]
+        emoji_list = [c for c in allchars if c in emoji.EMOJI_DATA]
+        clean_text = ''.join([str for str in text if not any(i in str for i in emoji_list)])
+        return clean_text
+    
+    def imgurpidor(self, url: str) -> str:
+        page = requests.get(url, stream=True, headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"})
+        soup = BeautifulSoup(page.text, 'html.parser')
+        metatag = soup.find("meta", property="og:image")
+        return metatag['content']
 
     def _render_info(self, start: float) -> str:
         try:
@@ -182,7 +198,7 @@ class HerokuInfoMod(loader.Module):
         imgform = self.config['banner_url'].split('.')[-1]
         imgset = self.config['imgSettings']
         if imgform in ['jpg', 'jpeg', 'png', 'bmp', 'webp']:
-            response = requests.get(self.config['banner_url'], stream=True)
+            response = requests.get(self.config['banner_url'] if not self.config['banner_url'].startswith('https://imgur') else self.imgurpidor(self.config['banner_url']), stream=True, headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"})
             img = Image.open(BytesIO(response.content))
             font = ImageFont.truetype(
                 glob.glob(f'{os.getcwd()}/assets/font.*')[0], 
@@ -208,7 +224,7 @@ class HerokuInfoMod(loader.Module):
     
     @loader.command()
     async def insfont(self, message: Message):
-        "Install font"
+        "<Url|Reply to font> - Install font"
         if message.is_reply:
             reply = await message.get_reply_message()
             fontform = reply.document.mime_type.split("/")[1]
@@ -218,7 +234,7 @@ class HerokuInfoMod(loader.Module):
                     '<b>Incorrect font format</b>\n<blockquote>Поддерживаемые форматы -> otf, ttf</blockquote>'
                 )
                 return
-            origpath = f'{os.getcwd()}/assets/font.{fontform}'
+            origpath = glob.glob(f'{os.getcwd()}/assets/font.*')[0]
             ptf = f'{os.getcwd()}/font.{fontform}'
             os.rename(origpath, ptf)
             photo = await reply.download_media(origpath)
@@ -229,7 +245,25 @@ class HerokuInfoMod(loader.Module):
                     'Reply to font!'
                 )
                 return
-        os.remove(ptf)
+            os.remove(ptf)
+        elif utils.check_url(utils.get_args_raw(message)):
+            fontform = utils.get_args_raw(message).split('.')[-1]
+            if not fontform in ['ttf', 'otf']:
+                await utils.answer(
+                    message,
+                    '<b>Incorrect font format</b>\n<blockquote>Поддерживаемые форматы -> otf, ttf</blockquote>'
+                )
+                return
+            response = requests.get(utils.get_args_raw(message), stream=True)
+            os.remove(glob.glob(f'{os.getcwd()}/assets/font.*')[0])
+            with open(f'{os.getcwd()}/assets/font.{fontform}', 'wb') as file:
+                file.write(response.content)
+        else:
+            await utils.answer(
+                message,
+                '<b>Reply to font or paste link</b>'
+            )
+            return
         await utils.answer(
             message,
             '<b>Font installed</b><emoji document_id=5436040291507247633>🎉</emoji>\nТеперь вы с удовольствием можете пользоваться им'
@@ -249,7 +283,7 @@ class HerokuInfoMod(loader.Module):
                 message = await utils.answer(message, self.config["ping_emoji"])
             await utils.answer_file(
                 message,
-                f'{utils.os.getcwd()}/assets/imginfo.{self.config["banner_url"].split(".")[-1]}',
+                self._get_info_photo(start),
                 reply_to=getattr(message, "reply_to_msg_id", None),
             )
         elif self.config["custom_message"] is None:
