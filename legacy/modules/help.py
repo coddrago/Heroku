@@ -211,9 +211,13 @@ class Help(loader.Module):
         """[args] | help with your modules!"""
         args = utils.get_args_raw(message)
         force = False
+        only_hidden = False
         if "-f" in args:
             args = args.replace(" -f", "").replace("-f", "")
             force = True
+        if "-h" in args:
+            args = args.replace(" -f", "").replace("-f", "")
+            only_hidden = True
 
         if args:
             await self.modhelp(message, args)
@@ -237,6 +241,7 @@ class Help(loader.Module):
         plain_ = []
         core_ = []
         no_commands_ = []
+        hidden_mods = []
 
         for mod in self.allmodules.modules:
             if not hasattr(mod, "commands"):
@@ -258,6 +263,14 @@ class Help(loader.Module):
                 and len(mod.inline_handlers) == 0
             ):
                 no_commands_ += [
+                    "\n{} <code>{}</code>".format(self.config["empty_emoji"], name)
+                ]
+                continue
+            if only_hidden
+            and mod.__class__.__name__ in hidden
+            or (len(mod.commands) == 0
+                and len(mod.inline_handlers) == 0):
+                hidden_mods += [
                     "\n{} <code>{}</code>".format(self.config["empty_emoji"], name)
                 ]
                 continue
@@ -318,12 +331,13 @@ class Help(loader.Module):
         plain_.sort(key=extract_name)
         core_.sort(key=extract_name)
         no_commands_.sort(key=extract_name)
+        hidden_mods.sort(key=extract_name)
 
         await utils.answer(
             message,
             (self.config["desc_icon"] + " {}\n <blockquote>{}</blockquote><blockquote>{}</blockquote>").format(
                 reply,
-                "".join(core_ + plain_ + (no_commands_ if force else [])),
+                "".join((core_ + plain_ + (no_commands_ if force else [])) if not only_hidden else hidden_mods + no_commands_),
                 (
                     ""
                     if self.lookup("Loader").fully_loaded

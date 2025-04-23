@@ -9,6 +9,7 @@ from legacytl.tl.types import Message
 from legacytl.utils import get_display_name
 import requests
 import os
+import cpuinfo
 from .. import loader, utils, version
 from ..inline.types import InlineQuery
 import platform as lib_platform
@@ -81,6 +82,8 @@ class LegacyInfoMod(loader.Module):
                 branch=version.branch,
                 hostname=lib_platform.node(),
                 user=getpass.getuser(),
+                kernel=lib_platform.uname().release,
+                cpu=cpuinfo.get_cpu_info()["brand_raw"],
             ) if self.config["custom_message"] and "-d" not in args
             else (
                 f'<b>{{}}</b>\n\n<b>{{}} {self.strings("owner")}:</b> {me}\n\n<b>{{}}'

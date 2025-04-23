@@ -273,7 +273,7 @@ class Events(InlineUnit):
                         + unit.get("always_allow", [])
                         + button.get("always_allow", [])
                     ):
-                        await call.answer(self.translator.getkey("inline.button403"))
+                        await call.answer(self.translator.getkey("inline.button403"), show_alert=True)
                         return
 
                     try:
@@ -325,7 +325,7 @@ class Events(InlineUnit):
                 and call.from_user.id
                 not in self._custom_map[call.data].get("always_allow", [])
             ):
-                await call.answer(self.translator.getkey("inline.button403"))
+                await call.answer(self.translator.getkey("inline.button403"), show_alert=True)
                 return
 
             await self._custom_map[call.data]["handler"](
