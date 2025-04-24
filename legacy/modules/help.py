@@ -208,7 +208,7 @@ class Help(loader.Module):
 
     @loader.command(ru_doc="[args] | Помощь с вашими модулями!", ua_doc="[args] | допоможіть з вашими модулями!", de_doc="[args] | Hilfe mit deinen Modulen!")
     async def help(self, message: Message):
-        """[args] | help with your modules!"""
+        """[-f] [-h] | help with your modules!"""
         args = utils.get_args_raw(message)
         force = False
         only_hidden = False
