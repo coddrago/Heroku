@@ -234,6 +234,15 @@ class Help(loader.Module):
                 logger.debug("Module %s is not inited yet", mod.__class__.__name__)
                 continue
 
+            if (
+                len(mod.commands) == 0
+                and len(mod.inline_handlers) == 0
+            ):
+                no_commands_ += [
+                    "\n{} <code>{}</code>".format(self.config["empty_emoji"], name)
+                ]
+                continue
+
             if mod.__class__.__name__ in self.get("hide", []) and not force:
                 continue
 
@@ -243,15 +252,6 @@ class Help(loader.Module):
                 name = mod.strings["name"]
             except KeyError:
                 name = getattr(mod, "name", "ERROR")
-
-            if (
-                len(mod.commands) == 0
-                and len(mod.inline_handlers) == 0
-            ):
-                no_commands_ += [
-                    "\n{} <code>{}</code>".format(self.config["empty_emoji"], name)
-                ]
-                continue
 
             core = mod.__origin__.startswith("<core")
             tmp += "\n{} <code>{}</code>".format(
