@@ -301,7 +301,7 @@ class Help(loader.Module):
             return match.group(1) if match else line
 
         hidden_mods = []
-        if only_hidden and (mod.__class__.__name__ in hidden or (len(mod.commands) == 0 and len(mod.inline_handlers) == 0)):
+        if only_hidden:
             for mod in hidden:
                 hidden_mods += [
                     "\n{} <code>{}</code>".format(self.config["empty_emoji"], mod)
