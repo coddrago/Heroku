@@ -306,7 +306,11 @@ class Help(loader.Module):
                 hidden_mods += [
                     "\n{} <code>{}</code>".format(self.config["empty_emoji"], mod)
                 ]
-            hidden_mods.sort(key=extract_name)
+        hidden_mods.sort(key=extract_name)
+
+        plain_.sort(key=extract_name)
+        core_.sort(key=extract_name)
+        no_commands_.sort(key=extract_name)
 
         reply = self.strings("all_header").format(
             len(self.allmodules.modules),
@@ -320,10 +324,6 @@ class Help(loader.Module):
             ),
             len(no_commands_)
         )
-
-        plain_.sort(key=extract_name)
-        core_.sort(key=extract_name)
-        no_commands_.sort(key=extract_name)
 
         await utils.answer(
             message,
