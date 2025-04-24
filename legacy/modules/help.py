@@ -239,7 +239,7 @@ class Help(loader.Module):
                 and len(mod.inline_handlers) == 0
             ):
                 no_commands_ += [
-                    "\n{} <code>{}</code>".format(self.config["empty_emoji"], name)
+                    "\n{} <code>{}</code>".format(self.config["empty_emoji"], mod.strings["name"])
                 ]
                 continue
 
