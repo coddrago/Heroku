@@ -14,5 +14,6 @@ ruamel.yaml==0.17.21
 aiopsutil
 GitPython
 redis
+whoosh
 
 # Python 3.8+
