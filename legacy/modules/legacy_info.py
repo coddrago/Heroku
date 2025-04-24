@@ -75,13 +75,14 @@ class LegacyInfoMod(loader.Module):
                 prefix=prefix,
                 platform=platform,
                 upd=upd,
-                uptime=utils.formatted_uptime(),
+                uptime=f"{utils.formatted_uptime()}",
                 cpu_usage=f"{await utils.get_cpu_usage_async()}%",
                 ram_usage=f"{utils.get_ram_usage()} MB",
                 branch=version.branch,
                 hostname=lib_platform.node(),
                 user=getpass.getuser(),
                 kernel=lib_platform.uname().release,
+                os=lib_platform.system()
             ) if self.config["custom_message"] and "-d" not in args
             else (
                 f'<b>{{}}</b>\n\n<b>{{}} {self.strings("owner")}:</b> {me}\n\n<b>{{}}'

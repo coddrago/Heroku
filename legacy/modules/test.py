@@ -368,8 +368,8 @@ class TestMod(loader.Module):
         await utils.answer(
             message,
             self.config["Text_Of_Ping"].format(
-                ping=round((time.perf_counter_ns() - start) / 10**6, 3),
-                uptime=utils.formatted_uptime(),
+                ping=f"{round((time.perf_counter_ns() - start) / 10**6, 3)} ms",
+                uptime=f"{utils.formatted_uptime()}",
                 ping_hint=(
                     (self.config["hint"]) if random.choice([0, 0, 1]) == 1 else ""
                 ),
