@@ -1106,7 +1106,7 @@ class LoaderMod(loader.Module):
             args = args[:-1]
 
         if args not in self.config["ADDITIONAL_REPOS"]:
-            await utils.answer(message, self.strings("repo_not_exists"))
+            await utils.answer(message, self.strings("repo_not_exists").format(args))
             return
 
         self.config["ADDITIONAL_REPOS"].remove(args)
