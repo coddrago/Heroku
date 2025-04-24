@@ -172,8 +172,8 @@ class Limoka(loader.Module):
         self.config = loader.ModuleConfig(
             loader.ConfigValue(
                 "limoka_url",
-                "https://git.vsecoder.dev/root/limoka/-/raw/main/",
-                lambda: "Mirror: https://raw.githubusercontent.com/MuRuLOSE/limoka-mirror/refs/heads/main/",
+                "https://raw.githubusercontent.com/MuRuLOSE/limoka-mirror/refs/heads/main/",
+                lambda: "Mirror: https://git.vsecoder.dev/root/limoka/-/raw/main/",
                 validator=loader.validators.String(),
             )
         )
