@@ -248,9 +248,6 @@ class List(InlineUnit):
         page: typing.Union[int, str],
         unit_id: str = None,
     ):
-        if page == "close":
-            await self._client.delete_messages(call._units.get(call.unit_id).get("chat"), call._units.get(call.unit_id).get('message_id'))
-
         if self._units[unit_id]["current_index"] < 0 or page >= len(
             self._units[unit_id]["strings"]
         ):
@@ -290,7 +287,7 @@ class List(InlineUnit):
                 total_pages=len(self._units[unit_id]["strings"]),
                 unit_id=unit_id,
             )
-            + [[{"text": "🔻 Close", "callback": callback, "args": ("close",)}]],
+            + [[{"text": "🔻 Close", "action": "close"}]],
         )
 
     async def _list_inline_handler(self, inline_query: InlineQuery):
