@@ -335,16 +335,7 @@ class TerminalMod(loader.Module):
     async def pipcmd(self, message):
         await self.run_command(
             message,
-            ("pip ")
-            + utils.get_args_raw(message),
-            RawMessageEditor(
-                message,
-                f"apt {utils.get_args_raw(message)}",
-                self.config,
-                self.strings,
-                message,
-                True,
-            ),
+            "pip " + utils.get_args_raw(message),
         )
 
     async def run_command(
