@@ -240,59 +240,6 @@ class SudoMessageEditor(MessageEditor):
                 message.message.message.split("\n", 1)[0].encode() + b"\n"
             )
 
-
-class RawMessageEditor(SudoMessageEditor):
-    def __init__(
-        self,
-        message,
-        command,
-        config,
-        strings,
-        request_message,
-        show_done=False,
-    ):
-        super().__init__(message, command, config, strings, request_message)
-        self.show_done = show_done
-
-    async def redraw(self):
-        logger.debug(self.rc)
-
-        if self.rc is None:
-            text = (
-                "<code>"
-                + utils.escape_html(self.stdout[max(len(self.stdout) - 4095, 0) :])
-                + "</code>"
-            )
-        elif self.rc == 0:
-            text = (
-                "<code>"
-                + utils.escape_html(self.stdout[max(len(self.stdout) - 4090, 0) :])
-                + "</code>"
-            )
-        else:
-            text = (
-                "<code>"
-                + utils.escape_html(self.stderr[max(len(self.stderr) - 4095, 0) :])
-                + "</code>"
-            )
-
-        if self.rc is not None and self.show_done:
-            text += "\n" + self.strings("done")
-
-        logger.debug(text)
-
-        with contextlib.suppress(
-            legacytl.errors.rpcerrorlist.MessageNotModifiedError,
-            legacytl.errors.rpcerrorlist.MessageEmptyError,
-            ValueError,
-        ):
-            try:
-                await utils.answer(self.message, text)
-            except legacytl.errors.rpcerrorlist.MessageTooLongError as e:
-                logger.error(e)
-                logger.error(text)
-
-
 @loader.tds
 class TerminalMod(loader.Module):
     """Runs commands"""
@@ -321,14 +268,6 @@ class TerminalMod(loader.Module):
             ("apt " if os.geteuid() == 0 else "sudo -S apt ")
             + utils.get_args_raw(message)
             + " -y",
-            RawMessageEditor(
-                message,
-                f"apt {utils.get_args_raw(message)}",
-                self.config,
-                self.strings,
-                message,
-                True,
-            ),
         )
 
     @loader.command()
