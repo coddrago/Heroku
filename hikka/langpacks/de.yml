@@ -184,22 +184,27 @@ terminal:
   _cmd_doc_terminate: "[-f zum Erzwingen] - Antworten Sie auf eine Nachricht, um den Prozess zu beenden"
 
 heroku_backup:
-  period: "⌚️ <b>Einheit „ALPHA“</b> erstellt regelmäßige Sicherungen. Diese Einstellungen können später geändert werden.\n\nBitte wählen Sie die Häufigkeit der Sicherungen.\n\n<b>🚫 Daher ist es unmöglich, mit dem Befehl .lm aus Dateien heruntergeladene Module wiederherzustellen! Seien Sie vorsichtig und führen Sie vor der Wiederherstellung .backupmods aus.</b>"
-  saved: "✅ Häufigkeit gespeichert! Sie kann mit <code>{prefix}set_backup_period</code> geändert werden"
-  never: "✅ Ich werde keine automatischen Sicherungen durchführen. Dies kann mit <code>{prefix}set_backup_period</code> rückgängig gemacht werden"
-  invalid_args: "🚫 <b>Geben Sie die richtige Häufigkeit in Stunden an oder `0`, um sie zu deaktivieren</b>"
-  backup_caption: '<emoji document_id=5469718869536940860>👆</emoji> <b>Dies ist Ihre Sicherung der Datenbank. Geben Sie sie niemandem, da sie persönliche Informationen enthält. Wenn Sie sie wiederherstellen müssen, verwenden Sie</b> <pre><code class="language-heroku">{prefix}restoredb</code></pre> <b>als Antwort auf diese Datei.</b>'
-  reply_to_file: "<emoji document_id=5210952531676504517>🚫</emoji> <b>Antworten Sie auf eine .json- oder .zip-Datei</b>"
-  db_restored: "<emoji document_id=5774134533590880843>🔄</emoji> <b>Datenbank aktualisiert, Neustart...</b>"
-  modules_backup: "<emoji document_id=5431736674147114227>🗂</emoji> <b>Modul-Sicherung ({})</b>\n\n<b>Sie können sie wiederherstellen mit:</b>\n<pre><code class=\"language-heroku\">{}restoremods</code></pre>"
-  mods_restored: "<emoji document_id=5774134533590880843>🔄</emoji> <b>Module wiederhergestellt, Neustart...</b>"
-  backup_sent: "<emoji document_id=5431736674147114227>🗂</emoji> <b>Sicherung in gespeicherte Nachrichten gesendet</b>"
-  _cls_doc: "Verarbeitet Sicherungen der Datenbank und Module"
-  _cmd_doc_backupdb: "Erstellen Sie ein Datenbanksicherungs [wird in den privaten Nachrichten gesendet]"
-  _cmd_doc_backupmods: "Erstellen Sie eine Mod-Sicherung [wird in den privaten Nachrichten gesendet]"
-  _cmd_doc_restoredb: "Stellen Sie die Datenbank aus einer Datei wieder her"
-  _cmd_doc_restoremods: "<Antwort auf die Datei> - Module aus Sicherung wiederherstellen"
-  _cmd_doc_set_backup_period: "<Zeit in Stunden> - Häufigkeit der Sicherungen festlegen"
+  period: "⌚️ <b>Die Unit «ALPHA»</b> erstellt regelmäßig Backups. Diese Einstellungen können später geändert werden.\n\nBitte wählen Sie die Backup-Häufigkeit\n\n<b>🚫 Es ist daher nicht möglich, Module, die mit dem Befehl .lm aus Dateien heruntergeladen wurden, wiederherzustellen! Seien Sie vorsichtig und führen Sie vor der Wiederherstellung .backupmods aus.</b>"
+  saved: "✅ Die Periodizität ist gespeichert! Sie kann mit <code>{prefix}set_backup_period</code> geändert werden."
+  never: "✅ Ich werde keine automatischen Backups durchführen. Kann mit <code>{prefix}set_backup_period</code> abgebrochen werden."
+  invalid_args: "🚫 <b>Bitte geben Sie die korrekte Häufigkeit in Stunden an oder 0 zum Deaktivieren</b>"
+  backup_caption: '<emoji document_id=5469718869536940860>👆</emoji> <b>Dies ist Ihr Datenbank-Backup. Geben Sie es nicht an Dritte weiter, es enthält persönliche Informationen. Falls Sie es wiederherstellen müssen, verwenden Sie</b> <pre><code class="language-heroku">{prefix}restoredb</code></pre> <b>als Antwort auf diese Datei</b>.'
+  backupall_info: '<emoji document_id=5469718869536940860>👆</emoji> <b>Dies ist Ihre Sicherungskopie der Datenbank und Module. Geben Sie sie nicht weiter, da sie persönliche Informationen enthält. Falls Sie sie wiederherstellen müssen, verwenden Sie</b> <pre><code class="language-heroku">{prefix}restoreall</code></pre> <b>als Antwort auf diese Datei.</b>'
+  all_restored: "<emoji document_id=5774134533590880843>🔄</emoji> <b>Ihre vollständige Sicherung wurde wiederhergestellt, Neustart...</b>"
+  reply_to_file: "<emoji document_id=5210952531676504517>🚫</emoji> <b>Antworten Sie mit einer JSON- oder ZIP-Datei</b>"
+  db_restored: "<emoji document_id=5774134533590880843>🔄</emoji> <b>Datenbank aktualisiert, Neustart läuft…</b>"
+  modules_backup: "<emoji document_id=5431736674147114227>🗂</emoji> <b>Modulsicherung ({})</b>\n\n<b>Sie können sie wiederherstellen mit:</b>\n<pre><code class=\"language-heroku\">{}restoremods</code></pre>"
+  mods_restored: "<emoji document_id=5774134533590880843>🔄</emoji> <b>Module wiederhergestellt, Neustart</b>"
+  backup_sent: "<emoji document_id=5431736674147114227>🗂</emoji> <b>Backup an gespeicherte Nachrichten gesendet</b>"
+  backupall_sent: "<emoji document_id=5431736674147114227>🗂</emoji> <b>Sicherung der Datenbank und der an gespeicherte Nachrichten gesendeten Module</b>"
+  _cls_doc: "Verarbeitet Datenbank- und Modulsicherungen"
+  _cmd_doc_backupdb: "Datenbanksicherung erstellen [wird per PN gesendet]"
+  _cmd_doc_backupmods: "Erstelle ein Backup der Mods [wird per PN gesendet]"
+  _cmd_doc_restoredb: "Datenbank aus Datei wiederherstellen"
+  _cmd_doc_restoremods: "<Antwort auf Datei> - Mods aus Backup wiederherstellen"
+  _cmd_doc_set_backup_period: "<Zeit in Stunden> - Legt die Häufigkeit der Backups fest"
+  _cmd_doc_backupall: "Erstellt eine allgemeine Sicherungskopie (Module + Datenbank)"
+  _cmd_doc_restoreall: "Stellt ein gemeinsames Backup wieder her (Basis + Module)"
 
 presets:
   _fun_title: "🪩 Unterhaltsame Module"
@@ -502,7 +507,7 @@ loader:
   _cmd_doc_addrepo: "Füge ein zusätzliches Repository hinzu"
   _cmd_doc_delrepo: "Lösche ein zusätzliches Repository"
   basic_auth_doc: "Authentifizierung für den Zugriff auf das Repository"
- 
+
 translations:
   lang_saved: "{} <b>Sprache gespeichert!</b>"
   pack_saved: "<emoji document_id=5197474765387864959>👍</emoji> <b>Übersetzungspaket gespeichert!</b>"
