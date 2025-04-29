@@ -198,17 +198,27 @@ terminal:
   _cls_doc: "Runs commands"
 
 heroku_backup:
-  name: "HerokuBackup"
-  period: "⌚️ <b>Unit «ALPHA»</b> creates database backups periodically. You can change this behavior later.\n\nPlease, select the periodicity of automatic database backups.\n\n<b>🚫 It is therefore impossible to restore modules downloaded from files with the .lm command! Be careful and do .backupmods before restoring.</b>"
-  saved: "✅ Backup period saved. You can re-configure it later with <code>{prefix}set_backup_period</code>"
-  never: "✅ I will not make automatic backups. You can re-configure it later with <code>{prefix}set_backup_period</code>"
-  invalid_args: "🚫 <b>Specify correct backup period in hours, or `0` to disable</b>"
-  backup_caption: '<emoji document_id=5469718869536940860>👆</emoji> <b>This is your database backup. Do not give it to anyone, it contains personal info. If you need to restore it, you can use</b> <pre><code class="language-heroku">{prefix}restoredb</code></pre> <b>in reply to this file.</b>'
-  reply_to_file: "<emoji document_id=5210952531676504517>🚫</emoji> <b>Reply to .json or .zip file</b>"
+  period: "⌚️ <b>The unit «ALPHA»</b> creates regular backups. These settings can be changed later.\n\nPlease select the backup frequency\n\n<b>🚫 It is thus impossible to restore modules downloaded from files with the .lm command! Be careful and do .backupmods before restoring.</b>"
+  saved: "✅ The periodicity is saved! It can be changed with <code>{prefix}set_backup_period</code>"
+  never: "✅ I will not make automatic backups. Can be cancelled using <code>{prefix}set_backup_period</code>"
+  invalid_args: "🚫 <b>Please specify the correct frequency in hours, or `0` to disable</b>"
+  backup_caption: '<emoji document_id=5469718869536940860>👆</emoji> <b>This is your database backup. Do not share it with anyone, it contains personal information. If you need to restore it, use</b> <pre><code class="language-heroku">{prefix}restoredb</code></pre> <b>in response to this file.</b>'
+  backupall_info: '<emoji document_id=5469718869536940860>👆</emoji> <b>This is your backup of the database and modules. Do not give it to anyone, it contains personal information. If you need to restore it, use</b> <pre><code class="language-heroku">{prefix}restoreall</code></pre> <b>in response to this file.</b>'
+  all_restored: "<emoji document_id=5774134533590880843>🔄</emoji> <b>Your full backup has been restored, restarting....</b>"
+  reply_to_file: "<emoji document_id=5210952531676504517>🚫</emoji> <b>Reply with .json or .zip file</b>"
   db_restored: "<emoji document_id=5774134533590880843>🔄</emoji> <b>Database updated, restarting...</b>"
-  modules_backup: "<emoji document_id=5431736674147114227>🗂</emoji> <b>Backup of modules ({})</b>\n\n<b>You can restore it using:</b>\n<pre><code class=\"language-heroku\">{}restoremods</code></pre>"
-  mods_restored: "<emoji document_id=5774134533590880843>🔄</emoji> <b>Mods restored, restarting</b>"
-  backup_sent: "<emoji document_id=5431736674147114227>🗂</emoji> <b>Backup has been sent to saved messages</b>"
+  modules_backup: "<emoji document_id=5431736674147114227>🗂</emoji> <b>Modules backup ({})</b>\n\n<b>You can restore it using:</b>\n<pre><code class=\"language-heroku\">{}restoremods</code></pre>"
+  mods_restored: "<emoji document_id=5774134533590880843>🔄</emoji> <b>Modules restored, restarting</b>"
+  backup_sent: "<emoji document_id=5431736674147114227>🗂</emoji> <b>Backup sent to saved messages</b>"
+  backupall_sent: "<emoji document_id=5431736674147114227>🗂</emoji> <b>Backup of database and modules sent to saved messages</b>"
+  _cls_doc: "Processes database and module backups"
+  _cmd_doc_backupdb: "Create a database backup [will be sent to PM]"
+  _cmd_doc_backupmods: "Create a backup of mods [will be sent to PM]"
+  _cmd_doc_restoredb: "Restore database from file"
+  _cmd_doc_restoremods: "<response to file> - Restore mods from backup"
+  _cmd_doc_set_backup_period: "<time in hours> - Set the frequency of backups"
+  _cmd_doc_backupall: "Creates a general backup copy (modules + database)"
+  _cmd_doc_restoreall: "Restores a common backup (base + modules)"
 
 presets:
   name: "Presets"
@@ -228,8 +238,7 @@ presets:
   installing_module: "<emoji document_id=5451732530048802485>⏳</emoji> <b>Installing preset</b> <code>{}</code> <b>({}/{} modules)...</b>\n\n<emoji document_id=5188377234380954537>🪐</emoji> <i>Installing module {}...</i>"
   installed: "<emoji document_id=5436040291507247633>🎉</emoji> <b>Preset</b> <code>{}</code> <b>installed!</b>"
   already_installed: "✅ [Installed]"
-  _cls_doc: "Suggests new Heroku
-  users a packs of modules to load"
+  _cls_doc: "Suggests new Heroku users a packs of modules to load"
 
 settings:
   name: "Settings"
@@ -641,4 +650,3 @@ $inline:
   command: "🪐 Command «{}»"
   button403: "You are not allowed to press this button!"
   keep_id: "⚠️ Do not remove ID! {}"
-
