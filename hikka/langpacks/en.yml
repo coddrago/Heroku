@@ -141,11 +141,6 @@ heroku_settings:
   user_nn_list: "<emoji document_id=5469791106591890404>🪄</emoji> <b>NoNick is enabled for these users:</b>\n\n{}"
   chat_nn_list: "<emoji document_id=5469791106591890404>🪄</emoji> <b>NoNick is enabled for these chats:</b>\n\n{}"
   nothing: "<emoji document_id=5427052514094619126>🤷‍♀️</emoji> <b>Nothing to show...</b>"
-  privacy_leak: "⚠️ <b>This command gives access to your Heroku web interface. It's not recommended to run it in public group chats. Consider using it in <a href='tg://openmessage?user_id={}'>Saved messages</a>. Type</b> <code>{}proxypass force_insecure</code> <b>to ignore this warning</b>"
-  privacy_leak_nowarn: "⚠️ <b>This command gives access to your Heroku web interface. It's not recommended to run it in public group chats. Consider using it in <a href='tg://openmessage?user_id={}'>Saved messages</a>.</b>"
-  opening_tunnel: "🔁 <b>Opening tunnel to Heroku web interface...</b>"
-  tunnel_opened: "🎉 <b>Tunnel opened. This link is valid for about 1 hour</b>"
-  web_btn: "🌍 Web interface"
   btn_yes: "🚸 Open anyway"
   btn_no: "🔻 Cancel"
   lavhost_web: "✌️ <b>This link leads to your Heroku web interface on lavHost</b>\n\n<i>💡 You'll need to authorize using lavHost credentials, specified on registration</i>"
@@ -196,6 +191,13 @@ terminal:
   _cmd_doc_terminal: "<command> - Execute bash command"
   _cmd_doc_terminate: "[-f to force kill] - Use in reply to send SIGTERM to a process"
   _cls_doc: "Runs commands"
+
+heroku_web:
+  privacy_leak: "⚠️ <b>This command gives access to your Heroku web interface. It's not recommended to run it in public group chats. Consider using it in <a href='tg://openmessage?user_id={}'>Saved messages</a>. Type</b> <code>{}proxypass force_insecure</code> <b>to ignore this warning</b>"
+  privacy_leak_nowarn: "⚠️ <b>This command gives access to your Heroku web interface. It's not recommended to run it in public group chats. Consider using it in <a href='tg://openmessage?user_id={}'>Saved messages</a>.</b>"
+  opening_tunnel: "🔁 <b>Opening tunnel to Heroku web interface...</b>"
+  tunnel_opened: "🎉 <b>Tunnel opened. This link is valid for about 1 hour</b>"
+  web_btn: "🌍 Web interface"
 
 heroku_backup:
   period: "⌚️ <b>The unit «ALPHA»</b> creates regular backups. These settings can be changed later.\n\nPlease select the backup frequency\n\n<b>🚫 It is thus impossible to restore modules downloaded from files with the .lm command! Be careful and do .backupmods before restoring.</b>"
