@@ -131,11 +131,6 @@ heroku_settings:
   user_nn_list: "<emoji document_id=5469791106591890404>🪄</emoji> <b>NoNick ist für folgende Benutzer aktiviert:</b>\n\n{}"
   chat_nn_list: "<emoji document_id=5469791106591890404>🪄</emoji> <b>NoNick ist für folgende Chats aktiviert:</b>\n\n{}"
   nothing: "<emoji document_id=5427052514094619126>🤷‍♀️</emoji> <b>Nichts zu zeigen...</b>"
-  privacy_leak: "⚠️ <b>Dieser Befehl gewährt Zugriff auf die Heroku-Weboberfläche. Die Ausführung in öffentlichen Chats stellt ein Sicherheitsrisiko dar. Es wird empfohlen, dies in den <a href='tg://openmessage?user_id={}'>Gespeicherten Nachrichten</a> auszuführen. Führe</b> <code>{}proxypass force_insecure</code> <b>aus, um diese Warnung zu deaktivieren</b>"
-  privacy_leak_nowarn: "⚠️ <b>Dieser Befehl gewährt Zugriff auf die Heroku-Weboberfläche. Die Ausführung in öffentlichen Chats stellt ein Sicherheitsrisiko dar. Es wird empfohlen, dies in den <a href='tg://openmessage?user_id={}'>Gespeicherten Nachrichten</a> auszuführen.</b>"
-  opening_tunnel: "🔁 <b>Öffne Tunnel zur Heroku-Weboberfläche...</b>"
-  tunnel_opened: "🎉 <b>Der Tunnel ist geöffnet. Dieser Link bleibt maximal eine Stunde aktiv</b>"
-  web_btn: "🌍 Web-Oberfläche"
   btn_yes: "🚸 Trotzdem öffnen"
   btn_no: "🔻 Schließen"
   lavhost_web: "✌️ <b>Über diesen Link gelangst du zur Heroku-Weboberfläche auf lavHost</b>\n\n<i>💡 Du musst dich mit den bei der lavHost-Einrichtung angegebenen Daten anmelden</i>"
@@ -182,6 +177,13 @@ terminal:
   _cmd_doc_apt: "Kurzform für '.terminal apt'"
   _cmd_doc_terminal: "<Befehl> - Führen Sie einen Befehl im System aus"
   _cmd_doc_terminate: "[-f zum Erzwingen] - Antworten Sie auf eine Nachricht, um den Prozess zu beenden"
+
+heroku_web:
+  privacy_leak: "⚠️ <b>Dieser Befehl gewährt Zugriff auf die Heroku-Weboberfläche. Die Ausführung in öffentlichen Chats stellt ein Sicherheitsrisiko dar. Es wird empfohlen, dies in den <a href='tg://openmessage?user_id={}'>Gespeicherten Nachrichten</a> auszuführen. Führe</b> <code>{}proxypass force_insecure</code> <b>aus, um diese Warnung zu deaktivieren</b>"
+  privacy_leak_nowarn: "⚠️ <b>Dieser Befehl gewährt Zugriff auf die Heroku-Weboberfläche. Die Ausführung in öffentlichen Chats stellt ein Sicherheitsrisiko dar. Es wird empfohlen, dies in den <a href='tg://openmessage?user_id={}'>Gespeicherten Nachrichten</a> auszuführen.</b>"
+  opening_tunnel: "🔁 <b>Öffne Tunnel zur Heroku-Weboberfläche...</b>"
+  tunnel_opened: "🎉 <b>Der Tunnel ist geöffnet. Dieser Link bleibt maximal eine Stunde aktiv</b>"
+  web_btn: "🌍 Web-Oberfläche"
 
 heroku_backup:
   period: "⌚️ <b>Die Unit «ALPHA»</b> erstellt regelmäßig Backups. Diese Einstellungen können später geändert werden.\n\nBitte wählen Sie die Backup-Häufigkeit\n\n<b>🚫 Es ist daher nicht möglich, Module, die mit dem Befehl .lm aus Dateien heruntergeladen wurden, wiederherzustellen! Seien Sie vorsichtig und führen Sie vor der Wiederherstellung .backupmods aus.</b>"
