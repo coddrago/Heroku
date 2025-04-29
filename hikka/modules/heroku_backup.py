@@ -4,6 +4,12 @@
 # You can redistribute it and/or modify it under the terms of the GNU AGPLv3
 # 🔑 https://www.gnu.org/licenses/agpl-3.0.html
 
+# ©️ Codrago, 2024-2025
+# This file is a part of Heroku Userbot
+# 🌐 https://github.com/coddrago/Heroku
+# You can redistribute it and/or modify it under the terms of the GNU AGPLv3
+# 🔑 https://www.gnu.org/licenses/agpl-3.0.html
+
 import asyncio
 import contextlib
 import datetime
@@ -21,7 +27,6 @@ from .. import loader, utils
 from ..inline.types import BotInlineCall
 
 logger = logging.getLogger(__name__)
-
 
 @loader.tds
 class HerokuBackupMod(loader.Module):
@@ -123,20 +128,38 @@ class HerokuBackupMod(loader.Module):
                 self.get("last_backup") + self.get("period") - time.time()
             )
 
-            backup = io.BytesIO(json.dumps(self._db).encode())
-            backup.name = (
-                f"heroku-db-backup-{datetime.datetime.now():%d-%m-%Y-%H-%M}.json"
-            )
+            db = io.BytesIO(json.dumps(self._db).encode())
+            db.name = "db.json"
+
+            mods = io.BytesIO()
+            with zipfile.ZipFile(mods, "w", zipfile.ZIP_DEFLATED) as zipf:
+                for root, _, files in os.walk(loader.LOADED_MODULES_DIR):
+                    for file in files:
+                        if file.endswith(f"{self.tg_id}.py"):
+                            with open(os.path.join(root, file), "rb") as f:
+                                zipf.writestr(file, f.read())
+                zipf.writestr("db_mods.json", json.dumps(self.lookup("Loader").get("loaded_modules", {})))
+
+            mods.seek(0)
+            mods.name = "mods.zip"
+
+            archive = io.BytesIO()
+            with zipfile.ZipFile(archive, "w", zipfile.ZIP_DEFLATED) as z:
+                z.writestr("db.json", db.getvalue())
+                z.writestr("mods.zip", mods.getvalue())
+
+            archive.name = f"backup-{datetime.datetime.now():%d-%m-%Y-%H-%M}.zip"
+            archive.seek(0)
 
             await self.inline.bot.send_document(
                 int(f"-100{self._backup_channel.id}"),
-                backup,
+                archive,
                 reply_markup=self.inline.generate_markup(
                     [
                         [
                             {
                                 "text": "↪️ Restore this",
-                                "data": "hikka/backup/restore/confirm",
+                                "data": "heroku/backupall/restore/confirm",
                             }
                         ]
                     ]
@@ -152,44 +175,64 @@ class HerokuBackupMod(loader.Module):
 
     @loader.callback_handler()
     async def restore(self, call: BotInlineCall):
-        if not call.data.startswith("hikka/backup/restore"):
+        if not call.data.startswith("heroku/backupall/restore"):
             return
 
-        if call.data == "hikka/backup/restore/confirm":
+        if call.data == "heroku/backupall/restore/confirm":
             await utils.answer(
                 call,
                 "❓ <b>Are you sure?</b>",
                 reply_markup={
                     "text": "✅ Yes",
-                    "data": "hikka/backup/restore",
+                    "data": "heroku/backupall/restore",
                 },
             )
             return
 
-        file = await (
-            await self._client.get_messages(
-                self._backup_channel, call.message.message_id
-            )
-        )[0].download_media(bytes)
+        try:
+            file = await (
+                await self._client.get_messages(
+                    self._backup_channel, call.message.message_id
+                )
+            )[0].download_media(bytes)
 
-        decoded_text = json.loads(file.decode())
+            zipfile_bytes = io.BytesIO(file)
+            with zipfile.ZipFile(zipfile_bytes) as zf:
+                with zf.open("db.json") as f:
+                    db_data = json.loads(f.read().decode())
 
-        with contextlib.suppress(KeyError):
-            decoded_text["hikka.inline"].pop("bot_token")
+                with contextlib.suppress(KeyError):
+                    db_data["hikka.inline"].pop("bot_token")
 
-        if not self._db.process_db_autofix(decoded_text):
-            raise RuntimeError("Attempted to restore broken database")
+                if not self._db.process_db_autofix(db_data):
+                    raise RuntimeError("Attempted to restore broken database")
 
-        self._db.clear()
-        self._db.update(**decoded_text)
-        self._db.save()
+                self._db.clear()
+                self._db.update(**db_data)
+                self._db.save()
 
-        await call.answer(self.strings("db_restored"), show_alert=True)
-        await self.invoke("restart", "-f", peer=call.message.peer_id)
+                with zf.open("mods.zip") as modzip_bytes:
+                    with zipfile.ZipFile(io.BytesIO(modzip_bytes.read())) as modzip:
+                        with modzip.open("db_mods.json", "r") as modules:
+                            db_mods = json.loads(modules.read().decode())
+                            if isinstance(db_mods, dict):
+                                self.lookup("Loader").set("loaded_modules", db_mods)
+
+                        for name in modzip.namelist():
+                            if name == "db_mods.json":
+                                continue
+                            path = loader.LOADED_MODULES_PATH / Path(name).name
+                            with modzip.open(name, "r") as module:
+                                path.write_bytes(module.read())
+
+            await call.answer(self.strings("all_restored"), show_alert=True)
+            await self.invoke("restart", "-f", peer=call.message.peer_id)
+        except Exception:
+            logger.exception("Restore from backupall failed")
+            await call.answer(self.strings("reply_to_file"), show_alert=True)
 
     @loader.command()
     async def backupdb(self, message: Message):
-        """| save backup of your bd"""
         txt = io.BytesIO(json.dumps(self._db).encode())
         txt.name = f"db-backup-{datetime.datetime.now():%d-%m-%Y-%H-%M}.json"
         await self._client.send_file(
@@ -203,7 +246,6 @@ class HerokuBackupMod(loader.Module):
 
     @loader.command()
     async def restoredb(self, message: Message):
-        """[reply] | restore your bd"""
         if not (reply := await message.get_reply_message()) or not reply.media:
             await utils.answer(
                 message,
@@ -229,7 +271,6 @@ class HerokuBackupMod(loader.Module):
 
     @loader.command()
     async def backupmods(self, message: Message):
-        """| save backup of mods"""
         mods_quantity = len(self.lookup("Loader").get("loaded_modules", {}))
 
         result = io.BytesIO()
@@ -261,7 +302,6 @@ class HerokuBackupMod(loader.Module):
 
     @loader.command()
     async def restoremods(self, message: Message):
-        """[reply] | restore your mods"""
         if not (reply := await message.get_reply_message()) or not reply.media:
             await utils.answer(message, self.strings("reply_to_file"))
             return
@@ -308,4 +348,82 @@ class HerokuBackupMod(loader.Module):
             self.lookup("Loader").set("loaded_modules", decoded_text)
 
         await utils.answer(message, self.strings("mods_restored"))
+        await self.invoke("restart", "-f", peer=message.peer_id)
+
+    @loader.command()
+    async def backupall(self, message: Message):
+        db = io.BytesIO(json.dumps(self._db).encode())
+        db.name = "db.json"
+
+        mods = io.BytesIO()
+        with zipfile.ZipFile(mods, "w", zipfile.ZIP_DEFLATED) as zipf:
+            for root, _, files in os.walk(loader.LOADED_MODULES_DIR):
+                for file in files:
+                    if file.endswith(f"{self.tg_id}.py"):
+                        with open(os.path.join(root, file), "rb") as f:
+                            zipf.writestr(file, f.read())
+            zipf.writestr("db_mods.json", json.dumps(self.lookup("Loader").get("loaded_modules", {})))
+
+        mods.seek(0)
+        mods.name = "mods.zip"
+
+        archive = io.BytesIO()
+        with zipfile.ZipFile(archive, "w", zipfile.ZIP_DEFLATED) as z:
+            z.writestr("db.json", db.getvalue())
+            z.writestr("mods.zip", mods.getvalue())
+
+        archive.name = f"backup-all-{datetime.datetime.now():%d-%m-%Y-%H-%M}.zip"
+        archive.seek(0)
+
+        await self._client.send_file(
+            "me",
+            archive,
+            caption=self.strings("backupall_info").format(
+                prefix=utils.escape_html(self.get_prefix())
+            ),
+        )
+        await utils.answer(message, self.strings("backupall_sent"))
+
+    @loader.command()
+    async def restoreall(self, message: Message):
+        if not (reply := await message.get_reply_message()) or not reply.media:
+            await utils.answer(message, self.strings("reply_to_file"))
+            return
+
+        file = await reply.download_media(bytes)
+        try:
+            zipfile_bytes = io.BytesIO(file)
+            with zipfile.ZipFile(zipfile_bytes) as zf:
+                with zf.open("db.json") as f:
+                    db_data = json.loads(f.read().decode())
+
+                with contextlib.suppress(KeyError):
+                    db_data["hikka.inline"].pop("bot_token")
+
+                if not self._db.process_db_autofix(db_data):
+                    raise RuntimeError("Attempted to restore broken database")
+
+                self._db.clear()
+                self._db.update(**db_data)
+                self._db.save()
+
+                with zf.open("mods.zip") as modzip_bytes:
+                    with zipfile.ZipFile(io.BytesIO(modzip_bytes.read())) as modzip:
+                        with modzip.open("db_mods.json", "r") as modules:
+                            db_mods = json.loads(modules.read().decode())
+                            if isinstance(db_mods, dict):
+                                self.lookup("Loader").set("loaded_modules", db_mods)
+
+                        for name in modzip.namelist():
+                            if name == "db_mods.json":
+                                continue
+                            path = loader.LOADED_MODULES_PATH / Path(name).name
+                            with modzip.open(name, "r") as module:
+                                path.write_bytes(module.read())
+        except Exception as e:
+            logger.exception("Restore all failed")
+            await utils.answer(message, self.strings["reply_to_file"])
+            return
+
+        await utils.answer(message, self.strings["all_restored"])
         await self.invoke("restart", "-f", peer=message.peer_id)
