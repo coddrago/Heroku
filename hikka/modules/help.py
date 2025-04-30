@@ -159,21 +159,34 @@ class Help(loader.Module):
             if await self.allmodules.check_security(message, func)
         }
 
+        # Исправление: Уникальные инлайн-хендлеры
         if hasattr(module, "inline_handlers"):
+            seen_inline = set()
             for name, fun in module.inline_handlers.items():
-                reply += (
-                    "\n<emoji document_id=5372981976804366741>🤖</emoji>"
-                    " <code>{}</code> {}".format(
-                        f"@{self.inline.bot_username} {name}",
-                        (
-                            utils.escape_html(inspect.getdoc(fun))
-                            if fun.__doc__
-                            else self.strings("undoc")
-                        ),
+                if name not in seen_inline:
+                    reply += (
+                        "\n<emoji document_id=5372981976804366741>🤖</emoji>"
+                        " <code>{}</code> {}".format(
+                            f"@{self.inline.bot_username} {name}",
+                            (
+                                utils.escape_html(inspect.getdoc(fun))
+                                if fun.__doc__
+                                else self.strings("undoc")
+                            ),
+                        )
                     )
-                )
+                    seen_inline.add(name)
 
+        # Исправление: Уникальные команды с алиасами
+        seen_commands = set()
         for name, fun in commands.items():
+            if name in seen_commands:
+                continue
+                
+            seen_commands.add(name)
+            aliases = self.find_aliases(name)
+            seen_commands.update(aliases)
+
             reply += (
                 f'\n{self.config["command_emoji"]}'
                 " <code>{}{}</code>{} {}".format(
@@ -186,10 +199,10 @@ class Help(loader.Module):
                                     utils.escape_html(self.get_prefix()),
                                     alias,
                                 )
-                                for alias in self.find_aliases(name)
+                                for alias in aliases
                             )
                         )
-                        if self.find_aliases(name)
+                        if aliases
                         else ""
                     ),
                     (
@@ -243,7 +256,13 @@ class Help(loader.Module):
         core_ = []
         no_commands_ = []
 
+        # Исправление: Уникальные модули
+        processed_modules = set()
         for mod in self.allmodules.modules:
+            if mod.__class__.__name__ in processed_modules:
+                continue
+            processed_modules.add(mod.__class__.__name__)
+
             if not hasattr(mod, "commands"):
                 logger.debug("Module %s is not inited yet", mod.__class__.__name__)
                 continue
@@ -274,20 +293,15 @@ class Help(loader.Module):
             )
             first = True
 
-            commands = [
+            # Исправление: Уникальные команды
+            commands = list({
                 name
                 for name, func in mod.commands.items()
                 if await self.allmodules.check_security(message, func) or force
-            ]
+            })
 
-            for cmd in commands:
-                if first:
-                    tmp += f": ( {cmd}"
-                    first = False
-                else:
-                    tmp += f" | {cmd}"
-
-            icommands = [
+            # Исправление: Уникальные инлайн команды
+            icommands = list({
                 name
                 for name, func in mod.inline_handlers.items()
                 if await self.inline.check_inline_security(
@@ -295,14 +309,16 @@ class Help(loader.Module):
                     user=message.sender_id,
                 )
                 or force
-            ]
+            })
 
-            for cmd in icommands:
+            for cmd in commands + icommands:
                 if first:
-                    tmp += f": ( 🤖 {cmd}"
+                    prefix = "🤖 " if cmd in icommands else ""
+                    tmp += f": ( {prefix}{cmd}"
                     first = False
                 else:
-                    tmp += f" | 🤖 {cmd}"
+                    prefix = "🤖 " if cmd in icommands else ""
+                    tmp += f" | {prefix}{cmd}"
 
             if commands or icommands:
                 tmp += " )"
