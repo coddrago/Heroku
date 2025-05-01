@@ -3,7 +3,7 @@
 __pycache__/
 *.py[cod]
 *$py.class
-
+limoka_search/
 # C extensions
 *.so
 

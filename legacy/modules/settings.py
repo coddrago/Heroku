@@ -30,6 +30,12 @@ class CoreMod(loader.Module):
                 "<emoji document_id=4974259868996207180>▪️</emoji>",
                 "just emoji in .aliases",
             ),
+            loader.ConfigValue(
+                "alias_view",
+                None,
+                "Set up view for aliases list.\nKeywords:\n{emoji} - alias emoji\n{alias} - alias\n{cmd} - command\n\\n - new line",
+                validator=loader.validators.String()
+            )
         )
 
     async def blacklistcommon(self, message: Message):
@@ -167,16 +173,28 @@ class CoreMod(loader.Module):
 
     @loader.command()
     async def aliases(self, message: Message):
-        await utils.answer(
-            message,
-            self.strings("aliases")
-            + "\n".join(
-                [
-                    (self.config["alias_emoji"] + f" <code>{i}</code> &lt;- {y}")
-                    for i, y in self.allmodules.aliases.items()
-                ]
-            ),
-        )
+        if not self.config['alias_view']:
+            await utils.answer(
+                message,
+                self.strings("aliases")
+                + "\n".join(
+                    [
+                        (self.config["alias_emoji"] + f" <code>{i}</code> &lt;- {y}")
+                        for i, y in self.allmodules.aliases.items()
+                    ]
+                ),
+            )
+        else:
+            await utils.answer(
+                message,
+                self.strings("aliases")
+                + "".join(
+                        [
+                            (self.config['alias_view'].format(alias=alias, cmd=cmd, emoji=self.config["alias_emoji"]).replace("\\n", "\n"))
+                            for alias, cmd in self.allmodules.aliases.items()
+                        ]
+                    )
+            )
 
     @loader.command()
     async def addalias(self, message: Message):
