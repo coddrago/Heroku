@@ -185,7 +185,7 @@ class CoreMod(loader.Module):
             return
 
         alias, cmd = args
-        if self.allmodules.add_alias(alias, cmd):
+        if self.allmodules.add_alias(alias.lower(), cmd):
             self.set(
                 "aliases",
                 {
@@ -195,7 +195,7 @@ class CoreMod(loader.Module):
             )
             await utils.answer(
                 message,
-                self.strings("alias_created").format(utils.escape_html(alias)),
+                self.strings("alias_created").format(utils.escape_html(alias.lower())),
             )
         else:
             await utils.answer(
@@ -221,7 +221,7 @@ class CoreMod(loader.Module):
             return
 
         current = self.get("aliases", {})
-        del current[alias]
+        current.pop(alias, None)
         self.set("aliases", current)
         await utils.answer(
             message,
