@@ -188,7 +188,7 @@ class CoreMod(loader.Module):
             await utils.answer(
                 message,
                 self.strings("aliases")
-                + "".join(
+                + " ".join(
                         [
                             (self.config['alias_view'].format(alias=alias, cmd=cmd, emoji=self.config["alias_emoji"]).replace("\\n", "\n"))
                             for alias, cmd in self.allmodules.aliases.items()
