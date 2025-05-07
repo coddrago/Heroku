@@ -219,20 +219,6 @@ class CustomTelegramClient(TelegramClient):
 
         return await self.get_entity(*args, force=True, **kwargs)
 
-    async def get_messages(
-        self,
-        messages_ids: typing.Union[list],
-    ):
-        """
-        Gets the messages by ids
-        :param msg: List of messages ids
-        :return: :obj:`Messages`
-        """
-        try:
-            return await self(functions.messages.GetMessagesRequest(messages_ids))
-        except RPCError as e:
-            logger.debug("Can't get messages %s", e)
-
     async def get_entity(
         self,
         entity: EntityLike,
