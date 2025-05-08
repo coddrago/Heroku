@@ -279,8 +279,7 @@ class HerokuInfoMod(loader.Module):
                     '<b>Incorrect image format</b>\n<blockquote>Поддерживаемые форматы -> jpg, jpeg, png, bmp, webp</blockquote>'
                 )
                 return
-            if '{ping}' in self.config["custom_message"]:
-                message = await utils.answer(message, self.config["ping_emoji"])
+           
             await utils.answer_file(
                 message,
                 self._get_info_photo(start),
