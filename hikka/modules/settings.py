@@ -53,9 +53,7 @@ class CoreMod(loader.Module):
                     "callback": self._inline__choose__installation,
                     "args": (platform,),
                 }
-                for platform in ['vds', 'termux',
-                                 'userland', 'railway',
-                                 'jamhost', 'module_switch']
+                for platform in ['vds', 'termux','userland','jamhost']
             ],
             2
         )
@@ -325,12 +323,8 @@ class CoreMod(loader.Module):
             await utils.answer(message, self.strings["termux_install"])
         elif "-v" in args:
             await utils.answer(message, self.strings["vds_install"])
-        elif "-r" in args:
-            await utils.answer(message, self.strings["railway_install"])
         elif "-jh" in args:
             await utils.answer(message, self.strings["jamhost_install"])
-        elif "-ms" in args:
-            await utils.answer(message, self.strings["module_switch_install"])
         elif "-u" in args:
             await utils.answer(message, self.strings["userland_install"])
 
