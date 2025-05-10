@@ -129,3 +129,11 @@ Check out <a href="https://web.archive.org/dev.hikka.pw">dev.hikka.pw</a> for de
     <li><a href="https://t.me/GunyaKshin">Codwiz</a> for Ukrainian translation pack</li>
     <li><a href="https://t.me/lonami">Lonami</a> for Telethon, which is the base of Legacy-TL-New</li>
 </ul>
+
+<b>Acknowledgments</b>
+
+<ul>
+    <li>Thanks to all contributors, especially <a href="https://github.com/coddrago">@coddrago (Antoshka)</a>. Your support and free PR is priceless! ❤️</li>
+</ul>
+
+> if there is no benefit from the PR, we will remove the gratitude 😥
