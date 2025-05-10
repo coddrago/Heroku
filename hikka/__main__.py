@@ -69,8 +69,8 @@ if (
         print("Added NO_SUDO in your environment variables")
         restart()
 
-if sys.version_info < (3, 8, 0):
-    print("\U0001F6AB Error: you must use at least Python version 3.8.0")
+if sys.version_info < (3, 9, 0):
+    print("\U0001F6AB Error: you must use at least Python version 3.9.0")
 elif __package__ != "hikka":
     print("\U0001F6AB Error: you cannot run this as a script; you must execute as a package")
 else:
@@ -81,7 +81,7 @@ else:
     else:
         try:
             import herokutl  # noqa: F811
-            if tuple(map(int, herokutl.__version__.split("."))) < (2, 0, 8):
+            if tuple(map(int, herokutl.__version__.split("."))) < (1, 0, 2):
                 raise ImportError
         except ImportError:
             print("\U0001F504 Installing dependencies...")
