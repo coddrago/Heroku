@@ -49,9 +49,7 @@ def restart():
 
     if "HIKKA_DO_NOT_RESTART2" in os.environ:
         print(
-            "Got in a loop, exiting\nYou probably need to manually remove existing"
-            " packages and then restart Heroku. Run `pip uninstall -y telethon"
-            " telethon-mod hikka-tl-new`, then restart Heroku."
+            "HerokuTL version 1.0.2 or higher is required, use `pip install heroku-tl-new -U` for update."
         )
         sys.exit(0)
 
