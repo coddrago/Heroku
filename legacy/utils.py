@@ -975,6 +975,9 @@ def get_platform_emoji() -> str:
     if main.IS_DOCKER:
         return BASE.format(5456574628933693253)
 
+    if main.IS_SKIRIHOST:
+        return BASE.format(5262972342342022881)
+
     return BASE.format(5467541303938019154)
 
 def uptime() -> int:
