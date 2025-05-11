@@ -97,6 +97,7 @@ IS_HIKKAHOST = "HIKKAHOST" in os.environ
 IS_AEZA = "aeza" in socket.gethostname()
 IS_DJHOST = "IS_DJHOST" in os.environ
 IS_USERLAND = "userland" in os.environ
+IS_SKIRIHOST = "SKIRIHOST" in os.environ
 IS_WSL = False
 with contextlib.suppress(Exception):
     from platform import uname
