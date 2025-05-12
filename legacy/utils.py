@@ -932,11 +932,11 @@ def get_named_platform() -> str:
     if main.IS_HIKKAHOST:
         return "🌼 HikkaHost"
 
+    if main.SKIRIHOST:
+        return "🦊SkiriHost"
+
     if main.IS_DOCKER:
         return "🐳 Docker"
-
-    if main.IS_SKIRIHOST:
-        return "🦊 SkiriHost"
 
     return "🕶 Termux" if main.IS_TERMUX else "💎 VDS"
 
