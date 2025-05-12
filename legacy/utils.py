@@ -933,7 +933,7 @@ def get_named_platform() -> str:
         return "🌼 HikkaHost"
 
     if main.SKIRIHOST:
-        return "🦊SkiriHost"
+        return "🦊 SkiriHost"
 
     if main.IS_DOCKER:
         return "🐳 Docker"
