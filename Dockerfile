@@ -52,4 +52,4 @@ RUN pip install --no-warn-script-location --no-cache-dir -U -r optional_requirem
 RUN git reset --hard
 
 EXPOSE 8080
-CMD python -m hikka --root
+CMD python -m heroku --root
