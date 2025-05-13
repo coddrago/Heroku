@@ -409,8 +409,7 @@ class CommandDispatcher:
                         return False
 
                     break
-            if not watcher:
-                logger.warning("Ignoring message in datachat \\ logging chat")
+            
             return False
 
         message.message = prefix + txt + message.message[len(prefix + command) :]
@@ -677,11 +676,6 @@ class CommandDispatcher:
                 not in whitelist_modules
                 or await self._handle_tags(event, func)
             ):
-                logger.debug(
-                    "Ignored watcher of module %s because of %s",
-                    modname,
-                    await self._handle_tags_ext(event, func),
-                )
                 continue
 
             # Avoid weird AttributeErrors in weird dochub modules by settings placeholder
