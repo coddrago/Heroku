@@ -671,7 +671,6 @@ class LoaderMod(loader.Module):
                     "-q",
                     "--disable-pip-version-check",
                     "--no-warn-script-location",
-                    "--break-system-packages",
                     *["--user"] if loader.USER_INSTALL else [],
                     *requirements,
                 )
