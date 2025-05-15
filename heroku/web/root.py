@@ -1,8 +1,8 @@
 """Main bot page"""
 
 # ©️ Dan Gazizullin, 2021-2023
-# This file is a part of Hikka Userbot
-# 🌐 https://github.com/hikariatama/Hikka
+# This file is a part of Heroku Userbot
+# 🌐 https://github.com/hikariatama/Heroku
 # You can redistribute it and/or modify it under the terms of the GNU AGPLv3
 # 🔑 https://www.gnu.org/licenses/agpl-3.0.html
 
@@ -253,8 +253,8 @@ class Web:
         if "JAMHOST" in os.environ:
             return web.Response(status=403, body="Forbidden by JamHost EULA")
 
-        if "HIKKAHOST" in os.environ:
-            return web.Response(status=403, body="Forbidden by HikkaHost EULA")
+        if "HEROKUHOST" in os.environ:
+            return web.Response(status=403, body="Forbidden by HerokuHost EULA")
 
         if not self._check_session(request):
             return web.Response(status=401)
@@ -334,8 +334,8 @@ class Web:
         if "JAMHOST" in os.environ:
             return web.Response(status=403, body="Forbidden by JamHost EULA")
 
-        if "HIKKAHOST" in os.environ:
-            return web.Response(status=403, body="Forbidden by HikkaHost EULA")
+        if "HEROKUHOST" in os.environ:
+            return web.Response(status=403, body="Forbidden by HerokuHost EULA")
 
         if self._pending_client:
             return web.Response(status=208, body="Already pending")

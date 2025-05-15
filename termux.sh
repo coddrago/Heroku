@@ -18,12 +18,12 @@ else
     eval 'export LDFLAGS="-L/system/lib/"'
 fi
 
-eval 'export CFLAGS="-I/data/data/com.termux/files/usr/include/" && pip install Pillow -U --no-cache-dir'
+eval 'export CFLAGS="-I/data/data/com.termux/files/usr/include/" && pip install Pillow==9.5.0 --no-cache-dir'
 
 printf "\r\033[K\033[0;32mPillow installed!\e[0m\n"
 echo -e "\033[0;96mDownloading source code...\033[0m"
 
-eval "rm -rf ~/Hikka 2>/dev/null"
+eval "rm -rf ~/Heroku 2>/dev/null"
 eval "cd && git clone https://github.com/coddrago/Heroku && cd Heroku"
 
 echo -e "\033[0;96mSource code downloaded!...\033[0m\n"

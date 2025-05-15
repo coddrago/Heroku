@@ -103,7 +103,7 @@ from herokutl.tl.types import (
 from ._internal import fw_protect
 from .inline.types import BotInlineCall, InlineCall, InlineMessage
 from .tl_cache import CustomTelegramClient
-from .types import HikkaReplyMarkup, ListLike, Module
+from .types import HerokuReplyMarkup, ListLike, Module
 
 FormattingEntity = typing.Union[
     MessageEntityUnknown,
@@ -436,7 +436,7 @@ async def answer(
     message: typing.Union[Message, InlineCall, InlineMessage],
     response: str,
     *,
-    reply_markup: typing.Optional[HikkaReplyMarkup] = None,
+    reply_markup: typing.Optional[HerokuReplyMarkup] = None,
     **kwargs,
 ) -> typing.Union[InlineCall, InlineMessage, Message]:
     """
@@ -761,7 +761,7 @@ async def asset_channel(
     ):
         return client._channels_cache[title]["peer"], False
 
-    # legacy heroku / heroku chats conversion to heroku
+    # legacy heroku / hikka chats conversion to heroku
     if title.startswith("heroku-"):
         title = title.replace("heroku-", "heroku-")
 
@@ -919,9 +919,6 @@ def get_named_platform() -> str:
     if main.IS_WSL:
         return "🍀 WSL"
 
-    if main.IS_TOTHOST:
-        return "💘 ToTHost"
-
     if main.IS_JAMHOST:
         return "🧃 JamHost"
 
@@ -931,14 +928,8 @@ def get_named_platform() -> str:
     if main.IS_AEZA:
         return "🛡 Aeza"
 
-    if main.IS_GOORM:
-        return "🦾 GoormIDE"
-
-    if main.IS_RAILWAY:
-        return "🚂 Railway"
-
-    if main.IS_HIKKAHOST:
-        return "🌼 HikkaHost"
+    if main.IS_HEROKUHOST:
+        return "🌼 HerokuHost"
 
     if main.IS_DOCKER:
         return "🐳 Docker"
@@ -965,11 +956,8 @@ def get_platform_emoji() -> str:
         )
     )
 
-    if main.IS_HIKKAHOST:
+    if main.IS_HEROKUHOST:
         return BASE.format(5395745114494624362)
-
-    if main.IS_TOTHOST:
-        return BASE.format(5116472489639150735)
     
     if main.IS_JAMHOST:
         return BASE.format(5242536621659678947)
@@ -980,14 +968,8 @@ def get_platform_emoji() -> str:
     if main.IS_LAVHOST:
         return BASE.format(5352753797531721191)
 
-    if main.IS_GOORM:
-        return BASE.format(5298947740032573902)
-
     if main.IS_TERMUX:
         return BASE.format(5350588498359377932)
-
-    if main.IS_RAILWAY:
-        return BASE.format(5352539534498224966)
 
     if main.IS_DOCKER:
         return BASE.format(5352678227582152630)

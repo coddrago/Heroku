@@ -632,7 +632,7 @@ class LoaderMod(loader.Module):
                         {
                             "sklearn": "scikit-learn",
                             "pil": "Pillow",
-                            "herokutl": "Hikka-TL-New",
+                            "herokutl": "Heroku-TL-New",
                         }.get(e.name.lower(), e.name)
                     ]
 

@@ -33,7 +33,7 @@ NUM_ROWS = 5
 
 @loader.tds
 class HerokuConfigMod(loader.Module):
-    """Interactive configurator for Hikka Userbot"""
+    """Interactive configurator for Heroku Userbot"""
 
     strings = {"name": "HerokuConfig"}
 

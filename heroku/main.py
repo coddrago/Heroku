@@ -93,12 +93,9 @@ CONFIG_PATH = BASE_PATH / "config.json"
 
 IS_TERMUX = "com.termux" in os.environ.get("PREFIX", "")
 IS_DOCKER = "DOCKER" in os.environ
-IS_RAILWAY = "RAILWAY" in os.environ
-IS_GOORM = "GOORM" in os.environ
 IS_LAVHOST = "LAVHOST" in os.environ
-IS_HIKKAHOST = "HIKKAHOST" in os.environ
+IS_HEROKUHOST = "HEROKUHOST" in os.environ
 IS_AEZA = "aeza" in socket.gethostname()
-IS_TOTHOST = "TOTHOST" in os.environ
 IS_USERLAND = "userland" in os.environ.get("USER", "")
 IS_JAMHOST = "JAMHOST" in os.environ
 IS_WSL = False

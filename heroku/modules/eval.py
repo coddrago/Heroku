@@ -26,7 +26,7 @@ from herokutl.tl.types import Message
 from meval import meval
 
 from .. import loader, main, utils
-from ..log import HikkaException
+from ..log import HerokuException
 
 
 class Brainfuck:
@@ -162,7 +162,7 @@ class Evaluator(loader.Module):
                 **await self.getattrs(message),
             )
         except Exception:
-            item = HikkaException.from_exc_info(*sys.exc_info())
+            item = HerokuException.from_exc_info(*sys.exc_info())
 
             await utils.answer(
                 message,

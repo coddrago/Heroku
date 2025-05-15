@@ -25,7 +25,7 @@ from meval import meval
 from io import StringIO
 
 from .. import loader, utils
-from ..log import HikkaException
+from ..log import HerokuException
 
 logger = logging.getLogger(__name__)
 

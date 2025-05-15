@@ -51,7 +51,7 @@ def deps():
 if (
     getpass.getuser() == "root"
     and "--root" not in " ".join(sys.argv)
-    and all(trigger not in os.environ for trigger in {"DOCKER", "GOORM", "NO_SUDO"})
+    and all(trigger not in os.environ for trigger in {"DOCKER", "NO_SUDO"})
 ):
     print("\U0001F6AB" * 15)
     print("You attempted to run Heroku on behalf of root user")
@@ -99,10 +99,10 @@ else:
         print(traceback.format_exc())
         restart()
 
-    if "HIKKA_DO_NOT_RESTART" in os.environ:
-        del os.environ["HIKKA_DO_NOT_RESTART"]
-    if "HIKKA_DO_NOT_RESTART2" in os.environ:
-        del os.environ["HIKKA_DO_NOT_RESTART2"]
+    if "HEROKU_DO_NOT_RESTART" in os.environ:
+        del os.environ["HEROKU_DO_NOT_RESTART"]
+    if "HEROKU_DO_NOT_RESTART2" in os.environ:
+        del os.environ["HEROKU_DO_NOT_RESTART2"]
 
     prev_hash = None
     if os.path.exists(".requirements_hash"):

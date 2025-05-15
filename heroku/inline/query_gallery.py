@@ -47,7 +47,7 @@ class QueryGallery(InlineUnit):
                           - `disable_security` - Whether to disable the security checks at all. Defaults to `False`
         :param force_me: Either this gallery buttons must be pressed only by owner scope or no
         :param always_allow: Users, that are allowed to press buttons in addition to previous rules
-        :param disable_security: By default, Hikka will try to check security of gallery
+        :param disable_security: By default, Heroku will try to check security of gallery
                                  If you want to disable all security checks on this gallery in particular, pass `disable_security=True`
         :return: Status of answer
         """

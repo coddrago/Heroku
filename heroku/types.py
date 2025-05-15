@@ -54,7 +54,7 @@ from .pointers import PointerDict, PointerList
 
 __all__ = [
     "JSONSerializable",
-    "HikkaReplyMarkup",
+    "HerokuReplyMarkup",
     "ListLike",
     "Command",
     "StringLoader",
@@ -77,7 +77,7 @@ logger = logging.getLogger(__name__)
 
 
 JSONSerializable = typing.Union[str, int, float, bool, list, dict, None]
-HikkaReplyMarkup = typing.Union[typing.List[typing.List[dict]], typing.List[dict], dict]
+HerokuReplyMarkup = typing.Union[typing.List[typing.List[dict]], typing.List[dict], dict]
 ListLike = typing.Union[list, set, tuple]
 Command = typing.Callable[..., typing.Awaitable[typing.Any]]
 
@@ -483,7 +483,7 @@ class Module:
             if version.__version__ < ver:
                 _raise(
                     RuntimeError(
-                        f"Library requires Hikka version {'{}.{}.{}'.format(*ver)}+"
+                        f"Library requires Heroku version {'{}.{}.{}'.format(*ver)}+"
                     )
                 )
 
@@ -796,7 +796,7 @@ class ModuleConfig(dict):
         if callable(ret):
             try:
                 # Compatibility tweak
-                # does nothing in Hikka
+                # does nothing in Heroku
                 ret = ret(message)
             except Exception:
                 ret = ret()

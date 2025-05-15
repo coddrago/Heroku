@@ -43,7 +43,7 @@ from aiogram.utils.exceptions import (
 from herokutl.utils import resolve_inline_message_id
 
 from .. import utils
-from ..types import HikkaReplyMarkup
+from ..types import HerokuReplyMarkup
 from .types import InlineCall, InlineUnit
 
 logger = logging.getLogger(__name__)
@@ -52,7 +52,7 @@ logger = logging.getLogger(__name__)
 class Utils(InlineUnit):
     def _generate_markup(
         self,
-        markup_obj: typing.Optional[typing.Union[HikkaReplyMarkup, str]],
+        markup_obj: typing.Optional[typing.Union[HerokuReplyMarkup, str]],
     ) -> typing.Optional[InlineKeyboardMarkup]:
         """Generate markup for form or list of `dict`s"""
         if not markup_obj:
@@ -276,7 +276,7 @@ class Utils(InlineUnit):
         return None
 
     def _normalize_markup(
-        self, reply_markup: HikkaReplyMarkup
+        self, reply_markup: HerokuReplyMarkup
     ) -> typing.List[typing.List[typing.Dict[str, typing.Any]]]:
         if isinstance(reply_markup, dict):
             return [[reply_markup]]
@@ -294,7 +294,7 @@ class Utils(InlineUnit):
     async def _edit_unit(
         self,
         text: typing.Optional[str] = None,
-        reply_markup: typing.Optional[HikkaReplyMarkup] = None,
+        reply_markup: typing.Optional[HerokuReplyMarkup] = None,
         *,
         photo: typing.Optional[str] = None,
         file: typing.Optional[str] = None,
@@ -723,7 +723,7 @@ class Utils(InlineUnit):
 
     def _validate_markup(
         self,
-        buttons: typing.Optional[HikkaReplyMarkup],
+        buttons: typing.Optional[HerokuReplyMarkup],
     ) -> typing.List[typing.List[typing.Dict[str, typing.Any]]]:
         if buttons is None:
             buttons = []

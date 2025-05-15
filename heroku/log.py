@@ -80,7 +80,7 @@ def override_text(exception: Exception) -> typing.Optional[str]:
     return None
 
 
-class HikkaException:
+class HerokuException:
     def __init__(
         self,
         message: str,
@@ -102,7 +102,7 @@ class HikkaException:
         tb: traceback.TracebackException,
         stack: typing.Optional[typing.List[inspect.FrameInfo]] = None,
         comment: typing.Optional[typing.Any] = None,
-    ) -> "HikkaException":
+    ) -> "HerokuException":
         def to_hashable(dictionary: dict) -> dict:
             dictionary = dictionary.copy()
             for key, value in dictionary.items():
@@ -274,7 +274,7 @@ class TelegramLogsHandler(logging.Handler):
         self,
         call: BotInlineCall,
         bot: "aiogram.Bot",  # type: ignore  # noqa: F821
-        item: HikkaException,
+        item: HerokuException,
     ):
         chunks = item.message + "\n\n<b>🪐 Full traceback:</b>\n" + item.full_stack
 
@@ -288,7 +288,7 @@ class TelegramLogsHandler(logging.Handler):
         for chunk in chunks[1:]:
             await bot.send_message(chat_id=call.chat_id, text=chunk)
 
-    def _gen_web_debug_button(self, item: HikkaException) -> list:
+    def _gen_web_debug_button(self, item: HerokuException) -> list:
         if not item.sysinfo:
             return []
 
@@ -318,7 +318,7 @@ class TelegramLogsHandler(logging.Handler):
     async def _start_debugger(
         self,
         call: "InlineCall",  # type: ignore  # noqa: F821
-        item: HikkaException,
+        item: HerokuException,
     ):
         if not self.web_debugger:
             self.web_debugger = WebDebugger()
@@ -387,7 +387,7 @@ class TelegramLogsHandler(logging.Handler):
                         ),
                     )
                     for item in self.tg_buff
-                    if isinstance(item[0], HikkaException)
+                    if isinstance(item[0], HerokuException)
                     and (not item[1] or item[1] == client_id or self.force_send_all)
                 ]
                 for client_id in self._mods
@@ -456,7 +456,7 @@ class TelegramLogsHandler(logging.Handler):
 
         if record.levelno >= self.tg_level:
             if record.exc_info:
-                exc = HikkaException.from_exc_info(
+                exc = HerokuException.from_exc_info(
                     *record.exc_info,
                     stack=record.__dict__.get("stack", None),
                     comment=record.msg % record.args,
