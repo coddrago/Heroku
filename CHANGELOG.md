@@ -82,8 +82,8 @@
 - Fix request_join error
 - Decrease module info length in heta
 - Add privacy switch to `UnitHeta`
-- Add HerokuHost as a platform
-- Update to Heroku-TL 2.0.7
+- Add HikkaHost as a platform
+- Update to Hikka-TL 2.0.7
 - Allow double-restart
 - Personal messages scam modules protection
 - https://github.com/coddrago/Heroku/issues/115
