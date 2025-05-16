@@ -253,7 +253,7 @@ class Web:
         if "JAMHOST" in os.environ:
             return web.Response(status=403, body="Forbidden by JamHost EULA")
 
-        if "HEROKUHOST" in os.environ:
+        if "HIKKAHOST" in os.environ:
             return web.Response(status=403, body="Forbidden by HerokuHost EULA")
 
         if not self._check_session(request):
@@ -334,7 +334,7 @@ class Web:
         if "JAMHOST" in os.environ:
             return web.Response(status=403, body="Forbidden by JamHost EULA")
 
-        if "HEROKUHOST" in os.environ:
+        if "HIKKAHOST" in os.environ:
             return web.Response(status=403, body="Forbidden by HerokuHost EULA")
 
         if self._pending_client:
