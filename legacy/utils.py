@@ -932,7 +932,7 @@ def get_named_platform() -> str:
     if main.IS_HIKKAHOST:
         return "🌼 HikkaHost"
 
-    if main.SKIRIHOST:
+    if main.IS_SOKIRIHOST:
         return "🦊 SkiriHost"
 
     if main.IS_DOCKER:
