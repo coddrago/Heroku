@@ -187,6 +187,15 @@ class Utils(InlineUnit):
                                 web_app=WebAppInfo(button["data"]),
                             )
                         ]
+
+                    elif "copy" in button:
+                        line += [
+                            InlineKeyboardButton(
+                                button["text"],
+                                copy = button["copy"]
+                            )
+                        ]
+                        
                     elif "switch_inline_query_current_chat" in button:
                         line += [
                             InlineKeyboardButton(
@@ -751,6 +760,7 @@ class Utils(InlineUnit):
                 or "input" in button
                 or "data" in button
                 or "action" in button
+                or "copy" in button
                 for button in row
             )
             for row in buttons
