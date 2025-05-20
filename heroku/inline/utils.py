@@ -542,16 +542,17 @@ class Utils(InlineUnit):
                     else unit.get("buttons", [])
                 ),
             )
-        except RetryAfter as e:
+        except TelegramRetryAfter as e:
             logger.info("Sleeping %ss on aiogram FloodWait...", e.timeout)
             await asyncio.sleep(e.timeout)
             return await self._edit_unit(**utils.get_kwargs())
-        except MessageIdInvalid:
-            with contextlib.suppress(Exception):
-                await query.answer(
-                    "I should have edited some message, but it is deleted :("
-                )
-            return False
+        except TelegramAPIError:
+            if True: # TODO
+                with contextlib.suppress(Exception):
+                    await query.answer(
+                        "I should have edited some message, but it is deleted :("
+                    )
+                return False
         else:
             return True
 
