@@ -26,7 +26,7 @@ from aiogram.types import (
     InlineQueryResultArticle,
     InputTextMessageContent,
 )
-from aiogram.utils.exceptions import RetryAfter
+from aiogram.exceptions import TelegramRetryAfter
 from herokutl.errors.rpcerrorlist import ChatSendInlineForbiddenError
 from herokutl.extensions.html import CUSTOM_EMOJIS
 from herokutl.tl.types import Message
@@ -277,7 +277,7 @@ class List(InlineUnit):
                 reply_markup=self._list_markup(unit_id),
             )
             await call.answer()
-        except RetryAfter as e:
+        except TelegramRetryAfter as e:
             await call.answer(
                 f"Got FloodWait. Wait for {e.timeout} seconds",
                 show_alert=True,
