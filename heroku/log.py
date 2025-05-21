@@ -25,7 +25,7 @@ import typing
 from logging.handlers import RotatingFileHandler
 
 import herokutl
-from aiogram.utils.exceptions import NetworkError
+from aiogram.exceptions import TelegramNetworkError
 from herokutl.errors import PersistentTimestampOutdatedError
 
 from . import utils
@@ -72,7 +72,7 @@ linecache.getlines = getlines
 
 def override_text(exception: Exception) -> typing.Optional[str]:
     """Returns error-specific description if available, else `None`"""
-    if isinstance(exception, (NetworkError, asyncio.exceptions.TimeoutError)):
+    if isinstance(exception, (TelegramNetworkError, asyncio.exceptions.TimeoutError)):
         return "✈️ <b>You have problems with internet connection on your server.</b>"
     elif isinstance(exception, PersistentTimestampOutdatedError):
         return "✈️ <b>Telegram has problems with their datacenters.</b>"
