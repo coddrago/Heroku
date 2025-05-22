@@ -19,7 +19,7 @@ import time
 import typing
 
 from aiogram import Bot, Dispatcher
-from aiogram.enums import ParseMode, ContentType
+from aiogram.enums import ParseMode
 from aiogram.exceptions import TelegramNetworkError, TelegramUnauthorizedError
 from aiogram.client.default import DefaultBotProperties
 from herokutl.errors.rpcerrorlist import InputUserDeactivatedError, YouBlockedUserError
@@ -186,7 +186,6 @@ class InlineManager(
         self._dp.message.register(
             self._message_handler,
             lambda *_: True,
-            content_types=["any"],
         )
 
         old = self.bot.get_updates
