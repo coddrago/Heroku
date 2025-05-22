@@ -21,6 +21,7 @@ import time
 import zipfile
 from pathlib import Path
 
+from aiogram.types import InputFile
 from herokutl.tl.types import Message
 
 from .. import loader, utils
@@ -153,7 +154,7 @@ class HerokuBackupMod(loader.Module):
 
             await self.inline.bot.send_document(
                 int(f"-100{self._backup_channel.id}"),
-                archive,
+                InputFile(archive, filename=archive.name),
                 reply_markup=self.inline.generate_markup(
                     [
                         [
