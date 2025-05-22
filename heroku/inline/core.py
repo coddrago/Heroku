@@ -19,7 +19,7 @@ import time
 import typing
 
 from aiogram import Bot, Dispatcher
-from aiogram.enums import ParseMode
+from aiogram.enums import ParseMode, ContentType
 from aiogram.exceptions import TelegramNetworkError, TelegramUnauthorizedError
 from aiogram.client.default import DefaultBotProperties
 from herokutl.errors.rpcerrorlist import InputUserDeactivatedError, YouBlockedUserError
@@ -204,7 +204,7 @@ class InlineManager(
 
         self.bot.get_updates = new
 
-        self._task = asyncio.ensure_future(self._dp.start_polling())
+        self._task = asyncio.ensure_future(self._dp.start_polling(self._bot))
         self._cleaner_task = asyncio.ensure_future(self._cleaner())
 
     async def _stop(self):
