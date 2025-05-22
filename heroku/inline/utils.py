@@ -230,7 +230,7 @@ class Utils(InlineUnit):
                     )
                     return False
 
-            markup.row(*line)
+            markup.inline_keyboard.append(line)
 
         return markup
 
