@@ -143,6 +143,8 @@ class InlineCall(CallbackQuery, InlineMessage):
         }:
             setattr(self, attr, getattr(call, attr, None))
 
+        self.as_(inline_manager.bot)
+
         self.original_call = call
 
         InlineMessage.__init__(
