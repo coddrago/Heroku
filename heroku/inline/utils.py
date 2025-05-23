@@ -28,6 +28,7 @@ from aiogram.types import (
     InlineKeyboardMarkup,
     InputFile,
     WebAppInfo,
+    CopyTextButton,
     InputMediaAnimation,
     InputMediaAudio,
     InputMediaDocument,
@@ -191,7 +192,9 @@ class Utils(InlineUnit):
                         line += [
                             InlineKeyboardButton(
                                 text=button["text"],
-                                copy = button["copy"]
+                                copy_text=CopyTextButton(
+                                    text=button["copy"]
+                                )
                             )
                         ]
                         
