@@ -972,17 +972,19 @@ class Heroku:
 
         await asyncio.gather(*[self.amain_wrapper(client) for client in self.clients])
 
-    def _shutdown_handler(self, signum, frame):
-        """Shutdown handler"""
-        logging.info("Bye")
-        for client in self.clients:
-            client.disconnect()
-
+    async def _shutdown_handler(self):
+        for t in (getattr(self, "_task", None), getattr(self, "_cleaner_task", None)):
+            if t: t.cancel()
+        await self._dp.stop_polling()
+        await self.bot.session.close()
+        for c in self.clients:
+            await c.disconnect()
+        self.loop.stop()
         sys.exit(0)
 
     def main(self):
         """Main entrypoint"""
-        #todosignal.signal(signal.SIGINT, self._shutdown_handler)
+        signal.signal(signal.SIGINT, self._shutdown_handler)
         self.loop.run_until_complete(self._main())
         self.loop.close()
 
