@@ -16,6 +16,7 @@ from aiogram.types import CallbackQuery
 from aiogram.types import InlineQuery as AiogramInlineQuery
 from aiogram.types import InlineQueryResultArticle, InputTextMessageContent
 from aiogram.types import Message as AiogramMessage
+from pydantic import ConfigDict
 
 from .. import utils
 
@@ -121,6 +122,7 @@ class BotInlineMessage:
 
 class InlineCall(CallbackQuery, InlineMessage):
     """Modified version of classic aiogram `CallbackQuery`"""
+    model_config = ConfigDict(frozen=False)
 
     def __init__(
         self,
@@ -153,6 +155,7 @@ class InlineCall(CallbackQuery, InlineMessage):
 
 class BotInlineCall(CallbackQuery, BotInlineMessage):
     """Modified version of classic aiogram `CallbackQuery`"""
+    model_config = ConfigDict(frozen=False)
 
     def __init__(
         self,
@@ -234,12 +237,12 @@ class InlineQuery(AiogramInlineQuery):
     async def e400(self):
         await self.answer(
             self._get_res(
-                "🚫 400",
-                (
+                title="🚫 400",
+                description=(
                     "Bad request. You need to pass right arguments, follow module's"
                     " documentation"
                 ),
-                "https://img.icons8.com/color/344/swearing-male--v1.png",
+                thumb_url="https://img.icons8.com/color/344/swearing-male--v1.png",
             ),
             cache_time=0,
         )
@@ -247,9 +250,9 @@ class InlineQuery(AiogramInlineQuery):
     async def e403(self):
         await self.answer(
             self._get_res(
-                "🚫 403",
-                "You have no permissions to access this result",
-                "https://img.icons8.com/external-wanicon-flat-wanicon/344/external-forbidden-new-normal-wanicon-flat-wanicon.png",
+                title="🚫 403",
+                description="You have no permissions to access this result",
+                thumb_url="https://img.icons8.com/external-wanicon-flat-wanicon/344/external-forbidden-new-normal-wanicon-flat-wanicon.png",
             ),
             cache_time=0,
         )
@@ -257,9 +260,9 @@ class InlineQuery(AiogramInlineQuery):
     async def e404(self):
         await self.answer(
             self._get_res(
-                "🚫 404",
-                "No results found",
-                "https://img.icons8.com/external-justicon-flat-justicon/344/external-404-error-responsive-web-design-justicon-flat-justicon.png",
+                title="🚫 404",
+                description="No results found",
+                thumb_url="https://img.icons8.com/external-justicon-flat-justicon/344/external-404-error-responsive-web-design-justicon-flat-justicon.png",
             ),
             cache_time=0,
         )
@@ -267,9 +270,9 @@ class InlineQuery(AiogramInlineQuery):
     async def e426(self):
         await self.answer(
             self._get_res(
-                "🚫 426",
-                "You need to update Heroku before sending this request",
-                "https://img.icons8.com/fluency/344/approve-and-update.png",
+                title="🚫 426",
+                description="You need to update Heroku before sending this request",
+                thumb_url="https://img.icons8.com/fluency/344/approve-and-update.png",
             ),
             cache_time=0,
         )
@@ -277,9 +280,9 @@ class InlineQuery(AiogramInlineQuery):
     async def e500(self):
         await self.answer(
             self._get_res(
-                "🚫 500",
-                "Internal userbot error while processing request. More info in logs",
-                "https://img.icons8.com/external-vitaliy-gorbachev-flat-vitaly-gorbachev/344/external-error-internet-security-vitaliy-gorbachev-flat-vitaly-gorbachev.png",
+                title="🚫 500",
+                description="Internal userbot error while processing request. More info in logs",
+                thumb_url="https://img.icons8.com/external-vitaliy-gorbachev-flat-vitaly-gorbachev/344/external-error-internet-security-vitaliy-gorbachev-flat-vitaly-gorbachev.png",
             ),
             cache_time=0,
         )

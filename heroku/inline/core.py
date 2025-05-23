@@ -140,7 +140,7 @@ class InlineManager(
         except TelegramUnauthorizedError:
             logger.critical("Token expired, revoking...")
             return await self._dp_revoke_token(False)
-        logger.debug(f"Initialized {self.bot_username}")
+
         try:
             m = await self._client.send_message(self.bot_username, "/start heroku init")
         except (InputUserDeactivatedError, ValueError):

@@ -982,7 +982,7 @@ class Heroku:
 
     def main(self):
         """Main entrypoint"""
-        signal.signal(signal.SIGINT, self._shutdown_handler)
+        #todosignal.signal(signal.SIGINT, self._shutdown_handler)
         self.loop.run_until_complete(self._main())
         self.loop.close()
 
