@@ -973,6 +973,7 @@ class Heroku:
         await asyncio.gather(*[self.amain_wrapper(client) for client in self.clients])
 
     async def _shutdown_handler(self):
+        logging.debug("Ctrl + C....... Bye?")
         for t in (getattr(self, "_task", None), getattr(self, "_cleaner_task", None)):
             if t: t.cancel()
         await self._dp.stop_polling()
@@ -980,13 +981,14 @@ class Heroku:
         for c in self.clients:
             await c.disconnect()
         self.loop.stop()
-        sys.exit(0)
+        logging.info("Bye!")
 
     def main(self):
         """Main entrypoint"""
-        signal.signal(signal.SIGINT, self._shutdown_handler)
+        self.loop.add_signal_handler(signal.SIGINT,lambda: asyncio.create_task(self._shutdown()))
         self.loop.run_until_complete(self._main())
-        self.loop.close()
+        if not self.loop.is_closed():
+            self.loop.close()
 
 
 herokutl.extensions.html.CUSTOM_EMOJIS = not get_config_key("disable_custom_emojis")
