@@ -20,7 +20,7 @@ import typing
 
 from aiogram import Bot, Dispatcher
 from aiogram.enums import ParseMode
-from aiogram.exceptions import TelegramNetworkError, TelegramUnauthorizedError
+from aiogram.exceptions import TelegramConflictError, TelegramUnauthorizedError
 from aiogram.client.default import DefaultBotProperties
 from herokutl.errors.rpcerrorlist import InputUserDeactivatedError, YouBlockedUserError
 from herokutl.tl.functions.contacts import UnblockRequest
@@ -195,22 +195,22 @@ class InlineManager(
             nonlocal revoke, old
             try:
                 return await old(*args, **kwargs)
-            #except TelegramNetworkError:
-            #    await revoke()
+            except TelegramConflictError:
+                await revoke()
             except TelegramUnauthorizedError:
                 logger.critical("Got Unauthorized")
                 await self._stop()
 
         self.bot.get_updates = new
 
-        self._task = asyncio.ensure_future(self._dp.start_polling(self._bot))
+        self._task = asyncio.ensure_future(self._dp.start_polling(self._bot, handle_signals=False))
         self._cleaner_task = asyncio.ensure_future(self._cleaner())
 
     async def _stop(self):
         """Stop the bot"""
-        await self._task.cancel()
+        self._task.cancel()
         await self._dp.stop_polling()
-        await self._cleaner_task.cancel()
+        self._cleaner_task.cancel()
 
     def pop_web_auth_token(self, token: str) -> bool:
         """
