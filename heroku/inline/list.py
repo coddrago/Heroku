@@ -314,8 +314,8 @@ class List(InlineUnit):
                                 id=utils.rand(20),
                                 title="Heroku",
                                 input_message_content=InputTextMessageContent(
-                                    self.sanitise_text(unit["strings"][0]),
-                                    "HTML",
+                                    message_text=self.sanitise_text(unit["strings"][0]),
+                                    parse_mode="HTML",
                                     disable_web_page_preview=True,
                                 ),
                                 reply_markup=self._list_markup(inline_query.query),

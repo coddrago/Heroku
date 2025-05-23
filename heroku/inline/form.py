@@ -417,14 +417,14 @@ class Form(InlineUnit):
                                     )
                                 ),
                                 input_message_content=InputTextMessageContent(
-                                    (
+                                    message_text=(
                                         "🔄 <b>Transferring value to"
                                         " userbot...</b>\n<i>This message will be"
                                         " deleted automatically</i>"
                                         if inline_query.from_user.id == self._me
                                         else "🔄 <b>Transferring value to userbot...</b>"
                                     ),
-                                    "HTML",
+                                    parse_mode="HTML",
                                     disable_web_page_preview=True,
                                 ),
                             )
@@ -559,8 +559,8 @@ class Form(InlineUnit):
                             id=utils.rand(20),
                             title="Heroku",
                             input_message_content=InputTextMessageContent(
-                                form["text"],
-                                "HTML",
+                                message_text=form["text"],
+                                parse_mode="HTML",
                                 disable_web_page_preview=True,
                             ),
                             reply_markup=self.generate_markup(inline_query.query),
