@@ -985,10 +985,15 @@ class Heroku:
 
     def main(self):
         """Main entrypoint"""
-        self.loop.add_signal_handler(signal.SIGINT,lambda: asyncio.create_task(self._shutdown()))
-        self.loop.run_until_complete(self._main())
-        if not self.loop.is_closed():
-            self.loop.close()
+        self.loop.add_signal_handler(
+            signal.SIGINT,
+            lambda: asyncio.create_task(self._shutdown_handler())
+        )
+        try:
+            self.loop.run_until_complete(self._main())
+        finally:
+            if not self.loop.is_closed():
+                self.loop.close()
 
 
 herokutl.extensions.html.CUSTOM_EMOJIS = not get_config_key("disable_custom_emojis")
