@@ -147,7 +147,7 @@ class QueryGallery(InlineUnit):
                         parse_mode="HTML",
                         disable_web_page_preview=True,
                     ),
-                    thumb_url=photo_url,
+                    thumbnail_url=photo_url,
                     thumb_width=128,
                     thumb_height=128,
                 )

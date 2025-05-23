@@ -220,7 +220,7 @@ class InlineQuery(AiogramInlineQuery):
         )
 
     @staticmethod
-    def _get_res(title: str, description: str, thumb_url: str) -> list:
+    def _get_res(title: str, description: str, thumbnail_url: str) -> list:
         return [
             InlineQueryResultArticle(
                 id=utils.rand(20),
@@ -230,7 +230,7 @@ class InlineQuery(AiogramInlineQuery):
                     message_text="😶‍🌫️ <i>There is nothing here...</i>",
                     parse_mode="HTML",
                 ),
-                thumb_url=thumb_url,
+                thumbnail_url=thumbnail_url,
                 thumb_width=128,
                 thumb_height=128,
             )
@@ -244,7 +244,7 @@ class InlineQuery(AiogramInlineQuery):
                     "Bad request. You need to pass right arguments, follow module's"
                     " documentation"
                 ),
-                thumb_url="https://img.icons8.com/color/344/swearing-male--v1.png",
+                thumbnail_url="https://img.icons8.com/color/344/swearing-male--v1.png",
             ),
             cache_time=0,
         )
@@ -254,7 +254,7 @@ class InlineQuery(AiogramInlineQuery):
             self._get_res(
                 title="🚫 403",
                 description="You have no permissions to access this result",
-                thumb_url="https://img.icons8.com/external-wanicon-flat-wanicon/344/external-forbidden-new-normal-wanicon-flat-wanicon.png",
+                thumbnail_url="https://img.icons8.com/external-wanicon-flat-wanicon/344/external-forbidden-new-normal-wanicon-flat-wanicon.png",
             ),
             cache_time=0,
         )
@@ -264,7 +264,7 @@ class InlineQuery(AiogramInlineQuery):
             self._get_res(
                 title="🚫 404",
                 description="No results found",
-                thumb_url="https://img.icons8.com/external-justicon-flat-justicon/344/external-404-error-responsive-web-design-justicon-flat-justicon.png",
+                thumbnail_url="https://img.icons8.com/external-justicon-flat-justicon/344/external-404-error-responsive-web-design-justicon-flat-justicon.png",
             ),
             cache_time=0,
         )
@@ -274,7 +274,7 @@ class InlineQuery(AiogramInlineQuery):
             self._get_res(
                 title="🚫 426",
                 description="You need to update Heroku before sending this request",
-                thumb_url="https://img.icons8.com/fluency/344/approve-and-update.png",
+                thumbnail_url="https://img.icons8.com/fluency/344/approve-and-update.png",
             ),
             cache_time=0,
         )
@@ -284,7 +284,7 @@ class InlineQuery(AiogramInlineQuery):
             self._get_res(
                 title="🚫 500",
                 description="Internal userbot error while processing request. More info in logs",
-                thumb_url="https://img.icons8.com/external-vitaliy-gorbachev-flat-vitaly-gorbachev/344/external-error-internet-security-vitaliy-gorbachev-flat-vitaly-gorbachev.png",
+                thumbnail_url="https://img.icons8.com/external-vitaliy-gorbachev-flat-vitaly-gorbachev/344/external-error-internet-security-vitaliy-gorbachev-flat-vitaly-gorbachev.png",
             ),
             cache_time=0,
         )

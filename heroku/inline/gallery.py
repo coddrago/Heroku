@@ -680,7 +680,7 @@ class Gallery(InlineUnit):
                         ext = None
 
                     args = {
-                        "thumb_url": "https://img.icons8.com/fluency/344/loading.png",
+                        "thumbnail_url": "https://img.icons8.com/fluency/344/loading.png",
                         "caption": self._get_caption(unit["uid"], index=0),
                         "parse_mode": "HTML",
                         "reply_markup": self._gallery_markup(unit["uid"]),
