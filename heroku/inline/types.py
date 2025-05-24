@@ -208,7 +208,7 @@ class InlineQuery(AiogramInlineQuery):
     """Modified version of original Aiogram InlineQuery"""
 
     model_config = ConfigDict(frozen=False)
-
+#
     def __init__(
         self,
         inline_query: AiogramInlineQuery,
