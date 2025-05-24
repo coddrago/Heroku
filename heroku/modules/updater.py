@@ -146,7 +146,7 @@ class UpdaterMod(loader.Module):
             self.set("ignore_permanent", self.get_latest())
             await call.answer(self.strings("latest_disabled"))
             return
-
+####
         await self._delete_all_upd_messages()
 
         with contextlib.suppress(Exception):
