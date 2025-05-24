@@ -208,12 +208,17 @@ class InlineQuery(AiogramInlineQuery):
 
     model_config = ConfigDict(frozen=False)
 
-    def __init__(self, inline_query: AiogramInlineQuery):
+    def __init__(
+        self,
+        inline_query: AiogramInlineQuery,
+        inline_manager: "InlineManager",  # type: ignore  # noqa: F821
+    ):
         super().__init__(**inline_query.model_dump())
 
         for attr in {"id", "from_user", "query", "offset", "chat_type", "location"}:
             setattr(self, attr, getattr(inline_query, attr, None))
 
+        self.as_(inline_manager.bot)
         self.inline_query = inline_query
         self.args = (
             self.inline_query.query.split(maxsplit=1)[1]
