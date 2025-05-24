@@ -590,12 +590,7 @@ class Utils(InlineUnit):
             unit_id = call.unit_id
 
         try:
-            message_id, peer, _, _ = resolve_inline_message_id(
-                self._units[unit_id]["inline_message_id"]
-            )
-
-            await self._client.delete_messages(peer, [message_id])
-            await self._unload_unit(unit_id)
+            await self._client.delete_messages(call._units.get(unit_id).get('chat'), call._units.get(unit_id).get('message_id'))
         except Exception:
             return False
 
