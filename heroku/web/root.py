@@ -503,7 +503,7 @@ class Web:
         markup = InlineKeyboardMarkup()
         markup.add(
             InlineKeyboardButton(
-                "🔓 Authorize user",
+                text="🔓 Authorize user",
                 callback_data=f"authorize_web_{token}",
             )
         )
