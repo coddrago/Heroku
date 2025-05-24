@@ -12,7 +12,6 @@
 
 import logging
 
-from aiogram import Bot
 from aiogram.types import CallbackQuery
 from aiogram.types import InlineQuery as AiogramInlineQuery
 from aiogram.types import InlineQueryResultArticle, InputTextMessageContent
@@ -208,18 +207,13 @@ class InlineQuery(AiogramInlineQuery):
     """Modified version of original Aiogram InlineQuery"""
 
     model_config = ConfigDict(frozen=False)
-#
-    def __init__(
-        self,
-        inline_query: AiogramInlineQuery,
-        bot: "Bot",
-    ):
+
+    def __init__(self, inline_query: AiogramInlineQuery):
         super().__init__(**inline_query.model_dump())
 
         for attr in {"id", "from_user", "query", "offset", "chat_type", "location"}:
             setattr(self, attr, getattr(inline_query, attr, None))
 
-        self.as_(bot.bot)
         self.inline_query = inline_query
         self.args = (
             self.inline_query.query.split(maxsplit=1)[1]
