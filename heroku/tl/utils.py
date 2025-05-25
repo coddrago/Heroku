@@ -56,7 +56,7 @@ class HTMLToTelegramParser(HTMLParser):
             EntityType = MessageEntityStrike
         elif tag == 'blockquote':
             EntityType = MessageEntityBlockquote
-            args["collapsed"] = True if attrs.get('expandable') else False
+            args["collapsed"] = 'expandable' in attrs
         elif tag == 'code':
             try:
                 # If we're in the middle of a <pre> tag, this <code> tag is
