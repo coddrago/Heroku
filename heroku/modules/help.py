@@ -333,7 +333,7 @@ class Help(loader.Module):
 
         await utils.answer(
             message,
-            (self.config["desc_icon"] + " {}\n <blockquote>{}</blockquote><blockquote>{}</blockquote>").format(
+            (self.config["desc_icon"] + " {}\n <blockquote expandable>{}</blockquote expandable><blockquote>{}</blockquote>").format(
                 reply,
                 "".join(core_ + plain_ + (no_commands_ if force else [])),
                 (
