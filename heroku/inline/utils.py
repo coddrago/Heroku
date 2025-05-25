@@ -500,8 +500,8 @@ class Utils(InlineUnit):
 
                 return False
             except TelegramRetryAfter as e:
-                logger.info("Sleeping %ss on aiogram FloodWait...", e.timeout)
-                await asyncio.sleep(e.timeout)
+                logger.info("Sleeping %ss on aiogram FloodWait...", e.retry_after)
+                await asyncio.sleep(e.retry_after)
                 return await self._edit_unit(**utils.get_kwargs())
                 
 
@@ -546,8 +546,8 @@ class Utils(InlineUnit):
                 ),
             )
         except TelegramRetryAfter as e:
-            logger.info("Sleeping %ss on aiogram FloodWait...", e.timeout)
-            await asyncio.sleep(e.timeout)
+            logger.info("Sleeping %ss on aiogram FloodWait...", e.retry_after)
+            await asyncio.sleep(e.retry_after)
             return await self._edit_unit(**utils.get_kwargs())
         except TelegramAPIError:
             if True: # TODO

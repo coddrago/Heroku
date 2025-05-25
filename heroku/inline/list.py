@@ -279,7 +279,7 @@ class List(InlineUnit):
             await call.answer()
         except TelegramRetryAfter as e:
             await call.answer(
-                f"Got FloodWait. Wait for {e.timeout} seconds",
+                f"Got FloodWait. Wait for {e.retry_after} seconds",
                 show_alert=True,
             )
         except Exception:
