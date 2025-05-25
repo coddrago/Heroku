@@ -51,6 +51,8 @@ import emoji
 import git
 import grapheme
 import herokutl
+import herokutl.extensions
+import herokutl.extensions.html
 import requests
 from aiogram.types import Message as AiogramMessage
 from herokutl import hints
@@ -104,6 +106,10 @@ from ._internal import fw_protect
 from .inline.types import BotInlineCall, InlineCall, InlineMessage
 from .tl_cache import CustomTelegramClient
 from .types import HerokuReplyMarkup, ListLike, Module
+############# Temporary bypass of the original parser
+from .tl.utils import parse
+herokutl.extensions.html.parse = parse
+############# Issue: https://github.com/LonamiWebs/Telethon/issues/4627
 
 FormattingEntity = typing.Union[
     MessageEntityUnknown,
