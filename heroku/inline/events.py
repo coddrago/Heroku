@@ -64,7 +64,7 @@ class Events(InlineUnit):
             func=self._allmodules.inline_handlers[cmd],
             user=inline_query.from_user.id,
         ):
-            instance = InlineQuery(inline_query)
+            instance = InlineQuery(inline_query=inline_query)
 
             try:
                 if not (
