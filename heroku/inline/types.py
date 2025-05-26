@@ -140,7 +140,6 @@ class InlineCall(CallbackQuery, InlineMessage):
             "from_user",
             "message",
             "inline_message_id",
-            "chat_instance",
             "data",
             "game_short_name",
         }:
