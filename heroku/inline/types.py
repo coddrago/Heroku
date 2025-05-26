@@ -130,8 +130,11 @@ class InlineCall(CallbackQuery, InlineMessage):
         inline_manager: "InlineManager",  # type: ignore  # noqa: F821
         unit_id: str,
     ):
-        CallbackQuery.__init__(self, **call.model_dump())
-
+        dump = call.model_dump()
+        if "result_id" in dump:  # tryung to avoid ValidationError
+            dump["id"] = dump.pop("result_id")
+        dump.setdefault("chat_instance", "")
+        CallbackQuery.__init__(self, **dump)
         for attr in {
             "id",
             "from_user",
