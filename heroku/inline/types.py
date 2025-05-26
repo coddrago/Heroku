@@ -135,14 +135,6 @@ class InlineCall(CallbackQuery, InlineMessage):
             dump["id"] = dump.pop("result_id")
         dump["chat_instance"] = ""
         CallbackQuery.__init__(self, **dump)
-        for attr in {
-            "from_user",
-            "message",
-            "inline_message_id",
-            "data",
-            "game_short_name",
-        }:
-            setattr(self, attr, getattr(call, attr, None))
 
         self.as_(inline_manager.bot)
 
@@ -167,17 +159,6 @@ class BotInlineCall(CallbackQuery, BotInlineMessage):
         unit_id: str,
     ):
         CallbackQuery.__init__(self, **call.model_dump())
-
-        for attr in {
-            "id",
-            "from_user",
-            "message",
-            "chat",
-            "chat_instance",
-            "data",
-            "game_short_name",
-        }:
-            setattr(self, attr, getattr(call, attr, None))
 
         self.original_call = call
 
@@ -211,9 +192,6 @@ class InlineQuery(AiogramInlineQuery):
 
     def __init__(self, inline_query: AiogramInlineQuery):
         super().__init__(**inline_query.model_dump())
-
-        for attr in {"id", "from_user", "query", "offset", "chat_type", "location"}:
-            setattr(self, attr, getattr(inline_query, attr, None))
 
         self.inline_query = inline_query
         self.args = (
