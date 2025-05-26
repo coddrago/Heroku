@@ -119,7 +119,7 @@ class Gallery(InlineUnit):
             return False
 
         if isinstance(caption, list):
-            caption = ListGalleryHelper(lst=caption)
+            caption = ListGalleryHelper(caption)
 
         if not isinstance(manual_security, bool):
             logger.error(
@@ -187,7 +187,7 @@ class Gallery(InlineUnit):
 
         if isinstance(next_handler, list):
             if all(isinstance(i, str) for i in next_handler):
-                next_handler = ListGalleryHelper(lst=next_handler)
+                next_handler = ListGalleryHelper(next_handler)
             else:
                 logger.error(
                     (

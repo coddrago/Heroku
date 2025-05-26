@@ -382,7 +382,7 @@ class Form(InlineUnit):
 
         inline_message_id = self._units[unit_id]["inline_message_id"]
 
-        msg = InlineMessage(inline_manager=self, unit_id=unit_id, inline_message_id=inline_message_id)
+        msg = InlineMessage(self, unit_id, inline_message_id)
 
         if not isinstance(base_reply_markup, Placeholder):
             await msg.edit(text, reply_markup=base_reply_markup)
