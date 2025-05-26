@@ -133,7 +133,7 @@ class InlineCall(CallbackQuery, InlineMessage):
         dump = call.model_dump()
         if "result_id" in dump:  # tryung to avoid ValidationError
             dump["id"] = dump.pop("result_id")
-        dump.setdefault("chat_instance", "")
+        dump["chat_instance"] = ""
         CallbackQuery.__init__(self, **dump)
         for attr in {
             "id",
