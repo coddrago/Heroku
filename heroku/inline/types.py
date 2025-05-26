@@ -136,7 +136,6 @@ class InlineCall(CallbackQuery, InlineMessage):
         dump["chat_instance"] = ""
         CallbackQuery.__init__(self, **dump)
         for attr in {
-            "id",
             "from_user",
             "message",
             "inline_message_id",
