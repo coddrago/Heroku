@@ -395,7 +395,7 @@ class TelegramLogsHandler(logging.Handler):
 
             for exceptions in self._exc_queue.values():
                 for exc in exceptions:
-                    await exc
+                    asyncio.create_task(exc)
 
             self.tg_buff = []
 
