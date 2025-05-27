@@ -51,6 +51,8 @@ import emoji
 import git
 import grapheme
 import herokutl
+import herokutl.extensions
+import herokutl.extensions.html
 import requests
 from aiogram.types import Message as AiogramMessage
 from herokutl import hints

@@ -28,17 +28,17 @@ from aiogram.types import (
     InlineKeyboardMarkup,
     InputFile,
     WebAppInfo,
+    CopyTextButton,
     InputMediaAnimation,
     InputMediaAudio,
     InputMediaDocument,
     InputMediaPhoto,
     InputMediaVideo,
 )
-from aiogram.utils.exceptions import (
-    BadRequest,
-    MessageIdInvalid,
-    MessageNotModified,
-    RetryAfter,
+from aiogram.exceptions import (
+    TelegramBadRequest,
+    TelegramAPIError,
+    TelegramRetryAfter,
 )
 from herokutl.utils import resolve_inline_message_id
 
@@ -61,7 +61,7 @@ class Utils(InlineUnit):
         if isinstance(markup_obj, InlineKeyboardMarkup):
             return markup_obj
 
-        markup = InlineKeyboardMarkup()
+        markup = InlineKeyboardMarkup(inline_keyboard=[])
 
         map_ = (
             self._units[markup_obj]["buttons"]
@@ -125,14 +125,14 @@ class Utils(InlineUnit):
 
                         line += [
                             InlineKeyboardButton(
-                                button["text"],
+                                text=str(button["text"]),
                                 url=button["url"],
                             )
                         ]
                     elif "callback" in button:
                         line += [
                             InlineKeyboardButton(
-                                button["text"],
+                                text=str(button["text"]),
                                 callback_data=button["_callback_data"],
                             )
                         ]
@@ -168,7 +168,7 @@ class Utils(InlineUnit):
                     elif "input" in button:
                         line += [
                             InlineKeyboardButton(
-                                button["text"],
+                                text=str(button["text"]),
                                 switch_inline_query_current_chat=button["_switch_query"]
                                 + " ",
                             )
@@ -176,14 +176,14 @@ class Utils(InlineUnit):
                     elif "data" in button:
                         line += [
                             InlineKeyboardButton(
-                                button["text"],
+                                text=str(button["text"]),
                                 callback_data=button["data"],
                             )
                         ]
                     elif "web_app" in button:
                         line += [
                             InlineKeyboardButton(
-                                button["text"],
+                                text=str(button["text"]),
                                 web_app=WebAppInfo(button["data"]),
                             )
                         ]
@@ -191,15 +191,17 @@ class Utils(InlineUnit):
                     elif "copy" in button:
                         line += [
                             InlineKeyboardButton(
-                                button["text"],
-                                copy = button["copy"]
+                                text=str(button["text"]),
+                                copy_text=CopyTextButton(
+                                    text=button["copy"]
+                                )
                             )
                         ]
                         
                     elif "switch_inline_query_current_chat" in button:
                         line += [
                             InlineKeyboardButton(
-                                button["text"],
+                                text=str(button["text"]),
                                 switch_inline_query_current_chat=button[
                                     "switch_inline_query_current_chat"
                                 ],
@@ -208,7 +210,7 @@ class Utils(InlineUnit):
                     elif "switch_inline_query" in button:
                         line += [
                             InlineKeyboardButton(
-                                button["text"],
+                                text=str(button["text"]),
                                 switch_inline_query_current_chat=button[
                                     "switch_inline_query"
                                 ],
@@ -231,7 +233,7 @@ class Utils(InlineUnit):
                     )
                     return False
 
-            markup.row(*line)
+            markup.inline_keyboard.append(line)
 
         return markup
 
@@ -423,16 +425,16 @@ class Utils(InlineUnit):
             media.name = "upload.mp4"
 
         if isinstance(media, io.BytesIO):
-            media = InputFile(media)
+            media = InputFile(filename=media)
 
         if file:
-            media = InputMediaDocument(media, caption=text, parse_mode="HTML")
+            media = InputMediaDocument(media=media, caption=text, parse_mode="HTML")
         elif photo:
-            media = InputMediaPhoto(media, caption=text, parse_mode="HTML")
+            media = InputMediaPhoto(media=media, caption=text, parse_mode="HTML")
         elif audio:
             if isinstance(audio, dict):
                 media = InputMediaAudio(
-                    audio["url"],
+                    media=audio["url"],
                     title=audio.get("title"),
                     performer=audio.get("performer"),
                     duration=audio.get("duration"),
@@ -441,14 +443,14 @@ class Utils(InlineUnit):
                 )
             else:
                 media = InputMediaAudio(
-                    audio,
+                    media=audio,
                     caption=text,
                     parse_mode="HTML",
                 )
         elif video:
-            media = InputMediaVideo(media, caption=text, parse_mode="HTML")
+            media = InputMediaVideo(media=media, caption=text, parse_mode="HTML")
         elif gif:
-            media = InputMediaAnimation(media, caption=text, parse_mode="HTML")
+            media = InputMediaAnimation(media=media, caption=text, parse_mode="HTML")
 
         if media is None and text is None and reply_markup:
             try:
@@ -485,24 +487,26 @@ class Utils(InlineUnit):
                         else unit.get("buttons", [])
                     ),
                 )
-            except MessageNotModified:
-                if query:
+            except TelegramAPIError as e:
+                if True: # TODO "" in e.message
+                    if query:
+                        with contextlib.suppress(Exception):
+                            await query.answer()
+                elif True: # TODO "" in e.message
                     with contextlib.suppress(Exception):
-                        await query.answer()
+                        await query.answer(
+                            "I should have edited some message, but it is deleted :("
+                        )
 
                 return False
-            except RetryAfter as e:
-                logger.info("Sleeping %ss on aiogram FloodWait...", e.timeout)
-                await asyncio.sleep(e.timeout)
+            except TelegramRetryAfter as e:
+                logger.info("Sleeping %ss on aiogram FloodWait...", e.retry_after)
+                await asyncio.sleep(e.retry_after)
                 return await self._edit_unit(**utils.get_kwargs())
-            except MessageIdInvalid:
-                with contextlib.suppress(Exception):
-                    await query.answer(
-                        "I should have edited some message, but it is deleted :("
-                    )
+                
 
                 return False
-            except BadRequest as e:
+            except TelegramBadRequest as e:
                 if "There is no text in the message to edit" not in str(e):
                     raise
 
@@ -541,16 +545,17 @@ class Utils(InlineUnit):
                     else unit.get("buttons", [])
                 ),
             )
-        except RetryAfter as e:
-            logger.info("Sleeping %ss on aiogram FloodWait...", e.timeout)
-            await asyncio.sleep(e.timeout)
+        except TelegramRetryAfter as e:
+            logger.info("Sleeping %ss on aiogram FloodWait...", e.retry_after)
+            await asyncio.sleep(e.retry_after)
             return await self._edit_unit(**utils.get_kwargs())
-        except MessageIdInvalid:
-            with contextlib.suppress(Exception):
-                await query.answer(
-                    "I should have edited some message, but it is deleted :("
-                )
-            return False
+        except TelegramAPIError:
+            if True: # TODO
+                with contextlib.suppress(Exception):
+                    await query.answer(
+                        "I should have edited some message, but it is deleted :("
+                    )
+                return False
         else:
             return True
 
@@ -585,12 +590,7 @@ class Utils(InlineUnit):
             unit_id = call.unit_id
 
         try:
-            message_id, peer, _, _ = resolve_inline_message_id(
-                self._units[unit_id]["inline_message_id"]
-            )
-
-            await self._client.delete_messages(peer, [message_id])
-            await self._unload_unit(unit_id)
+            await self._client.delete_messages(call._units.get(unit_id).get('chat'), call._units.get(unit_id).get('message_id'))
         except Exception:
             return False
 

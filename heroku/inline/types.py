@@ -16,6 +16,7 @@ from aiogram.types import CallbackQuery
 from aiogram.types import InlineQuery as AiogramInlineQuery
 from aiogram.types import InlineQueryResultArticle, InputTextMessageContent
 from aiogram.types import Message as AiogramMessage
+from pydantic import ConfigDict
 
 from .. import utils
 
@@ -121,6 +122,7 @@ class BotInlineMessage:
 
 class InlineCall(CallbackQuery, InlineMessage):
     """Modified version of classic aiogram `CallbackQuery`"""
+    model_config = ConfigDict(frozen=False)
 
     def __init__(
         self,
@@ -128,18 +130,13 @@ class InlineCall(CallbackQuery, InlineMessage):
         inline_manager: "InlineManager",  # type: ignore  # noqa: F821
         unit_id: str,
     ):
-        CallbackQuery.__init__(self)
+        dump = call.model_dump()
+        if "result_id" in dump:  # tryung to avoid ValidationError
+            dump["id"] = dump.pop("result_id")
+        dump["chat_instance"] = ""
+        CallbackQuery.__init__(self, **dump)
 
-        for attr in {
-            "id",
-            "from_user",
-            "message",
-            "inline_message_id",
-            "chat_instance",
-            "data",
-            "game_short_name",
-        }:
-            setattr(self, attr, getattr(call, attr, None))
+        self.as_(inline_manager.bot)
 
         self.original_call = call
 
@@ -153,6 +150,7 @@ class InlineCall(CallbackQuery, InlineMessage):
 
 class BotInlineCall(CallbackQuery, BotInlineMessage):
     """Modified version of classic aiogram `CallbackQuery`"""
+    model_config = ConfigDict(frozen=False)
 
     def __init__(
         self,
@@ -160,18 +158,7 @@ class BotInlineCall(CallbackQuery, BotInlineMessage):
         inline_manager: "InlineManager",  # type: ignore  # noqa: F821
         unit_id: str,
     ):
-        CallbackQuery.__init__(self)
-
-        for attr in {
-            "id",
-            "from_user",
-            "message",
-            "chat",
-            "chat_instance",
-            "data",
-            "game_short_name",
-        }:
-            setattr(self, attr, getattr(call, attr, None))
+        CallbackQuery.__init__(self, **call.model_dump())
 
         self.original_call = call
 
@@ -201,11 +188,10 @@ class BotMessage(AiogramMessage):
 class InlineQuery(AiogramInlineQuery):
     """Modified version of original Aiogram InlineQuery"""
 
-    def __init__(self, inline_query: AiogramInlineQuery):
-        super().__init__(self)
+    model_config = ConfigDict(frozen=False)
 
-        for attr in {"id", "from_user", "query", "offset", "chat_type", "location"}:
-            setattr(self, attr, getattr(inline_query, attr, None))
+    def __init__(self, inline_query: AiogramInlineQuery):
+        super().__init__(**inline_query.model_dump())
 
         self.inline_query = inline_query
         self.args = (
@@ -215,17 +201,17 @@ class InlineQuery(AiogramInlineQuery):
         )
 
     @staticmethod
-    def _get_res(title: str, description: str, thumb_url: str) -> list:
+    def _get_res(title: str, description: str, thumbnail_url: str) -> list:
         return [
             InlineQueryResultArticle(
                 id=utils.rand(20),
                 title=title,
                 description=description,
                 input_message_content=InputTextMessageContent(
-                    "😶‍🌫️ <i>There is nothing here...</i>",
+                    message_text="😶‍🌫️ <i>There is nothing here...</i>",
                     parse_mode="HTML",
                 ),
-                thumb_url=thumb_url,
+                thumbnail_url=thumbnail_url,
                 thumb_width=128,
                 thumb_height=128,
             )
@@ -234,12 +220,12 @@ class InlineQuery(AiogramInlineQuery):
     async def e400(self):
         await self.answer(
             self._get_res(
-                "🚫 400",
-                (
+                title="🚫 400",
+                description=(
                     "Bad request. You need to pass right arguments, follow module's"
                     " documentation"
                 ),
-                "https://img.icons8.com/color/344/swearing-male--v1.png",
+                thumbnail_url="https://img.icons8.com/color/344/swearing-male--v1.png",
             ),
             cache_time=0,
         )
@@ -247,9 +233,9 @@ class InlineQuery(AiogramInlineQuery):
     async def e403(self):
         await self.answer(
             self._get_res(
-                "🚫 403",
-                "You have no permissions to access this result",
-                "https://img.icons8.com/external-wanicon-flat-wanicon/344/external-forbidden-new-normal-wanicon-flat-wanicon.png",
+                title="🚫 403",
+                description="You have no permissions to access this result",
+                thumbnail_url="https://img.icons8.com/external-wanicon-flat-wanicon/344/external-forbidden-new-normal-wanicon-flat-wanicon.png",
             ),
             cache_time=0,
         )
@@ -257,9 +243,9 @@ class InlineQuery(AiogramInlineQuery):
     async def e404(self):
         await self.answer(
             self._get_res(
-                "🚫 404",
-                "No results found",
-                "https://img.icons8.com/external-justicon-flat-justicon/344/external-404-error-responsive-web-design-justicon-flat-justicon.png",
+                title="🚫 404",
+                description="No results found",
+                thumbnail_url="https://img.icons8.com/external-justicon-flat-justicon/344/external-404-error-responsive-web-design-justicon-flat-justicon.png",
             ),
             cache_time=0,
         )
@@ -267,9 +253,9 @@ class InlineQuery(AiogramInlineQuery):
     async def e426(self):
         await self.answer(
             self._get_res(
-                "🚫 426",
-                "You need to update Heroku before sending this request",
-                "https://img.icons8.com/fluency/344/approve-and-update.png",
+                title="🚫 426",
+                description="You need to update Heroku before sending this request",
+                thumbnail_url="https://img.icons8.com/fluency/344/approve-and-update.png",
             ),
             cache_time=0,
         )
@@ -277,9 +263,9 @@ class InlineQuery(AiogramInlineQuery):
     async def e500(self):
         await self.answer(
             self._get_res(
-                "🚫 500",
-                "Internal userbot error while processing request. More info in logs",
-                "https://img.icons8.com/external-vitaliy-gorbachev-flat-vitaly-gorbachev/344/external-error-internet-security-vitaliy-gorbachev-flat-vitaly-gorbachev.png",
+                title="🚫 500",
+                description="Internal userbot error while processing request. More info in logs",
+                thumbnail_url="https://img.icons8.com/external-vitaliy-gorbachev-flat-vitaly-gorbachev/344/external-error-internet-security-vitaliy-gorbachev-flat-vitaly-gorbachev.png",
             ),
             cache_time=0,
         )

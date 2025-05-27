@@ -19,8 +19,9 @@ import time
 import typing
 
 from aiogram import Bot, Dispatcher
-from aiogram.types import ParseMode
-from aiogram.utils.exceptions import TerminatedByOtherGetUpdates, Unauthorized
+from aiogram.enums import ParseMode
+from aiogram.exceptions import TelegramConflictError, TelegramUnauthorizedError
+from aiogram.client.default import DefaultBotProperties
 from herokutl.errors.rpcerrorlist import InputUserDeactivatedError, YouBlockedUserError
 from herokutl.tl.functions.contacts import UnblockRequest
 from herokutl.tl.types import Message
@@ -128,16 +129,15 @@ class InlineManager(
 
         self.init_complete = True
 
-        self.bot = Bot(token=self._token, parse_mode=ParseMode.HTML)
-        Bot.set_current(self.bot)
+        self.bot = Bot(token=self._token, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
         self._bot = self.bot
-        self._dp = Dispatcher(self.bot)
+        self._dp = Dispatcher()
 
         try:
             bot_me = await self.bot.get_me()
             self.bot_username = bot_me.username
             self.bot_id = bot_me.id
-        except Unauthorized:
+        except TelegramUnauthorizedError:
             logger.critical("Token expired, revoking...")
             return await self._dp_revoke_token(False)
 
@@ -168,25 +168,24 @@ class InlineManager(
 
         await self._client.delete_messages(self.bot_username, m)
 
-        self._dp.register_inline_handler(
+        self._dp.inline_query.register(
             self._inline_handler,
             lambda _: True,
         )
 
-        self._dp.register_callback_query_handler(
+        self._dp.callback_query.register(
             self._callback_query_handler,
             lambda _: True,
         )
 
-        self._dp.register_chosen_inline_handler(
+        self._dp.chosen_inline_result.register(
             self._chosen_inline_handler,
             lambda _: True,
         )
 
-        self._dp.register_message_handler(
+        self._dp.message.register(
             self._message_handler,
             lambda *_: True,
-            content_types=["any"],
         )
 
         old = self.bot.get_updates
@@ -196,21 +195,21 @@ class InlineManager(
             nonlocal revoke, old
             try:
                 return await old(*args, **kwargs)
-            except TerminatedByOtherGetUpdates:
+            except TelegramConflictError:
                 await revoke()
-            except Unauthorized:
+            except TelegramUnauthorizedError:
                 logger.critical("Got Unauthorized")
                 await self._stop()
 
         self.bot.get_updates = new
 
-        self._task = asyncio.ensure_future(self._dp.start_polling())
+        self._task = asyncio.ensure_future(self._dp.start_polling(self._bot, handle_signals=False))
         self._cleaner_task = asyncio.ensure_future(self._cleaner())
 
     async def _stop(self):
         """Stop the bot"""
         self._task.cancel()
-        self._dp.stop_polling()
+        await self._dp.stop_polling()
         self._cleaner_task.cancel()
 
     def pop_web_auth_token(self, token: str) -> bool:

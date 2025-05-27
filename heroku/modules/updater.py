@@ -144,7 +144,7 @@ class UpdaterMod(loader.Module):
 
         if call.data == "heroku/ignore_upd":
             self.set("ignore_permanent", self.get_latest())
-            await call.answer(self.strings("latest_disabled"))
+            await self.inline.bot(call.answer(self.strings("latest_disabled")))
             return
 
         await self._delete_all_upd_messages()
