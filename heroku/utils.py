@@ -1127,7 +1127,7 @@ def rand(size: int, /) -> str:
     :return: Random string
     """
     return "".join(
-        [random.choice("abcdefghijklmnopqrstuvwxyz1234567890!@$#$%*") for _ in range(size)]
+        [random.choice("abcdefghijklmnopqrstuvwxyz1234567890_") for _ in range(size)]
     )
 
 
