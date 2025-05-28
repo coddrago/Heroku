@@ -81,7 +81,7 @@ else:
     else:
         try:
             import herokutl  # noqa: F811
-            if tuple(map(int, herokutl.__version__.split("."))) < (1, 0, 2):
+            if tuple(map(int, herokutl.__version__.split("."))) < (1, 0, 6):
                 raise ImportError
         except ImportError:
             print("\U0001F504 Installing dependencies...")
