@@ -1,5 +1,5 @@
 # Heroku Changelog
-## 🪐 Heroku 1.6.9
+## 🪐 Heroku 1.7.0
 
 - First sex with a designer
 - added banner to ping
@@ -14,13 +14,15 @@
 - fixed bug with non-working .ping and .info on arch linux
 - updated .installation command
 - Telethon has been completely updated, moving to heroku-tl
-- new website: heroku-ub.top
-- update heroku-tl to 3.4.5
+- update heroku-tl to 1.0.6
 - added prefix to ping
 - removed official support serv00, tothost, goorm, railway
 - rename folder "hikka" to "heroku"
 - fix close btn
 - fix native imports
+- added converting Hikka backups to Heroku
+- updatet to aiogram 3.20.0
+- fix some bugs with buttons in inline
 
 ## 🪐 Heroku 1.6.8
 

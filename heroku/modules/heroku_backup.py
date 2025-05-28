@@ -257,7 +257,7 @@ class HerokuBackupMod(loader.Module):
                     [
                         [
                             {
-                                "text": self.strings["close_btn"],
+                                "text": "🔻 Close",
                                 "action": "close"
                             }
                         ]
@@ -289,7 +289,6 @@ class HerokuBackupMod(loader.Module):
         file = await reply.download_media(bytes)
         decoded_text = json.loads(file.decode())
         if re.match(r'(hikka.)(\S+\":)', file.decode()):
-            if self.strings.get("warn") is not None:
             await utils.answer(message,
                                self.strings["db_warning"],
                                reply_markup=
