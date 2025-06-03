@@ -17,6 +17,7 @@ import io
 import json
 import logging
 import os
+import re 
 import time
 import zipfile
 from pathlib import Path
@@ -232,6 +233,37 @@ class HerokuBackupMod(loader.Module):
             logger.exception("Restore from backupall failed")
             await call.answer(self.strings("reply_to_file"), show_alert=True)
 
+    async def convert(self, call: BotInlineCall, ans, file):
+        if ans == "y":
+            await utils.answer(
+                call,
+                self.strings["converting_db"]
+            )
+            fixed = re.sub(r'(hikka.)(\S+\":)', lambda m: 'heroku.' + m.group(2), file)
+            txt = io.BytesIO(fixed.encode())
+            txt.name = f"db-converted-{datetime.datetime.now():%d-%m-%Y-%H-%M}.json"
+            await utils.answer_file(
+                call,
+                txt,
+                caption=self.strings("backup_caption").format(
+                    prefix=utils.escape_html(self.get_prefix())
+                ),
+            )
+        else:
+            await utils.answer(
+                call,
+                self.strings["advice_converting"],
+                reply_markup=
+                    [
+                        [
+                            {
+                                "text": "🔻 Close",
+                                "action": "close"
+                            }
+                        ]
+                    ]
+                )
+
     @loader.command()
     async def backupdb(self, message: Message):
         txt = io.BytesIO(json.dumps(self._db).encode())
@@ -256,6 +288,24 @@ class HerokuBackupMod(loader.Module):
 
         file = await reply.download_media(bytes)
         decoded_text = json.loads(file.decode())
+        if re.match(r'(hikka.)(\S+\":)', file.decode()):
+            await utils.answer(message,
+                               self.strings["db_warning"],
+                               reply_markup=
+                                    [
+                                       {
+                                           "text": "❌",
+                                           "callback": self.convert,
+                                           "args": ("n", file.decode(),),
+                                       },
+                                       {
+                                           "text": "✅",
+                                           "callback": self.convert,
+                                           "args": ("y", file.decode(),),
+                                       }
+                                    ]
+                                )
+            return
 
         with contextlib.suppress(KeyError):
             decoded_text["heroku.inline"].pop("bot_token")

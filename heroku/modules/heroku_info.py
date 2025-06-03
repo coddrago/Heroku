@@ -142,7 +142,7 @@ class HerokuInfoMod(loader.Module):
             platform = platform.replace(emoji, icon)
         return (
             (
-                "<b>🪐 Heroku</b>\n"
+                "🪐 Heroku\n"
                 if self.config["show_heroku"]
                 else ""
             )

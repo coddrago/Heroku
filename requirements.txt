@@ -1,4 +1,4 @@
-git+https://github.com/ZetGoHack/heroku-tl-aio3.git
+heroku-tl-new==1.0.6
 pycloudflared==0.2.0
 
 # Python 3.9+
