@@ -137,7 +137,9 @@ class CommandDispatcher:
         ]
 
         self._cached_usernames.extend(
-            getattr(self._client.heroku_me, "usernames", None) or []
+            u.username.lower()
+            for u in getattr(self._client.heroku_me, "usernames", [])
+            or []
         )
 
         self.raw_handlers = []
