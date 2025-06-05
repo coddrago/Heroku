@@ -972,37 +972,21 @@ class Heroku:
 
         await asyncio.gather(*[self.amain_wrapper(client) for client in self.clients])
 
-    async def _shutdown_handler(self, final: bool = False):
-        if not final:
-            logging.info("Ctrl + C....... Bye?")
-            for client in self.clients:
-                inline = getattr(client.loader, "inline", None)
-                if inline:
-                    for t in (inline._task, inline._cleaner_task):
-                        if t:
-                            t.cancel()
-                    await inline._dp.stop_polling()
-                    await inline.bot.session.close()
-            for c in self.clients:
-                await c.disconnect()
-            logging.info("Bye!")
-        else:
-            for client in self.clients:
-                inline = getattr(client.loader, "inline", None)
-                if inline:
-                    inline._task.cancel()
-                    inline._cleaner_task.cancel()
-                    try:
-                        await inline._dp.stop_polling()
-                    except: pass
-                    try:
-                        await inline.bot.session.close()
-                    except: pass
-            for c in self.clients:
-                await c.disconnect()
-            for task in asyncio.all_tasks():
-                if task is not asyncio.current_task():
-                    task.cancel()
+    async def _shutdown_handler(self):
+        for client in self.clients:
+            inline = getattr(client.loader, "inline", None)
+            if inline:
+                for t in (inline._task, inline._cleaner_task):
+                    if t:
+                        t.cancel()
+                await inline._dp.stop_polling()
+                await inline.bot.session.close()
+        for c in self.clients:
+            await c.disconnect()
+        for task in asyncio.all_tasks():
+            if task is not asyncio.current_task():
+                task.cancel()
+        self.loop.stop()
 
     def main(self):
         """Main entrypoint"""
@@ -1013,7 +997,7 @@ class Heroku:
         try:
             self.loop.run_until_complete(self._main())
         finally:
-            self.loop.run_until_complete(self._shutdown_handler(True))
+            self.loop.run_until_complete(self._shutdown_handler())
 
 
 herokutl.extensions.html.CUSTOM_EMOJIS = not get_config_key("disable_custom_emojis")
