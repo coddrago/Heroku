@@ -143,7 +143,6 @@ heroku_settings:
   nothing: "<emoji document_id=5427052514094619126>🤷‍♀️</emoji> <b>Nothing to show...</b>"
   btn_yes: "🚸 Open anyway"
   btn_no: "🔻 Cancel"
-  lavhost_web: "✌️ <b>This link leads to your Heroku web interface on lavHost</b>\n\n<i>💡 You'll need to authorize using lavHost credentials, specified on registration</i>"
   disable_debugger: "✅ Debugger enabled"
   enable_debugger: "🚫 Debugger disabled"
   _cmd_doc_invoke: "<module or `core` for built-in methods> <method> - Only for debugging purposes. DO NOT USE IF YOU'RE NOT A DEVELOPER"
@@ -158,7 +157,6 @@ heroku_settings:
   _cmd_doc_watcherbl: "<module> - Toggle watcher in current chat"
   _cmd_doc_watcher: "<module> - Toggle global watcher rules\nArgs:\n[-c - only in chats]\n[-p - only in pm]\n[-o - only out]\n[-i - only incoming]"
   _cmd_doc_watchers: "List current watchers"
-  _cmd_doc_weburl: "Opens web tunnel to your Heroku web interface"
   _cls_doc: "Advanced settings for Heroku Userbot"
   core_protection_already_removed: "<emoji document_id=6003424016977628379>🔒</emoji> <b>Core protection is already removed</b>"
   core_protection_already_enabled: "<emoji document_id=6003424016977628379>🔒</emoji> <b>Core protection is already set up</b>"
@@ -198,6 +196,10 @@ heroku_web:
   opening_tunnel: "🔁 <b>Opening tunnel to Heroku web interface...</b>"
   tunnel_opened: "🎉 <b>Tunnel opened. This link is valid for about 1 hour</b>"
   web_btn: "🌍 Web interface"
+  _cmd_doc_weburl: "Opens web tunnel to your Heroku web interface"
+  btn_yes: "🚸 Open anyway"
+  btn_no: "🔻 Cancel"
+  lavhost_web: "✌️ <b>This link leads to your Heroku web interface on lavHost</b>\n\n<i>💡 You'll need to authorize using lavHost credentials, specified on registration</i>"
 
 heroku_backup:
   period: "⌚️ <b>The unit «ALPHA»</b> creates regular backups. These settings can be changed later.\n\nPlease select the backup frequency\n\n<b>🚫 It is thus impossible to restore modules downloaded from files with the .lm command! Be careful and do .backupmods before restoring.</b>"
