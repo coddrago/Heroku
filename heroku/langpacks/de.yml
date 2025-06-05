@@ -133,7 +133,6 @@ heroku_settings:
   nothing: "<emoji document_id=5427052514094619126>🤷‍♀️</emoji> <b>Nichts zu zeigen...</b>"
   btn_yes: "🚸 Trotzdem öffnen"
   btn_no: "🔻 Schließen"
-  lavhost_web: "✌️ <b>Über diesen Link gelangst du zur Heroku-Weboberfläche auf lavHost</b>\n\n<i>💡 Du musst dich mit den bei der lavHost-Einrichtung angegebenen Daten anmelden</i>"
   disable_debugger: "✅ Debugger aktiviert"
   enable_debugger: "🚫 Debugger deaktiviert"
   _cmd_doc_nonickchat: "Aktiviere NoNick für einen bestimmten Chat"
@@ -147,7 +146,6 @@ heroku_settings:
   _cmd_doc_watcherbl: "<Modul> - Aktiviere/deaktiviere Wächter im aktuellen Chat"
   _cmd_doc_watcher: "<Modul> - Verwaltung globaler Wächterregeln\nArgumente:\n[-c - nur in Chats]\n[-p - nur in privaten Nachrichten]\n[-o - nur ausgehende Nachrichten]\n[-i - nur eingehende Nachrichten]"
   _cmd_doc_watchers: "Zeigt aktive Wächter an"
-  _cmd_doc_weburl: "Öffnet einen Tunnel zur Heroku-Weboberfläche"
   core_protection_already_removed: "<emoji document_id=6003424016977628379>🔒</emoji> <b>Kernschutz wurde bereits entfernt</b>"
   core_protection_already_enabled: "<emoji document_id=6003424016977628379>🔒</emoji> <b>kernschutz wurde bereits installiert</b>"
   core_protection_confirm: "⚠️ <b>BITTE SORGFÄLTIG LESEN!</b>\n\nDurch das Entfernen des Kernschutzes bestätigst du, dass du weißt, was dies bedeutet und wofür es ist. Normalerweise benötigst du dies <b>nicht</b>. Wenn du kein Entwickler bist, benötigst du dies <b>nicht</b>. Wenn du unsicher bist, benötigst du dies <b>nicht</b>.\n\n<b>Bist du sicher, dass du den Kernschutz entfernen möchtest?</b>"
@@ -184,6 +182,10 @@ heroku_web:
   opening_tunnel: "🔁 <b>Öffne Tunnel zur Heroku-Weboberfläche...</b>"
   tunnel_opened: "🎉 <b>Der Tunnel ist geöffnet. Dieser Link bleibt maximal eine Stunde aktiv</b>"
   web_btn: "🌍 Web-Oberfläche"
+  btn_yes: "🚸 Trotzdem öffnen"
+  btn_no: "🔻 Schließen"
+  lavhost_web: "✌️ <b>Über diesen Link gelangst du zur Heroku-Weboberfläche auf lavHost</b>\n\n<i>💡 Du musst dich mit den bei der lavHost-Einrichtung angegebenen Daten anmelden</i>"
+  _cmd_doc_weburl: "Öffnet einen Tunnel zur Heroku-Weboberfläche"
 
 heroku_backup:
   period: "⌚️ <b>Die Unit «ALPHA»</b> erstellt regelmäßig Backups. Diese Einstellungen können später geändert werden.\n\nBitte wählen Sie die Backup-Häufigkeit\n\n<b>🚫 Es ist daher nicht möglich, Module, die mit dem Befehl .lm aus Dateien heruntergeladen wurden, wiederherzustellen! Seien Sie vorsichtig und führen Sie vor der Wiederherstellung .backupmods aus.</b>"
