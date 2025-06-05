@@ -428,7 +428,7 @@ class UpdaterMod(loader.Module):
         try:
             folder_id = (
                 max(
-                    (folder for folder in folders if hasattr(folder, "id")),
+                    (folder for folder in folders.filters if hasattr(folder, "id")),
                     key=lambda x: x.id,
                 ).id
                 + 1
