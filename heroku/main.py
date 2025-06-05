@@ -979,8 +979,10 @@ class Heroku:
                 for t in (inline._task, inline._cleaner_task):
                     if t:
                         t.cancel()
-                await inline._dp.stop_polling()
-                await inline.bot.session.close()
+                try:
+                    await inline._dp.stop_polling()
+                    await inline.bot.session.close()
+                except: pass
         for c in self.clients:
             await c.disconnect()
         for task in asyncio.all_tasks():
