@@ -527,6 +527,12 @@ rotating_handler.setFormatter(_main_formatter)
 
 
 def init():
+    class NoFetchUpdatesFilter(logging.Filter):
+        def filter(self, record: logging.LogRecord) -> bool:
+            msg = record.getMessage()
+            return "Failed to fetch updates" not in msg
+    
+    logging.getLogger("aiogram.dispatcher").addFilter(NoFetchUpdatesFilter())
     handler = logging.StreamHandler()
     handler.setLevel(logging.INFO)
     handler.setFormatter(_main_formatter)
