@@ -996,6 +996,8 @@ class Heroku:
         )
         try:
             self.loop.run_until_complete(self._main())
+        except:
+            pass
         finally:
             self.loop.run_until_complete(self._shutdown_handler())
 
