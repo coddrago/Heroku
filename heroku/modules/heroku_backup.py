@@ -233,18 +233,22 @@ class HerokuBackupMod(loader.Module):
             logger.exception("Restore from backupall failed")
             await call.answer(self.strings("reply_to_file"), show_alert=True)
 
+    def _convert(self, backup):
+        fixed = re.sub(r'(hikka\.)(\S+\":)', lambda m: 'heroku.' + m.group(2), backup)
+        txt = io.BytesIO(fixed.encode())
+        txt.name = f"db-converted-{datetime.datetime.now():%d-%m-%Y-%H-%M}.json"
+        return txt
+
     async def convert(self, call: BotInlineCall, ans, file):
         if ans == "y":
             await utils.answer(
                 call,
                 self.strings["converting_db"]
             )
-            fixed = re.sub(r'(hikka.)(\S+\":)', lambda m: 'heroku.' + m.group(2), file)
-            txt = io.BytesIO(fixed.encode())
-            txt.name = f"db-converted-{datetime.datetime.now():%d-%m-%Y-%H-%M}.json"
+            backup = self._convert(file)
             await utils.answer_file(
                 call,
-                txt,
+                backup,
                 caption=self.strings("backup_caption").format(
                     prefix=utils.escape_html(self.get_prefix())
                 ),
@@ -288,7 +292,7 @@ class HerokuBackupMod(loader.Module):
 
         file = await reply.download_media(bytes)
         decoded_text = json.loads(file.decode())
-        if re.match(r'(hikka.)(\S+\":)', file.decode()):
+        if re.search(r'"(hikka\.)(\S+\":)', file.decode()):
             await utils.answer(message,
                                self.strings["db_warning"],
                                reply_markup=
