@@ -15,6 +15,7 @@ import collections
 import json
 import logging
 import os
+import re
 import time
 import typing
 
@@ -143,7 +144,9 @@ class Database(dict):
             return
 
         try:
-            self.update(**json.loads(self._db_file.read_text()))
+            db = self._db_file.read_text()
+            db = re.sub(r'(hikka\.)(\S+\":)', lambda m: 'heroku.' + m.group(2), db)
+            self.update(**json.loads(db))
         except json.decoder.JSONDecodeError:
             logger.warning("Database read failed! Creating new one...")
         except FileNotFoundError:
