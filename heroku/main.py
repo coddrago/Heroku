@@ -1000,6 +1000,9 @@ class Heroku:
                     except: pass
             for c in self.clients:
                 await c.disconnect()
+            for task in asyncio.all_tasks():
+                if task is not asyncio.current_task():
+                    task.cancel()
 
     def main(self):
         """Main entrypoint"""
