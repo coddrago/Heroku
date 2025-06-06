@@ -1,4 +1,5 @@
 heroku-tl-new==1.0.8
 pycloudflared==0.2.0
+Pillow
 
 # Python 3.9+

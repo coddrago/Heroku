@@ -1,7 +1,6 @@
 # Heroku Changelog
 ## 🪐 Heroku 1.7.0
 
-- First sex with a designer
 - added banner to ping
 - added config for emoji in config (.cfg herokuconfig)
 - fixed close button in .update
@@ -21,7 +20,7 @@
 - fix close btn
 - fix native imports
 - added converting Hikka backups to Heroku
-- updatet to aiogram 3.20.0
+- updated to aiogram 3.20.0
 - fix some bugs with buttons in inline
 
 ## 🪐 Heroku 1.6.8
