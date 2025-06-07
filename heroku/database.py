@@ -145,7 +145,9 @@ class Database(dict):
 
         try:
             db = self._db_file.read_text()
-            db = re.sub(r'(hikka\.)(\S+\":)', lambda m: 'heroku.' + m.group(2), db)
+            if re.search(r'"(hikka\.)(\S+\":)', db):
+                logging.warning("Converting db after update")
+                db = re.sub(r'(hikka\.)(\S+\":)', lambda m: 'heroku.' + m.group(2), db)
             self.update(**json.loads(db))
         except json.decoder.JSONDecodeError:
             logger.warning("Database read failed! Creating new one...")

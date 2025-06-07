@@ -87,7 +87,7 @@ class HerokuBackupMod(loader.Module):
         self.set("period", value * 60 * 60)
         self.set("last_backup", round(time.time()))
 
-        await call.answer(self.strings("saved"), show_alert=True)
+        await self.inline.bot(call.answer(self.strings("saved"), show_alert=True))
         await call.delete()
 
     @loader.command()
