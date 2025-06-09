@@ -988,7 +988,6 @@ class Heroku:
         for task in asyncio.all_tasks():
             if task is not asyncio.current_task():
                 task.cancel()
-        logging.info("Bye!")
         self.loop.stop()
 
     def main(self):
@@ -1002,6 +1001,7 @@ class Heroku:
         except:
             pass
         finally:
+            logging.info("Bye!")
             self.loop.run_until_complete(self._shutdown_handler())
 
 
