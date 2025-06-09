@@ -60,7 +60,7 @@ class CoreMod(loader.Module):
                     "callback": self._inline__choose__installation,
                     "args": (platform,),
                 }
-                for platform in ['vds', 'termux','userland','jamhost']
+                for platform in ['vds','userland','jamhost']
             ],
             2
         )
@@ -312,7 +312,7 @@ class CoreMod(loader.Module):
 
         args = utils.get_args_raw(message)
 
-        if (not args or args not in {'-t', '-v', '-r', '-jh', '-ms', '-u'}) and \
+        if (not args or args not in {'-v', '-r', '-jh', '-ms', '-u'}) and \
             not (await self.inline.form(
                 self.strings("choose_installation"),
                 message,
@@ -326,8 +326,6 @@ class CoreMod(loader.Module):
                 message.peer_id,
                 "https://imgur.com/a/HrrFair.png",
                 caption=self.strings["installation"], reply_to=getattr(message, "reply_to_msg_id", None),)
-        elif "-t" in args:
-            await utils.answer(message, self.strings["termux_install"])
         elif "-v" in args:
             await utils.answer(message, self.strings["vds_install"])
         elif "-jh" in args:
