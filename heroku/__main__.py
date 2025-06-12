@@ -14,6 +14,7 @@
 
 import getpass
 import os
+import traceback
 import subprocess
 import sys
 import hashlib
