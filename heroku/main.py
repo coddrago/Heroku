@@ -84,7 +84,7 @@ else:
 
 BASE_DIR = (
     "/data"
-    if "DOCKER" in os.environ
+    if "DOCKER" in os.environ or "VAMHOST" in os.environ
     else os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 )
 
@@ -92,6 +92,7 @@ BASE_PATH = Path(BASE_DIR)
 CONFIG_PATH = BASE_PATH / "config.json"
 
 IS_DOCKER = "DOCKER" in os.environ
+IS_VAMHOST = "VAMHOST" in os.environ
 IS_LAVHOST = "LAVHOST" in os.environ
 IS_HIKKAHOST = "HIKKAHOST" in os.environ
 IS_AEZA = "aeza" in socket.gethostname()

@@ -51,7 +51,7 @@ def deps():
 if (
     getpass.getuser() == "root"
     and "--root" not in " ".join(sys.argv)
-    and all(trigger not in os.environ for trigger in {"DOCKER", "NO_SUDO"})
+    and all(trigger not in os.environ for trigger in {"DOCKER", "NO_SUDO", "VAMHOST"})
 ):
     print("\U0001F6AB" * 15)
     print("You attempted to run Heroku on behalf of root user")
