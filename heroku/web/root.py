@@ -247,7 +247,7 @@ class Web:
         self._qr_login = True
 
     async def init_qr_login(self, request: web.Request) -> web.Response:
-        if self.client_data and "LAVHOST" in os.environ or "VAMHOST" in os.environ:
+        if self.client_data and "LAVHOST" in os.environ:
             return web.Response(status=403, body="Forbidden by LavHost EULA")
 
         if not self._check_session(request):
