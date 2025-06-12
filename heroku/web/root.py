@@ -322,7 +322,7 @@ class Web:
         if not self._check_session(request):
             return web.Response(status=401, body="Authorization required")
 
-        if self.client_data and "LAVHOST" in os.environ or "VAMHOST" in os.environ:
+        if self.client_data and "LAVHOST" in os.environ:
             return web.Response(status=403, body="Forbidden by host EULA")
 
         if self._pending_client:
