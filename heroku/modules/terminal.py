@@ -56,12 +56,7 @@ async def read_stream(func: callable, stream, delay: float):
             if last_task:
                 # Send all pending data
                 last_task.cancel()
-                try:
-                    text = data.decode('utf-8')
-                except UnicodeDecodeError:
-                    text = data.decode('cp1251', errors='replace')
-
-                await func(text)
+                await func(data.decode())
                 # If there is no last task there is inherently no data, so theres no point sending a blank string
             break
 
