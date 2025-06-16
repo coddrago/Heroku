@@ -3,11 +3,10 @@ import logging
 import asyncio
 import re
 
-from .base_tunnel import BaseTunnel
 
 logger = logging.getLogger(__name__)
 
-class SSHTunnel(BaseTunnel):
+class SSHTunnel():
     def __init__(
         self,
         port: int,
