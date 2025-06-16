@@ -3,6 +3,7 @@
 __pycache__/
 *.py[cod]
 *$py.class
+.requirements_hash/
 
 # C extensions
 *.so
@@ -132,12 +133,11 @@ dmypy.json
 
 *__pycache__
 *.pyc
-hikka/api_token.py
-hikka/loaded_modules
+heroku/api_token.py
+heroku/loaded_modules
 loaded_modules
-hikka/debug_modules
-*.session
-*.session-journal
+heroku/debug_modules
+heroku*.session*
 database-*.json
 *.swp
 .setup_complete
@@ -153,9 +153,6 @@ config.ini
 config-*.json
 config.json
 *cache*.json
-*.png
-*.jpg
-*.jpeg
 *.webp
 *.webm
 *.tgs
@@ -173,7 +170,5 @@ config.json
 vendor/
 Pipfile.lock
 
-hikka.log.*
+heroku.log.*
 unknown_errors.txt
-
-*.sock
