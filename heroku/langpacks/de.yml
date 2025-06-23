@@ -189,8 +189,8 @@ heroku_web:
 
 heroku_backup:
   period: "⌚️ <b>Die Unit «ALPHA»</b> erstellt regelmäßig Backups. Diese Einstellungen können später geändert werden.\n\nBitte wählen Sie die Backup-Häufigkeit\n\n<b>🚫 Es ist daher nicht möglich, Module, die mit dem Befehl .lm aus Dateien heruntergeladen wurden, wiederherzustellen! Seien Sie vorsichtig und führen Sie vor der Wiederherstellung .backupmods aus.</b>"
-  saved: "✅ Die Periodizität ist gespeichert! Sie kann mit <code>{prefix}set_backup_period</code> geändert werden."
-  never: "✅ Ich werde keine automatischen Backups durchführen. Kann mit <code>{prefix}set_backup_period</code> abgebrochen werden."
+  saved: "✅ Die Periodizität ist gespeichert! Sie kann mit {präfix}set_backup_period {zeit} geändert werden."
+  never: "✅ Ich werde keine automatischen Backups durchführen. Kann mit {präfix}set_backup_period {zeit} abgebrochen werden."
   invalid_args: "🚫 <b>Bitte geben Sie die korrekte Häufigkeit in Stunden an oder 0 zum Deaktivieren</b>"
   backup_caption: '<emoji document_id=5469718869536940860>👆</emoji> <b>Dies ist Ihr Datenbank-Backup. Geben Sie es nicht an Dritte weiter, es enthält persönliche Informationen. Falls Sie es wiederherstellen müssen, verwenden Sie</b> <pre><code class="language-heroku">{prefix}restoredb</code></pre> <b>als Antwort auf diese Datei</b>.'
   backupall_info: '<emoji document_id=5469718869536940860>👆</emoji> <b>Dies ist Ihre Sicherungskopie der Datenbank und Module. Geben Sie sie nicht weiter, da sie persönliche Informationen enthält. Falls Sie sie wiederherstellen müssen, verwenden Sie</b> <pre><code class="language-heroku">{prefix}restoreall</code></pre> <b>als Antwort auf diese Datei.</b>'
