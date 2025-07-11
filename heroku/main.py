@@ -839,22 +839,22 @@ class Heroku:
                 f"• Version: {'.'.join(list(map(str, list(__version__))))}\n"
                 f"• {upd}\n"
             )
-
+            web_url = ""
             if not self.omit_log:
                 print(logo)
-                web_url = (
-                    f"🔗 Web url: {self.web.url}"
-                    if self.web and hasattr(self.web, "url")
-                    else ""
-                )
-                logging.debug(
-                    "\n🪐 Heroku %s #%s (%s) started\n%s",
-                    ".".join(list(map(str, list(__version__)))),
-                    build[:7],
-                    upd,
-                    web_url,
-                )
-                self.omit_log = True
+
+                if self.web and hasattr(self.web, "url"):
+                    web_url = (
+                        f"🔗 Web url: {self.web.url}"
+                    )
+                    logging.debug(
+                        "\n🪐 Heroku %s #%s (%s) started\n%s",
+                        ".".join(list(map(str, list(__version__)))),
+                        build[:7],
+                        upd,
+                        web_url,
+                    )
+                    self.omit_log = True
 
             await client.heroku_inline.bot.send_photo(
                 logging.getLogger().handlers[0].get_logid_by_client(client.tg_id),
