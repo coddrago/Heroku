@@ -60,7 +60,7 @@ class CoreMod(loader.Module):
                     "callback": self._inline__choose__installation,
                     "args": (platform,),
                 }
-                for platform in ['vds','userland','jamhost']
+                for platform in ['vds','userland','jamhost','rewhost']
             ],
             2
         )
@@ -335,6 +335,8 @@ class CoreMod(loader.Module):
             await utils.answer(message, self.strings["jamhost_install"])
         elif "-u" in args:
             await utils.answer(message, self.strings["userland_install"])
+        elif "-rh" in args:
+            await utils.answer(message, self.strings["rewhost_install"])
 
     async def _inline__choose__installation(self, call: InlineCall, platform: str):
         await call.edit(
