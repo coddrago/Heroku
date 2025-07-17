@@ -930,6 +930,9 @@ def get_named_platform() -> str:
     if main.IS_JAMHOST:
         return "🧃 JamHost"
 
+    if main.IS_REWHOST:
+        return "🚀 RewHost"
+
     if main.IS_USERLAND:
         return "🐧 UserLand"
 
