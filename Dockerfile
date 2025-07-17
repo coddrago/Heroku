@@ -13,7 +13,7 @@ ENV PYTHONUNBUFFERED=1 \
     VENV_PATH="/opt/pysetup/.venv" \
     \
     DOCKER=true \
-    REWHOST=true
+    REWHOST=true \
     GIT_PYTHON_REFRESH=quiet
 
 RUN apt-get update && apt-get upgrade -y && apt-get install --no-install-recommends -y \
