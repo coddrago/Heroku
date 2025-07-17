@@ -13,6 +13,7 @@ ENV PYTHONUNBUFFERED=1 \
     VENV_PATH="/opt/pysetup/.venv" \
     \
     DOCKER=true \
+    REWHOST=true
     GIT_PYTHON_REFRESH=quiet
 
 RUN apt-get update && apt-get upgrade -y && apt-get install --no-install-recommends -y \
@@ -43,7 +44,7 @@ RUN rm -rf /var/lib/apt/lists/ /var/cache/apt/archives/ /tmp/*
 WORKDIR /data
 RUN mkdir /data/private
 
-RUN git clone https://github.com/coddrago/Heroku /data/Heroku
+RUN git clone https://github.com/Rewixx-png/RewHeroku /data/Heroku
 WORKDIR /data/Heroku
 RUN git fetch && git checkout master && git pull
 
