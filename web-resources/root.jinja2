@@ -64,11 +64,21 @@
   <div class="blur main installation">
     <div class="title">
       <div class="heroku_label">
-        <div class="label_inner">
-          <img src="{{ platform_emoji }}" class="ringed_planet">
-          &nbsp;Heroku
-        </div>
-      </div>
+  <div class="label_inner">
+    {# Используем условный оператор для выбора иконки #}
+    {% if rewhost %}
+      {# Если переменная rewhost == True, показываем иконку ракеты #}
+      <img src="https://em-content.zobj.net/source/apple/354/rocket_1f680.png" class="ringed_planet">
+    {% elif lavhost %}
+      {# Пример для другого хостинга, оставляем его для совместимости #}
+      <img src="https://github.com/hikariatama/assets/raw/master/victory-hand_270c-fe0f.png" class="ringed_planet">
+    {% else %}
+      {# Во всех остальных случаях показываем стандартную иконку #}
+      <img src="{{ platform_emoji }}" class="ringed_planet">
+    {% endif %}
+     Heroku
+  </div>
+</div>
     </div><br>
     <div class="description">Incomprehensibly <span style="color:#c54245">the best</span> userbot<br><span
         style="color: #18cc18; display: none" class="authorized">Authorized!</span></div>
