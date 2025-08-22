@@ -19,8 +19,8 @@
 
 
 <b>Manual installation (no script):</b><br>
-<code>apt update && apt install git python3 -y && git clone https://github.com/coddrago/Heroku && cd Heroku && pip install -r requirements.txt && python3 -m hikka</code><br.>
-<i>If you are on VPS\VDS, type <code>--proxy-pass</code> in the end of command to open SSH tunnel to your Heroku web interface, or use <code>--no-web</code> to complete setup in console</i><br>
+<code>apt update && apt install git python3 -y && git clone https://github.com/coddrago/Heroku && cd Heroku && pip install -r requirements.txt && python3 -m heroku</code><br>
+<i>If you are installing Heroku onto a VPS/VDS, add <code>--proxy-pass</code> in the end of command to open SSH tunnel to your Heroku web interface, or use <code>--no-web</code> to complete setup in console</i><br>
 <br>
 <b>Some further details:</b>
 
@@ -50,13 +50,13 @@
 <h2 border="none"><img src="https://github.com/hikariatama/assets/raw/master/1312-micro-sd-card-flat.webp" height="54" align="middle"> Requirements</h2>
 <ul>
  <li>Python 3.9-3.13</li>
- <li>API_ID and HASH from <a href="https://my.telegram.org/apps" color="#2594cb">Telegram</a></li>
+ <li>API_ID and API_HASH from <a href="https://my.telegram.org/apps" color="#2594cb">Telegram</a></li>
 </ul>
 <hr>
 <h2 border="none"><img src="https://github.com/hikariatama/assets/raw/master/680-it-developer-flat.webp" height="54" align="middle"> Documentation</h2>
 
-Check out <a href="https://heroku-ub.xyz/">heroku-ub.xyz</a> for users' documentation<br>
-And <a href="https://dev.heroku-ub.xyz/">dev.heroku-ub.xyz</a> for developers documentation
+If you wan't to create your own module, visit <a href="https://dev.heroku-ub.xyz/">dev.heroku-ub.xyz</a> for developers documentation<br>
+Or, if you're just a regular user, check out the user documentation here: <a href="https://heroku-ub.xyz/">heroku-ub.xyz</a><br>
 
 <hr>
 <h2 border="none"><img src="https://github.com/hikariatama/assets/raw/master/981-consultation-flat.webp" height="54" align="middle"> <a href="https://t.me/heroku_talks">Support</a></h2>
