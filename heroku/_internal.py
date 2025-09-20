@@ -20,7 +20,7 @@ import sys
 
 
 async def fw_protect():
-    await asyncio.sleep(random.randint(1000, 3000) / 1000)
+    await asyncio.sleep(random.randint(500, 1000) / 1000)
 
 
 def get_startup_callback() -> callable:
