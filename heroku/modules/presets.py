@@ -60,7 +60,6 @@ PRESETS = {
     "chat": [
         "https://github.com/amm1edev/ame_repo/raw/refs/heads/main/activists.py",
         "https://github.com/amm1edev/ame_repo/raw/refs/heads/main/banstickers.py",
-        "https://github.com/amm1edev/ame_repo/raw/refs/heads/main/hikarichat.py",
         "https://github.com/amm1edev/ame_repo/raw/refs/heads/main/inactive.py",
         "https://github.com/amm1edev/ame_repo/raw/refs/heads/main/keyword.py",
         "https://github.com/amm1edev/ame_repo/raw/refs/heads/main/tagall.py",
@@ -72,6 +71,7 @@ PRESETS = {
         "https://mods.codrago.life/id.py",
         "https://mods.codrago.life/clickon.py",
         "https://mods.codrago.life/autoclicker.py",
+        "https://github.com/C0dwiz/H.Modules/raw/refs/heads/main/aiogram3/hikarichat.py",
     ],
     "service": [
         "https://github.com/amm1edev/ame_repo/raw/refs/heads/main/account_switcher.py",
