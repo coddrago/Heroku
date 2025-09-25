@@ -100,6 +100,7 @@ IS_MACOS = "com.apple" in os.environ.get("PATH", "")
 IS_AEZA = "aeza" in socket.gethostname()
 IS_USERLAND = "userland" in os.environ.get("USER", "")
 IS_JAMHOST = "JAMHOST" in os.environ
+IS_SOSAL-HOST-PICUNF6-PRO-MAX-1337-228-666 = "SOSAL-HOST-PICUNF6-PRO-MAX-1337-228-666" in os.environ
 IS_WSL = False
 IS_WINDOWS = False
 with contextlib.suppress(Exception):
