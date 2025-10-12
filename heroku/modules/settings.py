@@ -292,12 +292,21 @@ class CoreMod(loader.Module):
 
     @loader.command()
     async def addalias(self, message: Message):
-        if len(args := utils.get_args(message)) < 2:
+        args = utils.get_args_raw(message)
+        if not args:
             await utils.answer(message, self.strings("alias_args"))
             return
 
-        alias, cmd, *rest = args
-        rest = " ".join(rest) if rest else None
+        try:
+            alias, cmd, rest = args.split(maxsplit=2)
+        except ValueError:
+            try:
+                alias, cmd = args.split(maxsplit=1)
+                rest = None
+            except ValueError:
+                await utils.answer(message, self.strings("alias_args"))
+                return
+
         if self.allmodules.add_alias(alias, cmd, rest):
             self.set(
                 "aliases",
@@ -314,7 +323,7 @@ class CoreMod(loader.Module):
             await utils.answer(
                 message,
                 self.strings("no_command").format(utils.escape_html(cmd)),
-            )
+            ) 
 
     @loader.command()
     async def delalias(self, message: Message):
