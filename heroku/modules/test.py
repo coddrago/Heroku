@@ -21,6 +21,7 @@ import typing
 from io import BytesIO
 
 from herokutl.tl.types import Message
+from herokutl.types import InputMediaWebPage
 
 from .. import loader, main, utils
 from ..inline.types import InlineCall
