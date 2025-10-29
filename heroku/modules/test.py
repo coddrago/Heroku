@@ -105,6 +105,18 @@ class TestMod(loader.Module):
                 lambda: self.strings["banner_url"],
                 validator=loader.validators.String(),
             ),
+            loader.ConfigValue(
+                "quote_media",
+                False,
+                "Switch preview media to quote in ping",
+                validator=loader.validators.Boolean(),
+            ),
+            loader.ConfigValue(
+                "invert_media",
+                False,
+                "Switch preview invert media in ping",
+                validator=loader.validators.Boolean(),
+            ),
         )
 
     def _pass_config_to_logger(self):
@@ -381,6 +393,8 @@ class TestMod(loader.Module):
         start = time.perf_counter_ns()
         message = await utils.answer(message, self.config["ping_emoji"])
         banner = self.config["banner_url"]
+        if self.config["quote_media"] is True:
+            banner = InputMediaWebPage(self.config["banner_url"])
         
         await utils.answer(
             message,
@@ -393,7 +407,8 @@ class TestMod(loader.Module):
                 hostname=lib_platform.node(),
                 user=getpass.getuser(),
             ),
-            file = banner
+            file = banner,
+            invert_media = self.config["invert_media"]
         )
 
 
