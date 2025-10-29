@@ -58,6 +58,7 @@ from aiogram.types import Message as AiogramMessage
 from herokutl import hints
 from herokutl.tl.custom.message import Message
 from herokutl.tl.functions.account import UpdateNotifySettingsRequest
+from herokutl.types import InputMediaWebPage
 from herokutl.tl.functions.channels import (
     CreateChannelRequest,
     EditAdminRequest,
