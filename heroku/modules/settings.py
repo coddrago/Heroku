@@ -374,7 +374,6 @@ class CoreMod(loader.Module):
                 message,
                 reply_markup=self._markup,
                 photo="https://raw.githubusercontent.com/coddrago/assets/refs/heads/main/heroku/heroku_installation.png",
-                disable_security=True
         )
             ):
 
