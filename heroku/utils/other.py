@@ -231,3 +231,9 @@ def atexit(
         return
 
     _atexit.register(functools.partial(func, *args, **kwargs))
+
+def _copy_tl(o, **kwargs):
+    d = o.to_dict()
+    del d["_"]
+    d.update(kwargs)
+    return o.__class__(**d)
