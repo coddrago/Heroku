@@ -489,12 +489,13 @@ class Evaluator(loader.Module):
             "utils": utils,
             "main": main,
             "loader": loader,
-            "f": herokutl.tl.functions,
             "c": self._client,
             "m": message,
             "lookup": self.lookup,
             "self": self,
             "db": self.db,
+            **self.get_sub(herokutl.tl.types),
+            **self.get_sub(herokutl.tl.functions),
         }
 
     def get_sub(self, obj: typing.Any, _depth: int = 1) -> dict:
