@@ -144,4 +144,4 @@ def get_dir(mod: str) -> str:
     :param mod: Module's `__file__` to get directory of
     :return: Directory of given module
     """
-    return os.path.abspath(os.path.dirname(os.path.abspath(../mod)))
+    return os.path.abspath(os.path.dirname(os.path.abspath(f"../{mod}")))
