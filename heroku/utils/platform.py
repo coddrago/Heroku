@@ -126,7 +126,7 @@ def get_named_platform() -> str:
     Returns formatted platform name
     :return: Platform name
     """
-    from . import main
+    from .. import main
 
     with contextlib.suppress(Exception):
         if os.path.isfile("/proc/device-tree/model"):
