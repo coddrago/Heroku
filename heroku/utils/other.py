@@ -81,10 +81,10 @@ from herokutl.tl.types import (
     User,
 )
 
-from .._internal import fw_protect
-from ..inline.types import BotInlineCall, InlineCall, InlineMessage
-from ..tl_cache import CustomTelegramClient
-from ..types import HerokuReplyMarkup, ListLike, Module
+from ..._internal import fw_protect
+from ...inline.types import BotInlineCall, InlineCall, InlineMessage
+from ...tl_cache import CustomTelegramClient
+from ...types import HerokuReplyMarkup, ListLike, Module
 
 FormattingEntity = typing.Union[
     MessageEntityUnknown,
