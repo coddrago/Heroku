@@ -144,4 +144,4 @@ def get_dir(mod: str) -> str:
     :param mod: Module's `__file__` to get directory of
     :return: Directory of given module
     """
-    return(os.getcwd())
+    return(os.getcwd() + "/heroku")
