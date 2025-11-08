@@ -212,12 +212,6 @@ def chunks(_list: ListLike, n: int, /) -> typing.List[typing.List[typing.Any]]:
     """
     return [_list[i : i + n] for i in range(0, len(_list), n)]
 
-def _copy_tl(o, **kwargs):
-    d = o.to_dict()
-    del d["_"]
-    d.update(kwargs)
-    return o.__class__(**d)
-
 def atexit(
     func: typing.Callable,
     use_signal: typing.Optional[int] = None,
