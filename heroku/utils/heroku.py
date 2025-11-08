@@ -80,10 +80,10 @@ from herokutl.tl.types import (
     User,
 )
 
-from ..._internal import fw_protect
-from ...inline.types import BotInlineCall, InlineCall, InlineMessage
-from ...tl_cache import CustomTelegramClient
-from ...types import HerokuReplyMarkup, ListLike, Module
+from .._internal import fw_protect
+from ..inline.types import BotInlineCall, InlineCall, InlineMessage
+from ..tl_cache import CustomTelegramClient
+from ..types import HerokuReplyMarkup, ListLike, Module
 
 FormattingEntity = typing.Union[
     MessageEntityUnknown,
@@ -144,4 +144,4 @@ def get_dir(mod: str) -> str:
     :param mod: Module's `__file__` to get directory of
     :return: Directory of given module
     """
-    return os.path.abspath(os.path.dirname(os.path.abspath(mod)))
+    return os.path.abspath(os.path.dirname(os.path.abspath(../mod)))
