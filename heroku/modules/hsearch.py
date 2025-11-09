@@ -1,6 +1,5 @@
 __version__ = (2, 0, 0)
 # meta developer: @HSearch_Updates
-# change-log: Rebranding from FHeta to HSearch.
 
 # ©️ Fixyres, 2025
 # 🌐 https://github.com/Fixyres/HSearch
@@ -11,8 +10,6 @@ __version__ = (2, 0, 0)
 
 import asyncio
 import aiohttp
-import io
-import inspect
 import subprocess
 import sys
 import ssl
@@ -586,7 +583,7 @@ class HSearch(loader.Module):
                 "thumb": "https://raw.githubusercontent.com/Fixyres/HSearch/refs/heads/main/imgonline-com-ua-Resize-KbaztxA3oS67p3m8.png",
             }
 
-        mods = await self._api_get("search", query=query.args, inline="true", token=self.token, user_id=self.uid, ood=self.config["only_official_developers"])
+        mods = await self._api_get("search", query=query.args, inline="true", token=self.token, user_id=self.uid, ood=str(self.config["only_official_developers"]).lower())
         
         if not mods or not isinstance(mods, list):
             return {
@@ -668,7 +665,7 @@ class HSearch(loader.Module):
             return
 
         status_msg = await utils.answer(message, self.strings["searching"])
-        mods = await self._api_get("search", query=query, inline="false", token=self.token, user_id=self.uid, ood=self.config["only_official_developers"])
+        mods = await self._api_get("search", query=query, inline="false", token=self.token, user_id=self.uid, ood=str(self.config["only_official_developers"]).lower())
 
         if not mods or not isinstance(mods, list):
             await utils.answer(message, self.strings["no_results"])
