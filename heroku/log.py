@@ -457,6 +457,8 @@ class TelegramLogsHandler(logging.Handler):
         except TelegramRetryAfter as e:
             await asyncio.sleep(e.retry_after)
             await self.avoid_floodwait(exc)
+        except RuntimeError:
+            pass
 
     def emit(self, record: logging.LogRecord):
         try:
