@@ -1,9 +1,9 @@
 __version__ = (1, 0, 0)
-# meta developer: @FHeta_Updates
+# meta developer: @HSearch_Updates
 # change-log: The search has been improved.
 
 # ©️ Fixyres, 2025
-# 🌐 https://github.com/Fixyres/FHeta
+# 🌐 https://github.com/Fixyres/HSearch
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -336,28 +336,28 @@ class HSearch(loader.Module):
 
     async def client_ready(self, client, db):
         try:
-            await client(UnblockRequest("@FHeta_robot"))
+            await client(UnblockRequest("@HSearch_robot"))
         except:
             pass
             
         await self.request_join(
-            "FHeta_Updates",
-            "🔥 This is the channel with all updates in FHeta!"
+            "HSearch_Updates",
+            "🔥 This is the channel with all updates in HSearch!"
         )
 
         self.ssl = ssl.create_default_context()
         self.ssl.check_hostname = False
         self.ssl.verify_mode = ssl.CERT_NONE
         self.uid = (await client.get_me()).id
-        self.token = db.get("FHeta", "token")
+        self.token = db.get("HSearch", "token")
 
         if not self.token:
             try:
-                async with client.conversation("@FHeta_robot") as conv:
+                async with client.conversation("@HSearch_robot") as conv:
                     await conv.send_message('/token')
                     resp = await conv.get_response(timeout=5)
                     self.token = resp.text.strip()
-                    db.set("FHeta", "token", self.token)
+                    db.set("HSearch", "token", self.token)
             except:
                 pass
 
@@ -411,8 +411,8 @@ class HSearch(loader.Module):
             
     async def on_dlmod(self, client, db):
         try:
-            await client(UnblockRequest("@FHeta_robot"))
-            await utils.dnd(client, "@FHeta_robot", archive=True)
+            await client(UnblockRequest("@HSearch_robot"))
+            await utils.dnd(client, "@HSearch_robot", archive=True)
         except:
             pass
 
@@ -450,7 +450,7 @@ class HSearch(loader.Module):
             return {}
 
     async def _fetch_thumb(self, url: Optional[str]) -> str:
-        default_thumb = "https://raw.githubusercontent.com/Fixyres/FHeta/refs/heads/main/imgonline-com-ua-Resize-SOMllzo0cPFUCor.png"
+        default_thumb = "https://raw.githubusercontent.com/Fixyres/HSearch/refs/heads/main/imgonline-com-ua-Resize-SOMllzo0cPFUCor.png"
         
         if not url:
             return default_thumb
@@ -609,7 +609,7 @@ class HSearch(loader.Module):
                 "title": self.strings["inline_no_query"],
                 "description": self.strings["inline_desc"],
                 "message": self.strings["no_query"],
-                "thumb": "https://raw.githubusercontent.com/Fixyres/FHeta/refs/heads/main/imgonline-com-ua-Resize-4EUHOHiKpwRTb4s.png",
+                "thumb": "https://raw.githubusercontent.com/Fixyres/HSearch/refs/heads/main/imgonline-com-ua-Resize-4EUHOHiKpwRTb4s.png",
             }
 
         if len(query.args) > 168:
@@ -617,7 +617,7 @@ class HSearch(loader.Module):
                 "title": self.strings["inline_query_too_big"],
                 "description": self.strings["inline_no_results"],
                 "message": self.strings["query_too_big"],
-                "thumb": "https://raw.githubusercontent.com/Fixyres/FHeta/refs/heads/main/imgonline-com-ua-Resize-KbaztxA3oS67p3m8.png",
+                "thumb": "https://raw.githubusercontent.com/Fixyres/HSearch/refs/heads/main/imgonline-com-ua-Resize-KbaztxA3oS67p3m8.png",
             }
 
         mods = await self._api_get("search", query=query.args, inline="true", token=self.token, user_id=self.uid, ood="true")
@@ -627,7 +627,7 @@ class HSearch(loader.Module):
                 "title": self.strings["inline_no_results"],
                 "description": self.strings["inline_desc"],
                 "message": self.strings["no_results"],
-                "thumb": "https://raw.githubusercontent.com/Fixyres/FHeta/refs/heads/main/imgonline-com-ua-Resize-KbaztxA3oS67p3m8.png",
+                "thumb": "https://raw.githubusercontent.com/Fixyres/HSearch/refs/heads/main/imgonline-com-ua-Resize-KbaztxA3oS67p3m8.png",
             }
 
         seen_keys = set()
@@ -742,7 +742,7 @@ class HSearch(loader.Module):
         photo = None
         if len(unique_mods) == 1:
             photo = await self._fetch_thumb(first_mod.get("banner"))
-            if photo == "https://raw.githubusercontent.com/Fixyres/FHeta/refs/heads/main/imgonline-com-ua-Resize-SOMllzo0cPFUCor.png":
+            if photo == "https://raw.githubusercontent.com/Fixyres/HSearch/refs/heads/main/imgonline-com-ua-Resize-SOMllzo0cPFUCor.png":
                 photo = None
 
         await self.inline.form(
@@ -755,7 +755,7 @@ class HSearch(loader.Module):
         await status_msg.delete()
 
     @loader.watcher(chat_id=7575472403)
-    async def _install_via_fheta(self, message):
+    async def _install_via_nsearch(self, message):
         link = message.raw_text.strip()
         
         if not link.startswith("https://"):
