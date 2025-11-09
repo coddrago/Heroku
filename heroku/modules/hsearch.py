@@ -1,6 +1,6 @@
-__version__ = (1, 0, 0)
+__version__ = (2, 0, 0)
 # meta developer: @HSearch_Updates
-# change-log: The search has been improved.
+# change-log: Rebranding from FHeta to HSearch.
 
 # ©️ Fixyres, 2025
 # 🌐 https://github.com/Fixyres/HSearch
@@ -24,10 +24,10 @@ from telethon.tl.functions.contacts import UnblockRequest
 
 @loader.tds
 class HSearch(loader.Module):
-    '''Module for searching modules!'''
+    '''Module for searching modules! Watch all news HSearch in @HSearch_updates!'''
    
     strings = {
-        "name": "H:Search",
+        "name": "HSearch",
         "searching": "🔎 <b>Searching...</b>",
         "no_query": "❌ <b>Enter a query to search.</b>",
         "no_results": "❌ <b>No modules found.</b>",
@@ -42,16 +42,12 @@ class HSearch(loader.Module):
         "rating_added": "👍 Rating submitted!",
         "rating_changed": "👍 Rating has been changed!",
         "rating_removed": "👍 Rating deleted!",
-        "actual_version": "🎉 <b>You have the actual</b> <code>HSearch (v{version})</code><b>.</b>",
-        "old_version": "⛔️ <b>You have the old version </b><code>HSearch (v{version})</code><b>.</b>\n\n🆕 <b>New version</b> <code>v{new_version}</code><b> available!</b>\n",
-        "update_whats_new": "⁉️ <b>Change-log:</b><code> {whats_new}</code>\n\n",
-        "update_command": "🔄 <b>To update type: <code>{update_command}</code></b>",
         "inline_no_query": "Enter a query to search.",
         "inline_desc": "Name, command, description, author.",
         "inline_no_results": "Try another query.",
         "inline_query_too_big": "Your query is too big, please try reducing it to 168 characters.",
         "_cfg_doc_tracking": "Enable tracking of your data (user ID, language) for synchronization with the HSearch bot and for recommendations?",
-        "_cls_doc": "Module for searching modules! Watch all news HSearch in @HSearch_updates!"
+        "_cfg_doc_only_official_developers": "Use only modules from official developers when searching?"
     }
     
     strings_ru = {
@@ -69,16 +65,13 @@ class HSearch(loader.Module):
         "rating_added": "👍 Оценка отправлена!",
         "rating_changed": "👍 Оценка изменена!",
         "rating_removed": "👍 Оценка удалена!",
-        "actual_version": "🎉 <b>У вас актуальная версия</b> <code>HSearch (v{version})</code><b>.</b>",
-        "old_version": "⛔️ <b>У вас старая версия </b><code>HSearch (v{version})</code><b>.</b>\n\n🆕 <b>Доступна новая версия</b> <code>v{new_version}</code><b>!</b>\n",
-        "update_whats_new": "⁉️ <b>Список изменений:</b><code> {whats_new}</code>\n\n",
-        "update_command": "🔄 <b>Для обновления введите: <code>{update_command}</code></b>",
         "inline_no_query": "Введите запрос для поиска.",
         "inline_desc": "Название, команда, описание, автор.",
         "inline_no_results": "Попробуйте другой запрос.",
         "inline_query_too_big": "Ваш запрос слишком большой, пожалуйста, сократите его до 168 символов.",
         "_cfg_doc_tracking": "Включить отслеживание ваших данных (ID пользователя, язык) для синхронизации с ботом HSearch и для рекомендаций?",
-        "_cls_doc": "Модуль для поиска модулей! Следите за всеми новостями HSearch в @HSearch_updates!"
+        "_cls_doc": "Модуль для поиска модулей! Следите за всеми новостями HSearch в @HSearch_updates!",
+        "_cfg_doc_only_official_developers": "Использовать только модули официальных разработчиков при поиске?"
     }
     
     strings_de = {
@@ -96,16 +89,13 @@ class HSearch(loader.Module):
         "rating_added": "👍 Bewertung eingereicht!",
         "rating_changed": "👍 Bewertung wurde geändert!",
         "rating_removed": "👍 Bewertung gelöscht!",
-        "actual_version": "🎉 <b>Sie haben die aktuelle Version</b> <code>HSearch (v{version})</code><b>.</b>",
-        "old_version": "⛔️ <b>Sie haben die alte Version </b><code>HSearch (v{version})</code><b>.</b>\n\n🆕 <b>Neue Version</b> <code>v{new_version}</code><b> verfügbar!</b>\n",
-        "update_whats_new": "⁉️ <b>Änderungsprotokoll:</b><code> {whats_new}</code>\n\n",
-        "update_command": "🔄 <b>Zum Aktualisieren eingeben: <code>{update_command}</code></b>",
         "inline_no_query": "Geben Sie eine Suchanfrage ein.",
         "inline_desc": "Name, Befehl, Beschreibung, Autor.",
         "inline_no_results": "Versuchen Sie eine andere Anfrage.",
         "inline_query_too_big": "Ihre Anfrage ist zu groß, bitte reduzieren Sie sie auf 168 Zeichen.",
         "_cfg_doc_tracking": "Tracking Ihrer Daten (Benutzer-ID, Sprache) für die Synchronisierung mit dem HSearch-Bot und für Empfehlungen aktivieren?",
-        "_cls_doc": "Modul zum Suchen von Modulen! Verfolgen Sie alle Neuigkeiten von HSearch in @HSearch_updates!"
+        "_cls_doc": "Modul zum Suchen von Modulen! Verfolgen Sie alle Neuigkeiten von HSearch in @HSearch_updates!",
+        "_cfg_doc_only_official_developers": "Nur Module von offiziellen Entwicklern bei der Suche verwenden?"
     }
     
     strings_ua = {
@@ -123,16 +113,13 @@ class HSearch(loader.Module):
         "rating_added": "👍 Оцінку надіслано!",
         "rating_changed": "👍 Оцінку змінено!",
         "rating_removed": "👍 Оцінку видалено!",
-        "actual_version": "🎉 <b>У вас актуальна версія</b> <code>HSearch (v{version})</code><b>.</b>",
-        "old_version": "⛔️ <b>У вас стара версія </b><code>HSearch (v{version})</code><b>.</b>\n\n🆕 <b>Доступна нова версія</b> <code>v{new_version}</code><b>!</b>\n",
-        "update_whats_new": "⁉️ <b>Список змін:</b><code> {whats_new}</code>\n\n",
-        "update_command": "🔄 <b>Для оновлення введіть: <code>{update_command}</code></b>",
         "inline_no_query": "Введіть запит для пошуку.",
         "inline_desc": "Назва, команда, опис, автор.",
         "inline_no_results": "Спробуйте інший запит.",
         "inline_query_too_big": "Ваш запит занадто великий, будь ласка, скоротіть його до 168 символів.",
         "_cfg_doc_tracking": "Увімкнути відстеження ваших даних (ID користувача, мова) для синхронізації з ботом HSearch та для рекомендацій?",
-        "_cls_doc": "Модуль для пошуку модулів! Стежте за всіма новинами HSearch в @HSearch_updates!"
+        "_cls_doc": "Модуль для пошуку модулів! Стежте за всіма новинами HSearch в @HSearch_updates!",
+        "_cfg_doc_only_official_developers": "Використовувати лише модулі офіційних розробників під час пошуку?"
     }
     
     strings_es = {
@@ -150,16 +137,13 @@ class HSearch(loader.Module):
         "rating_added": "👍 ¡Calificación enviada!",
         "rating_changed": "👍 ¡Calificación cambiada!",
         "rating_removed": "👍 ¡Calificación eliminada!",
-        "actual_version": "🎉 <b>Tienes la versión actual</b> <code>HSearch (v{version})</code><b>.</b>",
-        "old_version": "⛔️ <b>Tienes la versión antigua </b><code>HSearch (v{version})</code><b>.</b>\n\n🆕 <b>¡Nueva versión</b> <code>v{new_version}</code><b> disponible!</b>\n",
-        "update_whats_new": "⁉️ <b>Registro de cambios:</b><code> {whats_new}</code>\n\n",
-        "update_command": "🔄 <b>Para actualizar escriba: <code>{update_command}</code></b>",
         "inline_no_query": "Ingrese una consulta para buscar.",
         "inline_desc": "Nombre, comando, descripción, autor.",
         "inline_no_results": "Pruebe otra consulta.",
         "inline_query_too_big": "Su consulta es demasiado grande, redúzcala a 168 caracteres.",
         "_cfg_doc_tracking": "¿Habilitar el seguimiento de sus datos (ID de usuario, idioma) para sincronización con el bot HSearch y para recomendaciones?",
-        "_cls_doc": "¡Módulo para buscar módulos! ¡Sigue todas las noticias de HSearch en @HSearch_updates!"
+        "_cls_doc": "¡Módulo para buscar módulos! ¡Sigue todas las noticias de HSearch en @HSearch_updates!",
+        "_cfg_doc_only_official_developers": "¿Usar solo módulos de desarrolladores oficiales al buscar?"
     }
     
     strings_fr = {
@@ -177,16 +161,13 @@ class HSearch(loader.Module):
         "rating_added": "👍 Évaluation soumise!",
         "rating_changed": "👍 Évaluation modifiée!",
         "rating_removed": "👍 Évaluation supprimée!",
-        "actual_version": "🎉 <b>Vous avez la version actuelle</b> <code>HSearch (v{version})</code><b>.</b>",
-        "old_version": "⛔️ <b>Vous avez l'ancienne version </b><code>HSearch (v{version})</code><b>.</b>\n\n🆕 <b>Nouvelle version</b> <code>v{new_version}</code><b> disponible!</b>\n",
-        "update_whats_new": "⁉️ <b>Journal des modifications:</b><code> {whats_new}</code>\n\n",
-        "update_command": "🔄 <b>Pour mettre à jour, tapez: <code>{update_command}</code></b>",
         "inline_no_query": "Entrez une requête pour rechercher.",
         "inline_desc": "Nom, commande, description, auteur.",
         "inline_no_results": "Essayez une autre requête.",
         "inline_query_too_big": "Votre requête est trop grande, veuillez la réduire à 168 caractères.",
         "_cfg_doc_tracking": "Activer le suivi de vos données (ID utilisateur, langue) pour la synchronisation avec le bot HSearch et pour les recommandations?",
-        "_cls_doc": "Module pour rechercher des modules! Suivez toutes les actualités de HSearch sur @HSearch_updates!"
+        "_cls_doc": "Module pour rechercher des modules! Suivez toutes les actualités de HSearch sur @HSearch_updates!",
+        "_cfg_doc_only_official_developers": "Utiliser uniquement les modules des développeurs officiels lors de la recherche ?"
     }
     
     strings_it = {
@@ -204,16 +185,13 @@ class HSearch(loader.Module):
         "rating_added": "👍 Valutazione inviata!",
         "rating_changed": "👍 Valutazione modificata!",
         "rating_removed": "👍 Valutazione eliminata!",
-        "actual_version": "🎉 <b>Hai la versione attuale</b> <code>HSearch (v{version})</code><b>.</b>",
-        "old_version": "⛔️ <b>Hai la vecchia versione </b><code>HSearch (v{version})</code><b>.</b>\n\n🆕 <b>Nuova versione</b> <code>v{new_version}</code><b> disponibile!</b>\n",
-        "update_whats_new": "⁉️ <b>Registro modifiche:</b><code> {whats_new}</code>\n\n",
-        "update_command": "🔄 <b>Per aggiornare digita: <code>{update_command}</code></b>",
         "inline_no_query": "Inserisci una query per cercare.",
         "inline_desc": "Nome, comando, descrizione, autore.",
         "inline_no_results": "Prova un'altra query.",
         "inline_query_too_big": "La tua query è troppo grande, riducila a 168 caratteri.",
         "_cfg_doc_tracking": "Abilitare il tracciamento dei tuoi dati (ID utente, lingua) per la sincronizzazione con il bot HSearch e per i consigli?",
-        "_cls_doc": "Modulo per cercare moduli! Segui tutte le notizie di HSearch su @HSearch_updates!"
+        "_cls_doc": "Modulo per cercare moduli! Segui tutte le notizie di HSearch su @HSearch_updates!",
+        "_cfg_doc_only_official_developers": "Utilizzare solo i moduli degli sviluppatori ufficiali durante la ricerca?"
     }
     
     strings_kk = {
@@ -231,16 +209,13 @@ class HSearch(loader.Module):
         "rating_added": "👍 Бағалау жіберілді!",
         "rating_changed": "👍 Бағалау өзгертілді!",
         "rating_removed": "👍 Бағалау жойылды!",
-        "actual_version": "🎉 <b>Сізде ағымдағы нұсқа бар</b> <code>HSearch (v{version})</code><b>.</b>",
-        "old_version": "⛔️ <b>Сізде ескі нұсқа бар </b><code>HSearch (v{version})</code><b>.</b>\n\n🆕 <b>Жаңа нұсқа</b> <code>v{new_version}</code><b> қолжетімді!</b>\n",
-        "update_whats_new": "⁉️ <b>Өзгерістер тізімі:</b><code> {whats_new}</code>\n\n",
-        "update_command": "🔄 <b>Жаңарту үшін теріңіз: <code>{update_command}</code></b>",
         "inline_no_query": "Іздеу үшін сұрауды енгізіңіз.",
         "inline_desc": "Аты, команда, сипаттама, автор.",
         "inline_no_results": "Басқа сұрауды байқап көріңіз.",
         "inline_query_too_big": "Сіздің сұрауыңыз тым үлкен, оны 168 таңбаға дейін қысқартыңыз.",
         "_cfg_doc_tracking": "HSearch ботымен синхрондау және ұсыныстар үшін деректеріңізді (пайдаланушы ID, тіл) қадағалауды қосу керек пе?",
-        "_cls_doc": "Модульдерді іздеуге арналған модуль! HSearch-ның барлық жаңалықтарын @HSearch_updates-те бақылаңыз!"
+        "_cls_doc": "Модульдерді іздеуге арналған модуль! HSearch-ның барлық жаңалықтарын @HSearch_updates-те бақылаңыз!",
+        "_cfg_doc_only_official_developers": "Іздеу кезінде тек ресми әзірлеушілердің модульдерін пайдалану керек пе?"
     }
     
     strings_tt = {
@@ -258,16 +233,13 @@ class HSearch(loader.Module):
         "rating_added": "👍 Бәя җибәрелде!",
         "rating_changed": "👍 Бәя үзгәртелде!",
         "rating_removed": "👍 Бәя бетерелде!",
-        "actual_version": "🎉 <b>Сездә актуаль версия бар</b> <code>HSearch (v{version})</code><b>.</b>",
-        "old_version": "⛔️ <b>Сездә иске версия бар </b><code>HSearch (v{version})</code><b>.</b>\n\n🆕 <b>Яңа версия</b> <code>v{new_version}</code><b> мөмкин!</b>\n",
-        "update_whats_new": "⁉️ <b>Үзгәрешләр исемлеге:</b><code> {whats_new}</code>\n\n",
-        "update_command": "🔄 <b>Яңарту өчен кертегез: <code>{update_command}</code></b>",
         "inline_no_query": "Эзләү өчен сорау кертегез.",
         "inline_desc": "Исем, команда, тасвирлама, автор.",
         "inline_no_results": "Башка сорау сынап карагыз.",
         "inline_query_too_big": "Сезнең сорау артык зур, аны 168 символга кадәр кыскартыгыз.",
         "_cfg_doc_tracking": "HSearch боты белән синхронлаштыру һәм тәкъдимнәр өчен мәгълүматларыгызны (кулланучы ID, тел) күзәтүне кабызыргамы?",
-        "_cls_doc": "Модульләрне эзләү өчен модуль! HSearch-ның барлык яңалыкларын @HSearch_updates-та күзәтегез!"
+        "_cls_doc": "Модульләрне эзләү өчен модуль! HSearch-ның барлык яңалыкларын @HSearch_updates-та күзәтегез!",
+        "_cfg_doc_only_official_developers": "Эзләгәндә фәкать рәсми эшләүчеләрнең модульләрен кулланырга?"
     }
     
     strings_tr = {
@@ -285,16 +257,13 @@ class HSearch(loader.Module):
         "rating_added": "👍 Değerlendirme gönderildi!",
         "rating_changed": "👍 Değerlendirme değiştirildi!",
         "rating_removed": "👍 Değerlendirme silindi!",
-        "actual_version": "🎉 <b>Güncel sürüme sahipsiniz</b> <code>HSearch (v{version})</code><b>.</b>",
-        "old_version": "⛔️ <b>Eski sürüme sahipsiniz </b><code>HSearch (v{version})</code><b>.</b>\n\n🆕 <b>Yeni sürüm</b> <code>v{new_version}</code><b> mevcut!</b>\n",
-        "update_whats_new": "⁉️ <b>Değişiklik günlüğü:</b><code> {whats_new}</code>\n\n",
-        "update_command": "🔄 <b>Güncellemek için yazın: <code>{update_command}</code></b>",
         "inline_no_query": "Arama yapmak için bir sorgu girin.",
         "inline_desc": "İsim, komut, açıklama, yazar.",
         "inline_no_results": "Başka bir sorgu deneyin.",
         "inline_query_too_big": "Sorgunuz çok büyük, lütfen 168 karaktere düşürün.",
         "_cfg_doc_tracking": "HSearch botu ile senkronizasyon ve öneriler için verilerinizin (kullanıcı kimliği, dil) takibini etkinleştir?",
-        "_cls_doc": "Modül aramak için modül! HSearch'nın tüm haberlerini @HSearch_updates'te takip edin!"
+        "_cls_doc": "Modül aramak için modül! HSearch'nın tüm haberlerini @HSearch_updates'te takip edin!",
+        "_cfg_doc_only_official_developers": "Arama yaparken yalnızca resmi geliştiricilerin modüllerini kullanmak?"
     }
     
     strings_yz = {
@@ -312,16 +281,13 @@ class HSearch(loader.Module):
         "rating_added": "👍 Сыаналааһын ыытылынна!",
         "rating_changed": "👍 Сыаналааһын уларыйбыта!",
         "rating_removed": "👍 Сыаналааһын сотулунна!",
-        "actual_version": "🎉 <b>Эһиги билигин кэмигэр версияҕа эрэбит</b> <code>HSearch (v{version})</code><b>.</b>",
-        "old_version": "⛔️ <b>Эһиги урукку версияҕа эрэбит </b><code>HSearch (v{version})</code><b>.</b>\n\n🆕 <b>Саҥа версия</b> <code>v{new_version}</code><b> баар!</b>\n",
-        "update_whats_new": "⁉️ <b>Уларытыылар тиһиктэрэ:</b><code> {whats_new}</code>\n\n",
-        "update_command": "🔄 <b>Саҥатарга суруйуҥ: <code>{update_command}</code></b>",
         "inline_no_query": "Көрдүүргэ ыйытыыны киллэриҥ.",
         "inline_desc": "Аата, көмө, ойуулааһын, оҥорбут киһи.",
         "inline_no_results": "Атын ыйытыыны бэрэбиэркэлээҥ.",
         "inline_query_too_big": "Эһиги ыйытыыҥ наһаа улахан, баһаалыста 168 бэлиэҕэ тиһэр курдук оҥороҥ.",
         "_cfg_doc_tracking": "HSearch бота синхроннааһын уонна сүбэлиириилэр туһугар датаҕытын (туһааччы ID, тыл) кэтээһиннэрии холбоорго дуо?",
-        "_cls_doc": "Модуллары көрдүүргэ модуль! HSearch туһунан бары саҥаны @HSearch_updates иһинээҕи көрүҥ!"
+        "_cls_doc": "Модуллары көрдүүргэ модуль! HSearch туһунан бары саҥаны @HSearch_updates иһинээҕи көрүҥ!",
+        "_cfg_doc_only_official_developers": "Qidiruvda faqat rasmiy ishlab chiquvchilarning modullaridan foydalanish kerakmi?"
     }
 
     def __init__(self):
@@ -330,6 +296,12 @@ class HSearch(loader.Module):
                 "tracking",
                 True,
                 lambda: self.strings["_cfg_doc_tracking"],
+                validator=loader.validators.Boolean()
+            ),
+            loader.ConfigValue(
+                "only_official_developers",
+                True,
+                lambda: self.strings["_cfg_doc_only_official_developers"],
                 validator=loader.validators.Boolean()
             )
         )
@@ -349,17 +321,11 @@ class HSearch(loader.Module):
         self.ssl.check_hostname = False
         self.ssl.verify_mode = ssl.CERT_NONE
         self.uid = (await client.get_me()).id
-        self.token = db.get("HSearch", "token")
 
-        if not self.token:
-            try:
-                async with client.conversation("@HSearch_robot") as conv:
-                    await conv.send_message('/token')
-                    resp = await conv.get_response(timeout=5)
-                    self.token = resp.text.strip()
-                    db.set("HSearch", "token", self.token)
-            except:
-                pass
+        async with client.conversation("@HSearch_robot") as conv:
+            await conv.send_message('/token')
+            resp = await conv.get_response(timeout=5)
+            self.token = resp.text.strip()
 
         asyncio.create_task(self._sync_loop())
         asyncio.create_task(self._certifi_loop())
@@ -620,7 +586,7 @@ class HSearch(loader.Module):
                 "thumb": "https://raw.githubusercontent.com/Fixyres/HSearch/refs/heads/main/imgonline-com-ua-Resize-KbaztxA3oS67p3m8.png",
             }
 
-        mods = await self._api_get("search", query=query.args, inline="true", token=self.token, user_id=self.uid, ood="true")
+        mods = await self._api_get("search", query=query.args, inline="true", token=self.token, user_id=self.uid, ood=self.config["only_official_developers"])
         
         if not mods or not isinstance(mods, list):
             return {
@@ -689,7 +655,7 @@ class HSearch(loader.Module):
         tr_doc="(sorgu) - modül arama.",
         yz_doc="(соруо) - модулларыты көҥүлүүр."
     )
-    async def hs(self, message):
+    async def hscmd(self, message):
         '''(query) - search modules.'''        
         query = utils.get_args_raw(message)
         
@@ -702,7 +668,7 @@ class HSearch(loader.Module):
             return
 
         status_msg = await utils.answer(message, self.strings["searching"])
-        mods = await self._api_get("search", query=query, inline="false", token=self.token, user_id=self.uid, ood="true")
+        mods = await self._api_get("search", query=query, inline="false", token=self.token, user_id=self.uid, ood=self.config["only_official_developers"])
 
         if not mods or not isinstance(mods, list):
             await utils.answer(message, self.strings["no_results"])
@@ -755,7 +721,7 @@ class HSearch(loader.Module):
         await status_msg.delete()
 
     @loader.watcher(chat_id=7575472403)
-    async def _install_via_nsearch(self, message):
+    async def _install_via_hsearch(self, message):
         link = message.raw_text.strip()
         
         if not link.startswith("https://"):
