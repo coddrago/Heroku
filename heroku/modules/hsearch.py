@@ -47,7 +47,11 @@ class HSearch(loader.Module):
         "inline_no_results": "Try another query.",
         "inline_query_too_big": "Your query is too big, please try reducing it to 168 characters.",
         "_cfg_doc_tracking": "Enable tracking of your data (user ID, language) for synchronization with the HSearch bot and for recommendations?",
-        "_cfg_doc_only_official_developers": "Use only modules from official developers when searching?"
+        "_cfg_doc_only_official_developers": "Use only modules from official developers when searching?",
+        "fheta_DEPRECATION": (
+            "<b>FHeta is outdated and has been automatically unloaded.</b>\n"
+            "Details: @HSearch_Updates"
+        ),
     }
     
     strings_ru = {
@@ -71,7 +75,11 @@ class HSearch(loader.Module):
         "inline_query_too_big": "Ваш запрос слишком большой, пожалуйста, сократите его до 168 символов.",
         "_cfg_doc_tracking": "Включить отслеживание ваших данных (ID пользователя, язык) для синхронизации с ботом HSearch и для рекомендаций?",
         "_cls_doc": "Модуль для поиска модулей! Следите за всеми новостями HSearch в @HSearch_updates!",
-        "_cfg_doc_only_official_developers": "Использовать только модули официальных разработчиков при поиске?"
+        "_cfg_doc_only_official_developers": "Использовать только модули официальных разработчиков при поиске?",
+        "fheta_DEPRECATION": (
+            "<b>FHeta устарел и был автоматически выгружен.</b>\n"
+            "Подробности: @HSearch_Updates"
+        ),
     }
     
     strings_de = {
@@ -95,7 +103,11 @@ class HSearch(loader.Module):
         "inline_query_too_big": "Ihre Anfrage ist zu groß, bitte reduzieren Sie sie auf 168 Zeichen.",
         "_cfg_doc_tracking": "Tracking Ihrer Daten (Benutzer-ID, Sprache) für die Synchronisierung mit dem HSearch-Bot und für Empfehlungen aktivieren?",
         "_cls_doc": "Modul zum Suchen von Modulen! Verfolgen Sie alle Neuigkeiten von HSearch in @HSearch_updates!",
-        "_cfg_doc_only_official_developers": "Nur Module von offiziellen Entwicklern bei der Suche verwenden?"
+        "_cfg_doc_only_official_developers": "Nur Module von offiziellen Entwicklern bei der Suche verwenden?",
+        "fheta_DEPRECATION": (
+            "<b>FHeta ist veraltet und wurde automatisch entladen.</b>\n"
+            "Mehr dazu: @HSearch_Updates"
+        ),
     }
     
     strings_ua = {
@@ -119,7 +131,11 @@ class HSearch(loader.Module):
         "inline_query_too_big": "Ваш запит занадто великий, будь ласка, скоротіть його до 168 символів.",
         "_cfg_doc_tracking": "Увімкнути відстеження ваших даних (ID користувача, мова) для синхронізації з ботом HSearch та для рекомендацій?",
         "_cls_doc": "Модуль для пошуку модулів! Стежте за всіма новинами HSearch в @HSearch_updates!",
-        "_cfg_doc_only_official_developers": "Використовувати лише модулі офіційних розробників під час пошуку?"
+        "_cfg_doc_only_official_developers": "Використовувати лише модулі офіційних розробників під час пошуку?",
+        "fheta_DEPRECATION": (
+            "<b>FHeta застарів і був автоматично вивантажений.</b>\n"
+            "Детальніше: @HSearch_Updates"
+        ),
     }
     
     strings_es = {
@@ -143,7 +159,11 @@ class HSearch(loader.Module):
         "inline_query_too_big": "Su consulta es demasiado grande, redúzcala a 168 caracteres.",
         "_cfg_doc_tracking": "¿Habilitar el seguimiento de sus datos (ID de usuario, idioma) para sincronización con el bot HSearch y para recomendaciones?",
         "_cls_doc": "¡Módulo para buscar módulos! ¡Sigue todas las noticias de HSearch en @HSearch_updates!",
-        "_cfg_doc_only_official_developers": "¿Usar solo módulos de desarrolladores oficiales al buscar?"
+        "_cfg_doc_only_official_developers": "¿Usar solo módulos de desarrolladores oficiales al buscar?",
+        "fheta_DEPRECATION": (
+            "<b>FHeta está obsoleto y ha sido descargado automáticamente.</b>\n"
+            "Detalles: @HSearch_Updates"
+        ),
     }
     
     strings_fr = {
@@ -167,7 +187,11 @@ class HSearch(loader.Module):
         "inline_query_too_big": "Votre requête est trop grande, veuillez la réduire à 168 caractères.",
         "_cfg_doc_tracking": "Activer le suivi de vos données (ID utilisateur, langue) pour la synchronisation avec le bot HSearch et pour les recommandations?",
         "_cls_doc": "Module pour rechercher des modules! Suivez toutes les actualités de HSearch sur @HSearch_updates!",
-        "_cfg_doc_only_official_developers": "Utiliser uniquement les modules des développeurs officiels lors de la recherche ?"
+        "_cfg_doc_only_official_developers": "Utiliser uniquement les modules des développeurs officiels lors de la recherche ?",
+        "fheta_DEPRECATION": (
+            "<b>FHeta est obsolète et a été déchargé automatiquement.</b>\n"
+            "Détails: @HSearch_Updates"
+        ),
     }
     
     strings_it = {
@@ -191,7 +215,11 @@ class HSearch(loader.Module):
         "inline_query_too_big": "La tua query è troppo grande, riducila a 168 caratteri.",
         "_cfg_doc_tracking": "Abilitare il tracciamento dei tuoi dati (ID utente, lingua) per la sincronizzazione con il bot HSearch e per i consigli?",
         "_cls_doc": "Modulo per cercare moduli! Segui tutte le notizie di HSearch su @HSearch_updates!",
-        "_cfg_doc_only_official_developers": "Utilizzare solo i moduli degli sviluppatori ufficiali durante la ricerca?"
+        "_cfg_doc_only_official_developers": "Utilizzare solo i moduli degli sviluppatori ufficiali durante la ricerca?",
+        "fheta_DEPRECATION": (
+            "<b>FHeta è obsoleto ed è stato scaricato automaticamente.</b>\n"
+            "Dettagli: @HSearch_Updates"
+        ),
     }
     
     strings_kk = {
@@ -215,7 +243,11 @@ class HSearch(loader.Module):
         "inline_query_too_big": "Сіздің сұрауыңыз тым үлкен, оны 168 таңбаға дейін қысқартыңыз.",
         "_cfg_doc_tracking": "HSearch ботымен синхрондау және ұсыныстар үшін деректеріңізді (пайдаланушы ID, тіл) қадағалауды қосу керек пе?",
         "_cls_doc": "Модульдерді іздеуге арналған модуль! HSearch-ның барлық жаңалықтарын @HSearch_updates-те бақылаңыз!",
-        "_cfg_doc_only_official_developers": "Іздеу кезінде тек ресми әзірлеушілердің модульдерін пайдалану керек пе?"
+        "_cfg_doc_only_official_developers": "Іздеу кезінде тек ресми әзірлеушілердің модульдерін пайдалану керек пе?",
+        "fheta_DEPRECATION": (
+            "<b>FHeta ескірген және автоматты түрде жүктелді.</b>\n"
+            "Толығырақ: @HSearch_Updates"
+        ),
     }
     
     strings_tt = {
@@ -239,7 +271,11 @@ class HSearch(loader.Module):
         "inline_query_too_big": "Сезнең сорау артык зур, аны 168 символга кадәр кыскартыгыз.",
         "_cfg_doc_tracking": "HSearch боты белән синхронлаштыру һәм тәкъдимнәр өчен мәгълүматларыгызны (кулланучы ID, тел) күзәтүне кабызыргамы?",
         "_cls_doc": "Модульләрне эзләү өчен модуль! HSearch-ның барлык яңалыкларын @HSearch_updates-та күзәтегез!",
-        "_cfg_doc_only_official_developers": "Эзләгәндә фәкать рәсми эшләүчеләрнең модульләрен кулланырга?"
+        "_cfg_doc_only_official_developers": "Эзләгәндә фәкать рәсми эшләүчеләрнең модульләрен кулланырга?",
+        "fheta_DEPRECATION": (
+            "<b>FHeta искергән һәм автомат рәвештә төяп алынган.</b>\n"
+            "Тулырак: @HSearch_Updates"
+        ),
     }
     
     strings_tr = {
@@ -263,7 +299,11 @@ class HSearch(loader.Module):
         "inline_query_too_big": "Sorgunuz çok büyük, lütfen 168 karaktere düşürün.",
         "_cfg_doc_tracking": "HSearch botu ile senkronizasyon ve öneriler için verilerinizin (kullanıcı kimliği, dil) takibini etkinleştir?",
         "_cls_doc": "Modül aramak için modül! HSearch'nın tüm haberlerini @HSearch_updates'te takip edin!",
-        "_cfg_doc_only_official_developers": "Arama yaparken yalnızca resmi geliştiricilerin modüllerini kullanmak?"
+        "_cfg_doc_only_official_developers": "Arama yaparken yalnızca resmi geliştiricilerin modüllerini kullanmak?",
+        "fheta_DEPRECATION": (
+            "<b>FHeta eski ve otomatik olarak kaldırıldı.</b>\n"
+            "Ayrıntılar: @HSearch_Updates"
+        ),
     }
     
     strings_yz = {
@@ -287,7 +327,11 @@ class HSearch(loader.Module):
         "inline_query_too_big": "Эһиги ыйытыыҥ наһаа улахан, баһаалыста 168 бэлиэҕэ тиһэр курдук оҥороҥ.",
         "_cfg_doc_tracking": "HSearch бота синхроннааһын уонна сүбэлиириилэр туһугар датаҕытын (туһааччы ID, тыл) кэтээһиннэрии холбоорго дуо?",
         "_cls_doc": "Модуллары көрдүүргэ модуль! HSearch туһунан бары саҥаны @HSearch_updates иһинээҕи көрүҥ!",
-        "_cfg_doc_only_official_developers": "Qidiruvda faqat rasmiy ishlab chiquvchilarning modullaridan foydalanish kerakmi?"
+        "_cfg_doc_only_official_developers": "Qidiruvda faqat rasmiy ishlab chiquvchilarning modullaridan foydalanish kerakmi?",
+        "fheta_DEPRECATION": (
+            "<b>FHeta ескірген жəне автоматты түрде жүктелді.</b>\n"
+            "Толығырақ: @HSearch_Updates"
+        ),
     }
 
     def __init__(self):
@@ -326,6 +370,14 @@ class HSearch(loader.Module):
             await conv.send_message('/token')
             resp = await conv.get_response(timeout=5)
             self.token = resp.text.strip()
+
+        if any(m.__class__.__name__ == "FHeta" for m in self.allmodules.modules):
+            try:
+                await self.invoke(command="unloadmod", args="FHeta", peer="me")
+                me = await self._client.get_me()
+                await self.inline.bot.send_message(me.id, self.strings["fheta_DEPRECATION"], disable_web_page_preview=True)
+            except:
+                pass
 
         asyncio.create_task(self._sync_loop())
         asyncio.create_task(self._certifi_loop())
