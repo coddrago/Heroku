@@ -294,8 +294,13 @@ class HSearch(loader.Module):
                 True,
                 lambda: self.strings["_cfg_doc_tracking"],
                 validator=loader.validators.Boolean()
-            ),
-            
+            ), 
+            loader.ConfigValue(
+                "only_official_developers",
+                True,
+                lambda: self.strings["_cfg_doc_only_official_developers"],
+                validator=loader.validators.Boolean()
+            )
         )
 
     async def client_ready(self, client, db):
@@ -578,7 +583,7 @@ class HSearch(loader.Module):
                 "thumb": "https://raw.githubusercontent.com/Fixyres/HSearch/refs/heads/main/imgonline-com-ua-Resize-KbaztxA3oS67p3m8.png",
             }
 
-        mods = await self._api_get("search", query=query.args, inline="true", token=self.token, user_id=self.uid, ood="true")
+        mods = await self._api_get("search", query=query.args, inline="true", token=self.token, user_id=self.uid, ood=str(self.config["only_official_developers"]).lower())
         
         if not mods or not isinstance(mods, list):
             return {
@@ -660,7 +665,7 @@ class HSearch(loader.Module):
             return
 
         status_msg = await utils.answer(message, self.strings["searching"])
-        mods = await self._api_get("search", query=query, inline="false", token=self.token, user_id=self.uid, ood="true")
+        mods = await self._api_get("search", query=query.args, inline="false", token=self.token, user_id=self.uid, ood=str(self.config["only_official_developers"]).lower())
 
         if not mods or not isinstance(mods, list):
             await utils.answer(message, self.strings["no_results"])
