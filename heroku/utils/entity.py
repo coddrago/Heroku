@@ -59,7 +59,6 @@ from herokutl.tl.types import (
     User,
 )
 
-from .args import get_args
 from .other import invite_inline_bot, run_sync
 
 from .._internal import fw_protect
@@ -368,6 +367,7 @@ async def get_target(message: Message, arg_no: int = 0) -> typing.Optional[int]:
     :param arg_no: Argument number to get target from
     :return: Target
     """
+    from .args import get_args
 
     if any(
         isinstance(entity, MessageEntityMentionName)
