@@ -5,111 +5,32 @@
 # You can redistribute it and/or modify it under the terms of the GNU AGPLv3
 # 🔑 https://www.gnu.org/licenses/agpl-3.0.html
 
-import asyncio
-import atexit as _atexit
 import contextlib
-import functools
-import inspect
 import io
 import json
 import logging
-import os
-import random
 import re
-import shlex
-import signal
-import string
-import time
 import typing
-from datetime import timedelta
-from urllib.parse import urlparse
-import emoji
 
-import git
 import grapheme
 import herokutl
-import herokutl.extensions
-import herokutl.extensions.html
-import requests
-from aiogram.types import Message as AiogramMessage
-from herokutl import hints
-from herokutl.tl.custom.message import Message
-from herokutl.tl.functions.account import UpdateNotifySettingsRequest
-from herokutl.tl.functions.channels import (
-    CreateChannelRequest,
-    EditAdminRequest,
-    EditPhotoRequest,
-    InviteToChannelRequest,
-)
-from herokutl.tl.functions.messages import (
-    GetDialogFiltersRequest,
-    SetHistoryTTLRequest,
-    UpdateDialogFilterRequest,
-)
 from herokutl.tl.types import (
     Channel,
     Chat,
-    ChatAdminRights,
     InputDocument,
-    InputPeerNotifySettings,
-    MessageEntityBankCard,
-    MessageEntityBlockquote,
-    MessageEntityBold,
-    MessageEntityBotCommand,
-    MessageEntityCashtag,
-    MessageEntityCode,
-    MessageEntityEmail,
-    MessageEntityHashtag,
-    MessageEntityItalic,
-    MessageEntityMention,
-    MessageEntityMentionName,
-    MessageEntityPhone,
-    MessageEntityPre,
-    MessageEntitySpoiler,
-    MessageEntityStrike,
-    MessageEntityTextUrl,
-    MessageEntityUnderline,
-    MessageEntityUnknown,
-    MessageEntityUrl,
+    Message,
     MessageMediaPhoto,
     MessageMediaDocument,
     MessageMediaWebPage,
-    PeerChannel,
-    PeerChat,
-    PeerUser,
-    UpdateNewChannelMessage,
-    User,
 )
 
 from .other import _copy_tl
-from .entity import get_chat_id
+from .entity import get_chat_id, FormattingEntity
 
-from .._internal import fw_protect
 from ..inline.types import BotInlineCall, InlineCall, InlineMessage
-from ..tl_cache import CustomTelegramClient
-from ..types import HerokuReplyMarkup, ListLike, Module
+from ..types import HerokuReplyMarkup, ListLike
 
-FormattingEntity = typing.Union[
-    MessageEntityUnknown,
-    MessageEntityMention,
-    MessageEntityHashtag,
-    MessageEntityBotCommand,
-    MessageEntityUrl,
-    MessageEntityEmail,
-    MessageEntityBold,
-    MessageEntityItalic,
-    MessageEntityCode,
-    MessageEntityPre,
-    MessageEntityTextUrl,
-    MessageEntityMentionName,
-    MessageEntityPhone,
-    MessageEntityCashtag,
-    MessageEntityUnderline,
-    MessageEntityStrike,
-    MessageEntityBlockquote,
-    MessageEntityBankCard,
-    MessageEntitySpoiler,
-]
+
 
 emoji_pattern = re.compile(
     "["
