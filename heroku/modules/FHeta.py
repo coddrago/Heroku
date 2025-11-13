@@ -1,8 +1,8 @@
 __version__ = (2, 0, 0)
-# meta developer: @HSearch_Updates
+# meta developer: @FHeta_Updates
 
 # ©️ Fixyres, 2025
-# 🌐 https://github.com/Fixyres/HSearch
+# 🌐 https://github.com/Fixyres/FHeta
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -20,11 +20,11 @@ from telethon.tl.functions.contacts import UnblockRequest
 
 
 @loader.tds
-class HSearch(loader.Module):
-    '''Module for searching modules! Watch all news HSearch in @HSearch_updates!'''
+class FHeta(loader.Module):
+    '''Module for searching modules! Watch all news FHeta in @FHeta_Updates!'''
    
     strings = {
-        "name": "HSearch",
+        "name": "FHeta",
         "searching": "🔎 <b>Searching...</b>",
         "no_query": "❌ <b>Enter a query to search.</b>",
         "no_results": "❌ <b>No modules found.</b>",
@@ -43,8 +43,7 @@ class HSearch(loader.Module):
         "inline_desc": "Name, command, description, author.",
         "inline_no_results": "Try another query.",
         "inline_query_too_big": "Your query is too big, please try reducing it to 168 characters.",
-        "_cfg_doc_tracking": "Enable tracking of your data (user ID, language) for synchronization with the HSearch bot and for recommendations?",
-        "_cfg_doc_only_official_developers": "Use only modules from official developers when searching?"
+        "_cfg_doc_tracking": "Enable tracking of your data (user ID, language) for synchronization with the FHeta bot and for recommendations?",
     }
     
     strings_ru = {
@@ -66,9 +65,8 @@ class HSearch(loader.Module):
         "inline_desc": "Название, команда, описание, автор.",
         "inline_no_results": "Попробуйте другой запрос.",
         "inline_query_too_big": "Ваш запрос слишком большой, пожалуйста, сократите его до 168 символов.",
-        "_cfg_doc_tracking": "Включить отслеживание ваших данных (ID пользователя, язык) для синхронизации с ботом HSearch и для рекомендаций?",
-        "_cls_doc": "Модуль для поиска модулей! Следите за всеми новостями HSearch в @HSearch_updates!",
-        "_cfg_doc_only_official_developers": "Использовать только модули официальных разработчиков при поиске?"
+        "_cfg_doc_tracking": "Включить отслеживание ваших данных (ID пользователя, язык) для синхронизации с ботом FHeta и для рекомендаций?",
+        "_cls_doc": "Модуль для поиска модулей! Следите за всеми новостями FHeta в @FHeta_Updates!",
     }
     
     strings_de = {
@@ -90,9 +88,8 @@ class HSearch(loader.Module):
         "inline_desc": "Name, Befehl, Beschreibung, Autor.",
         "inline_no_results": "Versuchen Sie eine andere Anfrage.",
         "inline_query_too_big": "Ihre Anfrage ist zu groß, bitte reduzieren Sie sie auf 168 Zeichen.",
-        "_cfg_doc_tracking": "Tracking Ihrer Daten (Benutzer-ID, Sprache) für die Synchronisierung mit dem HSearch-Bot und für Empfehlungen aktivieren?",
-        "_cls_doc": "Modul zum Suchen von Modulen! Verfolgen Sie alle Neuigkeiten von HSearch in @HSearch_updates!",
-        "_cfg_doc_only_official_developers": "Nur Module von offiziellen Entwicklern bei der Suche verwenden?"
+        "_cfg_doc_tracking": "Tracking Ihrer Daten (Benutzer-ID, Sprache) für die Synchronisierung mit dem FHeta-Bot und für Empfehlungen aktivieren?",
+        "_cls_doc": "Modul zum Suchen von Modulen! Verfolgen Sie alle Neuigkeiten von FHeta in @FHeta_Updates!",
     }
     
     strings_ua = {
@@ -114,177 +111,8 @@ class HSearch(loader.Module):
         "inline_desc": "Назва, команда, опис, автор.",
         "inline_no_results": "Спробуйте інший запит.",
         "inline_query_too_big": "Ваш запит занадто великий, будь ласка, скоротіть його до 168 символів.",
-        "_cfg_doc_tracking": "Увімкнути відстеження ваших даних (ID користувача, мова) для синхронізації з ботом HSearch та для рекомендацій?",
-        "_cls_doc": "Модуль для пошуку модулів! Стежте за всіма новинами HSearch в @HSearch_updates!",
-        "_cfg_doc_only_official_developers": "Використовувати лише модулі офіційних розробників під час пошуку?"
-    }
-    
-    strings_es = {
-        "searching": "🔎 <b>Buscando...</b>",
-        "no_query": "❌ <b>Ingrese una consulta para buscar.</b>",
-        "no_results": "❌ <b>No se encontraron módulos.</b>",
-        "query_too_big": "❌ <b>Su consulta es demasiado grande, redúzcala a 168 caracteres.</b>",
-        "result_query": "🔎 <b>Resultado {idx}/{total} por consulta:</b> <code>{query}</code>\n",
-        "result_single": "🔎 <b>Resultado por consulta:</b> <code>{query}</code>\n",
-        "module_info": "<code>{name}</code> <b>por</b> <code>{author}</code> <code>{version}</code>\n💾 <b>Comando de instalación:</b> <code>{install}</code>",
-        "desc": "\n📁 <b>Descripción:</b> {desc}",
-        "cmds": "\n👨‍💻 <b>Comandos:</b>\n{cmds}",
-        "inline_cmds": "\n🤖 <b>Comandos en línea:</b>\n{cmds}",
-        "lang": "es",
-        "rating_added": "👍 ¡Calificación enviada!",
-        "rating_changed": "👍 ¡Calificación cambiada!",
-        "rating_removed": "👍 ¡Calificación eliminada!",
-        "inline_no_query": "Ingrese una consulta para buscar.",
-        "inline_desc": "Nombre, comando, descripción, autor.",
-        "inline_no_results": "Pruebe otra consulta.",
-        "inline_query_too_big": "Su consulta es demasiado grande, redúzcala a 168 caracteres.",
-        "_cfg_doc_tracking": "¿Habilitar el seguimiento de sus datos (ID de usuario, idioma) para sincronización con el bot HSearch y para recomendaciones?",
-        "_cls_doc": "¡Módulo para buscar módulos! ¡Sigue todas las noticias de HSearch en @HSearch_updates!",
-        "_cfg_doc_only_official_developers": "¿Usar solo módulos de desarrolladores oficiales al buscar?"
-    }
-    
-    strings_fr = {
-        "searching": "🔎 <b>Recherche...</b>",
-        "no_query": "❌ <b>Entrez une requête pour rechercher.</b>",
-        "no_results": "❌ <b>Aucun module trouvé.</b>",
-        "query_too_big": "❌ <b>Votre requête est trop grande, veuillez la réduire à 168 caractères.</b>",
-        "result_query": "🔎 <b>Résultat {idx}/{total} pour la requête:</b> <code>{query}</code>\n",
-        "result_single": "🔎 <b>Résultat pour la requête:</b> <code>{query}</code>\n",
-        "module_info": "<code>{name}</code> <b>par</b> <code>{author}</code> <code>{version}</code>\n💾 <b>Commande d'installation:</b> <code>{install}</code>",
-        "desc": "\n📁 <b>Description:</b> {desc}",
-        "cmds": "\n👨‍💻 <b>Commandes:</b>\n{cmds}",
-        "inline_cmds": "\n🤖 <b>Commandes en ligne:</b>\n{cmds}",
-        "lang": "fr",
-        "rating_added": "👍 Évaluation soumise!",
-        "rating_changed": "👍 Évaluation modifiée!",
-        "rating_removed": "👍 Évaluation supprimée!",
-        "inline_no_query": "Entrez une requête pour rechercher.",
-        "inline_desc": "Nom, commande, description, auteur.",
-        "inline_no_results": "Essayez une autre requête.",
-        "inline_query_too_big": "Votre requête est trop grande, veuillez la réduire à 168 caractères.",
-        "_cfg_doc_tracking": "Activer le suivi de vos données (ID utilisateur, langue) pour la synchronisation avec le bot HSearch et pour les recommandations?",
-        "_cls_doc": "Module pour rechercher des modules! Suivez toutes les actualités de HSearch sur @HSearch_updates!",
-        "_cfg_doc_only_official_developers": "Utiliser uniquement les modules des développeurs officiels lors de la recherche ?"
-    }
-    
-    strings_it = {
-        "searching": "🔎 <b>Ricerca in corso...</b>",
-        "no_query": "❌ <b>Inserisci una query per cercare.</b>",
-        "no_results": "❌ <b>Nessun modulo trovato.</b>",
-        "query_too_big": "❌ <b>La tua query è troppo grande, riducila a 168 caratteri.</b>",
-        "result_query": "🔎 <b>Risultato {idx}/{total} per query:</b> <code>{query}</code>\n",
-        "result_single": "🔎 <b>Risultato per query:</b> <code>{query}</code>\n",
-        "module_info": "<code>{name}</code> <b>di</b> <code>{author}</code> <code>{version}</code>\n💾 <b>Comando di installazione:</b> <code>{install}</code>",
-        "desc": "\n📁 <b>Descrizione:</b> {desc}",
-        "cmds": "\n👨‍💻 <b>Comandi:</b>\n{cmds}",
-        "inline_cmds": "\n🤖 <b>Comandi inline:</b>\n{cmds}",
-        "lang": "it",
-        "rating_added": "👍 Valutazione inviata!",
-        "rating_changed": "👍 Valutazione modificata!",
-        "rating_removed": "👍 Valutazione eliminata!",
-        "inline_no_query": "Inserisci una query per cercare.",
-        "inline_desc": "Nome, comando, descrizione, autore.",
-        "inline_no_results": "Prova un'altra query.",
-        "inline_query_too_big": "La tua query è troppo grande, riducila a 168 caratteri.",
-        "_cfg_doc_tracking": "Abilitare il tracciamento dei tuoi dati (ID utente, lingua) per la sincronizzazione con il bot HSearch e per i consigli?",
-        "_cls_doc": "Modulo per cercare moduli! Segui tutte le notizie di HSearch su @HSearch_updates!",
-        "_cfg_doc_only_official_developers": "Utilizzare solo i moduli degli sviluppatori ufficiali durante la ricerca?"
-    }
-    
-    strings_kk = {
-        "searching": "🔎 <b>Іздеу...</b>",
-        "no_query": "❌ <b>Іздеу үшін сұрауды енгізіңіз.</b>",
-        "no_results": "❌ <b>Модульдер табылмады.</b>",
-        "query_too_big": "❌ <b>Сіздің сұрауыңыз тым үлкен, оны 168 таңбаға дейін қысқартыңыз.</b>",
-        "result_query": "🔎 <b>Нәтиже {idx}/{total} сұрау бойынша:</b> <code>{query}</code>\n",
-        "result_single": "🔎 <b>Нәтиже сұрау бойынша:</b> <code>{query}</code>\n",
-        "module_info": "<code>{name}</code> <b>авторы</b> <code>{author}</code> <code>{version}</code>\n💾 <b>Орнату командасы:</b> <code>{install}</code>",
-        "desc": "\n📁 <b>Сипаттама:</b> {desc}",
-        "cmds": "\n👨‍💻 <b>Командалар:</b>\n{cmds}",
-        "inline_cmds": "\n🤖 <b>Инлайн командалар:</b>\n{cmds}",
-        "lang": "kk",
-        "rating_added": "👍 Бағалау жіберілді!",
-        "rating_changed": "👍 Бағалау өзгертілді!",
-        "rating_removed": "👍 Бағалау жойылды!",
-        "inline_no_query": "Іздеу үшін сұрауды енгізіңіз.",
-        "inline_desc": "Аты, команда, сипаттама, автор.",
-        "inline_no_results": "Басқа сұрауды байқап көріңіз.",
-        "inline_query_too_big": "Сіздің сұрауыңыз тым үлкен, оны 168 таңбаға дейін қысқартыңыз.",
-        "_cfg_doc_tracking": "HSearch ботымен синхрондау және ұсыныстар үшін деректеріңізді (пайдаланушы ID, тіл) қадағалауды қосу керек пе?",
-        "_cls_doc": "Модульдерді іздеуге арналған модуль! HSearch-ның барлық жаңалықтарын @HSearch_updates-те бақылаңыз!",
-        "_cfg_doc_only_official_developers": "Іздеу кезінде тек ресми әзірлеушілердің модульдерін пайдалану керек пе?"
-    }
-    
-    strings_tt = {
-        "searching": "🔎 <b>Эзләү...</b>",
-        "no_query": "❌ <b>Эзләү өчен сорау кертегез.</b>",
-        "no_results": "❌ <b>Модульләр табылмады.</b>",
-        "query_too_big": "❌ <b>Сезнең сорау артык зур, аны 168 символга кадәр кыскартыгыз.</b>",
-        "result_query": "🔎 <b>Нәтиҗә {idx}/{total} сорау буенча:</b> <code>{query}</code>\n",
-        "result_single": "🔎 <b>Нәтиҗә сорау буенча:</b> <code>{query}</code>\n",
-        "module_info": "<code>{name}</code> <b>авторы</b> <code>{author}</code> <code>{version}</code>\n💾 <b>Урнаштыру командасы:</b> <code>{install}</code>",
-        "desc": "\n📁 <b>Тасвирлама:</b> {desc}",
-        "cmds": "\n👨‍💻 <b>Командалар:</b>\n{cmds}",
-        "inline_cmds": "\n🤖 <b>Инлайн командалар:</b>\n{cmds}",
-        "lang": "tt",
-        "rating_added": "👍 Бәя җибәрелде!",
-        "rating_changed": "👍 Бәя үзгәртелде!",
-        "rating_removed": "👍 Бәя бетерелде!",
-        "inline_no_query": "Эзләү өчен сорау кертегез.",
-        "inline_desc": "Исем, команда, тасвирлама, автор.",
-        "inline_no_results": "Башка сорау сынап карагыз.",
-        "inline_query_too_big": "Сезнең сорау артык зур, аны 168 символга кадәр кыскартыгыз.",
-        "_cfg_doc_tracking": "HSearch боты белән синхронлаштыру һәм тәкъдимнәр өчен мәгълүматларыгызны (кулланучы ID, тел) күзәтүне кабызыргамы?",
-        "_cls_doc": "Модульләрне эзләү өчен модуль! HSearch-ның барлык яңалыкларын @HSearch_updates-та күзәтегез!",
-        "_cfg_doc_only_official_developers": "Эзләгәндә фәкать рәсми эшләүчеләрнең модульләрен кулланырга?"
-    }
-    
-    strings_tr = {
-        "searching": "🔎 <b>Aranıyor...</b>",
-        "no_query": "❌ <b>Arama yapmak için bir sorgu girin.</b>",
-        "no_results": "❌ <b>Modül bulunamadı.</b>",
-        "query_too_big": "❌ <b>Sorgunuz çok büyük, lütfen 168 karaktere düşürün.</b>",
-        "result_query": "🔎 <b>Sonuç {idx}/{total} sorgu için:</b> <code>{query}</code>\n",
-        "result_single": "🔎 <b>Sorgu için sonuç:</b> <code>{query}</code>\n",
-        "module_info": "<code>{name}</code> <b>tarafından</b> <code>{author}</code> <code>{version}</code>\n💾 <b>Kurulum komutu:</b> <code>{install}</code>",
-        "desc": "\n📁 <b>Açıklama:</b> {desc}",
-        "cmds": "\n👨‍💻 <b>Komutlar:</b>\n{cmds}",
-        "inline_cmds": "\n🤖 <b>Satır içi komutlar:</b>\n{cmds}",
-        "lang": "tr",
-        "rating_added": "👍 Değerlendirme gönderildi!",
-        "rating_changed": "👍 Değerlendirme değiştirildi!",
-        "rating_removed": "👍 Değerlendirme silindi!",
-        "inline_no_query": "Arama yapmak için bir sorgu girin.",
-        "inline_desc": "İsim, komut, açıklama, yazar.",
-        "inline_no_results": "Başka bir sorgu deneyin.",
-        "inline_query_too_big": "Sorgunuz çok büyük, lütfen 168 karaktere düşürün.",
-        "_cfg_doc_tracking": "HSearch botu ile senkronizasyon ve öneriler için verilerinizin (kullanıcı kimliği, dil) takibini etkinleştir?",
-        "_cls_doc": "Modül aramak için modül! HSearch'nın tüm haberlerini @HSearch_updates'te takip edin!",
-        "_cfg_doc_only_official_developers": "Arama yaparken yalnızca resmi geliştiricilerin modüllerini kullanmak?"
-    }
-    
-    strings_yz = {
-        "searching": "🔎 <b>Көрдөөбүт...</b>",
-        "no_query": "❌ <b>Көрдүүргэ ыйытыыны киллэриҥ.</b>",
-        "no_results": "❌ <b>Модуллар булуллубата.</b>",
-        "query_too_big": "❌ <b>Эһиги ыйытыыҥ наһаа улахан, баһаалыста 168 бэлиэҕэ тиһэр курдук оҥороҥ.</b>",
-        "result_query": "🔎 <b>Түмүк {idx}/{total} ыйытыы иһинээҕи:</b> <code>{query}</code>\n",
-        "result_single": "🔎 <b>Түмүк ыйытыы иһинээҕи:</b> <code>{query}</code>\n",
-        "module_info": "<code>{name}</code> <b>оҥоһуллубут</b> <code>{author}</code> <code>{version}</code>\n💾 <b>Туруоруу көмөтө:</b> <code>{install}</code>",
-        "desc": "\n📁 <b>Ойуулааһын:</b> {desc}",
-        "cmds": "\n👨‍💻 <b>Көмөлөр:</b>\n{cmds}",
-        "inline_cmds": "\n🤖 <b>Инлайн көмөлөр:</b>\n{cmds}",
-        "lang": "yz",
-        "rating_added": "👍 Сыаналааһын ыытылынна!",
-        "rating_changed": "👍 Сыаналааһын уларыйбыта!",
-        "rating_removed": "👍 Сыаналааһын сотулунна!",
-        "inline_no_query": "Көрдүүргэ ыйытыыны киллэриҥ.",
-        "inline_desc": "Аата, көмө, ойуулааһын, оҥорбут киһи.",
-        "inline_no_results": "Атын ыйытыыны бэрэбиэркэлээҥ.",
-        "inline_query_too_big": "Эһиги ыйытыыҥ наһаа улахан, баһаалыста 168 бэлиэҕэ тиһэр курдук оҥороҥ.",
-        "_cfg_doc_tracking": "HSearch бота синхроннааһын уонна сүбэлиириилэр туһугар датаҕытын (туһааччы ID, тыл) кэтээһиннэрии холбоорго дуо?",
-        "_cls_doc": "Модуллары көрдүүргэ модуль! HSearch туһунан бары саҥаны @HSearch_updates иһинээҕи көрүҥ!",
-        "_cfg_doc_only_official_developers": "Qidiruvda faqat rasmiy ishlab chiquvchilarning modullaridan foydalanish kerakmi?"
+        "_cfg_doc_tracking": "Увімкнути відстеження ваших даних (ID користувача, мова) для синхронізації з ботом FHeta та для рекомендацій?",
+        "_cls_doc": "Модуль для пошуку модулів! Стежте за всіма новинами FHeta в @FHeta_Updates!",
     }
 
     def __init__(self):
@@ -294,19 +122,18 @@ class HSearch(loader.Module):
                 True,
                 lambda: self.strings["_cfg_doc_tracking"],
                 validator=loader.validators.Boolean()
-            ),
-            
+            )
         )
 
     async def client_ready(self, client, db):
         try:
-            await client(UnblockRequest("@HSearch_robot"))
+            await client(UnblockRequest("@FHeta_robot"))
         except:
             pass
             
         await self.request_join(
-            "HSearch_Updates",
-            "🔥 This is the channel with all updates in HSearch!"
+            "FHeta_Updates",
+            "🔥 This is the channel with all updates in FHeta!"
         )
 
         self.ssl = ssl.create_default_context()
@@ -314,7 +141,7 @@ class HSearch(loader.Module):
         self.ssl.verify_mode = ssl.CERT_NONE
         self.uid = (await client.get_me()).id
 
-        async with client.conversation("@HSearch_robot") as conv:
+        async with client.conversation("@FHeta_robot") as conv:
             await conv.send_message('/token')
             resp = await conv.get_response(timeout=5)
             self.token = resp.text.strip()
@@ -369,8 +196,8 @@ class HSearch(loader.Module):
             
     async def on_dlmod(self, client, db):
         try:
-            await client(UnblockRequest("@HSearch_robot"))
-            await utils.dnd(client, "@HSearch_robot", archive=True)
+            await client(UnblockRequest("@FHeta_robot"))
+            await utils.dnd(client, "@FHeta_robot", archive=True)
         except:
             pass
 
@@ -408,10 +235,8 @@ class HSearch(loader.Module):
             return {}
 
     async def _fetch_thumb(self, url: Optional[str]) -> str:
-        default_thumb = "https://raw.githubusercontent.com/Fixyres/HSearch/refs/heads/main/imgonline-com-ua-Resize-SOMllzo0cPFUCor.png"
-        
         if not url:
-            return default_thumb
+            return "https://raw.githubusercontent.com/Fixyres/FHeta/refs/heads/main/assets/empty_pic.png"
         
         try:
             async with aiohttp.ClientSession() as session:
@@ -552,22 +377,15 @@ class HSearch(loader.Module):
         de_doc="(anfrage) - module suchen.",
         ru_doc="(запрос) - искать модули.",
         ua_doc="(запит) - шукати модулі.",
-        es_doc="(consulta) - buscar módulos.",
-        fr_doc="(requête) - rechercher des modules.",
-        it_doc="(richiesta) - cercare moduli.",
-        kk_doc="(сұраныс) - модульдерді іздеу.",
-        tt_doc="(сорау) - модульләрне эзләү.",
-        tr_doc="(sorgu) - modül arama.",
-        yz_doc="(соруо) - модулларыты көҥүлүүр."
     )
-    async def hs(self, query):
+    async def fheta(self, query):
         '''(query) - search modules.'''        
         if not query.args:
             return {
                 "title": self.strings["inline_no_query"],
                 "description": self.strings["inline_desc"],
                 "message": self.strings["no_query"],
-                "thumb": "https://raw.githubusercontent.com/Fixyres/HSearch/refs/heads/main/imgonline-com-ua-Resize-4EUHOHiKpwRTb4s.png",
+                "thumb": "https://raw.githubusercontent.com/Fixyres/FHeta/refs/heads/main/assets/magnifying_glass.png",
             }
 
         if len(query.args) > 168:
@@ -575,7 +393,7 @@ class HSearch(loader.Module):
                 "title": self.strings["inline_query_too_big"],
                 "description": self.strings["inline_no_results"],
                 "message": self.strings["query_too_big"],
-                "thumb": "https://raw.githubusercontent.com/Fixyres/HSearch/refs/heads/main/imgonline-com-ua-Resize-KbaztxA3oS67p3m8.png",
+                "thumb": "https://raw.githubusercontent.com/Fixyres/FHeta/refs/heads/main/assets/try_other_query.png",
             }
 
         mods = await self._api_get("search", query=query.args, inline="true", token=self.token, user_id=self.uid, ood="true")
@@ -585,37 +403,12 @@ class HSearch(loader.Module):
                 "title": self.strings["inline_no_results"],
                 "description": self.strings["inline_desc"],
                 "message": self.strings["no_results"],
-                "thumb": "https://raw.githubusercontent.com/Fixyres/HSearch/refs/heads/main/imgonline-com-ua-Resize-KbaztxA3oS67p3m8.png",
+                "thumb": "https://raw.githubusercontent.com/Fixyres/FHeta/refs/heads/main/assets/try_other_query.png",
             }
 
-        seen_keys = set()
         results = []
-        installs_to_fetch = []
         
         for mod in mods[:50]:
-            key = f"{mod.get('name', '')}_{mod.get('author', '')}_{mod.get('version', '')}"
-            if key in seen_keys:
-                continue
-            seen_keys.add(key)
-            
-            if 'likes' not in mod or 'dislikes' not in mod:
-                installs_to_fetch.append(mod.get('install', ''))
-        
-        if installs_to_fetch:
-            stats_response = await self._api_post("get", json=installs_to_fetch)
-            for mod in mods[:50]:
-                install = mod.get('install', '')
-                if install in stats_response:
-                    mod['likes'] = stats_response[install].get('likes', 0)
-                    mod['dislikes'] = stats_response[install].get('dislikes', 0)
-        
-        seen_keys = set()
-        for mod in mods[:50]:
-            key = f"{mod.get('name', '')}_{mod.get('author', '')}_{mod.get('version', '')}"
-            if key in seen_keys:
-                continue
-            seen_keys.add(key)
-            
             stats = {
                 "likes": mod.get('likes', 0),
                 "dislikes": mod.get('dislikes', 0)
@@ -639,15 +432,8 @@ class HSearch(loader.Module):
         de_doc="(anfrage) - module suchen.",
         ru_doc="(запрос) - искать модули.",
         ua_doc="(запит) - шукати модулі.",
-        es_doc="(consulta) - buscar módulos.",
-        fr_doc="(requête) - rechercher des modules.",
-        it_doc="(richiesta) - cercare moduli.",
-        kk_doc="(сұраныс) - модульдерді іздеу.",
-        tt_doc="(сорау) - модульләрне эзләү.",
-        tr_doc="(sorgu) - modül arama.",
-        yz_doc="(соруо) - модулларыты көҥүлүүр."
     )
-    async def hscmd(self, message):
+    async def fhetacmd(self, message):
         '''(query) - search modules.'''        
         query = utils.get_args_raw(message)
         
@@ -666,31 +452,7 @@ class HSearch(loader.Module):
             await utils.answer(message, self.strings["no_results"])
             return
 
-        seen_keys = set()
-        unique_mods = []
-        
-        for mod in mods:
-            key = f"{mod.get('name', '')}_{mod.get('author', '')}_{mod.get('version', '')}"
-            if key not in seen_keys:
-                seen_keys.add(key)
-                unique_mods.append(mod)
-
-        if not unique_mods:
-            await utils.answer(message, self.strings["no_results"])
-            await status_msg.delete()
-            return
-
-        first_mod = unique_mods[0]
-        
-        if 'likes' not in first_mod or 'dislikes' not in first_mod:
-            installs = [m.get('install', '') for m in unique_mods]
-            stats_response = await self._api_post("get", json=installs)
-            
-            for mod in unique_mods:
-                install = mod.get('install', '')
-                if install in stats_response:
-                    mod['likes'] = stats_response[install].get('likes', 0)
-                    mod['dislikes'] = stats_response[install].get('dislikes', 0)
+        first_mod = mods[0]
         
         stats = {
             "likes": first_mod.get('likes', 0),
@@ -698,22 +460,22 @@ class HSearch(loader.Module):
         }
         
         photo = None
-        if len(unique_mods) == 1:
+        if len(mods) == 1:
             photo = await self._fetch_thumb(first_mod.get("banner"))
-            if photo == "https://raw.githubusercontent.com/Fixyres/HSearch/refs/heads/main/imgonline-com-ua-Resize-SOMllzo0cPFUCor.png":
+            if photo == "https://raw.githubusercontent.com/Fixyres/FHeta/refs/heads/main/assets/empty_pic.png":
                 photo = None
 
         await self.inline.form(
             message=message,
-            text=self._fmt_mod(first_mod, query, 1, len(unique_mods)),
+            text=self._fmt_mod(first_mod, query, 1, len(mods)),
             photo=photo,
-            reply_markup=self._mk_btns(first_mod.get("install", ""), stats, 0, unique_mods if len(unique_mods) > 1 else None, query)
+            reply_markup=self._mk_btns(first_mod.get("install", ""), stats, 0, mods if len(mods) > 1 else None, query)
         )
         
         await status_msg.delete()
 
     @loader.watcher(chat_id=7575472403)
-    async def _install_via_hsearch(self, message):
+    async def _install_via_fheta(self, message):
         link = message.raw_text.strip()
         
         if not link.startswith("https://"):
