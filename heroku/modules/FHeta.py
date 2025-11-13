@@ -44,7 +44,6 @@ class FHeta(loader.Module):
         "inline_no_results": "Try another query.",
         "inline_query_too_big": "Your query is too big, please try reducing it to 168 characters.",
         "_cfg_doc_tracking": "Enable tracking of your data (user ID, language) for synchronization with the FHeta bot and for recommendations?",
-        "_cfg_doc_only_official_developers": "Use only modules from official developers when searching?"
     }
     
     strings_ru = {
@@ -68,7 +67,6 @@ class FHeta(loader.Module):
         "inline_query_too_big": "Ваш запрос слишком большой, пожалуйста, сократите его до 168 символов.",
         "_cfg_doc_tracking": "Включить отслеживание ваших данных (ID пользователя, язык) для синхронизации с ботом FHeta и для рекомендаций?",
         "_cls_doc": "Модуль для поиска модулей! Следите за всеми новостями FHeta в @FHeta_Updates!",
-        "_cfg_doc_only_official_developers": "Использовать только модули официальных разработчиков при поиске?"
     }
     
     strings_de = {
@@ -92,7 +90,6 @@ class FHeta(loader.Module):
         "inline_query_too_big": "Ihre Anfrage ist zu groß, bitte reduzieren Sie sie auf 168 Zeichen.",
         "_cfg_doc_tracking": "Tracking Ihrer Daten (Benutzer-ID, Sprache) für die Synchronisierung mit dem FHeta-Bot und für Empfehlungen aktivieren?",
         "_cls_doc": "Modul zum Suchen von Modulen! Verfolgen Sie alle Neuigkeiten von FHeta in @FHeta_Updates!",
-        "_cfg_doc_only_official_developers": "Nur Module von offiziellen Entwicklern bei der Suche verwenden?"
     }
     
     strings_ua = {
@@ -116,175 +113,6 @@ class FHeta(loader.Module):
         "inline_query_too_big": "Ваш запит занадто великий, будь ласка, скоротіть його до 168 символів.",
         "_cfg_doc_tracking": "Увімкнути відстеження ваших даних (ID користувача, мова) для синхронізації з ботом FHeta та для рекомендацій?",
         "_cls_doc": "Модуль для пошуку модулів! Стежте за всіма новинами FHeta в @FHeta_Updates!",
-        "_cfg_doc_only_official_developers": "Використовувати лише модулі офіційних розробників під час пошуку?"
-    }
-    
-    strings_es = {
-        "searching": "🔎 <b>Buscando...</b>",
-        "no_query": "❌ <b>Ingrese una consulta para buscar.</b>",
-        "no_results": "❌ <b>No se encontraron módulos.</b>",
-        "query_too_big": "❌ <b>Su consulta es demasiado grande, redúzcala a 168 caracteres.</b>",
-        "result_query": "🔎 <b>Resultado {idx}/{total} por consulta:</b> <code>{query}</code>\n",
-        "result_single": "🔎 <b>Resultado por consulta:</b> <code>{query}</code>\n",
-        "module_info": "<code>{name}</code> <b>por</b> <code>{author}</code> <code>{version}</code>\n💾 <b>Comando de instalación:</b> <code>{install}</code>",
-        "desc": "\n📁 <b>Descripción:</b> {desc}",
-        "cmds": "\n👨‍💻 <b>Comandos:</b>\n{cmds}",
-        "inline_cmds": "\n🤖 <b>Comandos en línea:</b>\n{cmds}",
-        "lang": "es",
-        "rating_added": "👍 ¡Calificación enviada!",
-        "rating_changed": "👍 ¡Calificación cambiada!",
-        "rating_removed": "👍 ¡Calificación eliminada!",
-        "inline_no_query": "Ingrese una consulta para buscar.",
-        "inline_desc": "Nombre, comando, descripción, autor.",
-        "inline_no_results": "Pruebe otra consulta.",
-        "inline_query_too_big": "Su consulta es demasiado grande, redúzcala a 168 caracteres.",
-        "_cfg_doc_tracking": "¿Habilitar el seguimiento de sus datos (ID de usuario, idioma) para sincronización con el bot FHeta y para recomendaciones?",
-        "_cls_doc": "¡Módulo para buscar módulos! ¡Sigue todas las noticias de FHeta en @FHeta_Updates!",
-        "_cfg_doc_only_official_developers": "¿Usar solo módulos de desarrolladores oficiales al buscar?"
-    }
-    
-    strings_fr = {
-        "searching": "🔎 <b>Recherche...</b>",
-        "no_query": "❌ <b>Entrez une requête pour rechercher.</b>",
-        "no_results": "❌ <b>Aucun module trouvé.</b>",
-        "query_too_big": "❌ <b>Votre requête est trop grande, veuillez la réduire à 168 caractères.</b>",
-        "result_query": "🔎 <b>Résultat {idx}/{total} pour la requête:</b> <code>{query}</code>\n",
-        "result_single": "🔎 <b>Résultat pour la requête:</b> <code>{query}</code>\n",
-        "module_info": "<code>{name}</code> <b>par</b> <code>{author}</code> <code>{version}</code>\n💾 <b>Commande d'installation:</b> <code>{install}</code>",
-        "desc": "\n📁 <b>Description:</b> {desc}",
-        "cmds": "\n👨‍💻 <b>Commandes:</b>\n{cmds}",
-        "inline_cmds": "\n🤖 <b>Commandes en ligne:</b>\n{cmds}",
-        "lang": "fr",
-        "rating_added": "👍 Évaluation soumise!",
-        "rating_changed": "👍 Évaluation modifiée!",
-        "rating_removed": "👍 Évaluation supprimée!",
-        "inline_no_query": "Entrez une requête pour rechercher.",
-        "inline_desc": "Nom, commande, description, auteur.",
-        "inline_no_results": "Essayez une autre requête.",
-        "inline_query_too_big": "Votre requête est trop grande, veuillez la réduire à 168 caractères.",
-        "_cfg_doc_tracking": "Activer le suivi de vos données (ID utilisateur, langue) pour la synchronisation avec le bot FHeta et pour les recommandations?",
-        "_cls_doc": "Module pour rechercher des modules! Suivez toutes les actualités de FHeta sur @FHeta_Updates!",
-        "_cfg_doc_only_official_developers": "Utiliser uniquement les modules des développeurs officiels lors de la recherche ?"
-    }
-    
-    strings_it = {
-        "searching": "🔎 <b>Ricerca in corso...</b>",
-        "no_query": "❌ <b>Inserisci una query per cercare.</b>",
-        "no_results": "❌ <b>Nessun modulo trovato.</b>",
-        "query_too_big": "❌ <b>La tua query è troppo grande, riducila a 168 caratteri.</b>",
-        "result_query": "🔎 <b>Risultato {idx}/{total} per query:</b> <code>{query}</code>\n",
-        "result_single": "🔎 <b>Risultato per query:</b> <code>{query}</code>\n",
-        "module_info": "<code>{name}</code> <b>di</b> <code>{author}</code> <code>{version}</code>\n💾 <b>Comando di installazione:</b> <code>{install}</code>",
-        "desc": "\n📁 <b>Descrizione:</b> {desc}",
-        "cmds": "\n👨‍💻 <b>Comandi:</b>\n{cmds}",
-        "inline_cmds": "\n🤖 <b>Comandi inline:</b>\n{cmds}",
-        "lang": "it",
-        "rating_added": "👍 Valutazione inviata!",
-        "rating_changed": "👍 Valutazione modificata!",
-        "rating_removed": "👍 Valutazione eliminata!",
-        "inline_no_query": "Inserisci una query per cercare.",
-        "inline_desc": "Nome, comando, descrizione, autore.",
-        "inline_no_results": "Prova un'altra query.",
-        "inline_query_too_big": "La tua query è troppo grande, riducila a 168 caratteri.",
-        "_cfg_doc_tracking": "Abilitare il tracciamento dei tuoi dati (ID utente, lingua) per la sincronizzazione con il bot FHeta e per i consigli?",
-        "_cls_doc": "Modulo per cercare moduli! Segui tutte le notizie di FHeta su @FHeta_Updates!",
-        "_cfg_doc_only_official_developers": "Utilizzare solo i moduli degli sviluppatori ufficiali durante la ricerca?"
-    }
-    
-    strings_kk = {
-        "searching": "🔎 <b>Іздеу...</b>",
-        "no_query": "❌ <b>Іздеу үшін сұрауды енгізіңіз.</b>",
-        "no_results": "❌ <b>Модульдер табылмады.</b>",
-        "query_too_big": "❌ <b>Сіздің сұрауыңыз тым үлкен, оны 168 таңбаға дейін қысқартыңыз.</b>",
-        "result_query": "🔎 <b>Нәтиже {idx}/{total} сұрау бойынша:</b> <code>{query}</code>\n",
-        "result_single": "🔎 <b>Нәтиже сұрау бойынша:</b> <code>{query}</code>\n",
-        "module_info": "<code>{name}</code> <b>авторы</b> <code>{author}</code> <code>{version}</code>\n💾 <b>Орнату командасы:</b> <code>{install}</code>",
-        "desc": "\n📁 <b>Сипаттама:</b> {desc}",
-        "cmds": "\n👨‍💻 <b>Командалар:</b>\n{cmds}",
-        "inline_cmds": "\n🤖 <b>Инлайн командалар:</b>\n{cmds}",
-        "lang": "kk",
-        "rating_added": "👍 Бағалау жіберілді!",
-        "rating_changed": "👍 Бағалау өзгертілді!",
-        "rating_removed": "👍 Бағалау жойылды!",
-        "inline_no_query": "Іздеу үшін сұрауды енгізіңіз.",
-        "inline_desc": "Аты, команда, сипаттама, автор.",
-        "inline_no_results": "Басқа сұрауды байқап көріңіз.",
-        "inline_query_too_big": "Сіздің сұрауыңыз тым үлкен, оны 168 таңбаға дейін қысқартыңыз.",
-        "_cfg_doc_tracking": "FHeta ботымен синхрондау және ұсыныстар үшін деректеріңізді (пайдаланушы ID, тіл) қадағалауды қосу керек пе?",
-        "_cls_doc": "Модульдерді іздеуге арналған модуль! FHeta-ның барлық жаңалықтарын @FHeta_Updates-те бақылаңыз!",
-        "_cfg_doc_only_official_developers": "Іздеу кезінде тек ресми әзірлеушілердің модульдерін пайдалану керек пе?"
-    }
-    
-    strings_tt = {
-        "searching": "🔎 <b>Эзләү...</b>",
-        "no_query": "❌ <b>Эзләү өчен сорау кертегез.</b>",
-        "no_results": "❌ <b>Модульләр табылмады.</b>",
-        "query_too_big": "❌ <b>Сезнең сорау артык зур, аны 168 символга кадәр кыскартыгыз.</b>",
-        "result_query": "🔎 <b>Нәтиҗә {idx}/{total} сорау буенча:</b> <code>{query}</code>\n",
-        "result_single": "🔎 <b>Нәтиҗә сорау буенча:</b> <code>{query}</code>\n",
-        "module_info": "<code>{name}</code> <b>авторы</b> <code>{author}</code> <code>{version}</code>\n💾 <b>Урнаштыру командасы:</b> <code>{install}</code>",
-        "desc": "\n📁 <b>Тасвирлама:</b> {desc}",
-        "cmds": "\n👨‍💻 <b>Командалар:</b>\n{cmds}",
-        "inline_cmds": "\n🤖 <b>Инлайн командалар:</b>\n{cmds}",
-        "lang": "tt",
-        "rating_added": "👍 Бәя җибәрелде!",
-        "rating_changed": "👍 Бәя үзгәртелде!",
-        "rating_removed": "👍 Бәя бетерелде!",
-        "inline_no_query": "Эзләү өчен сорау кертегез.",
-        "inline_desc": "Исем, команда, тасвирлама, автор.",
-        "inline_no_results": "Башка сорау сынап карагыз.",
-        "inline_query_too_big": "Сезнең сорау артык зур, аны 168 символга кадәр кыскартыгыз.",
-        "_cfg_doc_tracking": "FHeta боты белән синхронлаштыру һәм тәкъдимнәр өчен мәгълүматларыгызны (кулланучы ID, тел) күзәтүне кабызыргамы?",
-        "_cls_doc": "Модульләрне эзләү өчен модуль! FHeta-ның барлык яңалыкларын @FHeta_Updates-та күзәтегез!",
-        "_cfg_doc_only_official_developers": "Эзләгәндә фәкать рәсми эшләүчеләрнең модульләрен кулланырга?"
-    }
-    
-    strings_tr = {
-        "searching": "🔎 <b>Aranıyor...</b>",
-        "no_query": "❌ <b>Arama yapmak için bir sorgu girin.</b>",
-        "no_results": "❌ <b>Modül bulunamadı.</b>",
-        "query_too_big": "❌ <b>Sorgunuz çok büyük, lütfen 168 karaktere düşürün.</b>",
-        "result_query": "🔎 <b>Sonuç {idx}/{total} sorgu için:</b> <code>{query}</code>\n",
-        "result_single": "🔎 <b>Sorgu için sonuç:</b> <code>{query}</code>\n",
-        "module_info": "<code>{name}</code> <b>tarafından</b> <code>{author}</code> <code>{version}</code>\n💾 <b>Kurulum komutu:</b> <code>{install}</code>",
-        "desc": "\n📁 <b>Açıklama:</b> {desc}",
-        "cmds": "\n👨‍💻 <b>Komutlar:</b>\n{cmds}",
-        "inline_cmds": "\n🤖 <b>Satır içi komutlar:</b>\n{cmds}",
-        "lang": "tr",
-        "rating_added": "👍 Değerlendirme gönderildi!",
-        "rating_changed": "👍 Değerlendirme değiştirildi!",
-        "rating_removed": "👍 Değerlendirme silindi!",
-        "inline_no_query": "Arama yapmak için bir sorgu girin.",
-        "inline_desc": "İsim, komut, açıklama, yazar.",
-        "inline_no_results": "Başka bir sorgu deneyin.",
-        "inline_query_too_big": "Sorgunuz çok büyük, lütfen 168 karaktere düşürün.",
-        "_cfg_doc_tracking": "FHeta botu ile senkronizasyon ve öneriler için verilerinizin (kullanıcı kimliği, dil) takibini etkinleştir?",
-        "_cls_doc": "Modül aramak için modül! FHeta'nın tüm haberlerini @FHeta_Updates'te takip edin!",
-        "_cfg_doc_only_official_developers": "Arama yaparken yalnızca resmi geliştiricilerin modüllerini kullanmak?"
-    }
-    
-    strings_yz = {
-        "searching": "🔎 <b>Көрдөөбүт...</b>",
-        "no_query": "❌ <b>Көрдүүргэ ыйытыыны киллэриҥ.</b>",
-        "no_results": "❌ <b>Модуллар булуллубата.</b>",
-        "query_too_big": "❌ <b>Эһиги ыйытыыҥ наһаа улахан, баһаалыста 168 бэлиэҕэ тиһэр курдук оҥороҥ.</b>",
-        "result_query": "🔎 <b>Түмүк {idx}/{total} ыйытыы иһинээҕи:</b> <code>{query}</code>\n",
-        "result_single": "🔎 <b>Түмүк ыйытыы иһинээҕи:</b> <code>{query}</code>\n",
-        "module_info": "<code>{name}</code> <b>оҥоһуллубут</b> <code>{author}</code> <code>{version}</code>\n💾 <b>Туруоруу көмөтө:</b> <code>{install}</code>",
-        "desc": "\n📁 <b>Ойуулааһын:</b> {desc}",
-        "cmds": "\n👨‍💻 <b>Көмөлөр:</b>\n{cmds}",
-        "inline_cmds": "\n🤖 <b>Инлайн көмөлөр:</b>\n{cmds}",
-        "lang": "yz",
-        "rating_added": "👍 Сыаналааһын ыытылынна!",
-        "rating_changed": "👍 Сыаналааһын уларыйбыта!",
-        "rating_removed": "👍 Сыаналааһын сотулунна!",
-        "inline_no_query": "Көрдүүргэ ыйытыыны киллэриҥ.",
-        "inline_desc": "Аата, көмө, ойуулааһын, оҥорбут киһи.",
-        "inline_no_results": "Атын ыйытыыны бэрэбиэркэлээҥ.",
-        "inline_query_too_big": "Эһиги ыйытыыҥ наһаа улахан, баһаалыста 168 бэлиэҕэ тиһэр курдук оҥороҥ.",
-        "_cfg_doc_tracking": "FHeta бота синхроннааһын уонна сүбэлиириилэр туһугар датаҕытын (туһааччы ID, тыл) кэтээһиннэрии холбоорго дуо?",
-        "_cls_doc": "Модуллары көрдүүргэ модуль! FHeta туһунан бары саҥаны @FHeta_updates иһинээҕи көрүҥ!",
-        "_cfg_doc_only_official_developers": "Qidiruvda faqat rasmiy ishlab chiquvchilarning modullaridan foydalanish kerakmi?"
     }
 
     def __init__(self):
@@ -293,12 +121,6 @@ class FHeta(loader.Module):
                 "tracking",
                 True,
                 lambda: self.strings["_cfg_doc_tracking"],
-                validator=loader.validators.Boolean()
-            ),
-            loader.ConfigValue(
-                "only_official_developers",
-                False,
-                lambda: self.strings["_cfg_doc_only_official_developers"],
                 validator=loader.validators.Boolean()
             )
         )
@@ -555,13 +377,6 @@ class FHeta(loader.Module):
         de_doc="(anfrage) - module suchen.",
         ru_doc="(запрос) - искать модули.",
         ua_doc="(запит) - шукати модулі.",
-        es_doc="(consulta) - buscar módulos.",
-        fr_doc="(requête) - rechercher des modules.",
-        it_doc="(richiesta) - cercare moduli.",
-        kk_doc="(сұраныс) - модульдерді іздеу.",
-        tt_doc="(сорау) - модульләрне эзләү.",
-        tr_doc="(sorgu) - modül arama.",
-        yz_doc="(соруо) - модулларыты көҥүлүүр."
     )
     async def fheta(self, query):
         '''(query) - search modules.'''        
@@ -581,7 +396,7 @@ class FHeta(loader.Module):
                 "thumb": "https://raw.githubusercontent.com/Fixyres/FHeta/refs/heads/main/assets/try_other_query.png",
             }
 
-        mods = await self._api_get("search", query=query.args, inline="true", token=self.token, user_id=self.uid, ood=str(self.config["only_official_developers"]).lower())
+        mods = await self._api_get("search", query=query.args, inline="true", token=self.token, user_id=self.uid, ood="true")
         
         if not mods or not isinstance(mods, list):
             return {
@@ -591,34 +406,9 @@ class FHeta(loader.Module):
                 "thumb": "https://raw.githubusercontent.com/Fixyres/FHeta/refs/heads/main/assets/try_other_query.png",
             }
 
-        seen_keys = set()
         results = []
-        installs_to_fetch = []
         
         for mod in mods[:50]:
-            key = f"{mod.get('name', '')}_{mod.get('author', '')}_{mod.get('version', '')}"
-            if key in seen_keys:
-                continue
-            seen_keys.add(key)
-            
-            if 'likes' not in mod or 'dislikes' not in mod:
-                installs_to_fetch.append(mod.get('install', ''))
-        
-        if installs_to_fetch:
-            stats_response = await self._api_post("get", json=installs_to_fetch)
-            for mod in mods[:50]:
-                install = mod.get('install', '')
-                if install in stats_response:
-                    mod['likes'] = stats_response[install].get('likes', 0)
-                    mod['dislikes'] = stats_response[install].get('dislikes', 0)
-        
-        seen_keys = set()
-        for mod in mods[:50]:
-            key = f"{mod.get('name', '')}_{mod.get('author', '')}_{mod.get('version', '')}"
-            if key in seen_keys:
-                continue
-            seen_keys.add(key)
-            
             stats = {
                 "likes": mod.get('likes', 0),
                 "dislikes": mod.get('dislikes', 0)
@@ -642,13 +432,6 @@ class FHeta(loader.Module):
         de_doc="(anfrage) - module suchen.",
         ru_doc="(запрос) - искать модули.",
         ua_doc="(запит) - шукати модулі.",
-        es_doc="(consulta) - buscar módulos.",
-        fr_doc="(requête) - rechercher des modules.",
-        it_doc="(richiesta) - cercare moduli.",
-        kk_doc="(сұраныс) - модульдерді іздеу.",
-        tt_doc="(сорау) - модульләрне эзләү.",
-        tr_doc="(sorgu) - modül arama.",
-        yz_doc="(соруо) - модулларыты көҥүлүүр."
     )
     async def fhetacmd(self, message):
         '''(query) - search modules.'''        
@@ -663,37 +446,13 @@ class FHeta(loader.Module):
             return
 
         status_msg = await utils.answer(message, self.strings["searching"])
-        mods = await self._api_get("search", query=query, inline="false", token=self.token, user_id=self.uid, ood=str(self.config["only_official_developers"]).lower())
+        mods = await self._api_get("search", query=query, inline="false", token=self.token, user_id=self.uid, ood="true")
 
         if not mods or not isinstance(mods, list):
             await utils.answer(message, self.strings["no_results"])
             return
 
-        seen_keys = set()
-        unique_mods = []
-        
-        for mod in mods:
-            key = f"{mod.get('name', '')}_{mod.get('author', '')}_{mod.get('version', '')}"
-            if key not in seen_keys:
-                seen_keys.add(key)
-                unique_mods.append(mod)
-
-        if not unique_mods:
-            await utils.answer(message, self.strings["no_results"])
-            await status_msg.delete()
-            return
-
-        first_mod = unique_mods[0]
-        
-        if 'likes' not in first_mod or 'dislikes' not in first_mod:
-            installs = [m.get('install', '') for m in unique_mods]
-            stats_response = await self._api_post("get", json=installs)
-            
-            for mod in unique_mods:
-                install = mod.get('install', '')
-                if install in stats_response:
-                    mod['likes'] = stats_response[install].get('likes', 0)
-                    mod['dislikes'] = stats_response[install].get('dislikes', 0)
+        first_mod = mods[0]
         
         stats = {
             "likes": first_mod.get('likes', 0),
@@ -701,16 +460,16 @@ class FHeta(loader.Module):
         }
         
         photo = None
-        if len(unique_mods) == 1:
+        if len(mods) == 1:
             photo = await self._fetch_thumb(first_mod.get("banner"))
             if photo == "https://raw.githubusercontent.com/Fixyres/FHeta/refs/heads/main/assets/empty_pic.png":
                 photo = None
 
         await self.inline.form(
             message=message,
-            text=self._fmt_mod(first_mod, query, 1, len(unique_mods)),
+            text=self._fmt_mod(first_mod, query, 1, len(mods)),
             photo=photo,
-            reply_markup=self._mk_btns(first_mod.get("install", ""), stats, 0, unique_mods if len(unique_mods) > 1 else None, query)
+            reply_markup=self._mk_btns(first_mod.get("install", ""), stats, 0, mods if len(mods) > 1 else None, query)
         )
         
         await status_msg.delete()
