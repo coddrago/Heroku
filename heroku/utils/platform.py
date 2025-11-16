@@ -33,7 +33,7 @@ with contextlib.suppress(Exception):
         IS_WINDOWS = True
 
 
-def get_named_platform() -> str:
+def get_named_platform(self) -> str:
     """
     Returns formatted platform name
     :return: Platform name
@@ -76,7 +76,7 @@ def get_named_platform() -> str:
     return f"✌️ lavHost {os.environ['LAVHOST']}" if main.IS_LAVHOST else "💎 VDS"
 
 
-def get_platform_emoji() -> str:
+def get_platform_emoji(self) -> str:
     """
     Returns custom emoji for current platform
     :return: Emoji entity in string
