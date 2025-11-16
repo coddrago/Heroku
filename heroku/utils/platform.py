@@ -15,6 +15,23 @@ import herokutl
 parser = herokutl.utils.sanitize_parse_mode("html")
 logger = logging.getLogger(__name__)
 
+IS_DOCKER = "DOCKER" in os.environ
+IS_LAVHOST = "LAVHOST" in os.environ
+IS_HIKKAHOST = "HIKKAHOST" in os.environ
+IS_MACOS = "com.apple" in os.environ.get("PATH", "")
+IS_USERLAND = "userland" in os.environ.get("USER", "")
+IS_PTERODACTYL = "PTERODACTYL" in os.environ
+IS_JAMHOST = "JAMHOST" in os.environ
+IS_WSL = False
+IS_WINDOWS = False
+with contextlib.suppress(Exception):
+    from platform import uname
+
+    if "microsoft-standard" in uname().release:
+        IS_WSL = True
+    elif uname().system == "Windows":
+        IS_WINDOWS = True
+
 
 def get_named_platform() -> str:
     """
@@ -32,28 +49,28 @@ def get_named_platform() -> str:
 
                 return f"🍇 {model}" if "Raspberry" in model else f"❓ {model}"
 
-    if main.IS_WSL:
+    if self.IS_WSL:
         return "🍀 WSL"
 
-    if main.IS_WINDOWS:
+    if self.IS_WINDOWS:
         return "💻 Windows"
 
-    if main.IS_MACOS:
+    if self.IS_MACOS:
         return "🍏 MacOS"
 
-    if main.IS_JAMHOST:
+    if self.IS_JAMHOST:
         return "🧃 JamHost"
 
-    if main.IS_USERLAND:
+    if self.IS_USERLAND:
         return "🐧 UserLand"
 
-    if main.IS_PTERODACTYL:
+    if self.IS_PTERODACTYL:
         return "🦅 Pterodactyl"
        
-    if main.IS_HIKKAHOST:
+    if self.IS_HIKKAHOST:
         return "🌼 HikkaHost"
 
-    if main.IS_DOCKER:
+    if self.IS_DOCKER:
         return "🐳 Docker"
 
     return f"✌️ lavHost {os.environ['LAVHOST']}" if main.IS_LAVHOST else "💎 VDS"

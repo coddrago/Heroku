@@ -93,23 +93,6 @@ BASE_DIR = (
 BASE_PATH = Path(BASE_DIR)
 CONFIG_PATH = BASE_PATH / "config.json"
 
-IS_DOCKER = "DOCKER" in os.environ
-IS_LAVHOST = "LAVHOST" in os.environ
-IS_HIKKAHOST = "HIKKAHOST" in os.environ
-IS_MACOS = "com.apple" in os.environ.get("PATH", "")
-IS_USERLAND = "userland" in os.environ.get("USER", "")
-IS_PTERODACTYL = "PTERODACTYL" in os.environ
-IS_JAMHOST = "JAMHOST" in os.environ
-IS_WSL = False
-IS_WINDOWS = False
-with contextlib.suppress(Exception):
-    from platform import uname
-
-    if "microsoft-standard" in uname().release:
-        IS_WSL = True
-    elif uname().system == "Windows":
-        IS_WINDOWS = True
-
 # fmt: off
 LATIN_MOCK = [
     "Amor", "Arbor", "Astra", "Aurum", "Bellum", "Caelum",
