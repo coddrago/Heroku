@@ -33,7 +33,7 @@ with contextlib.suppress(Exception):
         IS_WINDOWS = True
 
 
-def get_named_platform(self) -> str:
+def get_named_platform() -> str:
     """
     Returns formatted platform name
     :return: Platform name
@@ -49,34 +49,34 @@ def get_named_platform(self) -> str:
 
                 return f"🍇 {model}" if "Raspberry" in model else f"❓ {model}"
 
-    if self.IS_WSL:
+    if IS_WSL:
         return "🍀 WSL"
 
-    if self.IS_WINDOWS:
+    if IS_WINDOWS:
         return "💻 Windows"
 
-    if self.IS_MACOS:
+    if IS_MACOS:
         return "🍏 MacOS"
 
-    if self.IS_JAMHOST:
+    if IS_JAMHOST:
         return "🧃 JamHost"
 
-    if self.IS_USERLAND:
+    if IS_USERLAND:
         return "🐧 UserLand"
 
-    if self.IS_PTERODACTYL:
+    if IS_PTERODACTYL:
         return "🦅 Pterodactyl"
        
-    if self.IS_HIKKAHOST:
+    if IS_HIKKAHOST:
         return "🌼 HikkaHost"
 
-    if self.IS_DOCKER:
+    if IS_DOCKER:
         return "🐳 Docker"
 
-    return f"✌️ lavHost {os.environ['LAVHOST']}" if main.IS_LAVHOST else "💎 VDS"
+    return f"✌️ lavHost {os.environ['LAVHOST']}" if IS_LAVHOST else "💎 VDS"
 
 
-def get_platform_emoji(self) -> str:
+def get_platform_emoji() -> str:
     """
     Returns custom emoji for current platform
     :return: Emoji entity in string
@@ -92,22 +92,22 @@ def get_platform_emoji(self) -> str:
         )
     )
 
-    if self.IS_HIKKAHOST:
+    if IS_HIKKAHOST:
         return BASE.format(5395745114494624362)
     
-    if self.IS_JAMHOST:
+    if IS_JAMHOST:
         return BASE.format(5242536621659678947)
 
-    if self.IS_USERLAND:
+    if IS_USERLAND:
         return BASE.format(5458877818031077824)
 
-    if self.IS_PTERODACTYL:
+    if IS_PTERODACTYL:
         return BASE.format(5427286516797831670)
         
-    if self.IS_LAVHOST:
+    if IS_LAVHOST:
         return BASE.format(5352753797531721191)
 
-    if self.IS_DOCKER:
+    if IS_DOCKER:
         return BASE.format(5352678227582152630)
 
     return BASE.format(5393588431026674882)
