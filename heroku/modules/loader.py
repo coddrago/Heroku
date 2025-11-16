@@ -182,6 +182,7 @@ class LoaderMod(loader.Module):
                 },
             },
         )
+        self._db.save()
 
     @loader.command(alias="dlm")
     async def dlmod(self, message: Message, force_pm: bool = False):
