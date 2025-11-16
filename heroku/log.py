@@ -39,7 +39,7 @@ from .web.debugger import WebDebugger
 
 INTERNET_ERRORS = (
     TelegramNetworkError, asyncio.exceptions.TimeoutError,
-    ServerError,PersistentTimestampOutdatedError
+    ServerError, PersistentTimestampOutdatedError
 )
 
 # Monkeypatch linecache to make interactive line debugger available
