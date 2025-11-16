@@ -177,4 +177,5 @@ def get_cpu_usage():
 
 init_ts = time.perf_counter()
 
-get_platform_name = get_named_platform
+get_platform_name = get_named_platform()
+platforms = get_named_platform()

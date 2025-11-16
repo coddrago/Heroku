@@ -800,7 +800,7 @@ class Heroku:
                     patcher.patch(client, session)
 
                 await client.connect()
-                client.phone = "Why do you need your own phone number?"
+                client.phone = "None"
 
                 self.clients += [client]
             except sqlite3.OperationalError:

@@ -183,9 +183,9 @@ class LoaderMod(loader.Module):
             },
         )
 
-    @loader.command()
-    async def dlm(self, message: Message, force_pm: bool = False):
-        if args := utils.get_args(message):
+    @loader.command(alias = "dlm")
+    async def dlmod(self, message: Message, force_pm: bool = False):
+        if args := utils.get_args_split_by(message, [',', '\n']):
             args = args[0]
 
             await utils.answer(
@@ -1094,7 +1094,7 @@ class LoaderMod(loader.Module):
             msg = await self.unload_module(args)
 
         else:
-            modules = [m for m in args.split("\n") if m]
+            modules = [m for m in args.split(["\n", ","]) if m]
             success = []
             errors = []
             msg = ""
