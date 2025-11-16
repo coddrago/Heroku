@@ -132,7 +132,7 @@ class HerokuInfoMod(loader.Module):
         _version = f'<i>{".".join(list(map(str, list(version.__version__))))}</i>'
         prefix = f"«<code>{utils.escape_html(self.get_prefix())}</code>»"
 
-        platform = utils.get_named_platform()
+        platform = utils.get_named_platform(self)
 
         for emoji, icon in [
             ("🍊", "<emoji document_id=5449599833973203438>🧡</emoji>"),
