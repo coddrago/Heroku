@@ -131,7 +131,7 @@ def get_args_split_by(
         for sep in separator:
             new_section = []
             for section in sections:
-                new_section.extend(one_section.split(sep))
+                new_section.extend(section.split(sep))
             sections = new_section
     return [section.strip() for section in sections if section.strip()]
 
