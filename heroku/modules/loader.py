@@ -188,15 +188,9 @@ class LoaderMod(loader.Module):
         if args := utils.get_args_split_by(message, [',', '\n']):
             args = args[0]
 
-            await utils.answer(
-                message, self.strings("finding_module_in_repos")
-            )
+            await utils.answer(message, self.strings("finding_module_in_repos"))
 
-            if (
-                await self.download_and_install(args, message, force_pm)
-                == MODULE_LOADING_FORBIDDEN
-            ):
-                return
+            await self.download_and_install(args, message, force_pm)
 
             if self.fully_loaded:
                 self.update_modules_in_db()
