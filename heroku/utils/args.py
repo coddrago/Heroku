@@ -123,6 +123,15 @@ def get_args_split_by(
     :param separator: Separator to split by
     :return: List of arguments
     """
-    return [
-        section.strip() for section in get_args_raw(message).split(separator) if section
-    ]
+    args = get_args_raw(message)
+    if isinstance(separator, str):
+        sections = args.split(separator)
+    else:
+        sections =[args]
+        for sep in separator:
+            new_section = []
+            for section in sections:
+                new_section.extend(one_section.split(sep))
+            sections = new_section
+    return [section.strip() for section in sections if section.strip()]
+
