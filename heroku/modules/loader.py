@@ -183,12 +183,20 @@ class LoaderMod(loader.Module):
             },
         )
 
-    @loader.command(alias="dlm")
+    @loader.command(alias = "dlm")
     async def dlmod(self, message: Message, force_pm: bool = False):
-        if args := utils.get_args_split_by(message, [",", "\n"]):
-            await utils.answer(message, self.strings("finding_module_in_repos"))
+        if args := utils.get_args_split_by(message, [',', '\n']):
+            args = args[0]
 
-            await self.download_and_install(args, message, force_pm)
+            await utils.answer(
+                message, self.strings("finding_module_in_repos")
+            )
+
+            if (
+                await self.download_and_install(args, message, force_pm)
+                == MODULE_LOADING_FORBIDDEN
+            ):
+                return
 
             if self.fully_loaded:
                 self.update_modules_in_db()
@@ -263,7 +271,7 @@ class LoaderMod(loader.Module):
     ) -> dict:
         return {
             repo: {
-                f"Mod/{repo_id}/{i}": f"{repo.strip('/')}/{link}.py"
+                f"Mod/{repo_id}/{i}": f'{repo.strip("/")}/{link}.py'
                 for i, link in enumerate(set(await self._get_repo(repo)))
             }
             for repo_id, repo in enumerate(
@@ -289,69 +297,56 @@ class LoaderMod(loader.Module):
 
     async def download_and_install(
         self,
-        module_names: list,
+        module_name: str,
         message: typing.Optional[Message] = None,
         force_pm: bool = False,
-    ) -> list:
-        buff = []
-        output = []
-        for module_name in module_names:
-            try:
-                blob_link = False
-                module_name = module_name.strip()
-                if urlparse(module_name).netloc:
-                    url = module_name
-                    if re.match(
-                        r"^(https:\/\/github\.com\/.*?\/.*?\/blob\/.*\.py)|"
-                        r"(https:\/\/gitlab\.com\/.*?\/.*?\/-\/blob\/.*\.py)$",
-                        url,
-                    ):
-                        url = url.replace("/blob/", "/raw/")
-                        blob_link = True
-                else:
-                    url = await self._find_link(module_name)
+    ) -> int:
+        try:
+            blob_link = False
+            module_name = module_name.strip()
+            if urlparse(module_name).netloc:
+                url = module_name
+                if re.match(
+                    r"^(https:\/\/github\.com\/.*?\/.*?\/blob\/.*\.py)|"
+                    r"(https:\/\/gitlab\.com\/.*?\/.*?\/-\/blob\/.*\.py)$",
+                    url,
+                ):
+                    url = url.replace("/blob/", "/raw/")
+                    blob_link = True
+            else:
+                url = await self._find_link(module_name)
 
-                    if not url:
-                        if message is not None:
-                            output.append(self.strings("no_module"))
-
-                        buff.append(MODULE_LOADING_FAILED)
-                        continue
-
-                if message:
-                    message = await utils.answer(
-                        message,
-                        self.strings("installing").format(module_name),
-                    )
-
-                try:
-                    r = await self._storage.fetch(url, auth=self.config["basic_auth"])
-                except requests.exceptions.HTTPError:
+                if not url:
                     if message is not None:
-                        output.append(self.strings("no_module"))
+                        await utils.answer(message, self.strings("no_module"))
 
-                    buff.append(MODULE_LOADING_FAILED)
-                    continue
+                    return MODULE_LOADING_FAILED
 
-                output.append(
-                    await self.load_module(
-                        r,
-                        message,
-                        module_name,
-                        url,
-                        blob_link=blob_link,
-                        suggest_sub=False if len(module_names) > 1 else True,
-                    )
+            if message:
+                message = await utils.answer(
+                    message,
+                    self.strings("installing").format(module_name),
                 )
-                buff.append(MODULE_LOADING_SUCCESS)
-                continue
-            except Exception:
-                logger.exception("Failed to load %s", module_name)
-                buff.append(MODULE_LOADING_FAILED)
-                continue
-        if len(list(filter(None, output))) > 1:
-            await utils.answer(message, "\n\n".join(output))
-        return buff
+
+            try:
+                r = await self._storage.fetch(url, auth=self.config["basic_auth"])
+            except requests.exceptions.HTTPError:
+                if message is not None:
+                    await utils.answer(message, self.strings("no_module"))
+
+                return MODULE_LOADING_FAILED
+
+            await self.load_module(
+                r,
+                message,
+                module_name,
+                url,
+                blob_link=blob_link,
+            )
+            return MODULE_LOADING_SUCCESS
+        except Exception:
+            logger.exception("Failed to load %s", module_name)
+            return MODULE_LOADING_FAILED
 
     async def _inline__load(
         self,
@@ -526,7 +521,6 @@ class LoaderMod(loader.Module):
         save_fs: bool = False,
         blob_link: bool = False,
         did_requires: bool = False,
-        suggest_sub: bool = True,
     ):
         if any(
             line.replace(" ", "") == "#scope:ffmpeg" for line in doc.splitlines()
