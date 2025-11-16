@@ -37,4 +37,4 @@ def get_dir(mod: str) -> str:
     """
     return(os.getcwd() + "/heroku")
 
-version = get_version_raw()
+version = get_version_raw
