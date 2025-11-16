@@ -36,3 +36,5 @@ def get_dir(mod: str) -> str:
     :return: Directory of given module
     """
     return(os.getcwd() + "/heroku")
+
+version = get_version_raw

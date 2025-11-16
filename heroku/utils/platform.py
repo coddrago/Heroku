@@ -92,22 +92,22 @@ def get_platform_emoji() -> str:
         )
     )
 
-    if main.IS_HIKKAHOST:
+    if self.IS_HIKKAHOST:
         return BASE.format(5395745114494624362)
     
-    if main.IS_JAMHOST:
+    if self.IS_JAMHOST:
         return BASE.format(5242536621659678947)
 
-    if main.IS_USERLAND:
+    if self.IS_USERLAND:
         return BASE.format(5458877818031077824)
 
-    if main.IS_PTERODACTYL:
+    if self.IS_PTERODACTYL:
         return BASE.format(5427286516797831670)
         
-    if main.IS_LAVHOST:
+    if self.IS_LAVHOST:
         return BASE.format(5352753797531721191)
 
-    if main.IS_DOCKER:
+    if self.IS_DOCKER:
         return BASE.format(5352678227582152630)
 
     return BASE.format(5393588431026674882)
