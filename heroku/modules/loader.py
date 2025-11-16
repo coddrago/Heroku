@@ -186,12 +186,10 @@ class LoaderMod(loader.Module):
     @loader.command(alias = "dlm")
     async def dlmod(self, message: Message, force_pm: bool = False):
         if args := utils.get_args_split_by(message, [',', '\n']):
-            args = args[0]
 
             await utils.answer(
                 message, self.strings("finding_module_in_repos")
             )
-
             if (
                 await self.download_and_install(args, message, force_pm)
                 == MODULE_LOADING_FORBIDDEN
