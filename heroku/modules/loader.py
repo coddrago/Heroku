@@ -526,7 +526,7 @@ class LoaderMod(loader.Module):
         save_fs: bool = False,
         blob_link: bool = False,
         did_requires: bool = False,
-        suggest_sub: bool = False,
+        suggest_sub: bool = True,
     ):
         if any(
             line.replace(" ", "") == "#scope:ffmpeg" for line in doc.splitlines()
