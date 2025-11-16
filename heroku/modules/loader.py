@@ -1101,7 +1101,7 @@ class LoaderMod(loader.Module):
             msg = await self.unload_module(args)
 
         else:
-            modules = [m for m in args.split("\n") if m]
+            modules = [m for m in args.split(["\n", ","]) if m]
             success = []
             errors = []
             msg = ""
