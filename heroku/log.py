@@ -37,6 +37,11 @@ from .tl_cache import CustomTelegramClient
 from .types import BotInlineCall, Module, CoreOverwriteError
 from .web.debugger import WebDebugger
 
+INTERNET_ERRORS = (
+    TelegramNetworkError, asyncio.exceptions.TimeoutError,
+    ServerError,PersistentTimestampOutdatedError
+)
+
 # Monkeypatch linecache to make interactive line debugger available
 # in werkzeug web debugger
 # This is weird, but the only adequate approach
@@ -410,6 +415,14 @@ class TelegramLogsHandler(logging.Handler):
                     for item in self.tg_buff
                     if isinstance(item[0], HerokuException)
                     and (not item[1] or item[1] == client_id or self.force_send_all)
+                    and (
+                        not isinstance(item[0].sysinfo[1], INTERNET_ERRORS)
+                        or not getattr(
+                            self._mods[client_id].lookup("tester"),
+                            "config",
+                            {}
+                        ).get("disable_internet_warn", False)
+                    )
                 ]
                 for client_id in self._mods
             }
