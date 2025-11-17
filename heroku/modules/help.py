@@ -162,9 +162,9 @@ class Help(loader.Module):
             )
 
         if isinstance(self.lookup(args), loader.Library):
-            await utils.answer(
+            return await utils.answer(
                 message,
-                self.strings["help_library"].format(
+                self.strings["help_lib"].format(
                     name
                 )
             )
