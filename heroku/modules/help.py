@@ -161,6 +161,14 @@ class Help(loader.Module):
                 + "\n</i>"
             )
 
+        if isinstance(self.lookup(args), loader.Library):
+            await utils.answer(
+                message,
+                self.strings["help_library"].format(
+                    name
+                )
+            )
+
         commands = {
             name: func
             for name, func in module.commands.items()
