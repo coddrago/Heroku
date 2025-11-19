@@ -186,19 +186,38 @@ class LoaderMod(loader.Module):
     @loader.command(alias = "dlm")
     async def dlmod(self, message: Message, force_pm: bool = False):
         if args := utils.get_args(message):
-            args = args[0]
+            if len(args) == 1:
+                args = args[0]
 
-            await utils.answer(
-                message, self.strings("finding_module_in_repos")
-            )
-            if (
-                await self.download_and_install(args, message, force_pm)
-                == MODULE_LOADING_FORBIDDEN
-            ):
-                return
+                await utils.answer(
+                    message, self.strings("finding_module_in_repos")
+                )
+                if (
+                    await self.download_and_install(args, message, force_pm)
+                    == MODULE_LOADING_FORBIDDEN
+                ):
+                    return
 
-            if self.fully_loaded:
-                self.update_modules_in_db()
+                if self.fully_loaded:
+                    self.update_modules_in_db()
+            else:
+                not_installed = []
+
+                await utils.answer(
+                    message, "Installing {} modules..."
+                )
+
+                for arg in args:
+                    result = await self.download_and_install(arg)
+                    
+                    if result == MODULE_LOADING_FAILED:
+                        not_installed.append(arg)
+                await utils.answer(
+                    message, f"{len(args - len(not_installed))} modules was installed.\n\nModules <code>{'</code>, <code>'.join(not_installed)}</code> cannot be installed because they are not available in the repo"
+                )
+
+                if self.fully_loaded:
+                    self.update_modules_in_db()
         else:
             await self.inline.list(
                 message,
