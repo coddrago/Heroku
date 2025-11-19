@@ -204,7 +204,7 @@ class LoaderMod(loader.Module):
                 not_installed = []
 
                 await utils.answer(
-                    message, "Installing {} modules..."
+                    message, "Installing {} modules...".format(len(args))
                 )
 
                 for arg in args:
@@ -213,7 +213,10 @@ class LoaderMod(loader.Module):
                     if result == MODULE_LOADING_FAILED:
                         not_installed.append(arg)
                 await utils.answer(
-                    message, f"{len(args - len(not_installed))} modules was installed.\n\nModules <code>{'</code>, <code>'.join(not_installed)}</code> cannot be installed because they are not available in the repo"
+                    message, "{} modules was installed.\n\nModules <code>{}</code> cannot be installed because they are not available in the repo".format(
+                        len(args) - len(not_installed),
+                        "</code>, <code>".join(not_installed)
+                    )
                 )
 
                 if self.fully_loaded:
