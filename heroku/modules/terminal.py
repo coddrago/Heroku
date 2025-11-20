@@ -161,7 +161,7 @@ class SudoMessageEditor(MessageEditor):
             and self.state == 1
         ):
             logger.debug("switching state to 0")
-            await utils.answer(message, self.strings("auth_fail"))
+            await utils.answer(self.message, self.strings("auth_fail"))
             self.state = 0
             handled = True
             await asyncio.sleep(2)
