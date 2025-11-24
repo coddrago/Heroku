@@ -290,8 +290,8 @@ class HerokuInfoMod(loader.Module):
     async def infocmd(self, message: Message):
         start = time.perf_counter_ns()
         media = self.config["banner_url"]
-        if self.config["quote_media"] is True:
-            media = InputMediaWebPage(self.config["banner_url"]) 
+        if self.config["banner_url"] and self.config["quote_media"] is True:
+            media = InputMediaWebPage(self.config["banner_url"], optional = True) 
         try:
             if self.config['switchInfo']:
                 if self._get_info_photo(start) is None:

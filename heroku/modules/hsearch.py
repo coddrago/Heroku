@@ -241,7 +241,7 @@ class HSearch(loader.Module):
         except:
             pass
         
-        return default_thumb
+        return "https://raw.githubusercontent.com/Fixyres/FHeta/refs/heads/main/assets/empty_pic.png"
 
     def _fmt_mod(self, mod: Dict, query: str = "", idx: int = 1, total: int = 1, inline: bool = False) -> str:
         info = self.strings["module_info"].format(

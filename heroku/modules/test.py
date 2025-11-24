@@ -400,8 +400,8 @@ class TestMod(loader.Module):
         start = time.perf_counter_ns()
         message = await utils.answer(message, self.config["ping_emoji"])
         banner = self.config["banner_url"]
-        if self.config["quote_media"] is True and banner != None:
-            banner = InputMediaWebPage(self.config["banner_url"])
+        if self.config["banner_url"] and self.config["quote_media"] is True:
+            banner = InputMediaWebPage(self.config["banner_url"], optional = True)
         
         await utils.answer(
             message,

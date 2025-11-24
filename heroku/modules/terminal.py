@@ -161,7 +161,7 @@ class SudoMessageEditor(MessageEditor):
             and self.state == 1
         ):
             logger.debug("switching state to 0")
-            await utils.answer(message, self.strings("auth_fail"))
+            await utils.answer(self.message, self.strings("auth_fail"))
             self.state = 0
             handled = True
             await asyncio.sleep(2)
@@ -321,30 +321,6 @@ class TerminalMod(loader.Module):
     async def terminalcmd(self, message):
         await self.run_command(message, utils.get_args_raw(message))
         
-    @loader.command()
-    async def pipcmd(self, message):
-        await self.run_command(
-            message,
-            ("pip " if os.geteuid() == 0 else "sudo -S pip ")
-            + utils.get_args_raw(message)
-            )
-
-    @loader.command()
-    async def aptcmd(self, message):
-        await self.run_command(
-            message,
-            ("apt " if os.geteuid() == 0 else "sudo -S apt ")
-            + utils.get_args_raw(message)
-            + " -y",
-            RawMessageEditor(
-                message,
-                f"apt {utils.get_args_raw(message)}",
-                self.config,
-                self.strings,
-                message,
-                True,
-            ),
-        )
 
     async def run_command(
         self,
