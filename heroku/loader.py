@@ -57,6 +57,9 @@ from .types import (
     get_inline_handlers,
 )
 
+if typing.TYPE_CHECKING:
+    from .tl_cache import CustomTelegramClient
+
 __all__ = [
     "Modules",
     "InfiniteLoop",

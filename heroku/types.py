@@ -53,6 +53,9 @@ from .inline.types import (
 )
 from .pointers import PointerDict, PointerList
 
+if typing.TYPE_CHECKING:
+    from .loader import Modules
+
 __all__ = [
     "JSONSerializable",
     "HerokuReplyMarkup",
@@ -120,6 +123,7 @@ class Module:
 
     def internal_init(self):
         """Called after the class is initialized in order to pass the client and db. Do not call it yourself"""
+        self.allmodules: "Modules"
         self.db = self.allmodules.db
         self._db = self.allmodules.db
         self.client = self.allmodules.client
@@ -129,8 +133,8 @@ class Module:
         self.get_prefixes = self.allmodules.get_prefixes
         self.inline = self.allmodules.inline
         self.allclients = self.allmodules.allclients
-        self.tg_id = self._client.tg_id
-        self._tg_id = self._client.tg_id
+        self.tg_id: int = self._client.tg_id
+        self._tg_id: int = self._client.tg_id
 
     async def on_unload(self):
         """Called after unloading / reloading module"""
