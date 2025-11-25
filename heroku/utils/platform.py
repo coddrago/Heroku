@@ -33,7 +33,7 @@ with contextlib.suppress(Exception):
         IS_WINDOWS = True
 
 
-def platforms(self) -> str:
+def get_named_platform() -> str:
     """
     Returns formatted platform name
     :return: Platform name
@@ -215,5 +215,4 @@ def get_cpu_usage():
 
 init_ts = time.perf_counter()
 
-get_named_platform() == platforms(self)
-get_platform_name() == get_named_platform()
+get_platform_name = get_named_platform
