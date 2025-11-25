@@ -118,9 +118,16 @@ class HerokuInfoMod(loader.Module):
         try:
             repo = git.Repo(search_parent_directories=True)
             diff = repo.git.log([f"HEAD..origin/{version.branch}", "--oneline"])
-            upd = (
-                self.strings("update_required").format(prefix=self.get_prefix()) if diff else self.strings("up-to-date")
-            )
+            if diff:
+                if getattr(self._mods[client_id].lookup("settings"), "config", {}).get("disable_emoji", True):
+                    upd = (self.strings("update_required").format(prefix=self.get_prefix()))
+                else:
+                    upd = ("<emoji document_id=5424728541650494040>😕</emoji> " + self.strings("update_required").format(prefix=self.get_prefix()))
+            else:
+                if getattr(self._mods[client_id].lookup("settings"), "config", {}).get("disable_emoji", True):
+                    upd = self.strings["up-to-date"]
+                else:
+                    upd = ("<emoji document_id=5370699111492229743>😌</emoji> " + self.strings["up-to-date"])
         except Exception:
             upd = ""
 
@@ -334,16 +341,8 @@ class HerokuInfoMod(loader.Module):
             )
 
     @loader.command()
-    async def herokuinfo(self, message: Message):
+    async def ubinfo(self, message: Message):
         await utils.answer(message, self.strings("desc"))
-
-    @loader.command()
-    async def setinfo(self, message: Message):
-        if not (args := utils.get_args_html(message)):
-            return await utils.answer(message, self.strings("setinfo_no_args"))
-
-        self.config["custom_message"] = args
-        await utils.answer(message, self.strings("setinfo_success"))
 
     @loader.command()
     async def switchinfo(self, message: Message):

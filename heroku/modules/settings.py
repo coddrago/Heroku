@@ -50,6 +50,12 @@ class CoreMod(loader.Module):
                 validator=loader.validators.Boolean(),
                 on_change=self._process_config_changes,
                 ),
+            loader.ConfigValue(
+                "disable_emoji",
+                False,
+                "Disable emoji in platform and in \"update info\"",
+                validator=loader.validators.Boolean(),
+            ),
         )
 
     async def client_ready(self):
