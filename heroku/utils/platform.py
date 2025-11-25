@@ -33,12 +33,11 @@ with contextlib.suppress(Exception):
         IS_WINDOWS = True
 
 
-def get_named_platform() -> str:
+def platforms(self) -> str:
     """
     Returns formatted platform name
     :return: Platform name
     """
-    from .. import main
 
     with contextlib.suppress(Exception):
         if os.path.isfile("/proc/device-tree/model"):
@@ -121,7 +120,6 @@ def get_platform_emoji() -> str:
     Returns custom emoji for current platform
     :return: Emoji entity in string
     """
-    from .. import main
 
     BASE = "".join(
         (
@@ -217,5 +215,5 @@ def get_cpu_usage():
 
 init_ts = time.perf_counter()
 
-get_platform_name = get_named_platform
-platforms = get_named_platform
+get_named_platform() = platforms(self)
+get_platform_name() = get_named_platform()
