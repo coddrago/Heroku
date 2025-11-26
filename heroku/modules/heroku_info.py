@@ -171,7 +171,7 @@ class HerokuInfoMod(loader.Module):
                 build=build,
                 prefix=prefix,
                 platform=platform,
-                platform_emoji=platform_emoji
+                platform_emoji=platform_emoji,
                 upd=upd,
                 uptime=utils.formatted_uptime(),
                 cpu_usage=utils.get_cpu_usage(),
