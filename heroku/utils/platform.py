@@ -95,7 +95,7 @@ def get_named_platform_emoji() -> str:
                 if "Raspberry" in model:
                     return f"🍇 "
                 else:
-                    return "? 
+                    return "?"
 
     if IS_WSL:
         return "🍀 "
