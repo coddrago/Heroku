@@ -33,7 +33,7 @@ with contextlib.suppress(Exception):
         IS_WINDOWS = True
 
 
-def get_named_platform() -> str:
+def get_named_platform(self) -> str:
     """
     Returns formatted platform name
     :return: Platform name
