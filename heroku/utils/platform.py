@@ -44,76 +44,87 @@ def get_named_platform() -> str:
             with open("/proc/device-tree/model") as f:
                 model = f.read()
                 if "Orange" in model:
-                    if getattr(self._mods[client_id].lookup("settings"), "config", {}).get("disable_emoji", True):
-                        return f"{model}"
-                    else:
-                        return f"🍊 {model}"
+                    return f"{model}"
 
                 if "Raspberry" in model:
-                    if getattr(self._mods[client_id].lookup("settings"), "config", {}).get("disable_emoji", True):
-                        return f"{model}"
-                    else:
-                        return f"🍇 {model}"
+                    return f"{model}"
+                else:
+                    return f"{model}"
 
     if IS_WSL:
-        if getattr(self._mods[client_id].lookup("settings"), "config", {}).get("disable_emoji", True):
-            return "WSL"
-        else:
-            return "🍀 WSL"
+        return "WSL"
 
     if IS_WINDOWS:
-        if getattr(self._mods[client_id].lookup("settings"), "config", {}).get("disable_emoji", True):
-            return "Windows"
-        else:
-            return "💻 Windows"
+        return "Windows"
 
     if IS_MACOS:
-        if getattr(self._mods[client_id].lookup("settings"), "config", {}).get("disable_emoji", True):
-            return "MacOS"
-        else:
-            return "🍏 MacOS"
+        return "MacOS"
 
     if IS_JAMHOST:
-        if getattr(self._mods[client_id].lookup("settings"), "config", {}).get("disable_emoji", True):
-            return "JamHost"
-        else:
-            return "🧃 JamHost"
+        return "JamHost"
 
     if IS_USERLAND:
-        if getattr(self._mods[client_id].lookup("settings"), "config", {}).get("disable_emoji", True):
-            return "UserLand"
-        else:
-            return "🐧 UserLand"
+        return "UserLand"
 
     if IS_PTERODACTYL:
-        if getattr(self._mods[client_id].lookup("settings"), "config", {}).get("disable_emoji", True):
-            return "Pterodactyl"
-        else:
-            return "🦅 Pterodactyl"
+        return "Pterodactyl"
        
     if IS_HIKKAHOST:
-        if getattr(self._mods[client_id].lookup("settings"), "config", {}).get("disable_emoji", True):
-            return "HikkaHost"
-        else:
-            return "🌼 HikkaHost"
+        return "HikkaHost"
 
     if IS_DOCKER:
-        if getattr(self._mods[client_id].lookup("settings"), "config", {}).get("disable_emoji", True):
-            return "Docker"
-        else:
-            return "🐳 Docker"
+        return "Docker"
 
     if IS_LAVHOST:
-        if getattr(self._mods[client_id].lookup("settings"), "config", {}).get("disable_emoji", True):
-            return f"lavHost {os.environ['LAVHOST']}"
-        else:
-            return f"✌️ lavHost {os.environ['LAVHOST']}"
+        return f"lavHost {os.environ['LAVHOST']}"
     else:
-        if getattr(self._mods[client_id].lookup("settings"), "config", {}).get("disable_emoji", True):
-            return "VDS"
-        else:
-            return "💎 VDS"
+        return "VDS"
 
+def get_named_platform_emoji() -> str:
+    """
+    Returns emoji for current platform
+    """
+
+    with contextlib.suppress(Exception):
+        if os.path.isfile("/proc/device-tree/model"):
+            with open("/proc/device-tree/model") as f:
+                model = f.read()
+                if "Orange" in model:
+                    return f"🍊 "
+
+                if "Raspberry" in model:
+                    return f"🍇 "
+                else:
+                    return "? 
+
+    if IS_WSL:
+        return "🍀 "
+
+    if IS_WINDOWS:
+        return "💻 "
+
+    if IS_MACOS:
+         return "🍏 "
+
+    if IS_JAMHOST:
+        return "🧃 "
+
+    if IS_USERLAND:
+        return "🐧 "
+
+    if IS_PTERODACTYL:
+        return "🦅 "
+       
+    if IS_HIKKAHOST:
+        return "🌼 "
+
+    if IS_DOCKER:
+        return "🐳 "
+
+    if IS_LAVHOST:
+        return f"✌️ "
+    else:
+        return "💎 "
 
 def get_platform_emoji() -> str:
     """

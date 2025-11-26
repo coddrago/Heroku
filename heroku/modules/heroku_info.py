@@ -119,15 +119,9 @@ class HerokuInfoMod(loader.Module):
             repo = git.Repo(search_parent_directories=True)
             diff = repo.git.log([f"HEAD..origin/{version.branch}", "--oneline"])
             if diff:
-                if getattr(self._mods[client_id].lookup("settings"), "config", {}).get("disable_emoji", True):
-                    upd = (self.strings("update_required").format(prefix=self.get_prefix()))
-                else:
-                    upd = ("<emoji document_id=5424728541650494040>😕</emoji> " + self.strings("update_required").format(prefix=self.get_prefix()))
+                upd = (self.strings("update_required").format(prefix=self.get_prefix()))
             else:
-                if getattr(self._mods[client_id].lookup("settings"), "config", {}).get("disable_emoji", True):
-                    upd = self.strings["up-to-date"]
-                else:
-                    upd = ("<emoji document_id=5370699111492229743>😌</emoji> " + self.strings["up-to-date"])
+                upd = self.strings["up-to-date"]
         except Exception:
             upd = ""
 
@@ -140,6 +134,7 @@ class HerokuInfoMod(loader.Module):
         prefix = f"«<code>{utils.escape_html(self.get_prefix())}</code>»"
 
         platform = utils.get_named_platform()
+        platform_emoji = utils.get_named_platform_emoji()
 
         for emoji, icon in [
             ("🍊", "<emoji document_id=5449599833973203438>🧡</emoji>"),
@@ -163,7 +158,7 @@ class HerokuInfoMod(loader.Module):
             ("💻", "<emoji document_id=5469825590884310445>💻</emoji>"),
             ("🍏", "<emoji document_id=5372908412604525258>🍏</emoji>")
         ]:
-            platform = platform.replace(emoji, icon)
+            platform_emoji = platform_emoji.replace(emoji, icon)
         return (
             (
                 "🪐 Heroku\n"
@@ -176,6 +171,7 @@ class HerokuInfoMod(loader.Module):
                 build=build,
                 prefix=prefix,
                 platform=platform,
+                platform_emoji=platform_emoji
                 upd=upd,
                 uptime=utils.formatted_uptime(),
                 cpu_usage=utils.get_cpu_usage(),
