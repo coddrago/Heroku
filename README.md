@@ -64,6 +64,8 @@
 sudo apt update && sudo apt install git python3 -y && \
 git clone https://github.com/coddrago/Heroku && \
 cd Heroku && \
+python3 -m venv .venv && \
+source .venv/bin/activate && \
 pip install -r requirements.txt && \
 python3 -m heroku
 ```
@@ -74,6 +76,8 @@ python3 -m heroku
 sudo dnf update -y && sudo dnf install git python3 -y && \
 git clone https://github.com/coddrago/Heroku && \
 cd Heroku && \
+python3 -m venv .venv && \
+source .venv/bin/activate && \
 python3 -m pip install -r requirements.txt && \
 python3 -m heroku
 ```
@@ -84,6 +88,8 @@ python3 -m heroku
 sudo pacman -Syu --noconfirm && sudo pacman -S git python --noconfirm --needed && \
 git clone https://github.com/coddrago/Heroku && \
 cd Heroku && \
+python3 -m venv .venv && \
+source .venv/bin/activate && \
 python3 -m pip install -r requirements.txt && \
 python3 -m heroku
 ```
@@ -113,7 +119,7 @@ curl -Ss https://bootstrap.pypa.io/get-pip.py | python3
 
 4. **Enter this command(RMB):**
 ```bash
-clear && git clone https://github.com/coddrago/Heroku && cd Heroku && pip install -r requirements.txt && python3 -m heroku
+clear && git clone https://github.com/coddrago/Heroku && cd Heroku && python3 -m venv .venv && source .venv/bin/activate && pip install -r requirements.txt && python3 -m heroku
 ```
 > **🔗How to get API_ID and API_HASH?:** [Video](https://youtu.be/DcqDA249Lhg?t=24)
 
@@ -123,7 +129,7 @@ clear && git clone https://github.com/coddrago/Heroku && cd Heroku && pip instal
 3. <b>Wait for the distribution to install, you can pour some tea</b>
 4. <b>After successful installation, a terminal will open in front of you, write there:</b>
 ```bash
-sudo apt update && sudo apt upgrade -y && sudo apt install python3 git python3-pip -y && git clone https://github.com/coddrago/Heroku && cd Heroku && sudo pip install -r requirements.txt && python3 -m heroku
+sudo apt update && sudo apt upgrade -y && sudo apt install python3 git python3-pip -y && git clone https://github.com/coddrago/Heroku && cd Heroku && python3 -m venv .venv && source .venv/bin/activate && sudo pip install -r requirements.txt && python3 -m heroku
 ```
 
 5. <b>At the end of the installation, a link will appear, follow it and enter your account details to log in.</b>
