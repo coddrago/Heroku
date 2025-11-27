@@ -177,7 +177,7 @@ To install, just go to [@lavhostbot](https://t.me/lavhostbot) and follow these s
 <details>
   <summary><b>🧃Jamhost</b></summary>
     
-  1. Go to @jamhostbot and write the command <code>/pay</code>
+  1. Go to [@jamhostbot](https://t.me/jamhostbot) and write the command <code>/pay</code>
   2. Pay for the subscription on the website
   3. After payment, write the command <code>/install</code> to the bot, select " <b>🪐 Heroku</b> " in the list of userbots and select the desired server
   4. Log in using the link provided by the bot
