@@ -11,6 +11,7 @@
 # 🔑 https://www.gnu.org/licenses/agpl-3.0.html
 
 import logging
+import typing
 
 from aiogram.types import CallbackQuery
 from aiogram.types import InlineQuery as AiogramInlineQuery
@@ -21,6 +22,9 @@ from pydantic import ConfigDict
 from .. import utils
 
 logger = logging.getLogger(__name__)
+
+if typing.TYPE_CHECKING:
+    from ..inline.core import InlineManager
 
 
 class InlineMessage:
