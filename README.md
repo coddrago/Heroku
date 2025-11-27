@@ -108,29 +108,30 @@ python3 -m heroku
 ### Other
 <details>
   <summary><b>WSL(Windows)</b></summary>
-> **⚠️ WARNING: Can be unstable!**
 
-1. **Download WSL.** For this open window PowerShell with admin rights and write in console 
-```powershell
-wsl --install -d Ubuntu-22.04
-```
+  > **⚠️ WARNING: Can be unstable!**
 
-> *⚠️For install beed Windows 10 build 2004 or Windows 11 of any version and PC with virtualization support.*
-> *For installation on earlier OS, please refer to this [page](https://learn.microsoft.com/ru-ru/windows/wsl/install-manual).*
-
-2. **Restart PC and start programm Ubuntu 22.04.x**
-3. **Enter this command(RMB):** 
-```bash
-curl -Ss https://bootstrap.pypa.io/get-pip.py | python3
-```
-> *⚠️ If yellow warnings appear, enter export PATH="/home/username/.local/bin:$PATH" replacing /home/username/.local/bin with the path mentioned in the message*
-
-4. **Enter this command(RMB):**
-```bash
-clear && git clone https://github.com/coddrago/Heroku && cd Heroku && python3 -m venv .venv && source .venv/bin/activate && pip install -r requirements.txt && python3 -m heroku
-```
-> **🔗How to get API_ID and API_HASH?:** [Video](https://youtu.be/DcqDA249Lhg?t=24)
-
+  1. **Download WSL.** For this open window PowerShell with admin rights and write in console 
+  ```powershell
+  wsl --install -d Ubuntu-22.04
+  ```
+  
+  > *⚠️For install beed Windows 10 build 2004 or Windows 11 of any version and PC with virtualization support.*
+  > *For installation on earlier OS, please refer to this [page](https://learn.microsoft.com/ru-ru/windows/wsl/install-manual).*
+  
+  2. **Restart PC and start programm Ubuntu 22.04.x**
+  3. **Enter this command(RMB):** 
+  ```bash
+  curl -Ss https://bootstrap.pypa.io/get-pip.py | python3
+  ```
+  > *⚠️ If yellow warnings appear, enter export PATH="/home/username/.local/bin:$PATH" replacing /home/username/.local/bin with the path mentioned in the message*
+  
+  4. **Enter this command(RMB):**
+  ```bash
+  clear && git clone https://github.com/coddrago/Heroku && cd Heroku && python3 -m venv .venv && source .venv/bin/activate && pip install -r requirements.txt && python3 -m heroku
+  ```
+  > **🔗How to get API_ID and API_HASH?:** [Video](https://youtu.be/DcqDA249Lhg?t=24)
+  
 </details>
 
 <details>
