@@ -53,49 +53,65 @@
 > - ⚠️ Будьте осторожны с неизвестными командами (.terminal, .eval, .ecpp и т.д.)
 
 ---
-
 ## 🚀 Установка
 
 ### VPS/VDS
-#### Ubuntu / Debian
-
-```bash
-sudo apt update && sudo apt install git python3 -y && \
-git clone https://github.com/coddrago/Heroku && \
-cd Heroku && \
-python3 -m venv .venv && source .venv/bin/activate && \
-pip install -r requirements.txt && \
-python3 -m heroku
-```
-#### Fedora
-
-```bash
-sudo dnf update -y && sudo dnf install git python3 -y && \
-git clone https://github.com/coddrago/Heroku && \
-cd Heroku && \
-python3 -m venv .venv && source .venv/bin/activate && \
-python3 -m pip install -r requirements.txt && \
-python3 -m heroku
-```
-#### Arch Linux
-
-```bash
-sudo pacman -Syu --noconfirm && sudo pacman -S git python --noconfirm --needed && \
-git clone https://github.com/coddrago/Heroku && \
-cd Heroku && \
-python3 -m venv .venv && source .venv/bin/activate && \
-python3 -m pip install -r requirements.txt && \
-python3 -m heroku
-```
-> Примечание для пользователей VPS/VDS:  
+> **Примечание для пользователей VPS/VDS:**  
 > Добавьте `--proxy-pass` для включения SSH-туннелирования  
 > Добавьте `--no-web` для настройки только через консоль  
 > Добавьте `--root` для пользователей root (чтобы избежать ввода force_insecure)
 
-### WSL(Windows)
-> ⚠️ ВНИМАНИЕ: Может быть нестабильно!
+<details>
+  <summary><b>Ubuntu / Debian</b></summary>
 
-1. Скачайте WSL. Для этого откройте PowerShell с правами администратора и введите в консоль
+  ```bash
+  sudo apt update && sudo apt install git python3 -y && \
+  git clone https://github.com/coddrago/Heroku && \
+  cd Heroku && \
+  python3 -m venv .venv && \
+  source .venv/bin/activate && \
+  pip install -r requirements.txt && \
+  python3 -m heroku
+  ```
+</details>
+
+<details>
+<summary><b>Fedora</b></summary>
+  
+  ```bash
+  sudo dnf update -y && sudo dnf install git python3 -y && \
+  git clone https://github.com/coddrago/Heroku && \
+  cd Heroku && \
+  python3 -m venv .venv && \
+  source .venv/bin/activate && \
+  python3 -m pip install -r requirements.txt && \
+  python3 -m heroku
+  ```
+</details>
+
+<details>
+<summary><b>Arch Linux</b></summary>
+  
+```bash
+sudo pacman -Syu --noconfirm && sudo pacman -S git python --noconfirm --needed && \
+git clone https://github.com/coddrago/Heroku && \
+cd Heroku && \
+python3 -m venv .venv && \
+source .venv/bin/activate && \
+python3 -m pip install -r requirements.txt && \
+python3 -m heroku
+```
+</details>
+
+
+
+### Другие
+<details>
+  <summary><b>WSL(Windows)</b></summary>
+
+  > **⚠️ ВНИМАНИЕ: Может быть нестабильно!**
+
+1. **Скачайте WSL.** Для этого откройте PowerShell с правами администратора и введите в консоль
 ```powershell
 wsl --install -d Ubuntu-22.04
 ```
@@ -103,21 +119,25 @@ wsl --install -d Ubuntu-22.04
 > *⚠️Для установки требуется Windows 10 сборки 2004 или Windows 11 любой версии и ПК с поддержкой виртуализации.*
 > *Для установки на более ранние ОС, пожалуйста, обратитесь к этой [странице](https://learn.microsoft.com/ru-ru/windows/wsl/install-manual).*
 
-2. Перезагрузите ПК и запустите программу Ubuntu 22.04.x
-3. Введите эту команду (ПКМ):
+2. **Перезагрузите ПК и запустите программу Ubuntu 22.04.x**
+3. **Введите эту команду (ПКМ):**
 ```bash
 curl -Ss https://bootstrap.pypa.io/get-pip.py | python3
 ```
 > *⚠️ Если появятся желтые предупреждения, введите export PATH="/home/username/.local/bin:$PATH", заменив /home/username/.local/bin путем, указанным в сообщении*
 
-4. Введите эту команду (ПКМ):
+4. **Введите эту команду (ПКМ):**
 ```bash
 clear && git clone https://github.com/coddrago/Heroku && cd Heroku && python3 -m venv .venv && source .venv/bin/activate && pip install -r requirements.txt && python3 -m heroku
 ```
-> 🔗Как получить API_ID и API_HASH?: [Видео](https://youtu.be/DcqDA249Lhg?t=24)
+> **🔗Как получить API_ID и API_HASH?:** [Видео](https://youtu.be/DcqDA249Lhg?t=24)
+  
+</details>
 
-### Телефон (Userland)
-1. <b>Установите UserLAnd по</b> <a href="https://play.google.com/store/apps/details?id=tech.ula">ссылке</a>
+<details>
+  <summary><b>Phone(Userland)</b></summary>
+  
+ 1. <b>Установите UserLAnd по</b> <a href="https://play.google.com/store/apps/details?id=tech.ula">ссылке</a>
 2. <b>Откройте его, выберите Ubuntu —> Minimal —> Terminal</b>
 3. <b>Дождитесь установки дистрибутива, можете заварить чай</b>
 4. <b>После успешной установки перед вами откроется терминал, введите туда:</b>
@@ -126,29 +146,42 @@ sudo apt update && sudo apt upgrade -y && sudo apt install python3 git python3-p
 ```
 5. <b>В конце установки появится ссылка, перейдите по ней и введите данные своей учетной записи для входа.</b>
 > Вуаля! Вы установили Heroku на UserLAnd.
+</details>
 
-### Официальные хостинги
-#### 🌘 HikkaHost
-1. Перейдите в [@hikkahost_bot](https://.me/hikkahost_bot)
+### Официальные хосты
+<details>
+<summary><b>🌘 HikkaHost</b></summary>
+  
+ 1. Перейдите в [@hikkahost_bot](https://.me/hikkahost_bot)
 2. Нажмите "Установить"
 3. Выберите "🪐 Heroku"
 И продолжайте установку.
 
-> После этого вы получите ссылку, откройте ее и войдите в свою учетную запись.
+> **После этого вы получите ссылку, откройте ее и войдите в свою учетную запись.**
 
-#### ⬇️ Lavhost
+</details>
+
+<details>
+<summary><b>⬇️ Lavhost</b></summary>
+
 Для установки просто перейдите в [@lavhostbot](https://t.me/lavhostbot) и выполните следующие шаги:
 
 1. Введите команду `/buy`, выберите и оплатите счет
 2. Отправьте квитанцию об оплате, если потребуется
 3. После подтверждения оплаты введите `/install` и выберите Heroku
 4. Следуйте инструкциям бота
-#### 🧃 Jamhost
 
-1. Перейдите в @jamhostbot и напишите команду <code>/pay</code>
+</details>
+
+<details>
+  <summary><b>🧃Jamhost</b></summary>
+    
+1. Перейдите в [@jamhostbot](https://t.me/jamhostbot) и напишите команду `/pay`
 2. Оплатите подписку на сайте
 3. После оплаты напишите команду <code>/install</code> боту, выберите " <b>🪐 Heroku</b> " в списке юзерботов и выберите нужный сервер
 4. Войдите, используя ссылку, предоставленную ботом
+
+</details>
 
 ## Дополнительные функции
 

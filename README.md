@@ -58,32 +58,40 @@
 ## 🚀 Installation
 
 ### VPS/VDS
-#### Ubuntu / Debian
+> **Note for VPS/VDS Users:**  
+> Add `--proxy-pass` to enable SSH tunneling  
+> Add `--no-web` for console-only setup  
+> Add `--root` for root users (to avoid entering force_insecure)
+<details> <summary><b>Ubuntu / Debian</b></summary>
 
-```bash
-sudo apt update && sudo apt install git python3 -y && \
-git clone https://github.com/coddrago/Heroku && \
-cd Heroku && \
-python3 -m venv .venv && \
-source .venv/bin/activate && \
-pip install -r requirements.txt && \
-python3 -m heroku
-```
+  ```bash
+  sudo apt update && sudo apt install git python3 -y && \
+  git clone https://github.com/coddrago/Heroku && \
+  cd Heroku && \
+  python3 -m venv .venv && \
+  source .venv/bin/activate && \
+  pip install -r requirements.txt && \
+  python3 -m heroku
+  ```
+</details>
 
-#### Fedora
+<details>
+<summary><b>Fedora</b></summary>
+  
+  ```bash
+  sudo dnf update -y && sudo dnf install git python3 -y && \
+  git clone https://github.com/coddrago/Heroku && \
+  cd Heroku && \
+  python3 -m venv .venv && \
+  source .venv/bin/activate && \
+  python3 -m pip install -r requirements.txt && \
+  python3 -m heroku
+  ```
+</details>
 
-```bash
-sudo dnf update -y && sudo dnf install git python3 -y && \
-git clone https://github.com/coddrago/Heroku && \
-cd Heroku && \
-python3 -m venv .venv && \
-source .venv/bin/activate && \
-python3 -m pip install -r requirements.txt && \
-python3 -m heroku
-```
-
-#### Arch Linux
-
+<details>
+<summary><b>Arch Linux</b></summary>
+  
 ```bash
 sudo pacman -Syu --noconfirm && sudo pacman -S git python --noconfirm --needed && \
 git clone https://github.com/coddrago/Heroku && \
@@ -93,70 +101,89 @@ source .venv/bin/activate && \
 python3 -m pip install -r requirements.txt && \
 python3 -m heroku
 ```
+</details>
 
-> **Note for VPS/VDS Users:**  
-> Add `--proxy-pass` to enable SSH tunneling  
-> Add `--no-web` for console-only setup  
-> Add `--root` for root users (to avoid entering force_insecure)
 
-### WSL(Windows)
-> **⚠️ WARNING: Can be unstable!**
 
-1. **Download WSL.** For this open window PowerShell with admin rights and write in console 
-```powershell
-wsl --install -d Ubuntu-22.04
-```
+### Other
+<details>
+  <summary><b>WSL(Windows)</b></summary>
 
-> *⚠️For install beed Windows 10 build 2004 or Windows 11 of any version and PC with virtualization support.*
-> *For installation on earlier OS, please refer to this [page](https://learn.microsoft.com/ru-ru/windows/wsl/install-manual).*
+  > **⚠️ WARNING: Can be unstable!**
 
-2. **Restart PC and start programm Ubuntu 22.04.x**
-3. **Enter this command(RMB):** 
-```bash
-curl -Ss https://bootstrap.pypa.io/get-pip.py | python3
-```
-> *⚠️ If yellow warnings appear, enter export PATH="/home/username/.local/bin:$PATH" replacing /home/username/.local/bin with the path mentioned in the message*
+  1. **Download WSL.** For this open window PowerShell with admin rights and write in console 
+  ```powershell
+  wsl --install -d Ubuntu-22.04
+  ```
+  
+  > *⚠️For install beed Windows 10 build 2004 or Windows 11 of any version and PC with virtualization support.*
+  > *For installation on earlier OS, please refer to this [page](https://learn.microsoft.com/ru-ru/windows/wsl/install-manual).*
+  
+  2. **Restart PC and start programm Ubuntu 22.04.x**
+  3. **Enter this command(RMB):** 
+  ```bash
+  curl -Ss https://bootstrap.pypa.io/get-pip.py | python3
+  ```
+  > *⚠️ If yellow warnings appear, enter export PATH="/home/username/.local/bin:$PATH" replacing /home/username/.local/bin with the path mentioned in the message*
+  
+  4. **Enter this command(RMB):**
+  ```bash
+  clear && git clone https://github.com/coddrago/Heroku && cd Heroku && python3 -m venv .venv && source .venv/bin/activate && pip install -r requirements.txt && python3 -m heroku
+  ```
+  > **🔗How to get API_ID and API_HASH?:** [Video](https://youtu.be/DcqDA249Lhg?t=24)
+  
+</details>
 
-4. **Enter this command(RMB):**
-```bash
-clear && git clone https://github.com/coddrago/Heroku && cd Heroku && python3 -m venv .venv && source .venv/bin/activate && pip install -r requirements.txt && python3 -m heroku
-```
-> **🔗How to get API_ID and API_HASH?:** [Video](https://youtu.be/DcqDA249Lhg?t=24)
-
-### Phone(Userland)
-1. <b>Install UserLAnd from</b> <a href="https://play.google.com/store/apps/details?id=tech.ula">the link</a>
-2. <b>Open it, choose Ubuntu —&gt; Minimal —&gt; Terminal</b>
-3. <b>Wait for the distribution to install, you can pour some tea</b>
-4. <b>After successful installation, a terminal will open in front of you, write there:</b>
-```bash
-sudo apt update && sudo apt upgrade -y && sudo apt install python3 git python3-pip -y && git clone https://github.com/coddrago/Heroku && cd Heroku && python3 -m venv .venv && source .venv/bin/activate && sudo pip install -r requirements.txt && python3 -m heroku
-```
+<details>
+  <summary><b>Phone(Userland)</b></summary>
+  
+  1. <b>Install UserLAnd from</b> <a href="https://play.google.com/store/apps/details?id=tech.ula">the link</a>
+  2. <b>Open it, choose Ubuntu —&gt; Minimal —&gt; Terminal</b>
+  3. <b>Wait for the distribution to install, you can pour some tea</b> 
+  4. <b>After successful installation, a terminal will open in front of you, write there:</b>
+    
+  ```bash
+  sudo apt update && sudo apt upgrade -y && sudo apt install python3 git python3-pip -y && git clone https://github.com/coddrago/Heroku && cd Heroku && python3 -m venv .venv && source .venv/bin/activate && sudo pip install -r requirements.txt && python3 -m heroku
+  ```
 
 5. <b>At the end of the installation, a link will appear, follow it and enter your account details to log in.</b>
 > **Voila! You have installed Heroku on UserLAnd.**
+</details>
 
 ### Official hostings
-#### 🌘 HikkaHost
-1. Go to [@hikkahost_bot](https://.me/hikkahost_bot)
-2. Press "Install"
-3. Choose "🪐 Heroku"
-And continue installation.
+<details>
+<summary><b>🌘 HikkaHost</b></summary>
+  
+  1. Go to [@hikkahost_bot](https://.me/hikkahost_bot)
+  2. Press "Install"
+  3. Choose "🪐 Heroku"
+  And continue installation.
+  > **After that, you will receive a link, open it and login in your account.**
 
-> **After that, you will receive a link, open it and login in your account.**
+</details>
 
-#### ⬇️ Lavhost
+<details>
+<summary><b>⬇️ Lavhost</b></summary>
+
 To install, just go to [@lavhostbot](https://t.me/lavhostbot) and follow these steps:
 
 1. Enter the command `/buy`, select and pay the invoice
 2. Send the payment receipt if required
 3. After payment confirmation, type `/install` and select Heroku
 4. Follow the bot's instructions
-#### 🧃 Jamhost
 
-1. Go to @jamhostbot and write the command <code>/pay</code>
-2. Pay for the subscription on the website
-3. After payment, write the command <code>/install</code> to the bot, select " <b>🪐 Heroku</b> " in the list of userbots and select the desired server
-4. Log in using the link provided by the bot
+</details>
+
+<details>
+  <summary><b>🧃Jamhost</b></summary>
+    
+  1. Go to [@jamhostbot](https://t.me/jamhostbot) and write the command <code>/pay</code>
+  2. Pay for the subscription on the website
+  3. After payment, write the command <code>/install</code> to the bot, select " <b>🪐 Heroku</b> " in the list of userbots and select the desired server
+  4. Log in using the link provided by the bot
+</details>
+
+
 
 ## Additional Features
 
