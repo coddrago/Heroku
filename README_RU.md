@@ -63,6 +63,7 @@
 sudo apt update && sudo apt install git python3 -y && \
 git clone https://github.com/coddrago/Heroku && \
 cd Heroku && \
+python3 -m venv .venv && source .venv/bin/activate && \
 pip install -r requirements.txt && \
 python3 -m heroku
 ```
@@ -72,6 +73,7 @@ python3 -m heroku
 sudo dnf update -y && sudo dnf install git python3 -y && \
 git clone https://github.com/coddrago/Heroku && \
 cd Heroku && \
+python3 -m venv .venv && source .venv/bin/activate && \
 python3 -m pip install -r requirements.txt && \
 python3 -m heroku
 ```
@@ -81,6 +83,7 @@ python3 -m heroku
 sudo pacman -Syu --noconfirm && sudo pacman -S git python --noconfirm --needed && \
 git clone https://github.com/coddrago/Heroku && \
 cd Heroku && \
+python3 -m venv .venv && source .venv/bin/activate && \
 python3 -m pip install -r requirements.txt && \
 python3 -m heroku
 ```
@@ -109,7 +112,7 @@ curl -Ss https://bootstrap.pypa.io/get-pip.py | python3
 
 4. Введите эту команду (ПКМ):
 ```bash
-clear && git clone https://github.com/coddrago/Heroku && cd Heroku && pip install -r requirements.txt && python3 -m heroku
+clear && git clone https://github.com/coddrago/Heroku && cd Heroku && python3 -m venv .venv && source .venv/bin/activate && pip install -r requirements.txt && python3 -m heroku
 ```
 > 🔗Как получить API_ID и API_HASH?: [Видео](https://youtu.be/DcqDA249Lhg?t=24)
 
@@ -119,7 +122,7 @@ clear && git clone https://github.com/coddrago/Heroku && cd Heroku && pip instal
 3. <b>Дождитесь установки дистрибутива, можете заварить чай</b>
 4. <b>После успешной установки перед вами откроется терминал, введите туда:</b>
 ```bash
-sudo apt update && sudo apt upgrade -y && sudo apt install python3 git python3-pip -y && git clone https://github.com/coddrago/Heroku && cd Heroku && sudo pip install -r requirements.txt && python3 -m heroku
+sudo apt update && sudo apt upgrade -y && sudo apt install python3 git python3-pip -y && git clone https://github.com/coddrago/Heroku && cd Heroku && python3 -m venv .venv && source .venv/bin/activate && sudo pip install -r requirements.txt && python3 -m heroku
 ```
 5. <b>В конце установки появится ссылка, перейдите по ней и введите данные своей учетной записи для входа.</b>
 > Вуаля! Вы установили Heroku на UserLAnd.
