@@ -30,10 +30,10 @@
       <img src="https://img.shields.io/badge/code%20style-black-000000.svg" alt="Code Style: Black">
     </a>
     <br>
-    <a href="https://github.com/coddrago/blob/master/README.md">
+    <a href="https://github.com/coddrago/Heroku/blob/master/README.md">
       <img src="https://img.shields.io/badge/lang-en-red.svg" alt="En">
     </a>
-    <a href="https://github.com/coddrago/blob/master/README_RU.md">
+    <a href="https://github.com/coddrago/Heroku/blob/master/README_RU.md">
       <img src="https://img.shields.io/badge/lang-ru-green.svg" alt="Ru">
     </a>
   </p>
