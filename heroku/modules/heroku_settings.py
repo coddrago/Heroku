@@ -158,9 +158,9 @@ class HerokuSettingsMod(loader.Module):
         )
 
     async def _uninstall_confirm_step_3(self, call: InlineCall):
-        await call.edit(self.strings("deauth_confirm_step3"))
-        await call.answer(
-            [
+        await call.edit(
+            self.strings("deauth_confirm_step3"),
+            reply_markup=[
                 {
                     "text": self.strings("deauth_confirm_btn"),
                     "callback": self._uninstall,
