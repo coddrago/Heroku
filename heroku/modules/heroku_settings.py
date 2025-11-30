@@ -132,14 +132,14 @@ class HerokuSettingsMod(loader.Module):
                         [
                             {
                                 "text": self.strings("deauth_yes"),
-                                "callback": self._uninstall,
+                                "callback": self._uninstall_confirm_step_3,
                             },
                             *[
                                 {
                                     "text": self.strings(f"deauth_no_{i}"),
                                     "action": "close",
                                 }
-                                for i in range(1, 4)
+                                for i in range(1, 10)
                             ],
                         ],
                         key=lambda _: random.random(),
@@ -154,6 +154,18 @@ class HerokuSettingsMod(loader.Module):
                         "action": "close",
                     }
                 ]
+            ],
+        )
+
+    async def _uninstall_confirm_step_3(self, call: InlineCall):
+        await call.edit(self.strings("deauth_confirm_step3"))
+        await call.answer(
+            [
+                {
+                    "text": self.strings("deauth_confirm_btn"),
+                    "callback": self._uninstall,
+                },
+                {"text": self.strings("deauth_cancel"), "action": "close"},
             ],
         )
 
