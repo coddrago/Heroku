@@ -18,21 +18,19 @@ import emoji
 import pyrogram
 import requests
 from aiogram.types import Message as AiogramMessage
-from pyrogram import hints
-from pyrogram.tl.custom.message import Message
-from pyrogram.tl.functions.account import UpdateNotifySettingsRequest
-from pyrogram.tl.functions.channels import (
-    CreateChannelRequest,
-    EditPhotoRequest,
+from pyrogram import types
+from herokutl.tl.custom.message import Message
+from pyrogram.raw.functions.channels import (
+    CreateChannel,
+    EditPhoto,
 )
-from pyrogram.tl.functions.messages import (
-    GetDialogFiltersRequest,
-    SetHistoryTTLRequest,
-    UpdateDialogFilterRequest,
+from pyrogram.raw.functions.messages import (
+    GetDialogFilters,
+    SetHistoryTTL,
+    UpdateDialogFilter,
 )
-from pyrogram.types import (
+from pyrogram.raw.types import (
     Channel,
-    InputPeerNotifySettings,
     MessageEntityBankCard,
     MessageEntityBlockquote,
     MessageEntityBold,
@@ -56,8 +54,9 @@ from pyrogram.types import (
     PeerChat,
     PeerUser,
     UpdateNewChannelMessage,
-    User,
+    User
 )
+from pyrogram.utils import get_raw_peer_id
 
 from .other import invite_inline_bot, run_sync
 
@@ -86,6 +85,9 @@ FormattingEntity = typing.Union[
     MessageEntityBankCard,
     MessageEntitySpoiler,
 ]
+
+if typing.TYPE_CHECKING:
+    from ..types import Entity
 
 parser = pyrogram.utils.sanitize_parse_mode("html")
 logger = logging.getLogger(__name__)
@@ -255,7 +257,7 @@ async def asset_channel(
 
     peer = (
         await client.invoke(
-            CreateChannelRequest(
+            CreateChannel(
                 title,
                 description,
                 megagroup=not channel,
@@ -281,13 +283,13 @@ async def asset_channel(
 
     if ttl:
         await fw_protect()
-        await client.invoke(SetHistoryTTLRequest(peer=peer, period=ttl))
+        await client.invoke(SetHistoryTTL(peer=peer, period=ttl))
 
     if _folder:
         if _folder != "Heroku":
             raise NotImplementedError
 
-        folders = await client.invoke(GetDialogFiltersRequest())
+        folders = await client.invoke(GetDialogFilters())
 
         try:
             folder = next(folder for folder in folders if folder.title == "Heroku")
@@ -301,7 +303,7 @@ async def asset_channel(
             folder.include_peers += [await client.get_input_entity(peer)]
 
             await client.invoke(
-                UpdateDialogFilterRequest(
+                UpdateDialogFilter(
                     folder.id,
                     folder,
                 )
@@ -312,7 +314,7 @@ async def asset_channel(
 
 async def set_avatar(
     client: CustomTelegramClient,
-    peer: hints.Entity,
+    peer: 'Entity',
     avatar: str,
 ) -> bool:
     """
@@ -336,7 +338,7 @@ async def set_avatar(
 
     await fw_protect()
     res = await client.invoke(
-        EditPhotoRequest(
+        EditPhoto(
             channel=peer,
             photo=await client.upload_file(f, file_name="photo.png"),
         )
@@ -437,7 +439,7 @@ def get_chat_id(message: typing.Union[Message, AiogramMessage]) -> int:
     )[0]
 
 
-def get_entity_id(entity: hints.Entity) -> int:
+def get_entity_id(entity: 'Entity') -> int:
     """
     Get entity ID
     :param entity: Entity to get ID from
@@ -539,7 +541,7 @@ def find_caller(
 
 async def dnd(
     client: CustomTelegramClient,
-    peer: hints.Entity,
+    peer: 'Entity',
     archive: bool = True,
 ) -> bool:
     """
@@ -549,20 +551,14 @@ async def dnd(
     :return: `True` on success, otherwise `False`
     """
     try:
-        await client.invoke(
-            UpdateNotifySettingsRequest(
-                peer=peer,
-                settings=InputPeerNotifySettings(
-                    show_previews=False,
-                    silent=True,
-                    mute_until=2**31 - 1,
-                ),
-            )
+        await client.update_chat_notifications(
+            show_previews=False,
+            mute=True
         )
 
         if archive:
             await fw_protect()
-            await client.edit_folder(peer, 1)
+            await client.archive_chats(get_raw_peer_id(peer))
     except Exception:
         logger.exception("utils.dnd error")
         return False

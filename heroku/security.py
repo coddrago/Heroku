@@ -32,15 +32,17 @@ import logging
 import time
 import typing
 
-from pyrogram.hints import EntityLike
-from pyrogram.tl.functions.messages import GetFullChatRequest
-from pyrogram.types import ChatParticipantAdmin, ChatParticipantCreator, Message
+from pyrogram.raw.functions.messages import GetFullChat
+from pyrogram.raw.types import ChatParticipantAdmin, ChatParticipantCreator, Message
 from pyrogram.utils import get_display_name
 
 from . import main, utils
 from .database import Database
 from .tl_cache import CustomTelegramClient
 from .types import Command
+
+if typing.TYPE_CHECKING:
+    from .types import EntityLike
 
 logger = logging.getLogger(__name__)
 
@@ -230,7 +232,7 @@ class SecurityManager:
     def add_rule(
         self,
         target_type: str,
-        target: EntityLike,
+        target: 'EntityLike',
         rule: str,
         duration: int,
     ):
@@ -631,7 +633,7 @@ class SecurityManager:
             ):
                 participant = self._cache[cache_obj]["user"]
             else:
-                full_chat = await message.client.invoke(GetFullChatRequest(message.chat_id))
+                full_chat = await message.client.invoke(GetFullChat(message.chat_id))
                 participants = full_chat.full_chat.participants.participants
                 participant = next(
                     (

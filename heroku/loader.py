@@ -30,7 +30,7 @@ from pathlib import Path
 from types import FunctionType
 from uuid import uuid4
 
-from pyrogram.tl.tlobject import TLObject
+from pyrogram.tlobject import TLObject
 
 from . import security, utils, validators
 from .database import Database

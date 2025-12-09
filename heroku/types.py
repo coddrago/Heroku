@@ -29,13 +29,11 @@ from dataclasses import dataclass, field
 from importlib.abc import SourceLoader
 
 import requests
-from pyrogram.hints import EntityLike
-from pyrogram.tl.functions.account import UpdateNotifySettingsRequest
-from pyrogram.types import (
+from pyrogram import raw
+from pyrogram.raw.types import (
     Channel,
     ChannelForbidden,
     ChannelFull,
-    InputPeerNotifySettings,
     Message,
     UserFull,
 )
@@ -82,9 +80,13 @@ logger = logging.getLogger(__name__)
 
 JSONSerializable = typing.Union[str, int, float, bool, list, dict, None]
 HerokuReplyMarkup = typing.Union[typing.List[typing.List[dict]], typing.List[dict], dict]
+Entity = typing.Union[raw.base.User, raw.base.Chat]
+EntityLike = typing.Union[
+    str, int, Entity, raw.base.Peer, raw.base.InputPeer, raw.base.UserFull,
+    raw.base.ChatFull, raw.base.messages.chat_full.ChatFull
+]
 ListLike = typing.Union[list, set, tuple]
 Command = typing.Callable[..., typing.Awaitable[typing.Any]]
-
 
 class StringLoader(SourceLoader):
     """Load a python module/file from a string"""
@@ -156,7 +158,7 @@ class Module:
         self,
         command: str,
         args: typing.Optional[str] = None,
-        peer: typing.Optional[EntityLike] = None,
+        peer: typing.Optional['EntityLike'] = None,
         message: typing.Optional[Message] = None,
         edit: bool = False,
     ) -> Message:
@@ -325,7 +327,7 @@ class Module:
     async def _decline(
         self,
         call: InlineCall,
-        channel: EntityLike,
+        channel: 'EntityLike',
         event: asyncio.Event,
     ):
         from . import utils
@@ -347,7 +349,7 @@ class Module:
 
     async def request_join(
         self,
-        peer: EntityLike,
+        peer: 'EntityLike',
         reason: str,
         assure_joined: typing.Optional[bool] = False,
     ) -> bool:
@@ -394,11 +396,10 @@ class Module:
             return True
         
         event = asyncio.Event()
-        await self.client.invoke(
-            UpdateNotifySettingsRequest(
-                peer=self.inline.bot_username,
-                settings=InputPeerNotifySettings(show_previews=False, silent=False),
-            )
+        await self.client.update_chat_notifications(
+            chat_id=self.inline.bot_username,
+            show_previews=False,
+            mute=False
         )
 
         await self.inline.bot.send_photo(
@@ -986,7 +987,7 @@ class CacheRecordEntity:
     def __init__(
         self,
         hashable_entity: "Hashable",  # type: ignore  # noqa: F821
-        resolved_entity: EntityLike,
+        resolved_entity: 'EntityLike',
         exp: int,
     ):
         self.entity = copy.deepcopy(resolved_entity)
@@ -1019,7 +1020,7 @@ class CacheRecordPerms:
         self,
         hashable_entity: "Hashable",  # type: ignore  # noqa: F821
         hashable_user: "Hashable",  # type: ignore  # noqa: F821
-        resolved_perms: EntityLike,
+        resolved_perms: 'EntityLike',
         exp: int,
     ):
         self.perms = copy.deepcopy(resolved_perms)

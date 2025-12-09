@@ -47,7 +47,9 @@ from pathlib import Path
 
 import aiohttp
 import pyrogram
-from pyrogram import events
+from herokutl import events
+from pyrogram import handlers
+from pyrogram.qrlogin import QRLogin
 from pyrogram.errors import (
     ApiIdInvalid,
     AuthKeyDuplicated,
@@ -57,15 +59,15 @@ from pyrogram.errors import (
     SessionPasswordNeeded,
     YouBlockedUser,
 )
-from pyrogram.network.connection import (
+from herokutl.network.connection import (
     ConnectionTcpFull,
     ConnectionTcpMTProxyRandomizedIntermediate,
 )
-from pyrogram.password import compute_check
-from pyrogram.sessions import MemorySession, SQLiteSession
-from pyrogram.tl.functions.account import GetPasswordRequest
-from pyrogram.tl.functions.auth import CheckPasswordRequest
-from pyrogram.tl.functions.contacts import UnblockRequest
+from pyrogram.utils import compute_check
+from herokutl.sessions import MemorySession, SQLiteSession
+from pyrogram.raw.functions.account import GetPassword
+from pyrogram.raw.functions.auth import CheckPassword
+from pyrogram.raw.functions.contacts import Unblock
 
 from . import database, loader, utils, version
 from ._internal import print_banner, restart
@@ -254,7 +256,7 @@ def gen_port(cfg: str = "port", no8080: bool = False) -> int:
     return port
 
 
-def parse_arguments() -> dict:
+def parse_arguments():
     """
     Parses the arguments
     :returns: Dictionary with arguments
@@ -552,120 +554,26 @@ class Heroku:
             client.disconnect()
             await asyncio.sleep(3600)  # Will be restarted from web anyway
 
-    async def _web_banner(self):
-        """Shows web banner"""
-        logging.info("🔎 Web mode ready for configuration")
-        logging.info("🔗 Please visit %s", self.web.url)
-
-    async def wait_for_web_auth(self, token: str) -> bool:
-        """
-        Waits for web auth confirmation in Telegram
-        :param token: Token to wait for
-        :return: True if auth was successful, False otherwise
-        """
-        timeout = 5 * 60
-        polling_interval = 1
-        for _ in range(timeout * polling_interval):
-            await asyncio.sleep(polling_interval)
-
-            for client in self.clients:
-                if client.loader.inline.pop_web_auth_token(token):
-                    return True
-
-        return False
-
-    async def _phone_login(self, client: CustomTelegramClient) -> bool:
-        phone = input(
-            "\033[0;96mEnter phone: \033[0m"
-            if self.arguments.tty
-            else "Enter phone: "
-        )
-
-        await client.start(phone)
-
-        me = await client.get_me()
-        telegram_id = me.id
-        client._tg_id = telegram_id
-        client.tg_id = telegram_id
-        client.hikka_me = me
-        client.heroku_me = me
-
-        db = database.Database(client)
-        await db.init()
-
-        while (bot := input("You can enter a custom bot username or leave it empty and Heroku will generate a random one: ")):
-            try:
-                if await self._check_bot(client, bot):
-                    db.set("heroku.inline", "custom_bot", bot)
-                    print("Bot username saved!")
-                    break
-                else:
-                    print("Bot username is occupied. Try again or leave it empty")
-                    continue
-            except Exception:
-                print("Something went wrong")
-
-        await self.save_client_session(client)
-        self.clients += [client]
-        return True
-
-    async def _check_bot(
-        self,
-        client: CustomTelegramClient,
-        username: str,
-    ) -> bool:
-        async with client.conversation("@BotFather", exclusive=False) as conv:
-            try:
-                m = await conv.send_message("/token")
-            except YouBlockedUser:
-                await client.invoke(UnblockRequest(id="@BotFather"))
-                m = await conv.send_message("/token")
-
-            r = await conv.get_response()
-
-            await m.delete()
-            await r.delete()
-
-            if not hasattr(r, "reply_markup") or not hasattr(r.reply_markup, "rows"):
-                return False
-
-            for row in r.reply_markup.rows:
-                for button in row.buttons:
-                    if username != button.text.strip("@"):
-                        continue
-
-                    m = await conv.send_message("/cancel")
-                    r = await conv.get_response()
-
-                    await m.delete()
-                    await r.delete()
-
-                    return True
-        try:
-            await client.get_entity(f"{username}")
-        except:
-            return True
-
     async def _initial_setup(self) -> bool:
         """Responsible for first start"""
         if self.arguments.no_auth:
             return False
 
-        if not self.web:
-            client = CustomTelegramClient(
-                MemorySession(),
-                self.api_token.ID,
-                self.api_token.HASH,
-                connection=self.conn,
-                proxy=self.proxy,
-                connection_retries=None,
-                device_model=get_app_name(),
-                system_version=generate_random_system_version(),
-                app_version=".".join(map(str, __version__)) + " x64",
-                lang_code="en",
-                system_lang_code="en-US",
-            )
-            await client.connect()
+        if not self.web: # TODO
+            # client = TelegramClient(
+            #     MemorySession(),
+            #     self.api_token.ID,
+            #     self.api_token.HASH,
+            #     connection=self.conn,
+            #     proxy=self.proxy,
+            #     connection_retries=None,
+            #     device_model=get_app_name(),
+            #     system_version=generate_random_system_version(),
+            #     app_version=".".join(map(str, __version__)) + " x64",
+            #     lang_code="en",
+            #     system_lang_code="en-US",
+            # )
+            # await client.connect()
 
             print(
                 (
@@ -687,7 +595,7 @@ class Heroku:
                 return await self._phone_login(client)
 
             print("\033[0;96mLoading QR code...\033[0m")
-            qr_login = await client.qr_login()
+            qr_login = QRLogin(client)
 
             def print_qr():
                 qr = QRCode()
@@ -721,7 +629,7 @@ class Heroku:
 
             if qr_logined:
                 print_banner("2fa.txt")
-                password = await client.invoke(GetPasswordRequest())
+                password = await client.invoke(GetPassword())
                 while True:
                     _2fa = getpass(
                         f"\033[0;96mEnter 2FA password ({password.hint}): \033[0m"
@@ -732,7 +640,7 @@ class Heroku:
                         await client._on_login(
                             (
                                 await client.invoke(
-                                    CheckPasswordRequest(
+                                    CheckPassword(
                                         compute_check(password, _2fa.strip())
                                     )
                                 )

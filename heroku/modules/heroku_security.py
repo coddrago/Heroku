@@ -15,8 +15,7 @@ import datetime
 import time
 import typing
 
-from pyrogram.hints import EntityLike
-from pyrogram.types import Message, PeerUser, User
+from pyrogram.raw.types import Message, PeerUser, User
 from pyrogram.utils import get_display_name
 
 from .. import loader, main, security, utils
@@ -36,6 +35,9 @@ from ..security import (
     PM,
     SecurityGroup,
 )
+
+if typing.TYPE_CHECKING:
+    from ..types import EntityLike
 
 
 @loader.tds
@@ -756,7 +758,7 @@ class HerokuSecurityMod(loader.Module):
         self,
         call: InlineCall,
         target_type: str,
-        target: typing.Union[EntityLike, str],
+        target: typing.Union['EntityLike', str],
         rule: str,
         duration: int,
     ):
@@ -813,7 +815,7 @@ class HerokuSecurityMod(loader.Module):
         self,
         obj: typing.Union[Message, InlineMessage],
         target_type: str,
-        target: typing.Union[EntityLike, str],
+        target: typing.Union['EntityLike', str],
         rule: str,
         duration: int,
     ):

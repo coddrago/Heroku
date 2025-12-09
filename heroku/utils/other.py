@@ -15,17 +15,19 @@ import signal
 import typing
 
 import pyrogram
-from pyrogram import hints
-from pyrogram.tl.functions.channels import (
-    EditAdminRequest,
-    InviteToChannelRequest,
+from pyrogram.raw.functions.channels import (
+    EditAdmin,
+    InviteToChannel,
 )
-from pyrogram.types import (
+from pyrogram.raw.types import (
     ChatAdminRights,
 )
 
 from ..tl_cache import CustomTelegramClient
 from ..types import ListLike
+
+if typing.TYPE_CHECKING:
+    from ..types import EntityLike
 
 parser = pyrogram.utils.sanitize_parse_mode("html")
 logger = logging.getLogger(__name__)
@@ -43,7 +45,7 @@ def rand(size: int, /) -> str:
 
 async def invite_inline_bot(
     client: CustomTelegramClient,
-    peer: hints.EntityLike,
+    peer: 'EntityLike',
 ) -> None:
     """
     Invites inline bot to a chat
@@ -54,7 +56,7 @@ async def invite_inline_bot(
     """
 
     try:
-        await client.invoke(InviteToChannelRequest(peer, [client.loader.inline.bot_username]))
+        await client.invoke(InviteToChannel(peer, [client.loader.inline.bot_username]))
     except Exception as e:
         raise RuntimeError(
             "Can't invite inline bot to old asset chat, which is required by module"
@@ -62,7 +64,7 @@ async def invite_inline_bot(
 
     with contextlib.suppress(Exception):
         await client.invoke(
-            EditAdminRequest(
+            EditAdmin(
                 channel=peer,
                 user_id=client.loader.inline.bot_username,
                 admin_rights=ChatAdminRights(ban_users=True),

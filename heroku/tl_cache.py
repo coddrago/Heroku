@@ -17,19 +17,19 @@ import time
 import typing
 
 from pyrogram.client import Client as TelegramClient
+# from herokutl.client import TelegramClient
 from pyrogram import __name__ as __base_name__
 from pyrogram import helpers
 from pyrogram._updates import ChannelState, Entity, EntityType, SessionState
 from pyrogram.errors import RPCError
 from pyrogram.errors import TopicDeleted
-from pyrogram.hints import EntityLike
 from pyrogram.network import MTProtoSender
-from pyrogram.tl import functions
-from pyrogram.tl.alltlobjects import LAYER
-from pyrogram.tl.functions.channels import GetFullChannelRequest
-from pyrogram.tl.functions.users import GetFullUserRequest
+from pyrogram.raw import functions
+from pyrogram.raw.all import layer as LAYER
+from pyrogram.raw.functions.channels import GetFullChannelRequest
+from pyrogram.raw.functions.users import GetFullUserRequest
 from pyrogram.tl.tlobject import TLRequest
-from pyrogram.types import (
+from pyrogram.raw.types import (
     ChannelFull,
     Message,
     Updates,
@@ -46,6 +46,9 @@ from .types import (
     CacheRecordPerms,
     Module,
 )
+
+if typing.TYPE_CHECKING:
+    from .types import EntityLike
 
 logger = logging.getLogger(__name__)
 
@@ -97,6 +100,10 @@ class CustomTelegramClient(TelegramClient):
                 typing.Any,
             ]
         ] = None
+        self.tg_id = 0
+        self._tg_id = 0
+        self.hikka_me = UserFull
+        self.heroku_me = UserFull
 
     async def connect(self, unix_socket_path: typing.Optional[str] = None):
         if self.session is None:
@@ -226,7 +233,7 @@ class CustomTelegramClient(TelegramClient):
 
     async def get_entity(
         self,
-        entity: EntityLike,
+        entity: 'EntityLike',
         exp: int = 5 * 60,
         force: bool = False,
     ):
@@ -301,8 +308,8 @@ class CustomTelegramClient(TelegramClient):
 
     async def get_perms_cached(
         self,
-        entity: EntityLike,
-        user: typing.Optional[EntityLike] = None,
+        entity: 'EntityLike',
+        user: typing.Optional['EntityLike'] = None,
         exp: int = 5 * 60,
         force: bool = False,
     ):
@@ -418,7 +425,7 @@ class CustomTelegramClient(TelegramClient):
 
     async def get_fullchannel(
         self,
-        entity: EntityLike,
+        entity: 'EntityLike',
         exp: int = 300,
         force: bool = False,
     ) -> ChannelFull:
@@ -470,7 +477,7 @@ class CustomTelegramClient(TelegramClient):
 
     async def get_fulluser(
         self,
-        entity: EntityLike,
+        entity: 'EntityLike',
         exp: int = 300,
         force: bool = False,
     ) -> UserFull:
@@ -542,7 +549,7 @@ class CustomTelegramClient(TelegramClient):
 
     async def _find_message_obj_in_stack(
         self,
-        chat: EntityLike,
+        chat: 'EntityLike',
         stack: typing.List[inspect.FrameInfo],
     ) -> typing.Optional[Message]:
         """
@@ -561,7 +568,7 @@ class CustomTelegramClient(TelegramClient):
 
     async def _find_topic_in_stack(
         self,
-        chat: EntityLike,
+        chat: 'EntityLike',
         stack: typing.List[inspect.FrameInfo],
     ) -> typing.Optional[Message]:
         """
