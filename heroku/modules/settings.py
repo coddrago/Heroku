@@ -12,9 +12,9 @@ import contextlib
 # 🔑 https://www.gnu.org/licenses/agpl-3.0.html
 
 
-import herokutl
-from herokutl.extensions.html import CUSTOM_EMOJIS
-from herokutl.tl.types import Message, User
+import pyrogram
+from pyrogram.extensions.html import CUSTOM_EMOJIS
+from pyrogram.types import Message, User
 
 from .. import loader, main, utils, version
 from ..inline.types import InlineCall
@@ -120,7 +120,7 @@ class CoreMod(loader.Module):
                 ),
                 *version.__version__,
                 utils.get_commit_url(),
-                f"{herokutl.__version__} #{herokutl.tl.alltlobjects.LAYER}",
+                f"{pyrogram.__version__} #{pyrogram.tl.alltlobjects.LAYER}",
             )
             + (
                 ""

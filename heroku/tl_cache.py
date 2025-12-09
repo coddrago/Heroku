@@ -16,20 +16,20 @@ import logging
 import time
 import typing
 
-from herokutl import TelegramClient
-from herokutl import __name__ as __base_name__
-from herokutl import helpers
-from herokutl._updates import ChannelState, Entity, EntityType, SessionState
-from herokutl.errors import RPCError
-from herokutl.errors.rpcerrorlist import TopicDeletedError
-from herokutl.hints import EntityLike
-from herokutl.network import MTProtoSender
-from herokutl.tl import functions
-from herokutl.tl.alltlobjects import LAYER
-from herokutl.tl.functions.channels import GetFullChannelRequest
-from herokutl.tl.functions.users import GetFullUserRequest
-from herokutl.tl.tlobject import TLRequest
-from herokutl.tl.types import (
+from pyrogram.client import Client as TelegramClient
+from pyrogram import __name__ as __base_name__
+from pyrogram import helpers
+from pyrogram._updates import ChannelState, Entity, EntityType, SessionState
+from pyrogram.errors import RPCError
+from pyrogram.errors import TopicDeleted
+from pyrogram.hints import EntityLike
+from pyrogram.network import MTProtoSender
+from pyrogram.tl import functions
+from pyrogram.tl.alltlobjects import LAYER
+from pyrogram.tl.functions.channels import GetFullChannelRequest
+from pyrogram.tl.functions.users import GetFullUserRequest
+from pyrogram.tl.tlobject import TLRequest
+from pyrogram.types import (
     ChannelFull,
     Message,
     Updates,
@@ -37,7 +37,7 @@ from herokutl.tl.types import (
     UpdateShort,
     UserFull,
 )
-from herokutl.utils import is_list_like
+from pyrogram.utils import is_list_like
 
 from .types import (
     CacheRecordEntity,
@@ -584,7 +584,7 @@ class CustomTelegramClient(TelegramClient):
         no_retry = kwargs.pop("_topic_no_retry", False)
         try:
             return await native_method(*args, **kwargs)
-        except TopicDeletedError:
+        except TopicDeleted:
             if no_retry:
                 raise
 

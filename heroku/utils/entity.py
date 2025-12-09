@@ -15,22 +15,22 @@ import typing
 from urllib.parse import urlparse
 import emoji
 
-import herokutl
+import pyrogram
 import requests
 from aiogram.types import Message as AiogramMessage
-from herokutl import hints
-from herokutl.tl.custom.message import Message
-from herokutl.tl.functions.account import UpdateNotifySettingsRequest
-from herokutl.tl.functions.channels import (
+from pyrogram import hints
+from pyrogram.tl.custom.message import Message
+from pyrogram.tl.functions.account import UpdateNotifySettingsRequest
+from pyrogram.tl.functions.channels import (
     CreateChannelRequest,
     EditPhotoRequest,
 )
-from herokutl.tl.functions.messages import (
+from pyrogram.tl.functions.messages import (
     GetDialogFiltersRequest,
     SetHistoryTTLRequest,
     UpdateDialogFilterRequest,
 )
-from herokutl.tl.types import (
+from pyrogram.types import (
     Channel,
     InputPeerNotifySettings,
     MessageEntityBankCard,
@@ -87,7 +87,7 @@ FormattingEntity = typing.Union[
     MessageEntitySpoiler,
 ]
 
-parser = herokutl.utils.sanitize_parse_mode("html")
+parser = pyrogram.utils.sanitize_parse_mode("html")
 logger = logging.getLogger(__name__)
 
 def get_lang_flag(countrycode: str) -> str:
@@ -254,7 +254,7 @@ async def asset_channel(
     await fw_protect()
 
     peer = (
-        await client(
+        await client.invoke(
             CreateChannelRequest(
                 title,
                 description,
@@ -281,13 +281,13 @@ async def asset_channel(
 
     if ttl:
         await fw_protect()
-        await client(SetHistoryTTLRequest(peer=peer, period=ttl))
+        await client.invoke(SetHistoryTTLRequest(peer=peer, period=ttl))
 
     if _folder:
         if _folder != "Heroku":
             raise NotImplementedError
 
-        folders = await client(GetDialogFiltersRequest())
+        folders = await client.invoke(GetDialogFiltersRequest())
 
         try:
             folder = next(folder for folder in folders if folder.title == "Heroku")
@@ -300,7 +300,7 @@ async def asset_channel(
         ):
             folder.include_peers += [await client.get_input_entity(peer)]
 
-            await client(
+            await client.invoke(
                 UpdateDialogFilterRequest(
                     folder.id,
                     folder,
@@ -335,7 +335,7 @@ async def set_avatar(
         return False
 
     await fw_protect()
-    res = await client(
+    res = await client.invoke(
         EditPhotoRequest(
             channel=peer,
             photo=await client.upload_file(f, file_name="photo.png"),
@@ -431,7 +431,7 @@ def get_chat_id(message: typing.Union[Message, AiogramMessage]) -> int:
     :param message: Message to get chat ID from
     :return: Chat ID
     """
-    return herokutl.utils.resolve_id(
+    return pyrogram.utils.resolve_id(
         getattr(message, "chat_id", None)
         or getattr(getattr(message, "chat", None), "id", None)
     )[0]
@@ -443,7 +443,7 @@ def get_entity_id(entity: hints.Entity) -> int:
     :param entity: Entity to get ID from
     :return: Entity ID
     """
-    return herokutl.utils.get_peer_id(entity)
+    return pyrogram.utils.get_peer_id(entity)
 
 
 def escape_html(text: str, /) -> str:  # sourcery skip
@@ -549,7 +549,7 @@ async def dnd(
     :return: `True` on success, otherwise `False`
     """
     try:
-        await client(
+        await client.invoke(
             UpdateNotifySettingsRequest(
                 peer=peer,
                 settings=InputPeerNotifySettings(

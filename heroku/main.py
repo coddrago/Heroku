@@ -46,26 +46,26 @@ from getpass import getpass
 from pathlib import Path
 
 import aiohttp
-import herokutl
-from herokutl import events
-from herokutl.errors import (
-    ApiIdInvalidError,
-    AuthKeyDuplicatedError,
-    FloodWaitError,
-    PasswordHashInvalidError,
-    PhoneNumberInvalidError,
-    SessionPasswordNeededError,
-    YouBlockedUserError,
+import pyrogram
+from pyrogram import events
+from pyrogram.errors import (
+    ApiIdInvalid,
+    AuthKeyDuplicated,
+    FloodWait,
+    PasswordHashInvalid,
+    PhoneNumberInvalid,
+    SessionPasswordNeeded,
+    YouBlockedUser,
 )
-from herokutl.network.connection import (
+from pyrogram.network.connection import (
     ConnectionTcpFull,
     ConnectionTcpMTProxyRandomizedIntermediate,
 )
-from herokutl.password import compute_check
-from herokutl.sessions import MemorySession, SQLiteSession
-from herokutl.tl.functions.account import GetPasswordRequest
-from herokutl.tl.functions.auth import CheckPasswordRequest
-from herokutl.tl.functions.contacts import UnblockRequest
+from pyrogram.password import compute_check
+from pyrogram.sessions import MemorySession, SQLiteSession
+from pyrogram.tl.functions.account import GetPasswordRequest
+from pyrogram.tl.functions.auth import CheckPasswordRequest
+from pyrogram.tl.functions.contacts import UnblockRequest
 
 from . import database, loader, utils, version
 from ._internal import print_banner, restart
@@ -617,8 +617,8 @@ class Heroku:
         async with client.conversation("@BotFather", exclusive=False) as conv:
             try:
                 m = await conv.send_message("/token")
-            except YouBlockedUserError:
-                await client(UnblockRequest(id="@BotFather"))
+            except YouBlockedUser:
+                await client.invoke(UnblockRequest(id="@BotFather"))
                 m = await conv.send_message("/token")
 
             r = await conv.get_response()
@@ -706,9 +706,9 @@ class Heroku:
                         try:
                             await qr_login.recreate()
                             print_qr()
-                        except SessionPasswordNeededError:
+                        except SessionPasswordNeeded:
                             return True
-                    except SessionPasswordNeededError:
+                    except SessionPasswordNeeded:
                         return True
                     except KeyboardInterrupt:
                         print("\033[2J\033[3;1f")
@@ -721,7 +721,7 @@ class Heroku:
 
             if qr_logined:
                 print_banner("2fa.txt")
-                password = await client(GetPasswordRequest())
+                password = await client.invoke(GetPasswordRequest())
                 while True:
                     _2fa = getpass(
                         f"\033[0;96mEnter 2FA password ({password.hint}): \033[0m"
@@ -731,16 +731,16 @@ class Heroku:
                     try:
                         await client._on_login(
                             (
-                                await client(
+                                await client.invoke(
                                     CheckPasswordRequest(
                                         compute_check(password, _2fa.strip())
                                     )
                                 )
                             ).user
                         )
-                    except PasswordHashInvalidError:
+                    except PasswordHashInvalid:
                         print("\033[0;91mInvalid 2FA password!\033[0m")
-                    except FloodWaitError as e:
+                    except FloodWait as e:
                         seconds, minutes, hours = (
                             e.seconds % 3600 % 60,
                             e.seconds % 3600 // 60,
@@ -810,14 +810,14 @@ class Heroku:
                     session.filename,
                 )
                 continue
-            except (TypeError, AuthKeyDuplicatedError):
+            except (TypeError, AuthKeyDuplicated):
                 Path(session.filename).unlink(missing_ok=True)
                 self.sessions.remove(session)
-            except (ValueError, ApiIdInvalidError):
+            except (ValueError, ApiIdInvalid):
                 # Bad API hash/ID
                 run_config()
                 return False
-            except PhoneNumberInvalidError:
+            except PhoneNumberInvalid:
                 logging.error(
                     "Phone number is incorrect. Use international format (+XX...) "
                     "and don't put spaces in it."
@@ -1044,7 +1044,7 @@ class Heroku:
                     signal.SIGINT,
                     lambda: asyncio.create_task(self._shutdown_handler())
                 )
-            except NotImplementedError:
+            except NotImplemented:
                 logging.warning("Signal handlers not supported on this platform.")
         else:
             logging.info("Running on Windows — skipping signal handler.")
@@ -1063,6 +1063,6 @@ class Heroku:
             except:
                 pass
 
-herokutl.extensions.html.CUSTOM_EMOJIS = not get_config_key("disable_custom_emojis")
+pyrogram.extensions.html.CUSTOM_EMOJIS = not get_config_key("disable_custom_emojis")
 
 heroku = Heroku()

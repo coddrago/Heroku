@@ -40,8 +40,8 @@ import traceback
 import typing
 
 import requests
-from herokutl import events
-from herokutl.errors import FloodWaitError, RPCError
+from pyrogram import events
+from pyrogram.errors import FloodWait, RPCError
 from herokutl.tl.types import Message
 
 from . import main, security, utils
@@ -471,7 +471,7 @@ class CommandDispatcher:
         exc = sys.exc_info()[1]
         logger.exception("Command failed", extra={"stack": inspect.stack()})
         if isinstance(exc, RPCError):
-            if isinstance(exc, FloodWaitError):
+            if isinstance(exc, FloodWait):
                 hours = exc.seconds // 3600
                 minutes = (exc.seconds % 3600) // 60
                 seconds = exc.seconds % 60

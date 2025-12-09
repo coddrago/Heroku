@@ -25,10 +25,10 @@ from typing import Optional
 from pathlib import Path
 from PIL import Image, ImageDraw, ImageFont
 from io import BytesIO
-from herokutl.errors import WebpageMediaEmptyError
-from herokutl.types import InputMediaWebPage
-from herokutl.tl.types import Message
-from herokutl.utils import get_display_name
+from pyrogram.errors import WebpageMediaEmpty
+from pyrogram.types import InputMediaWebPage
+from pyrogram.types import Message
+from pyrogram.utils import get_display_name
 from .. import loader, utils, version
 import platform as lib_platform
 import getpass
@@ -327,7 +327,7 @@ class HerokuInfoMod(loader.Module):
                     reply_to=getattr(message, "reply_to_msg_id", None),
                     invert_media = self.config["invert_media"],
                 )
-        except WebpageMediaEmptyError:
+        except WebpageMediaEmpty:
             await utils.answer(
                 message,
                 self.strings["no_banner"].format(

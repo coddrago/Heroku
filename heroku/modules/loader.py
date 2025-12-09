@@ -33,10 +33,10 @@ from importlib.machinery import ModuleSpec
 from urllib.parse import urlparse
 
 import requests
-from herokutl.errors.common import ScamDetectionError
-from herokutl.errors.rpcerrorlist import MediaCaptionTooLongError
-from herokutl.tl.functions.channels import JoinChannelRequest
-from herokutl.tl.types import Channel, Message
+from pyrogram.errors.common import ScamDetectionError
+from pyrogram.errors import MediaCaptionTooLong
+from pyrogram.tl.functions.channels import JoinChannelRequest
+from pyrogram.types import Channel, Message
 
 from .. import loader, main, utils
 from .._local_storage import RemoteStorage
@@ -496,7 +496,7 @@ class LoaderMod(loader.Module):
         """
         Don't you dare call it externally
         """
-        await self._client(JoinChannelRequest(channel))
+        await self._client.invoke(JoinChannelRequest(channel))
         event.status = True
         event.set()
 
@@ -691,7 +691,7 @@ class LoaderMod(loader.Module):
                     {
                         "sklearn": "scikit-learn",
                         "pil": "Pillow",
-                        "herokutl": "Heroku-TL-New",
+                        "pyrogram": "Heroku-TL-New",
                     }.get(e.name.lower(), e.name)
                 ]
 
@@ -1085,7 +1085,7 @@ class LoaderMod(loader.Module):
 
         try:
             await utils.answer(message, loaded_msg(), reply_markup=subscribe_markup)
-        except MediaCaptionTooLongError:
+        except MediaCaptionTooLong:
             await message.reply(loaded_msg(False))
 
     async def _inline__subscribe(
@@ -1101,7 +1101,7 @@ class LoaderMod(loader.Module):
             await call.answer(self.strings("not_subscribed"))
             return
 
-        await self._client(JoinChannelRequest(entity))
+        await self._client.invoke(JoinChannelRequest(entity))
         await utils.answer(call, msg())
         await call.answer(self.strings("subscribed"))
 

@@ -75,13 +75,13 @@ elif __package__ != "heroku":
     print("\U0001F6AB Error: you cannot run this as a script; you must execute as a package")
 else:
     try:
-        import herokutl
+        import pyrogram
     except Exception:
         pass
     else:
         try:
-            import herokutl  # noqa: F811
-            if tuple(map(int, herokutl.__version__.split("."))) < (1, 1, 0):
+            import pyrogram  # noqa: F811
+            if tuple(map(int, pyrogram.__version__.split("."))) < (1, 1, 0):
                 raise ImportError
         except ImportError:
             print("\U0001F504 Installing dependencies...")

@@ -15,9 +15,9 @@ import datetime
 import time
 import typing
 
-from herokutl.hints import EntityLike
-from herokutl.tl.types import Message, PeerUser, User
-from herokutl.utils import get_display_name
+from pyrogram.hints import EntityLike
+from pyrogram.types import Message, PeerUser, User
+from pyrogram.utils import get_display_name
 
 from .. import loader, main, security, utils
 from ..inline.types import InlineCall, InlineMessage

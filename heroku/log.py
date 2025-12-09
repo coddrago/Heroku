@@ -24,10 +24,10 @@ import traceback
 import typing
 from logging.handlers import RotatingFileHandler
 
-import herokutl
+import pyrogram
 from aiogram.exceptions import TelegramNetworkError, TelegramRetryAfter
-from herokutl.errors import PersistentTimestampOutdatedError
-from herokutl.errors.rpcbaseerrors import (
+from pyrogram.errors import PersistentTimestampOutdated
+from pyrogram.errors.rpcbaseerrors import (
     ServerError,
     RPCError
 )
@@ -39,7 +39,7 @@ from .web.debugger import WebDebugger
 
 INTERNET_ERRORS = (
     TelegramNetworkError, asyncio.exceptions.TimeoutError,
-    ServerError, PersistentTimestampOutdatedError
+    ServerError, PersistentTimestampOutdated
 )
 
 # Monkeypatch linecache to make interactive line debugger available
@@ -85,7 +85,7 @@ def override_text(exception: Exception) -> typing.Optional[str]:
     if isinstance(exception, (TelegramNetworkError, asyncio.exceptions.TimeoutError)):
         return "✈️ <b>You have problems with internet connection on your server.</b>"
 
-    if isinstance(exception, PersistentTimestampOutdatedError):
+    if isinstance(exception, PersistentTimestampOutdated):
         return "✈️ <b>Telegram has problems with their datacenters.</b>"
 
     if isinstance(exception, CoreOverwriteError):
@@ -143,7 +143,7 @@ class HerokuException:
                             dictionary[key] = "<Database>"
                         elif isinstance(
                             value,
-                            (herokutl.TelegramClient, CustomTelegramClient),
+                            (pyrogram.TelegramClient, CustomTelegramClient),
                         ):
                             dictionary[key] = f"<{value.__class__.__name__}>"
                         elif len(str(value)) > 512:
@@ -304,7 +304,7 @@ class TelegramLogsHandler(logging.Handler):
     ):
         chunks = item.message + "\n\n<b>🪐 Full traceback:</b>\n" + item.full_stack
 
-        chunks = list(utils.smart_split(*herokutl.extensions.html.parse(chunks), 4096))
+        chunks = list(utils.smart_split(*pyrogram.extensions.html.parse(chunks), 4096))
 
         await call.edit(
             chunks[0],
@@ -591,7 +591,7 @@ def init():
         TelegramLogsHandler((handler, rotating_handler), 7000)
     )
     logging.getLogger().setLevel(logging.NOTSET)
-    logging.getLogger("herokutl").setLevel(logging.WARNING)
+    logging.getLogger("pyrogram").setLevel(logging.WARNING)
     logging.getLogger("matplotlib").setLevel(logging.WARNING)
     logging.getLogger("aiohttp").setLevel(logging.WARNING)
     logging.getLogger("aiogram").setLevel(logging.WARNING)

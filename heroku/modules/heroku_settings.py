@@ -13,13 +13,13 @@
 import logging
 import random
 
-import herokutl
-from herokutl.tl.functions.messages import (
+import pyrogram
+from pyrogram.tl.functions.messages import (
     GetDialogFiltersRequest,
     UpdateDialogFilterRequest,
 )
-from herokutl.tl.types import Message
-from herokutl.utils import get_display_name
+from pyrogram.types import Message
+from pyrogram.utils import get_display_name
 
 from .. import loader, log, main, utils
 from .._internal import fw_protect, restart
@@ -104,7 +104,7 @@ class HerokuSettingsMod(loader.Module):
 
         await fw_protect()
 
-        folders = await self._client(GetDialogFiltersRequest())
+        folders = await self._client.invoke(GetDialogFiltersRequest())
 
         if any(folder.title == "heroku" for folder in folders):
             folder_id = max(
@@ -112,7 +112,7 @@ class HerokuSettingsMod(loader.Module):
                 key=lambda x: x.id,
             ).id
             await fw_protect()
-            await self._client(UpdateDialogFilterRequest(id=folder_id))
+            await self._client.invoke(UpdateDialogFilterRequest(id=folder_id))
 
         for handler in logging.getLogger().handlers:
             handler.setLevel(logging.CRITICAL)
@@ -469,7 +469,7 @@ class HerokuSettingsMod(loader.Module):
     async def inline__setting(self, call: InlineCall, key: str, state: bool = False):
         if callable(key):
             key()
-            herokutl.extensions.html.CUSTOM_EMOJIS = not main.get_config_key(
+            pyrogram.extensions.html.CUSTOM_EMOJIS = not main.get_config_key(
                 "disable_custom_emojis"
             )
         else:

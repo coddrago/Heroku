@@ -9,14 +9,14 @@ import logging
 import shlex
 import typing
 
-import herokutl
-import herokutl.extensions
-import herokutl.extensions.html
-from herokutl.tl.custom.message import Message
+import pyrogram
+import pyrogram.extensions
+import pyrogram.extensions.html
+from pyrogram.tl.custom.message import Message
 
 from .entity import escape_html, relocate_entities
 
-parser = herokutl.utils.sanitize_parse_mode("html")
+parser = pyrogram.utils.sanitize_parse_mode("html")
 logger = logging.getLogger(__name__)
 
 def iter_attrs(obj: typing.Any, /) -> typing.List[typing.Tuple[str, typing.Any]]:
@@ -33,8 +33,8 @@ def validate_html(html: str) -> str:
     :param html: HTML to validate
     :return: Valid HTML
     """
-    text, entities = herokutl.extensions.html.parse(html)
-    return herokutl.extensions.html.unparse(escape_html(text), entities)
+    text, entities = pyrogram.extensions.html.parse(html)
+    return pyrogram.extensions.html.unparse(escape_html(text), entities)
     
 def get_kwargs() -> typing.Dict[str, typing.Any]:
     """

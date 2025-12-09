@@ -29,9 +29,9 @@ from dataclasses import dataclass, field
 from importlib.abc import SourceLoader
 
 import requests
-from herokutl.hints import EntityLike
-from herokutl.tl.functions.account import UpdateNotifySettingsRequest
-from herokutl.tl.types import (
+from pyrogram.hints import EntityLike
+from pyrogram.tl.functions.account import UpdateNotifySettingsRequest
+from pyrogram.types import (
     Channel,
     ChannelForbidden,
     ChannelFull,
@@ -394,7 +394,7 @@ class Module:
             return True
         
         event = asyncio.Event()
-        await self.client(
+        await self.client.invoke(
             UpdateNotifySettingsRequest(
                 peer=self.inline.bot_username,
                 settings=InputPeerNotifySettings(show_previews=False, silent=False),

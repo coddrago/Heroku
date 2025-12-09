@@ -12,7 +12,7 @@
 
 import logging
 
-from herokutl.tl.types import Message
+from pyrogram.types import Message
 
 from .. import loader, utils
 

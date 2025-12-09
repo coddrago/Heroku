@@ -8,9 +8,9 @@ import logging
 import typing
 
 import git
-import herokutl
+import pyrogram
 
-parser = herokutl.utils.sanitize_parse_mode("html")
+parser = pyrogram.utils.sanitize_parse_mode("html")
 logger = logging.getLogger(__name__)
 
 # GeekTG Compatibility

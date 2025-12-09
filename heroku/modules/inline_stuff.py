@@ -13,9 +13,9 @@
 import re
 import string
 
-from herokutl.errors.rpcerrorlist import YouBlockedUserError
-from herokutl.tl.functions.contacts import UnblockRequest
-from herokutl.tl.types import Message
+from pyrogram.errors import YouBlockedUser
+from pyrogram.tl.functions.contacts import UnblockRequest
+from pyrogram.types import Message
 
 from .. import loader, utils
 from ..inline.types import BotInlineMessage, InlineCall
@@ -61,8 +61,8 @@ class InlineStuff(loader.Module):
         async with self._client.conversation("@BotFather", exclusive=False) as conv:
             try:
                 m = await conv.send_message("/token")
-            except YouBlockedUserError:
-                await self._client(UnblockRequest(id="@BotFather"))
+            except YouBlockedUser:
+                await self._client.invoke(UnblockRequest(id="@BotFather"))
                 m = await conv.send_message("/token")
 
             r = await conv.get_response()

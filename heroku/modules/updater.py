@@ -24,12 +24,12 @@ import typing
 
 import git
 from git import GitCommandError, Repo
-from herokutl.extensions.html import CUSTOM_EMOJIS
-from herokutl.tl.functions.messages import (
+from pyrogram.extensions.html import CUSTOM_EMOJIS
+from pyrogram.tl.functions.messages import (
     GetDialogFiltersRequest,
     UpdateDialogFilterRequest,
 )
-from herokutl.tl.types import DialogFilter, TextWithEntities, Message
+from pyrogram.types import DialogFilter, TextWithEntities, Message
 
 from .. import loader, main, utils, version
 from .._internal import restart
@@ -515,7 +515,7 @@ class UpdaterMod(loader.Module):
             )
 
     async def _add_folder(self):
-        folders = await self._client(GetDialogFiltersRequest())
+        folders = await self._client.invoke(GetDialogFiltersRequest())
 
         if any(getattr(folder, "title", None) == "Heroku" for folder in folders.filters):
             return
@@ -532,7 +532,7 @@ class UpdaterMod(loader.Module):
             folder_id = 2
 
         try:
-            await self._client(
+            await self._client.invoke(
                 UpdateDialogFilterRequest(
                     folder_id,
                     DialogFilter(

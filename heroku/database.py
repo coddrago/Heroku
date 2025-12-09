@@ -27,8 +27,8 @@ except ImportError as e:
 
 import typing
 
-from herokutl.errors.rpcerrorlist import ChannelsTooMuchError
-from herokutl.tl.types import Message, User
+from pyrogram.errors import ChannelsTooMuch
+from pyrogram.types import Message, User
 
 from . import main, utils
 from .pointers import (
@@ -126,7 +126,7 @@ class Database(dict):
                 archive=True,
                 avatar="https://raw.githubusercontent.com/coddrago/assets/refs/heads/main/heroku/heroku_assets.png"
             )
-        except ChannelsTooMuchError:
+        except ChannelsTooMuch:
             self._assets = None
             logger.error(
                 "Can't find and/or create assets folder\n"

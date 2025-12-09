@@ -22,11 +22,12 @@ from aiogram import Bot, Dispatcher
 from aiogram.enums import ParseMode
 from aiogram.exceptions import TelegramConflictError, TelegramUnauthorizedError
 from aiogram.client.default import DefaultBotProperties
-from herokutl.errors.rpcerrorlist import InputUserDeactivatedError, YouBlockedUserError
-from herokutl.tl.functions.contacts import UnblockRequest
-from herokutl.tl.functions.messages import GetDialogFiltersRequest, UpdateDialogFilterRequest
-from herokutl.tl.types import DialogFilter, Message, InputPeerUser
-from herokutl.utils import get_display_name
+from pyrogram.errors import InputUserDeactivated, YouBlockedUser
+from pyrogram.raw.functions.contacts.unblock import Unblock
+from pyrogram.raw.functions.messages import GetDialogFilters, UpdateDialogFilter
+from pyrogram.types import Message, InputPeerUser
+from pyrogram.types.user_and_chats.folder import Folder
+from pyrogram.utils import get_display_name
 
 from .. import utils
 from ..database import Database
@@ -144,7 +145,7 @@ class InlineManager(
 
         try:
             m = await self._client.send_message(self.bot_username, "/start heroku init")
-        except (InputUserDeactivatedError, ValueError):
+        except (InputUserDeactivated, ValueError):
             self._db.set("heroku.inline", "bot_token", None)
             self._token = False
 
@@ -153,8 +154,8 @@ class InlineManager(
 
             self.init_complete = False
             return False
-        except YouBlockedUserError:
-            await self._client(UnblockRequest(id=self.bot_username))
+        except YouBlockedUser:
+            await self._client.unblock_user(self.bot_username)
             try:
                 m = await self._client.send_message(
                     self.bot_username, "/start heroku init"
@@ -167,8 +168,8 @@ class InlineManager(
             logger.critical("Initialization of inline manager failed!", exc_info=True)
             return False
         
-        _folders = await self._client(GetDialogFiltersRequest())
-        for folder in _folders.filters:
+        _folders = await self._client.get_folders()
+        for folder in _folders:
             if getattr(folder, "title", None) == "Heroku":
                 if any(
                     [
@@ -182,25 +183,19 @@ class InlineManager(
                 pinned = [
                     await self._client.get_input_entity(self.bot_id)
                 ]
-                include = folder.include_peers
-                exclude = folder.exclude_peers
-                emoticon = folder.emoticon
+                include = folder.included_chats
+                exclude = folder.excluded_chats
+                emoticon = folder.icon
                 color = folder.color
-
-                await self._client(
-                    UpdateDialogFilterRequest(
-                        folder.id,
-                        DialogFilter(
-                            folder.id,
-                            pinned_peers=pinned,
-                            include_peers=include,
-                            exclude_peers=exclude,
-                            emoticon=emoticon,
-                            color=color,
-                        )
-                    )
+                self._client.edit_folder(
+                    folder.id,
+                    pinned_chats=pinned,
+                    included_chats=include,
+                    excluded_chats=exclude,
+                    icon=emoticon,
+                    color=color,
                 )
-                break
+ 
 
         await self._client.delete_messages(self.bot_username, m)
 

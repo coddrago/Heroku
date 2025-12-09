@@ -18,10 +18,10 @@ import random
 import time
 import typing
 
-from herokutl.tl import functions
-from herokutl.tl.tlobject import TLRequest
-from herokutl.tl.types import Message
-from herokutl.utils import is_list_like
+from pyrogram.tl import functions
+from pyrogram.tl.tlobject import TLRequest
+from pyrogram.types import Message
+from pyrogram.utils import is_list_like
 from aiogram.types import BufferedInputFile
 
 from .. import loader, utils

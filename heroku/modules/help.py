@@ -15,8 +15,8 @@ import difflib
 import inspect
 import logging
 
-from herokutl.extensions.html import CUSTOM_EMOJIS
-from herokutl.tl.types import Message
+from pyrogram.extensions.html import CUSTOM_EMOJIS
+from pyrogram.types import Message
 
 from .. import loader, utils
 

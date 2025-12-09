@@ -15,8 +15,8 @@ import logging
 import re
 import os
 
-from herokutl.errors.rpcerrorlist import YouBlockedUserError
-from herokutl.tl.functions.contacts import UnblockRequest
+from pyrogram.errors import YouBlockedUser
+from pyrogram.tl.functions.contacts import UnblockRequest
 
 from .. import utils
 from .._internal import fw_protect
@@ -121,8 +121,8 @@ class TokenObtainment(InlineUnit):
             try:
                 await fw_protect()
                 m = await conv.send_message("/token")
-            except YouBlockedUserError:
-                await self._client(UnblockRequest(id="@BotFather"))
+            except YouBlockedUser:
+                await self._client.invoke(UnblockRequest(id="@BotFather"))
                 await fw_protect()
                 m = await conv.send_message("/token")
 

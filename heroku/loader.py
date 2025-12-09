@@ -30,7 +30,7 @@ from pathlib import Path
 from types import FunctionType
 from uuid import uuid4
 
-from herokutl.tl.tlobject import TLObject
+from pyrogram.tl.tlobject import TLObject
 
 from . import security, utils, validators
 from .database import Database
@@ -147,9 +147,9 @@ native_import = builtins.__import__
 
 def patched_import(name: str, *args, **kwargs):
     if name.startswith("telethon"):
-        return native_import("herokutl" + name[8:], *args, **kwargs)
+        return native_import("pyrogram" + name[8:], *args, **kwargs)
     elif name.startswith("hikkatl"):
-        return native_import("herokutl" + name[7:], *args, **kwargs)
+        return native_import("pyrogram" + name[7:], *args, **kwargs)
     elif name.startswith("hikkalls"):
         return native_import(name, *args, **kwargs)
     elif name.startswith("hikka"):

@@ -27,9 +27,9 @@ from aiogram.types import (
     InputTextMessageContent,
 )
 from aiogram.exceptions import TelegramRetryAfter
-from herokutl.errors.rpcerrorlist import ChatSendInlineForbiddenError
-from herokutl.extensions.html import CUSTOM_EMOJIS
-from herokutl.tl.types import Message
+from pyrogram.errors import ChatSendInlineForbidden
+from pyrogram.extensions.html import CUSTOM_EMOJIS
+from pyrogram.types import Message
 
 from .. import main, utils
 from ..types import HerokuReplyMarkup
@@ -216,7 +216,7 @@ class List(InlineUnit):
 
         try:
             m = await self._invoke_unit(unit_id, message)
-        except ChatSendInlineForbiddenError:
+        except ChatSendInlineForbidden:
             await answer(self.translator.getkey("inline.inline403"))
         except Exception:
             logger.exception("Can't send list")

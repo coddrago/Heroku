@@ -36,7 +36,8 @@ import re
 import typing
 import signal
 
-import herokutl
+import pyrogram
+from pyrogram.errors import MessageEmpty, MessageNotModified, MessageTooLong
 
 from .. import loader, utils
 
@@ -77,7 +78,7 @@ async def sleep_for_task(func: callable, data: bytes, delay: float):
 class MessageEditor:
     def __init__(
         self,
-        message: herokutl.tl.types.Message,
+        message: pyrogram.tl.types.Message,
         command: str,
         config,
         strings,
@@ -113,10 +114,10 @@ class MessageEditor:
         text += (self.strings("stderr") + stderr) if stderr else ""
         text += self.strings("end")
 
-        with contextlib.suppress(herokutl.errors.rpcerrorlist.MessageNotModifiedError):
+        with contextlib.suppress(MessageNotModified):
             try:
                 self.message = await utils.answer(self.message, text)
-            except herokutl.errors.rpcerrorlist.MessageTooLongError as e:
+            except MessageTooLong as e:
                 logger.error(e)
                 logger.error(text)
         # The message is never empty due to the template header
@@ -175,7 +176,7 @@ class SudoMessageEditor(MessageEditor):
 
             try:
                 await utils.answer(self.message, text)
-            except herokutl.errors.rpcerrorlist.MessageNotModifiedError as e:
+            except MessageNotModified as e:
                 logger.debug(e)
 
             logger.debug("edited message with link to self")
@@ -191,7 +192,7 @@ class SudoMessageEditor(MessageEditor):
             self.message.client.remove_event_handler(self.on_message_edited)
             self.message.client.add_event_handler(
                 self.on_message_edited,
-                herokutl.events.messageedited.MessageEdited(chats=["me"]),
+                pyrogram.events.messageedited.MessageEdited(chats=["me"]),
             )
 
             logger.debug("registered handler")
@@ -239,7 +240,7 @@ class SudoMessageEditor(MessageEditor):
             # The user has provided interactive authentication. Send password to stdin for sudo.
             try:
                 self.authmsg = await utils.answer(message, self.strings("auth_ongoing"))
-            except herokutl.errors.rpcerrorlist.MessageNotModifiedError:
+            except MessageNotModified:
                 # Try to clear personal info if the edit fails
                 await message.delete()
 
@@ -290,13 +291,13 @@ class RawMessageEditor(SudoMessageEditor):
         logger.debug(text)
 
         with contextlib.suppress(
-            herokutl.errors.rpcerrorlist.MessageNotModifiedError,
-            herokutl.errors.rpcerrorlist.MessageEmptyError,
+            MessageNotModified,
+            MessageEmpty,
             ValueError,
         ):
             try:
                 await utils.answer(self.message, text)
-            except herokutl.errors.rpcerrorlist.MessageTooLongError as e:
+            except MessageTooLong as e:
                 logger.error(e)
                 logger.error(text)
 
@@ -355,7 +356,7 @@ class TerminalMod(loader.Module):
 
     async def run_command(
         self,
-        message: herokutl.tl.types.Message,
+        message: pyrogram.tl.types.Message,
         cmd: str,
         editor: typing.Optional[MessageEditor] = None,
     ):

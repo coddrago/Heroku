@@ -25,20 +25,20 @@ import aiohttp_jinja2
 import requests
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from aiohttp import web
-from herokutl.errors import (
-    FloodWaitError,
-    PasswordHashInvalidError,
-    PhoneCodeExpiredError,
-    PhoneCodeInvalidError,
-    SessionPasswordNeededError,
-    YouBlockedUserError,
+from pyrogram.errors import (
+    FloodWait,
+    PasswordHashInvalid,
+    PhoneCodeExpired,
+    PhoneCodeInvalid,
+    SessionPasswordNeeded,
+    YouBlockedUser,
 )
-from herokutl.password import compute_check
-from herokutl.sessions import MemorySession
-from herokutl.tl.functions.account import GetPasswordRequest
-from herokutl.tl.functions.auth import CheckPasswordRequest
-from herokutl.tl.functions.contacts import UnblockRequest
-from herokutl.utils import parse_phone
+from pyrogram.password import compute_check
+from pyrogram.sessions import MemorySession
+from pyrogram.tl.functions.account import GetPasswordRequest
+from pyrogram.tl.functions.auth import CheckPasswordRequest
+from pyrogram.tl.functions.contacts import UnblockRequest
+from pyrogram.utils import parse_phone
 
 from .. import database, main, utils
 from .._internal import restart
@@ -135,8 +135,8 @@ class Web:
         async with client.conversation("@BotFather", exclusive=False) as conv:
             try:
                 m = await conv.send_message("/token")
-            except YouBlockedUserError:
-                await client(UnblockRequest(id="@BotFather"))
+            except YouBlockedUser:
+                await client.invoke(UnblockRequest(id="@BotFather"))
                 m = await conv.send_message("/token")
 
             r = await conv.get_response()
@@ -233,10 +233,10 @@ class Web:
                 logger.debug("Recreating QR login")
                 try:
                     await self._qr_login.recreate()
-                except SessionPasswordNeededError:
+                except SessionPasswordNeeded:
                     self._2fa_needed = True
                     return
-            except SessionPasswordNeededError:
+            except SessionPasswordNeeded:
                 self._2fa_needed = True
                 break
 
@@ -337,13 +337,13 @@ class Web:
         await client.connect()
         try:
             await client.send_code_request(phone)
-        except FloodWaitError as e:
+        except FloodWait as e:
             return web.Response(status=429, body=self._render_fw_error(e))
 
         return web.Response(body="ok")
 
     @staticmethod
-    def _render_fw_error(e: FloodWaitError) -> str:
+    def _render_fw_error(e: FloodWait) -> str:
         seconds, minutes, hours = (
             e.seconds % 3600 % 60,
             e.seconds % 3600 // 60,
@@ -370,23 +370,23 @@ class Web:
         try:
             await self._pending_client._on_login(
                 (
-                    await self._pending_client(
+                    await self._pending_client.invoke(
                         CheckPasswordRequest(
                             compute_check(
-                                await self._pending_client(GetPasswordRequest()),
+                                await self._pending_client.invoke(GetPasswordRequest()),
                                 text.strip(),
                             )
                         )
                     )
                 ).user
             )
-        except PasswordHashInvalidError:
+        except PasswordHashInvalid:
             logger.debug("Invalid 2FA code")
             return web.Response(
                 status=403,
                 body="Invalid 2FA password",
             )
-        except FloodWaitError as e:
+        except FloodWait as e:
             logger.debug("FloodWait for 2FA code")
             return web.Response(
                 status=421,
@@ -427,16 +427,16 @@ class Web:
         if not password:
             try:
                 await self._pending_client.sign_in(phone, code=code)
-            except SessionPasswordNeededError:
+            except SessionPasswordNeeded:
                 return web.Response(
                     status=401,
                     body="2FA Password required",
                 )
-            except PhoneCodeExpiredError:
+            except PhoneCodeExpired:
                 return web.Response(status=404, body="Code expired")
-            except PhoneCodeInvalidError:
+            except PhoneCodeInvalid:
                 return web.Response(status=403, body="Invalid code")
-            except FloodWaitError as e:
+            except FloodWait as e:
                 return web.Response(
                     status=421,
                     body=(self._render_fw_error(e)),
@@ -444,12 +444,12 @@ class Web:
         else:
             try:
                 await self._pending_client.sign_in(phone, password=password)
-            except PasswordHashInvalidError:
+            except PasswordHashInvalid:
                 return web.Response(
                     status=403,
                     body="Invalid 2FA password",
                 )
-            except FloodWaitError as e:
+            except FloodWait as e:
                 return web.Response(
                     status=421,
                     body=(self._render_fw_error(e)),

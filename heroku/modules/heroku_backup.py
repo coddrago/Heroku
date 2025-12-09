@@ -23,7 +23,7 @@ import zipfile
 from pathlib import Path
 
 from aiogram.types import BufferedInputFile
-from herokutl.tl.types import Message
+from pyrogram.types import Message
 
 from .. import loader, utils
 from ..inline.types import BotInlineCall

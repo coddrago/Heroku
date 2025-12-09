@@ -3,7 +3,7 @@ import logging
 import re
 from pathlib import Path
 
-from herokutl.sessions import SQLiteSession
+from pyrogram.sessions import SQLiteSession
 
 from ..tl_cache import CustomTelegramClient
 from .customtl import ConnectionTcpFull, MTProtoState

@@ -19,10 +19,10 @@ import tempfile
 import typing
 from types import ModuleType
 
-import herokutl
-from herokutl.errors.rpcerrorlist import MessageIdInvalidError
-from herokutl.sessions import StringSession
-from herokutl.tl.types import Message
+import pyrogram
+from pyrogram.errors import MessageIdInvalid
+from pyrogram.sessions import StringSession
+from pyrogram.types import Message
 from meval import meval
 from io import StringIO
 
@@ -479,13 +479,13 @@ class Evaluator(loader.Module):
             "client": self._client,
             "reply": reply,
             "r": reply,
-            **self.get_sub(herokutl.tl.types),
-            **self.get_sub(herokutl.tl.functions),
+            **self.get_sub(pyrogram.tl.types),
+            **self.get_sub(pyrogram.tl.functions),
             "event": message,
             "chat": message.to_id,
-            "herokutl": herokutl,
-            "telethon": herokutl,
-            "hikkatl": herokutl,
+            "pyrogram": pyrogram,
+            "telethon": pyrogram,
+            "hikkatl": pyrogram,
             "utils": utils,
             "main": main,
             "loader": loader,
@@ -494,8 +494,8 @@ class Evaluator(loader.Module):
             "lookup": self.lookup,
             "self": self,
             "db": self.db,
-            **self.get_sub(herokutl.tl.types),
-            **self.get_sub(herokutl.tl.functions),
+            **self.get_sub(pyrogram.tl.types),
+            **self.get_sub(pyrogram.tl.functions),
         }
 
     def get_sub(self, obj: typing.Any, _depth: int = 1) -> dict:
@@ -517,7 +517,7 @@ class Evaluator(loader.Module):
                             lambda x: x[0][0] != "_"
                             and isinstance(x[1], ModuleType)
                             and x[1] != obj
-                            and x[1].__package__.rsplit(".", _depth)[0] == "herokutl.tl",
+                            and x[1].__package__.rsplit(".", _depth)[0] == "pyrogram.tl",
                             obj.__dict__.items(),
                         )
                     ]

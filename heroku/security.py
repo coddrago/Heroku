@@ -32,10 +32,10 @@ import logging
 import time
 import typing
 
-from herokutl.hints import EntityLike
-from herokutl.tl.functions.messages import GetFullChatRequest
-from herokutl.tl.types import ChatParticipantAdmin, ChatParticipantCreator, Message
-from herokutl.utils import get_display_name
+from pyrogram.hints import EntityLike
+from pyrogram.tl.functions.messages import GetFullChatRequest
+from pyrogram.types import ChatParticipantAdmin, ChatParticipantCreator, Message
+from pyrogram.utils import get_display_name
 
 from . import main, utils
 from .database import Database
@@ -631,7 +631,7 @@ class SecurityManager:
             ):
                 participant = self._cache[cache_obj]["user"]
             else:
-                full_chat = await message.client(GetFullChatRequest(message.chat_id))
+                full_chat = await message.client.invoke(GetFullChatRequest(message.chat_id))
                 participants = full_chat.full_chat.participants.participants
                 participant = next(
                     (
