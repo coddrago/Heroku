@@ -48,13 +48,13 @@ from pathlib import Path
 import aiohttp
 import pyrogram
 from herokutl import events
-from pyrogram import handlers, Client
+from pyrogram import Client, filters, handlers
 from pyrogram.qrlogin import QRLogin
 from pyrogram.errors import (
     ApiIdInvalid,
     AuthKeyDuplicated,
+    BadRequest,
     FloodWait,
-    PasswordHashInvalid,
     PhoneNumberInvalid,
     SessionPasswordNeeded,
     YouBlockedUser,
@@ -63,7 +63,6 @@ from herokutl.network.connection import (
     ConnectionTcpFull,
     ConnectionTcpMTProxyRandomizedIntermediate,
 )
-from pyrogram.utils import compute_check
 from herokutl.sessions import MemorySession, SQLiteSession
 from pyrogram.raw.functions.account import GetPassword
 from pyrogram.raw.functions.auth import CheckPassword
@@ -423,7 +422,7 @@ class Heroku:
 
     def _read_sessions(self):
         """Gets sessions from environment and data directory"""
-        self.sessions = []
+        self.sessions: list[SQLiteSession] = []
         self.sessions += [
             SQLiteSession(
                 os.path.join(
@@ -619,8 +618,8 @@ class Heroku:
         async with client.conversation("@BotFather", exclusive=False) as conv:
             try:
                 m = await conv.send_message("/token")
-            except YouBlockedUserError:
-                await client(UnblockRequest(id="@BotFather"))
+            except YouBlockedUser:
+                await client(Unblock(id="@BotFather"))
                 m = await conv.send_message("/token")
 
             r = await conv.get_response()
@@ -633,7 +632,7 @@ class Heroku:
 
             for row in r.reply_markup.rows:
                 for button in row.buttons:
-                    if username != button.text.strip("@"):
+                    if username != button.text.html.strip("@"):
                         continue
 
                     m = await conv.send_message("/cancel")
@@ -732,22 +731,14 @@ class Heroku:
                         else f"Enter 2FA password ({password.hint}): "
                     )
                     try:
-                        await client._on_login(
-                            (
-                                await client.invoke(
-                                    CheckPassword(
-                                        compute_check(password, _2fa.strip())
-                                    )
-                                )
-                            ).user
-                        )
-                    except PasswordHashInvalid:
+                        await client.check_password(_2fa)
+                    except BadRequest:
                         print("\033[0;91mInvalid 2FA password!\033[0m")
                     except FloodWait as e:
                         seconds, minutes, hours = (
-                            e.seconds % 3600 % 60,
-                            e.seconds % 3600 // 60,
-                            e.seconds // 3600,
+                            e.value % 3600 % 60,
+                            e.value % 3600 // 60,
+                            e.value // 3600,
                         )
                         seconds, minutes, hours = (
                             f"{seconds} second(-s)",
@@ -803,7 +794,7 @@ class Heroku:
                     patcher.patch(client, session)
 
                 await client.connect()
-                client.phone = "None"
+                client.phone_number = "None"
 
                 self.clients += [client]
             except sqlite3.OperationalError:
@@ -931,29 +922,28 @@ class Heroku:
         client.dispatcher = dispatcher
         modules.check_security = dispatcher.check_security
 
-        client.add_event_handler(
-            dispatcher.handle_incoming,
-            events.NewMessage,
+        client.add_handler(
+            handlers.MessageHandler(dispatcher.handle_incoming),
         )
 
-        client.add_event_handler(
+        client.add_handler(
             dispatcher.handle_incoming,
             events.ChatAction,
         )
 
-        client.add_event_handler(
-            dispatcher.handle_command,
-            events.NewMessage(forwards=False),
+        client.add_handler(
+            handlers.MessageHandler(
+                dispatcher.handle_command,
+                filters=~filters.forwarded
+            )
         )
 
-        client.add_event_handler(
-            dispatcher.handle_command,
-            events.MessageEdited(),
+        client.add_handler(
+            handlers.EditedMessageHandler(dispatcher.handle_command),
         )
 
-        client.add_event_handler(
-            dispatcher.handle_raw,
-            events.Raw(),
+        client.add_handler(
+            handlers.RawUpdateHandler(dispatcher.handle_raw),
         )
 
     async def amain(self, first: bool, client: CustomTelegramClient):

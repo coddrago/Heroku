@@ -139,7 +139,7 @@ class HSearch(loader.Module):
         async with client.conversation("@FHeta_robot") as conv:
             await conv.send_message('/token')
             resp = await conv.get_response(timeout=5)
-            self.token = resp.text.strip()
+            self.token = resp.text.html.strip()
 
         asyncio.create_task(self._sync_loop())
         asyncio.create_task(self._certifi_loop())

@@ -345,9 +345,9 @@ class Web:
     @staticmethod
     def _render_fw_error(e: FloodWait) -> str:
         seconds, minutes, hours = (
-            e.seconds % 3600 % 60,
-            e.seconds % 3600 // 60,
-            e.seconds // 3600,
+            e.value % 3600 % 60,
+            e.value % 3600 // 60,
+            e.value // 3600,
         )
         seconds, minutes, hours = (
             f"{seconds} second(-s)",

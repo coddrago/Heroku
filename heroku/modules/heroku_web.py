@@ -176,7 +176,7 @@ class HerokuWebMod(loader.Module):
                 )
                 return
         
-            if "force_insecure" in message.text.lower():
+            if "force_insecure" in message.text.html.lower():
                 await self._inline_login(message, user)
         
             try:
@@ -262,7 +262,7 @@ class HerokuWebMod(loader.Module):
         except FloodWait as e:
             await utils.answer(
                 call,
-                self.strings("floodwait_error").format(e.seconds),
+                self.strings("floodwait_error").format(e.value),
                 reply_markup={"text": self.strings("btn_no"), "action": "close"},
             )
             return
@@ -334,7 +334,7 @@ class HerokuWebMod(loader.Module):
         except FloodWait as e:
             await utils.answer(
                 call,
-                self.strings("floodwait_error").format(e.seconds),
+                self.strings("floodwait_error").format(e.value),
                 reply_markup={"text": self.strings("btn_no"), "action": "close"},
             )
             return
@@ -366,7 +366,7 @@ class HerokuWebMod(loader.Module):
         except FloodWait as e:
             await utils.answer(
                 call,
-                self.strings("floodwait_error").format(e.seconds),
+                self.strings("floodwait_error").format(e.value),
                 reply_markup={"text": self.strings("btn_no"), "action": "close"},
             )
             return

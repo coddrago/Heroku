@@ -42,7 +42,7 @@ import typing
 import requests
 from pyrogram import events
 from pyrogram.errors import FloodWait, RPCError
-from herokutl.tl.types import Message
+from pyrogram.types import ChatEvent, ChatEventFilter, Message
 
 from . import main, security, utils
 from .database import Database
@@ -194,9 +194,9 @@ class CommandDispatcher:
 
     def _handle_grep(self, message: Message) -> Message:
         # Allow escaping grep with double stick
-        if "||grep" in message.text or "|| grep" in message.text:
+        if "||grep" in message.text.html or "|| grep" in message.text.html:
             message.raw_text = re.sub(r"\|\| ?grep", "| grep", message.raw_text)
-            message.text = re.sub(r"\|\| ?grep", "| grep", message.text)
+            message.text.html = re.sub(r"\|\| ?grep", "| grep", message.text.html)
             message.message = re.sub(r"\|\| ?grep", "| grep", message.message)
             return message
 
@@ -407,13 +407,13 @@ class CommandDispatcher:
             return False
 
         if message.is_channel and message.edit_date and not message.is_group:
-            async for event in self._client.iter_admin_log(
+            async for event in self._client.get_chat_event_log(
                 chat_id,
                 limit=10,
-                edit=True,
+                filters=ChatEventFilter(edited_messages=True),
             ):
-                if event.action.prev_message.id == message.id:
-                    if event.user_id != self._client.tg_id:
+                if event.old_message.id == message.id:
+                    if event.user.id != self._client.tg_id:
                         logger.debug("Ignoring edit in channel")
                         return False
 
@@ -472,9 +472,9 @@ class CommandDispatcher:
         logger.exception("Command failed", extra={"stack": inspect.stack()})
         if isinstance(exc, RPCError):
             if isinstance(exc, FloodWait):
-                hours = exc.seconds // 3600
-                minutes = (exc.seconds % 3600) // 60
-                seconds = exc.seconds % 60
+                hours = exc.value // 3600
+                minutes = (exc.value % 3600) // 60
+                seconds = exc.value % 60
                 hours = f"{hours} hours, " if hours else ""
                 minutes = f"{minutes} minutes, " if minutes else ""
                 seconds = f"{seconds} seconds" if seconds else ""

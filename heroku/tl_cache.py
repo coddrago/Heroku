@@ -10,24 +10,25 @@
 # You can redistribute it and/or modify it under the terms of the GNU AGPLv3
 # 🔑 https://www.gnu.org/licenses/agpl-3.0.html
 
+import asyncio
 import copy
 import inspect
 import logging
+import sys
 import time
 import typing
 
 from pyrogram.client import Client as TelegramClient
 # from herokutl.client import TelegramClient
 from pyrogram import __name__ as __base_name__
-from pyrogram import helpers
 from pyrogram._updates import ChannelState, Entity, EntityType, SessionState
 from pyrogram.errors import RPCError
 from pyrogram.errors import TopicDeleted
 from pyrogram.network import MTProtoSender
 from pyrogram.raw import functions
 from pyrogram.raw.all import layer as LAYER
-from pyrogram.raw.functions.channels import GetFullChannelRequest
-from pyrogram.raw.functions.users import GetFullUserRequest
+from pyrogram.raw.functions.channels import GetFullChannel
+from pyrogram.raw.functions.users import GetFullUser
 from pyrogram.tl.tlobject import TLRequest
 from pyrogram.raw.types import (
     ChannelFull,
@@ -35,6 +36,7 @@ from pyrogram.raw.types import (
     Updates,
     UpdatesCombined,
     UpdateShort,
+    User,
     UserFull,
 )
 from pyrogram.utils import is_list_like
@@ -66,6 +68,15 @@ def hashable(value: typing.Any) -> bool:
         return False
 
     return True
+
+def get_running_loop():
+    if sys.version_info >= (3, 7):
+        try:
+            return asyncio.get_running_loop()
+        except RuntimeError:
+            return asyncio.get_event_loop_policy().get_event_loop()
+    else:
+        return asyncio.get_event_loop()
 
 
 class CustomTelegramClient(TelegramClient):
@@ -102,8 +113,8 @@ class CustomTelegramClient(TelegramClient):
         ] = None
         self.tg_id = 0
         self._tg_id = 0
-        self.hikka_me = UserFull
-        self.heroku_me = UserFull
+        self.hikka_me = User
+        self.heroku_me = User
 
     async def connect(self, unix_socket_path: typing.Optional[str] = None):
         if self.session is None:
@@ -112,8 +123,8 @@ class CustomTelegramClient(TelegramClient):
             )
 
         if self._loop is None:
-            self._loop = helpers.get_running_loop()
-        elif self._loop != helpers.get_running_loop():
+            self._loop = get_running_loop()
+        elif self._loop != get_running_loop():
             raise RuntimeError(
                 "The asyncio event loop must not change after connection (see the FAQ"
                 " for details)"
@@ -124,7 +135,7 @@ class CustomTelegramClient(TelegramClient):
             self.session.port,
             self.session.dc_id,
             loggers=self._log,
-            proxy=self._proxy,
+            proxy=self.proxy,
             local_addr=self._local_addr,
         )
 
@@ -174,13 +185,13 @@ class CustomTelegramClient(TelegramClient):
                         )
                     )
 
-        self._init_request.query = functions.help.GetConfigRequest()
+        self._init_request.query = functions.help.GetConfig()
 
         req = self._init_request
         if self._no_updates:
-            req = functions.InvokeWithoutUpdatesRequest(req)
+            req = functions.InvokeWithoutUpdates(req)
 
-        await self._sender.send(functions.InvokeWithLayerRequest(LAYER, req))
+        await self._sender.send(functions.InvokeWithLayer(LAYER, req))
 
         if self._message_box.is_empty():
             me = await self.get_me()
