@@ -1,0 +1,8 @@
+{
+  "typeCheckingMode": "off",
+  "analysis": {
+    "diagnosticMode": "workspace"
+  },
+  // "reportUnknownMemberType": "warning",
+  "reportAttributeAccessIssue": "warning"
+}
