@@ -12,6 +12,7 @@
 
 import re
 import string
+import random
 
 from pyrogram.errors import YouBlockedUser
 from pyrogram.tl.functions.contacts import UnblockRequest
@@ -89,9 +90,15 @@ class InlineStuff(loader.Module):
     @loader.command()
     async def ch_heroku_bot(self, message: Message):
         args = utils.get_args_raw(message).strip("@")
+
+        if not args:
+            from .. import main
+            uid = utils.rand(7)
+            genran = "".join(random.choice(main.LATIN_MOCK))
+            args = f"{genran}_{uid}_bot"
+
         if (
-            not args
-            or not args.lower().endswith("bot")
+            not args.lower().endswith("bot")
             or len(args) <= 4
             or any(
                 litera not in (string.ascii_letters + string.digits + "_")

@@ -15,12 +15,15 @@ import typing
 
 from .types import InlineUnit
 
+if typing.TYPE_CHECKING:
+    from ..inline.core import InlineManager
+
 logger = logging.getLogger(__name__)
 
 
 class BotPM(InlineUnit):
     def set_fsm_state(
-        self,
+        self: "InlineManager",
         user: typing.Union[str, int],
         state: typing.Union[str, bool],
     ) -> bool:
@@ -60,7 +63,7 @@ class BotPM(InlineUnit):
 
     ss = set_fsm_state
 
-    def get_fsm_state(self, user: typing.Union[str, int]) -> typing.Union[bool, str]:
+    def get_fsm_state(self: "InlineManager", user: typing.Union[str, int]) -> typing.Union[bool, str]:
         """
         Get FSM state for user
         :param user: user id

@@ -41,6 +41,9 @@ from .. import main, utils
 from ..types import HerokuReplyMarkup
 from .types import InlineMessage, InlineUnit
 
+if typing.TYPE_CHECKING:
+    from ..inline.core import InlineManager
+
 logger = logging.getLogger(__name__)
 
 VERIFICATION_EMOJIES = list(
@@ -65,7 +68,7 @@ class Placeholder:
 
 class Form(InlineUnit):
     async def form(
-        self,
+        self: "InlineManager",
         text: str,
         message: typing.Union[Message, int],
         reply_markup: typing.Optional[HerokuReplyMarkup] = None,
@@ -389,7 +392,7 @@ class Form(InlineUnit):
 
         return msg
 
-    async def _form_inline_handler(self, inline_query: InlineQuery):
+    async def _form_inline_handler(self: "InlineManager", inline_query: InlineQuery):
         try:
             query = inline_query.query.split()[0]
         except IndexError:

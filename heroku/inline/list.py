@@ -35,12 +35,15 @@ from .. import main, utils
 from ..types import HerokuReplyMarkup
 from .types import InlineMessage, InlineUnit
 
+if typing.TYPE_CHECKING:
+    from ..inline.core import InlineManager
+
 logger = logging.getLogger(__name__)
 
 
 class List(InlineUnit):
     async def list(
-        self,
+        self: "InlineManager",
         message: typing.Union[Message, int],
         strings: typing.List[str],
         *,
@@ -249,7 +252,7 @@ class List(InlineUnit):
         return InlineMessage(self, unit_id, self._units[unit_id]["inline_message_id"])
 
     async def _list_page(
-        self,
+        self: "InlineManager",
         call: CallbackQuery,
         page: typing.Union[int, str],
         unit_id: str = None,
@@ -287,7 +290,7 @@ class List(InlineUnit):
             await call.answer("Error occurred", show_alert=True)
             return
 
-    def _list_markup(self, unit_id: str) -> InlineKeyboardMarkup:
+    def _list_markup(self: "InlineManager", unit_id: str) -> InlineKeyboardMarkup:
         """Generates aiogram markup for `list`"""
         callback = functools.partial(self._list_page, unit_id=unit_id)
         return self.generate_markup(
@@ -300,7 +303,7 @@ class List(InlineUnit):
             + [[{"text": "🔻 Close", "callback": callback, "args": ("close",)}]],
         )
 
-    async def _list_inline_handler(self, inline_query: InlineQuery):
+    async def _list_inline_handler(self: "InlineManager", inline_query: InlineQuery):
         for unit in self._units.copy().values():
             if (
                 inline_query.from_user.id == self._me

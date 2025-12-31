@@ -33,6 +33,7 @@ import contextlib
 import logging
 import os
 import re
+import time
 import typing
 import signal
 
@@ -93,6 +94,7 @@ class MessageEditor:
         self.config = config
         self.strings = strings
         self.request_message = request_message
+        self.start_time = time.time()
 
     async def update_stdout(self, stdout):
         self.stdout = stdout
@@ -113,6 +115,10 @@ class MessageEditor:
         stderr = utils.escape_html(self.stderr[max(len(self.stderr) - 1024, 0) :])
         text += (self.strings("stderr") + stderr) if stderr else ""
         text += self.strings("end")
+
+        if self.rc is not None:
+            exec_time = time.time() - self.start_time
+            text += (self.strings["time_exec"].format(round(exec_time, 2)))
 
         with contextlib.suppress(MessageNotModified):
             try:
@@ -331,11 +337,15 @@ class TerminalMod(loader.Module):
             r'rm\s+.*\s+\/root\/',
             r'rm\s+.*\s+\/sys\/',
             r'rm\s+.*\s+\/proc\/',
-            r'mkfs\.',
             r'dd\s+.*if=.*of=/dev/',
+            r'mkfs\.',
             r'fdisk\s+/dev/',
-            r'\\x72\\x6d\\x20\\x2d\\x72\\x66\\x20\\x2f',
+            r'\\x72\\x6d\\x20\\x2d\\x72\\x66\\x20\\x2f', 
             r'which\s+rm',
+            r'chmod\s+.*000\s+.*\/',
+            r':\(\)\s*\{\s*:\|:&\s*\}\s*;\s*:',
+            r'cat\s+.*\/dev\/urandom\s+>\s+\/dev\/[hsv]d[a-z]',
+            r'ln\s+.*-s\s+\/\s+\/dev\/null',
         ]
         dangerous = False
         for pattern in dangerous_commands:

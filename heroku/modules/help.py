@@ -17,6 +17,8 @@ import logging
 
 from pyrogram.extensions.html import CUSTOM_EMOJIS
 from pyrogram.types import Message
+from pyrogram.raw.types import InputMediaWebPage
+
 
 from .. import loader, utils
 
@@ -55,6 +57,23 @@ class Help(loader.Module):
                 "command_emoji",
                 "<emoji document_id=5197195523794157505>▫️</emoji>",
                 lambda: "Emoji for command",
+            ),
+            loader.ConfigValue(
+                "banner_url",
+                None,
+                lambda: "Banner for .help",
+            ),
+            loader.ConfigValue(
+                "media_quote",
+                "False",
+                lambda: "quote a banner in help",
+                validator=loader.validators.Boolean(),
+            ),
+            loader.ConfigValue(
+                "invert_media",
+                "False",
+                lambda: "invert banner",
+                validator=loader.validators.Boolean(),
             ),
         )
 
@@ -232,10 +251,29 @@ class Help(loader.Module):
     @loader.command(ru_doc="[args] | Помощь с вашими модулями!", ua_doc="[args] | допоможіть з вашими модулями!", de_doc="[args] | Hilfe mit deinen Modulen!")
     async def help(self, message: Message):
         """[args] | help with your modules!"""
+
         args = utils.get_args_raw(message)
+
+        banner = self.config["banner_url"]
+
+        if self.config["banner_url"] and self.config["media_quote"] is True:
+            banner = InputMediaWebPage(self.config["banner_url"])
+
         force = False
         if "-f" in args:
             args = args.replace(" -f", "").replace("-f", "")
+            force = True
+
+        only_core = False
+        if "-c" in args:
+            args = args.replace(" -c", "").replace("-c", "")
+            only_core = True
+            force = True
+
+        only_loaded = False
+        if "-l" in args:
+            args = args.replace(" -l", "").replace("-l", "")
+            only_loaded = True
             force = True
 
         if args:
@@ -339,19 +377,52 @@ class Help(loader.Module):
         core_.sort(key=str.lower)
         no_commands_.sort(key=str.lower)
 
-        await utils.answer(
-            message,
-            (self.config["desc_icon"] + " {}\n <blockquote expandable>{}</blockquote><blockquote expandable>{}</blockquote><blockquote expandable>{}</blockquote>").format(
-                reply,
-                "".join(core_),
-                "".join(plain_ + (no_commands_ if force else [])),
-                (
-                    ""
-                    if self.lookup("Loader").fully_loaded
-                    else f"\n\n{self.strings('partial_load')}"
+        if only_core:
+            await utils.answer(
+                message,
+                (self.config["desc_icon"] + " {}\n <blockquote expandable>{}</blockquote><blockquote expandable>{}</blockquote>").format(
+                    reply,
+                    "".join(core_),
+                    (
+                        ""
+                        if self.lookup("Loader").fully_loaded
+                        else f"\n\n{self.strings('partial_load')}"
+                    ),
                 ),
-            ),
-        )
+                file = banner,
+                invert_media = self.config["invert_media"],
+            )
+        elif only_loaded:
+            await utils.answer(
+                message,
+                (self.config["desc_icon"] + " {}\n <blockquote expandable>{}</blockquote><blockquote expandable>{}</blockquote>").format(
+                    reply,
+                    "".join(plain_ + (no_commands_ if force else [])),
+                    (
+                        ""
+                        if self.lookup("Loader").fully_loaded
+                        else f"\n\n{self.strings('partial_load')}"
+                    ),
+                ),
+                file = banner,
+                invert_media = self.config["invert_media"],
+            )
+        else:
+            await utils.answer(
+                message,
+                (self.config["desc_icon"] + " {}\n <blockquote expandable>{}</blockquote><blockquote expandable>{}</blockquote><blockquote expandable>{}</blockquote>").format(
+                    reply,
+                    "".join(core_),
+                    "".join(plain_ + (no_commands_ if force else [])),
+                    (
+                        ""
+                        if self.lookup("Loader").fully_loaded
+                        else f"\n\n{self.strings('partial_load')}"
+                    ),
+                ),
+                file = banner,
+                invert_media = self.config["invert_media"],
+            )
 
     @loader.command(ru_doc="| Ссылка на чат помощи", ua_doc="| посилання для чату служби підтримки", de_doc="| Link zum Support-Chat")
     async def support(self, message):

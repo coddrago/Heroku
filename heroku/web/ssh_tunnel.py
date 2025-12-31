@@ -98,7 +98,7 @@ class SSHTunnel():
                         await asyncio.sleep(2)
                     else:
                         logger.info("Exiting SSH Tunnel attempts after disconnect.")
-                        return
+                        
             self._all_commands_failed = True
         finally:
             if self._tunnel_url is None and self._all_commands_failed:

@@ -31,11 +31,14 @@ from aiogram.types import Message as AiogramMessage
 from .. import utils
 from .types import BotInlineCall, InlineCall, InlineQuery, InlineUnit
 
+if typing.TYPE_CHECKING:
+    from ..inline.core import InlineManager
+
 logger = logging.getLogger(__name__)
 
 
 class Events(InlineUnit):
-    async def _message_handler(self, message: AiogramMessage):
+    async def _message_handler(self: "InlineManager", message: AiogramMessage):
         """Processes incoming messages"""
         if message.chat.type != "private" or message.text == "/start heroku init":
             return
@@ -53,7 +56,7 @@ class Events(InlineUnit):
             except Exception:
                 logger.exception("Error on running aiogram watcher!")
 
-    async def _inline_handler(self, inline_query: AiogramInlineQuery):
+    async def _inline_handler(self: "InlineManager", inline_query: AiogramInlineQuery):
         """Inline query handler (forms' calls)"""
         if not (query := inline_query.query):
             await self._query_help(inline_query)
@@ -211,7 +214,7 @@ class Events(InlineUnit):
         await self._list_inline_handler(inline_query)
 
     async def _callback_query_handler(
-        self,
+        self: "InlineManager",
         call: CallbackQuery,
         reply_markup: typing.Optional[
             typing.List[typing.List[typing.Dict[str, typing.Any]]]
@@ -346,7 +349,7 @@ class Events(InlineUnit):
             return
 
     async def _chosen_inline_handler(
-        self,
+        self: "InlineManager",
         chosen_inline_query: ChosenInlineResult,
     ):
         query = chosen_inline_query.query
@@ -390,7 +393,7 @@ class Events(InlineUnit):
                         )
                         return
 
-    async def _query_help(self, inline_query: InlineQuery):
+    async def _query_help(self: "InlineManager", inline_query: InlineQuery):
         _help = []
         for name, fun in self._allmodules.inline_handlers.items():
             if not await self.check_inline_security(

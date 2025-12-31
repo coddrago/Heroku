@@ -20,12 +20,15 @@ from aiogram.types import InlineQuery, InlineQueryResultArticle, InputTextMessag
 from .. import utils
 from .types import InlineUnit
 
+if typing.TYPE_CHECKING:
+    from ..inline.core import InlineManager
+
 logger = logging.getLogger(__name__)
 
 
 class QueryGallery(InlineUnit):
     async def query_gallery(
-        self,
+        self: "InlineManager",
         query: InlineQuery,
         items: typing.List[typing.Dict[str, typing.Any]],
         *,

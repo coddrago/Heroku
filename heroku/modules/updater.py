@@ -25,11 +25,11 @@ import typing
 import git
 from git import GitCommandError, Repo
 from pyrogram.extensions.html import CUSTOM_EMOJIS
-from pyrogram.tl.functions.messages import (
-    GetDialogFiltersRequest,
-    UpdateDialogFilterRequest,
+from pyrogram.raw.functions.messages import (
+    GetDialogFilters,
+    UpdateDialogFilter,
 )
-from pyrogram.types import DialogFilter, TextWithEntities, Message
+from pyrogram.raw.types import DialogFilter, TextWithEntities, Message
 
 from .. import loader, main, utils, version
 from .._internal import restart
@@ -70,14 +70,12 @@ class UpdaterMod(loader.Module):
         self.set("autoupdate", True)
         if not state:
             self.config["autoupdate"] = False
-            await self.inline.bot(call.answer(self.strings("autoupdate_off").format(prefix=self.get_prefix()), show_alert=True))
-            await call.delete()
+            await self.inline.bot(call.answer(self.strings("autoupdate_off").format(prefix=self.get_prefix())))
             return
         
         self.config["autoupdate"] = True
 
-        await self.inline.bot(call.answer(self.strings("autoupdate_on"), show_alert=True))
-        await call.delete()
+        await self.inline.bot(call.answer(self.strings("autoupdate_on")))
 
     def get_changelog(self) -> str:
         try:
@@ -111,6 +109,30 @@ class UpdaterMod(loader.Module):
             ).hexsha
         except Exception:
             return ""
+
+    @loader.loop(interval=60, autostart=True)
+    async def poller_announcement(self):
+        async with aiohttp.ClientSession() as session:
+            try:
+                url = "https://api.github.com/repos/coddrago/assets/contents/heroku/announcment.txt"
+                r = await session.get(
+                    url,
+                    timeout=aiohttp.ClientTimeout(total=10),
+                    headers={"Accept": "application/vnd.github.v3.raw"}
+                )
+
+                if r.status == 200:
+                    announcement = (await r.text()).strip()
+                    previous = self.get("announcement", "")
+                    if announcement and announcement != previous:
+                        await self.inline.bot.send_message(
+                            self.tg_id,
+                            self.strings("announcement").format(announcement)
+                        )
+                        self.set("announcement", announcement)
+            except Exception:
+                pass
+            
 
     @loader.loop(interval=60, autostart=True)
     async def poller(self):
@@ -419,18 +441,16 @@ class UpdaterMod(loader.Module):
             if "LAVHOST" in os.environ:
                 msg_obj = await utils.answer(
                     msg_obj,
-                    self.strings("lavhost_update").format(
-                        "</b><emoji document_id=5192756799647785066>✌️</emoji><emoji"
-                        " document_id=5193117564015747203>✌️</emoji><emoji"
-                        " document_id=5195050806105087456>✌️</emoji><emoji"
-                        " document_id=5195457642587233944>✌️</emoji><b>"
+                    self.strings("restarting_caption").format(
+                        utils.get_platform_emoji()
                         if self._client.heroku_me.premium
                         and CUSTOM_EMOJIS
                         and isinstance(msg_obj, Message)
-                        else "lavHost"
+                        else "Heroku"
                     ),
                 )
                 await self.process_restart_message(msg_obj)
+                self.set("restart_ts", time.time())
                 await self.client.send_message("lavhostbot", "/update")
                 return
 
@@ -515,10 +535,7 @@ class UpdaterMod(loader.Module):
             )
 
     async def _add_folder(self):
-        folders = await self._client.invoke(GetDialogFiltersRequest())
-
-        if any(getattr(folder, "title", None) == "Heroku" for folder in folders.filters):
-            return
+        folders = await self._client.invoke(GetDialogFilters())
 
         try:
             folder_id = (
@@ -530,80 +547,85 @@ class UpdaterMod(loader.Module):
             )
         except ValueError:
             folder_id = 2
+        
+        folders = await self._client.invoke(GetDialogFilters())
+        filters = getattr(folders, 'filters', folders)
+        heroku_f = False
 
-        try:
-            await self._client.invoke(
-                UpdateDialogFilterRequest(
-                    folder_id,
-                    DialogFilter(
+        if filters:
+
+            for folder in filters:
+                title = getattr(folder, "title", None)
+        
+                if title:
+                    raw_title = getattr(title, "text", title)
+                    
+                    if str(raw_title).strip() == "Heroku":
+                        heroku_f = True
+
+        if heroku_f is True:
+            return
+        else:
+            try:
+                await self._client.invoke(
+                    UpdateDialogFilter(
                         folder_id,
-                        title=TextWithEntities(
-                            text='Heroku',
-                            entities=[]
-                        ),
-                        pinned_peers=(
-                            [
-                                await self._client.get_input_entity(
-                                    self._client.loader.inline.bot_id
+                        DialogFilter(
+                            folder_id,
+                            title=TextWithEntities(
+                                text='Heroku',
+                                entities=[]
+                            ),
+                            pinned_peers=(
+                                [
+                                    await self._client.get_input_entity(
+                                        self._client.loader.inline.bot_id
+                                    )
+                                ]
+                                if self._client.loader.inline.init_complete
+                                else []
+                            ),
+                            include_peers=[
+                                await self._client.get_input_entity(dialog.entity)
+                                async for dialog in self._client.iter_dialogs(
+                                    None,
+                                    ignore_migrated=True,
                                 )
-                            ]
-                            if self._client.loader.inline.init_complete
-                            else []
+                                if "heroku" in dialog.name or "Heroku" in dialog.name
+                                and dialog.is_channel
+                                or (
+                                    self._client.loader.inline.init_complete
+                                    and dialog.entity.id
+                                    == self._client.loader.inline.bot_id
+                                )
+                                or dialog.entity.id
+                                in [
+                                    2445389036,
+                                    2341345589,
+                                    2410964167,
+                                ]  # official heroku chats
+                            ],
+                            emoticon="🐱",
+                            exclude_peers=[],
+                            contacts=False,
+                            non_contacts=False,
+                            groups=False,
+                            broadcasts=False,
+                            bots=False,
+                            exclude_muted=False,
+                            exclude_read=False,
+                            exclude_archived=False,
                         ),
-                        include_peers=[
-                            await self._client.get_input_entity(dialog.entity)
-                            async for dialog in self._client.iter_dialogs(
-                                None,
-                                ignore_migrated=True,
-                            )
-                            if dialog.name
-                            in {
-                                "heroku-logs",
-                                "heroku-onload",
-                                "heroku-assets",
-                                "heroku-backups",
-                                "heroku-acc-switcher",
-                                "silent-tags",
-                            }
-                            and dialog.is_channel
-                            and (
-                                dialog.entity.participants_count == 1
-                                or dialog.entity.participants_count == 2
-                                and dialog.name in {"heroku-logs", "silent-tags"}
-                            )
-                            or (
-                                self._client.loader.inline.init_complete
-                                and dialog.entity.id
-                                == self._client.loader.inline.bot_id
-                            )
-                            or dialog.entity.id
-                            in [
-                                2445389036,
-                                2341345589,
-                                2410964167,
-                            ]  # official heroku chats
-                        ],
-                        emoticon="🐱",
-                        exclude_peers=[],
-                        contacts=False,
-                        non_contacts=False,
-                        groups=False,
-                        broadcasts=False,
-                        bots=False,
-                        exclude_muted=False,
-                        exclude_read=False,
-                        exclude_archived=False,
-                    ),
+                    )
                 )
-            )
-        except Exception:
-            logger.critical(
-                "Can't create Heroku folder. Possible reasons are:\n"
-                "- User reached the limit of folders in Telegram\n"
-                "- User got floodwait\n"
-                "Ignoring error and adding folder addition to ignore list\n",
-                exc_info=True
-            )
+            except Exception:
+                logger.critical(
+                    "Can't create Heroku folder. Possible reasons are:\n"
+                    "- User reached the limit of folders in Telegram\n"
+                    "- User got floodwait\n"
+                    "Ignoring error and adding folder addition to ignore list\n",
+                    exc_info=True
+                )
 
     async def update_complete(self):
         logger.debug("Self update successful! Edit message")
@@ -694,7 +716,7 @@ class UpdaterMod(loader.Module):
         await self.restart_common(call)
 
     @loader.command()
-    async def stop(self, message: Message):
+    async def ubstop(self, message: Message):
         """| stops your userbot"""
 
         if "LAVHOST" in os.environ:

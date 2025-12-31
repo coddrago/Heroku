@@ -60,7 +60,7 @@ class HerokuWebMod(loader.Module):
                        "text": self.strings("web_btn"),
                        "url": await main.heroku.web.get_url(proxy_pass=False),
                     },
-                    photo="https://imgur.com/a/yOoHsa2.png",
+                    photo="https://raw.githubusercontent.com/coddrago/assets/refs/heads/main/heroku/web_interface.png",
                 )
                 return
 

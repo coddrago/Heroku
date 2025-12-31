@@ -39,6 +39,9 @@ from .. import main, utils
 from ..types import HerokuReplyMarkup
 from .types import InlineMessage, InlineUnit
 
+if typing.TYPE_CHECKING:
+    from ..inline.core import InlineManager
+
 logger = logging.getLogger(__name__)
 
 
@@ -57,7 +60,7 @@ class ListGalleryHelper:
 
 class Gallery(InlineUnit):
     async def gallery(
-        self,
+        self: "InlineManager",
         message: typing.Union[Message, int],
         next_handler: typing.Union[callable, typing.List[str]],
         caption: typing.Union[typing.List[str], str, callable] = "",
@@ -333,7 +336,7 @@ class Gallery(InlineUnit):
         return InlineMessage(self, unit_id, self._units[unit_id]["inline_message_id"])
 
     async def _call_photo(
-        self,
+        self: "InlineManager",
         callback: typing.Union[
             typing.Callable[[], typing.Awaitable[str]],
             typing.Callable[[], str],
@@ -371,7 +374,7 @@ class Gallery(InlineUnit):
 
         return photo_url
 
-    async def _load_gallery_photos(self, unit_id: str):
+    async def _load_gallery_photos(self: "InlineManager", unit_id: str):
         """Preloads photo. Should be called via ensure_future"""
         unit = self._units[unit_id]
 
@@ -389,7 +392,7 @@ class Gallery(InlineUnit):
             asyncio.ensure_future(self._load_gallery_photos(unit_id))
 
     async def _gallery_slideshow_loop(
-        self,
+        self: "InlineManager",
         call: CallbackQuery,
         unit_id: typing.Optional[str] = None,
     ):
@@ -415,7 +418,7 @@ class Gallery(InlineUnit):
             )
 
     async def _gallery_slideshow(
-        self,
+        self: "InlineManager",
         call: CallbackQuery,
         unit_id: typing.Optional[str] = None,
     ):
@@ -443,7 +446,7 @@ class Gallery(InlineUnit):
         )
 
     async def _gallery_back(
-        self,
+        self: "InlineManager",
         call: CallbackQuery,
         unit_id: typing.Optional[str] = None,
     ):
@@ -477,7 +480,7 @@ class Gallery(InlineUnit):
             return
 
     def _get_current_media(
-        self,
+        self: "InlineManager",
         unit_id: str,
     ) -> typing.Union[InputMediaPhoto, InputMediaAnimation]:
         """Return current media, which should be updated in gallery"""
@@ -508,7 +511,7 @@ class Gallery(InlineUnit):
         )
 
     async def _gallery_page(
-        self,
+        self: "InlineManager",
         call: CallbackQuery,
         page: typing.Union[int, str],
         unit_id: typing.Optional[str] = None,
@@ -574,7 +577,7 @@ class Gallery(InlineUnit):
             await call.answer("Error occurred", show_alert=True)
             return
 
-    def _get_next_photo(self, unit_id: str) -> str:
+    def _get_next_photo(self: "InlineManager", unit_id: str) -> str:
         """Returns next photo"""
         try:
             return self._units[unit_id]["photos"][self._units[unit_id]["current_index"]]
@@ -586,7 +589,7 @@ class Gallery(InlineUnit):
             )
             return self._units[unit_id]["photos"][0]
 
-    def _get_caption(self, unit_id: str, index: int = 0) -> str:
+    def _get_caption(self: "InlineManager", unit_id: str, index: int = 0) -> str:
         """Calls and returnes caption for gallery"""
         caption = self._units[unit_id].get("caption", "")
         if isinstance(caption, ListGalleryHelper):
@@ -600,7 +603,7 @@ class Gallery(InlineUnit):
             else ""
         )
 
-    def _gallery_markup(self, unit_id: str) -> InlineKeyboardMarkup:
+    def _gallery_markup(self: "InlineManager", unit_id: str) -> InlineKeyboardMarkup:
         """Generates aiogram markup for `gallery`"""
         callback = functools.partial(self._gallery_page, unit_id=unit_id)
         unit = self._units[unit_id]
@@ -665,7 +668,7 @@ class Gallery(InlineUnit):
             )
         )
 
-    async def _gallery_inline_handler(self, inline_query: InlineQuery):
+    async def _gallery_inline_handler(self: "InlineManager", inline_query: InlineQuery):
         for unit in self._units.copy().values():
             if (
                 inline_query.from_user.id == self._me

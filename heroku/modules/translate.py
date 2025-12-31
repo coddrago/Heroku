@@ -25,6 +25,15 @@ class Translator(loader.Module):
 
     strings = {"name": "Translator"}
 
+    def __init__(self):
+        self.config = loader.ModuleConfig(
+            loader.ConfigValue(
+                "only_text",
+                False,
+                "only translated text in .tr",
+                validator=loader.validators.Boolean(),
+            ))
+
     @loader.command()
     async def tr(self, message: Message):
         if not (args := utils.get_args_raw(message)):
@@ -52,16 +61,19 @@ class Translator(loader.Module):
             entities = []
 
         try:
-            await utils.answer(
-                message,
-                await self._client.translate(
-                    message.peer_id,
+            tr_text = await self._client.translate(message.peer_id, message, lang, raw_text=text, entities=entities)
+            if self.config["only_text"]:
+                await utils.answer(
                     message,
-                    lang,
-                    raw_text=text,
-                    entities=entities,
-                ),
-            )
+                    tr_text,
+                )
+
+            else:
+                await utils.answer(
+                    message,
+                    self.strings["translated_text"].format(tr_text = tr_text)
+                )
+
         except Exception:
             logger.exception("Unable to translate text")
             await utils.answer(message, self.strings("error"))

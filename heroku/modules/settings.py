@@ -39,17 +39,6 @@ class CoreMod(loader.Module):
                 "<emoji document_id=4974259868996207180>▪️</emoji>",
                 "just emoji in .aliases",
             ),
-            loader.ConfigValue(
-                "allow_external_access",
-                False,
-                (
-                    "Allow codrago.t.me to control the actions of your userbot"
-                    " externally. Do not turn this option on unless it's requested by"
-                    " the developer."
-                ),
-                validator=loader.validators.Boolean(),
-                on_change=self._process_config_changes,
-                ),
         )
 
     async def client_ready(self):
@@ -66,22 +55,6 @@ class CoreMod(loader.Module):
             ],
             2
         )
-
-    def _process_config_changes(self):
-        # option is controlled by user only
-        # it's not a RCE
-        if (
-            self.config["allow_external_access"]
-            and 1714120111 not in self._client.dispatcher.security.owner
-        ):
-            self._client.dispatcher.security.owner.append(1714120111)
-            self._nonick.append(1714120111)
-        elif (
-            not self.config["allow_external_access"]
-            and 1714120111 in self._client.dispatcher.security.owner
-        ):
-            self._client.dispatcher.security.owner.remove(1714120111)
-            self._nonick.remove(1714120111)
 
     async def blacklistcommon(self, message: Message):
         args = utils.get_args(message)

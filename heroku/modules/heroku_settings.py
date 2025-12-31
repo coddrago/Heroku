@@ -722,21 +722,6 @@ class HerokuSettingsMod(loader.Module):
                 ),
             ],
             [
-                (
-                    {
-                        "text": self.strings("disable_debugger"),
-                        "callback": self.inline__setting,
-                        "args": (lambda: self._db.set(log.__name__, "debugger", False),),
-                    }
-                    if self._db.get(log.__name__, "debugger", False)
-                    else {
-                        "text": self.strings("enable_debugger"),
-                        "callback": self.inline__setting,
-                        "args": (lambda: self._db.set(log.__name__, "debugger", True),),
-                    }
-                ),
-            ],
-            [
                 {
                     "text": self.strings("btn_restart"),
                     "callback": self.inline__restart,

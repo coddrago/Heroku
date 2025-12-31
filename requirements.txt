@@ -1,4 +1,25 @@
-heroku-tl-new==1.7.2
+https://github.com/KurimuzonAkuma/kurigram/archive/dev.zip
+pyaes
+aiofile==3.8.1
+aiofiles==24.1.0
+aiogram==3.23.0
+pydantic-core>=2.27.2 
+pydantic>=2.10.4
+gitpython==3.1.2
+meval==2.5
+aiohttp_jinja2==1.5
+aiohttp==3.11.18
+Jinja2==3.0.3
+requests==2.27.1
+grapheme==0.6.0
+emoji==2.1.0
+werkzeug==2.2.2
+psutil==6.0.0
+tgcrypto==1.2.5
+rsa==4.9
+ruamel.yaml==0.17.21
+bs4==0.0.2
+whoosh
 Pillow
 
 # Python 3.9+

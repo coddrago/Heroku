@@ -122,7 +122,8 @@ LATIN_MOCK = [
     "Tigris", "Trans", "Tribuo", "Tristis", "Ultimus",
     "Unitas", "Universus", "Uterque", "Valde", "Vates",
     "Veritas", "Verus", "Vester", "Via", "Victoria",
-    "Vita", "Vox", "Vultus", "Zephyrus"
+    "Vita", "Vox", "Vultus", "Zephyrus", "Hewoku", "Bimbalas", "Nywuctuu",
+    "Sodrago", "Anyone"
 ]
 # fmt: on
 
@@ -385,7 +386,12 @@ class Heroku:
             BASE_DIR = self.arguments.data_root
             BASE_PATH = Path(BASE_DIR)
             CONFIG_PATH = BASE_PATH / "config.json"
-        self.loop = asyncio.get_event_loop()
+        try:
+            self.loop = asyncio.get_running_loop()
+            
+        except RuntimeError:
+            self.loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(self.loop)
 
         self.clients = SuperList()
         self.ready = asyncio.Event()
@@ -860,6 +866,7 @@ class Heroku:
             build = utils.get_git_hash()
             diff = repo.git.log([f"HEAD..origin/{version.branch}", "--oneline"])
             upd = "Update required" if diff else "Up-to-date"
+            pref = client.heroku_db.get("heroku.main", "command_prefix", None)
 
             logo = (
                 "                          _           \n"
@@ -893,12 +900,13 @@ class Heroku:
                 caption=(
                     "🪐 <b>Heroku {} started!</b>\n\n⚙ <b>GitHub commit SHA: <a"
                     ' href="https://github.com/coddrago/Heroku/commit/{}">{}</a></b>\n🔎'
-                    " <b>Update status: {}</b>\n<b>{}</b>".format(
+                    " <b>Update status: {}</b>\n<b>{}</b>\n🕶 <b>Prefix:</b> <code>{}</code>".format(
                         ".".join(list(map(str, list(__version__)))),
                         build,
                         build[:7],
                         upd,
                         web_url,
+                        "." if pref is None else pref,
                     )
                 ),
             )

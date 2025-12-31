@@ -26,7 +26,6 @@ from aiogram.types import BufferedInputFile
 
 from .. import loader, utils
 from ..inline.types import InlineCall
-from ..web.debugger import WebDebugger
 
 logger = logging.getLogger(__name__)
 
@@ -154,12 +153,10 @@ class APIRatelimiterMod(loader.Module):
                         and not self._lock
                     ):
                         self._lock = True
-                        report_bytes = io.BytesIO(
-                            json.dumps(
-                                self._ratelimiter,
-                                indent=4,
-                            ).encode()
-                        )
+                        report_bytes = json.dumps(
+                            self._ratelimiter,
+                            indent=4,
+                        ).encode()
                         report = BufferedInputFile(report_bytes, "local_fw_report.json")
 
                         await self.inline.bot.send_document(
@@ -207,39 +204,6 @@ class APIRatelimiterMod(loader.Module):
             reply_markup=[
                 {"text": self.strings("btn_no"), "action": "close"},
                 {"text": self.strings("btn_yes"), "callback": self._finish},
-            ],
-        )
-
-    @property
-    def _debugger(self) -> WebDebugger:
-        return logging.getLogger().handlers[0].web_debugger
-
-    async def _show_pin(self, call: InlineCall):
-        self.inline.bot(await call.answer(f"Werkzeug PIN: {self._debugger.pin}", show_alert=True))
-
-    @loader.command()
-    async def debugger(self, message: Message):
-        if not self._debugger:
-            await utils.answer(message, self.strings("debugger_disabled"))
-            return
-
-        await self.inline.form(
-            message=message,
-            text=self.strings("web_pin"),
-            reply_markup=[
-                [
-                    {
-                        "text": self.strings("web_pin_btn"),
-                        "callback": self._show_pin,
-                    }
-                ],
-                [
-                    {"text": self.strings("proxied_url"), "url": self._debugger.url},
-                    {
-                        "text": self.strings("local_url"),
-                        "url": f"http://127.0.0.1:{self._debugger.port}",
-                    },
-                ],
             ],
         )
 
