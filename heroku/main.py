@@ -70,6 +70,8 @@ from herokutl.tl.functions.contacts import UnblockRequest
 from . import database, loader, utils, version
 from ._internal import print_banner, restart
 from .dispatcher import CommandDispatcher
+from .inline.utils import Utils as inutils
+from .inline.token_obtainment import TokenObtainment
 from .qr import QRCode
 from .secure import patcher
 from .tl_cache import CustomTelegramClient
@@ -620,33 +622,32 @@ class Heroku:
         client: CustomTelegramClient,
         username: str,
     ) -> bool:
-        async with client.conversation("@BotFather", exclusive=False) as conv:
+        url: str = (
+            await client(herokutl.functions.messages.RequestWebViewRequest(
+                peer="@botfather",
+                bot="@botfather",
+                platform="android",
+                from_bot_menu=False,
+                url="https://webappinternal.telegram.org/botfather?")
+            )
+        ).url
+        for _ in range(5):
+            await asyncio.sleep(1.5)
             try:
-                m = await conv.send_message("/token")
-            except YouBlockedUserError:
-                await client(UnblockRequest(id="@BotFather"))
-                m = await conv.send_message("/token")
+                result = await inutils._get_webapp_session(None, url)
+            except:
+                continue
+            break
+        else:
+            print("Can't check bot. WebApp is not available now")
+            return False
 
-            r = await conv.get_response()
+        session, _hash = result
+        main_url = url.split("?")[0]
 
-            await m.delete()
-            await r.delete()
+        if await TokenObtainment._check_bot(None, session, main_url, _hash, username):
+            return True
 
-            if not hasattr(r, "reply_markup") or not hasattr(r.reply_markup, "rows"):
-                return False
-
-            for row in r.reply_markup.rows:
-                for button in row.buttons:
-                    if username != button.text.strip("@"):
-                        continue
-
-                    m = await conv.send_message("/cancel")
-                    r = await conv.get_response()
-
-                    await m.delete()
-                    await r.delete()
-
-                    return True
         try:
             await client.get_entity(f"{username}")
         except:
@@ -916,7 +917,6 @@ class Heroku:
                     )
                 ),
             )
-
             logging.debug(
                 "· Started for %s · Prefix: «%s» ·",
                 client.tg_id,

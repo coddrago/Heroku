@@ -147,12 +147,12 @@ class TokenObtainment(InlineUnit):
         ids = None
         bot_id = None
             
-        username = self._db.get("heroku.inline", "custom_bot", False).strip("@")
+        username = self._db.get("heroku.inline", "custom_bot", False)
         if username:
-            ids = re.search(inutils.BOT_ID_PATTERN.format(username), content)
+            ids = re.search(inutils.BOT_ID_PATTERN.format(username.strip("@")), content)
             
         else:
-            ids = re.search(inutils.BOT_BASE_PATTERN, content)
+            ids = inutils.BOT_BASE_PATTERN.search(content)
             
         if ids:
             bot_id = ids.group(1)
@@ -265,7 +265,7 @@ class TokenObtainment(InlineUnit):
                 content = await resp.json()
             result = content.get("ok", False)
         return result
-        
+
     async def assert_token(
         self: "InlineManager",
         create_new_if_needed: bool = True,

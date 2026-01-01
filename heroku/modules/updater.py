@@ -114,7 +114,7 @@ class UpdaterMod(loader.Module):
     async def poller_announcement(self):
         async with aiohttp.ClientSession() as session:
             try:
-                url = "https://api.github.com/repos/.../?ref=master"
+                url = "https://api.github.com/repos/coddrago/assets/contents/heroku/announcment.txt"
                 r = await session.get(
                     url,
                     timeout=aiohttp.ClientTimeout(total=10),

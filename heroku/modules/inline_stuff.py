@@ -59,33 +59,14 @@ class InlineStuff(loader.Module):
         )
 
     async def _check_bot(self, username: str) -> bool:
-        async with self._client.conversation("@BotFather", exclusive=False) as conv:
-            try:
-                m = await conv.send_message("/token")
-            except YouBlockedUserError:
-                await self._client(UnblockRequest(id="@BotFather"))
-                m = await conv.send_message("/token")
+        if await self.inline.check_bot(username):
+            return True
 
-            r = await conv.get_response()
-
-            await m.delete()
-            await r.delete()
-
-            if not hasattr(r, "reply_markup") or not hasattr(r.reply_markup, "rows"):
-                return False
-
-            for row in r.reply_markup.rows:
-                for button in row.buttons:
-                    if username != button.text.strip("@"):
-                        continue
-
-                    m = await conv.send_message("/cancel")
-                    r = await conv.get_response()
-
-                    await m.delete()
-                    await r.delete()
-
-                    return True
+        try:
+            await self._client.get_entity(username)
+            return False
+        except:
+            return True
 
     @loader.command()
     async def ch_heroku_bot(self, message: Message):
