@@ -409,33 +409,30 @@ class Heroku:
             and self.arguments.proxy_port is not None
             and self.arguments.proxy_secret is not None
         ):
+            logging.warning("The use of MTProto proxies is not yet available")
+            self.proxy = None
+            return
             logging.debug(
                 "Using proxy: %s:%s",
                 self.arguments.proxy_host,
                 self.arguments.proxy_port,
             )
-            self.proxy, self.conn = (
+            self.proxy = (
                 (
                     self.arguments.proxy_host,
                     self.arguments.proxy_port,
                     self.arguments.proxy_secret,
-                ),
-                ConnectionTcpMTProxyRandomizedIntermediate,
+                )
             )
             return
 
-        self.proxy, self.conn = None, ConnectionTcpFull
+        self.proxy = None
 
     def _read_sessions(self):
         """Gets sessions from environment and data directory"""
-        self.sessions: list[SQLiteSession] = []
+        self.sessions: list[str] = []
         self.sessions += [
-            SQLiteSession(
-                os.path.join(
-                    BASE_DIR,
-                    session.rsplit(".session", maxsplit=1)[0],
-                )
-            )
+            session.rsplit(".session", maxsplit=1)[0]
             for session in filter(
                 lambda f: f.startswith("heroku-") or f.startswith("hikka-") and f.endswith(".session"),
                 os.listdir(BASE_DIR),
@@ -492,7 +489,6 @@ class Heroku:
             data_root=BASE_DIR,
             api_token=self.api_token,
             proxy=self.proxy,
-            connection=self.conn,
         )
 
     async def _get_token(self):
@@ -528,28 +524,12 @@ class Heroku:
             client.hikka_me = me
             client.heroku_me = me
 
-        session = SQLiteSession(
-            os.path.join(
-                BASE_DIR,
-                f"heroku-{telegram_id}",
-            )
-        )
-
-        session.set_dc(
-            client.session.dc_id,
-            client.session.server_address,
-            client.session.port,
-        )
-
-        session.auth_key = client.session.auth_key
-
-        session.save()
+        session = f"heroku-{telegram_id}"
 
         if not delay_restart:
             client.disconnect()
             restart()
 
-        client.session = session
         # Set db attribute to this client in order to save
         # custom bot nickname from web
         client.heroku_db = database.Database(client)
@@ -661,10 +641,9 @@ class Heroku:
 
         if not self.web:
             client = Client(
-                MemorySession(),
+                f"temp-session-{utils.rand(6)}",
                 self.api_token.ID,
                 self.api_token.HASH,
-                connection=self.conn,
                 proxy=self.proxy,
                 connection_retries=None,
                 device_model=get_app_name(),

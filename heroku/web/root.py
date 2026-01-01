@@ -65,7 +65,6 @@ class Web:
         self._ratelimit = {}
         self.api_token = kwargs.pop("api_token")
         self.data_root = kwargs.pop("data_root")
-        self.connection = kwargs.pop("connection")
         self.proxy = kwargs.pop("proxy")
 
         self.app.router.add_get("/", self.root)
@@ -295,10 +294,9 @@ class Web:
 
     def _get_client(self) -> CustomTelegramClient:
         return CustomTelegramClient(
-            MemorySession(),
+            f"temp-session-{utils.rand(6)}",
             self.api_token.ID,
             self.api_token.HASH,
-            connection=self.connection,
             proxy=self.proxy,
             connection_retries=None,
             device_model=main.get_app_name(),

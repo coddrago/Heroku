@@ -83,7 +83,7 @@ def get_running_loop():
         return asyncio.get_event_loop()
 
 
-class CustomTelegramClient(TelegramClient):
+class CustomTelegramClient(TelegramClient): # TODO: rewrite the cache specifically for Kurigram
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -281,7 +281,7 @@ class CustomTelegramClient(TelegramClient):
                     "Can't parse hashable from entity %s, using legacy resolve",
                     entity,
                 )
-                return await super().get_entity(entity)
+                return await super().resolve_peer(entity)
         else:
             hashable_entity = entity
 
@@ -304,7 +304,7 @@ class CustomTelegramClient(TelegramClient):
             )
             return copy.deepcopy(self._heroku_entity_cache[hashable_entity].entity)
 
-        resolved_entity = await super().get_entity(entity)
+        resolved_entity = await super().get_chat(entity)
 
         if resolved_entity:
             cache_record = CacheRecordEntity(hashable_entity, resolved_entity, exp)
