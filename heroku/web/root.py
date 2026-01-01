@@ -35,13 +35,16 @@ from pyrogram.errors import (
 )
 from pyrogram.password import compute_check
 from pyrogram.sessions import MemorySession
-from pyrogram.tl.functions.account import GetPasswordRequest
-from pyrogram.tl.functions.auth import CheckPasswordRequest
-from pyrogram.tl.functions.contacts import UnblockRequest
+from pyrogram.raw.functions.account import GetPassword
+from pyrogram.raw.functions.auth import CheckPassword
+from pyrogram.raw.functions.contacts import Unblock
+from pyrogram.raw.functions.messages.request_app_web_view import RequestAppWebView
 from pyrogram.utils import parse_phone
 
 from .. import database, main, utils
 from .._internal import restart
+from ..inline.utils import Utils as inutils
+from ..inline.token_obtainment import TokenObtainment
 from ..tl_cache import CustomTelegramClient
 from ..version import __version__
 
@@ -131,33 +134,32 @@ class Web:
         client: CustomTelegramClient,
         username: str,
     ) -> bool:
-        async with client.conversation("@BotFather", exclusive=False) as conv:
+        url: str = (
+            await client(RequestWebView(
+                peer="@botfather",
+                bot="@botfather",
+                platform="android",
+                from_bot_menu=False,
+                url="https://webappinternal.telegram.org/botfather?")
+            )
+        ).url
+
+        for _ in range(5):
+            await asyncio.sleep(1.5)
             try:
-                m = await conv.send_message("/token")
-            except YouBlockedUser:
-                await client.invoke(UnblockRequest(id="@BotFather"))
-                m = await conv.send_message("/token")
+                result = await inutils._get_webapp_session(None, url)
+            except:
+                continue
+            break
+        else:
+            print("Can't check bot. WebApp is not available now")
+            return False
 
-            r = await conv.get_response()
+        session, _hash = result
+        main_url = url.split("?")[0]
 
-            await m.delete()
-            await r.delete()
-
-            if not hasattr(r, "reply_markup") or not hasattr(r.reply_markup, "rows"):
-                return False
-
-            for row in r.reply_markup.rows:
-                for button in row.buttons:
-                    if username != button.text.strip("@"):
-                        continue
-
-                    m = await conv.send_message("/cancel")
-                    r = await conv.get_response()
-
-                    await m.delete()
-                    await r.delete()
-
-                    return True
+        if await TokenObtainment._check_bot(None, session, main_url, _hash, username):
+            return True
 
     async def custom_bot(self, request: web.Request) -> web.Response:
         if not self._check_session(request):

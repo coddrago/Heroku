@@ -815,7 +815,7 @@ class Utils(InlineUnit):
                 await session.close()
                 raise RuntimeError("Getting hash failed")
             text = await resp.text()
-            _hash = re.search(HASH_PATTERN, text)
+            _hash = HASH_PATTERN.search(text)
             if _hash:
                 _hash = _hash.group(1)
             else:
