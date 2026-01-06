@@ -31,6 +31,7 @@ SUPPORTED_LANGUAGES = {
     "en": "🇬🇧 English",
     "ru": "🇷🇺 Русский",
     "ua": "🇺🇦 Український",
+    "kk": "🇰🇿 Қазақша",
     "de": "🇩🇪 Deutsch",
     "jp": "🇯🇵 日本語",
     "fr": "🇫🇷 Français",
