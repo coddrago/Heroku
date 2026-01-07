@@ -38,7 +38,7 @@ from pyrogram.utils import get_display_name
 
 from . import main, utils
 from .database import Database
-from .tl_cache import CustomTelegramClient
+from .tl_cache import CustomClient
 from .types import Command
 
 if typing.TYPE_CHECKING:
@@ -173,7 +173,7 @@ def _sec(func: Command, flags: int) -> Command:
 class SecurityManager:
     """Manages command execution security policy"""
 
-    def __init__(self, client: CustomTelegramClient, db: Database):
+    def __init__(self, client: CustomClient, db: Database):
         self._client = client
         self._db = db
         self._cache: typing.Dict[int, dict] = {}

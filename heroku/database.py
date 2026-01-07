@@ -39,7 +39,7 @@ from .pointers import (
     PointerDict,
     PointerList,
 )
-from .tl_cache import CustomTelegramClient
+from .tl_cache import CustomClient
 from .types import JSONSerializable
 
 __all__ = [
@@ -60,9 +60,9 @@ class NoAssetsChannel(Exception):
 
 
 class Database(dict):
-    def __init__(self, client: CustomTelegramClient):
+    def __init__(self, client: CustomClient):
         super().__init__()
-        self._client: CustomTelegramClient = client
+        self._client: CustomClient = client
         self._next_revision_call: int = 0
         self._revisions: typing.List[dict] = []
         self._assets: int = None

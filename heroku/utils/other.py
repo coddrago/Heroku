@@ -23,7 +23,7 @@ from pyrogram.raw.types import (
     ChatAdminRights,
 )
 
-from ..tl_cache import CustomTelegramClient
+from ..tl_cache import CustomClient
 from ..types import ListLike
 
 if typing.TYPE_CHECKING:
@@ -44,7 +44,7 @@ def rand(size: int, /) -> str:
     )
 
 async def invite_inline_bot(
-    client: CustomTelegramClient,
+    client: CustomClient,
     peer: 'EntityLike',
 ) -> None:
     """

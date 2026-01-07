@@ -47,7 +47,7 @@ from pyrogram.types import ChatEvent, ChatEventFilter, Message
 from . import main, security, utils
 from .database import Database
 from .loader import Modules
-from .tl_cache import CustomTelegramClient
+from .tl_cache import CustomClient
 
 logger = logging.getLogger(__name__)
 
@@ -111,7 +111,7 @@ class CommandDispatcher:
     def __init__(
         self,
         modules: Modules,
-        client: CustomTelegramClient,
+        client: CustomClient,
         db: Database,
     ):
         self._modules = modules

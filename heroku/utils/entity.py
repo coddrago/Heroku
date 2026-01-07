@@ -61,7 +61,7 @@ from pyrogram.utils import get_raw_peer_id
 from .other import invite_inline_bot, run_sync
 
 from .._internal import fw_protect
-from ..tl_cache import CustomTelegramClient
+from ..tl_cache import CustomClient
 from ..types import Module
 
 FormattingEntity = typing.Union[
@@ -198,7 +198,7 @@ def get_link(user: typing.Union[User, Channel], /) -> str:
 
 
 async def asset_channel(
-    client: CustomTelegramClient,
+    client: CustomClient,
     title: str,
     description: str,
     *,
@@ -313,7 +313,7 @@ async def asset_channel(
     return peer, True
 
 async def set_avatar(
-    client: CustomTelegramClient,
+    client: CustomClient,
     peer: 'Entity',
     avatar: str,
 ) -> bool:
@@ -540,7 +540,7 @@ def find_caller(
     )
 
 async def dnd(
-    client: CustomTelegramClient,
+    client: CustomClient,
     peer: 'Entity',
     archive: bool = True,
 ) -> bool:

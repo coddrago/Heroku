@@ -22,7 +22,7 @@ import typing
 import requests
 
 from . import utils
-from .tl_cache import CustomTelegramClient
+from .tl_cache import CustomClient
 from .version import __version__
 
 logger = logging.getLogger(__name__)
@@ -99,7 +99,7 @@ class LocalStorage:
 
 
 class RemoteStorage:
-    def __init__(self, client: CustomTelegramClient):
+    def __init__(self, client: CustomClient):
         self._local_storage = LocalStorage()
         self._client = client
 

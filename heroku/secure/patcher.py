@@ -5,11 +5,11 @@ from pathlib import Path
 
 from pyrogram.sessions import SQLiteSession
 
-from ..tl_cache import CustomTelegramClient
+from ..tl_cache import CustomClient
 from .customtl import ConnectionTcpFull, MTProtoState
 
 
-def patch(client: CustomTelegramClient, session: SQLiteSession):
+def patch(client: CustomClient, session: SQLiteSession):
     session_id = re.findall(r"\d+", session.filename)[-1]
     client._sender._state = MTProtoState(session.auth_key, client._sender._loggers)
     client._connection = ConnectionTcpFull

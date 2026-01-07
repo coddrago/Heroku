@@ -47,7 +47,7 @@ class TokenObtainment(InlineUnit):
             username = self._db.get("heroku.inline", "custom_bot").strip("@")
             username = f"@{username}"
             try:
-                await self._client.get_entity(username)
+                await self._client.get_chat(username)
             except ValueError:
                 pass
             else:

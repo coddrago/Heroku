@@ -59,10 +59,6 @@ from pyrogram.errors import (
     SessionPasswordNeeded,
     YouBlockedUser,
 )
-from herokutl.network.connection import (
-    ConnectionTcpFull,
-    ConnectionTcpMTProxyRandomizedIntermediate,
-)
 from herokutl.sessions import MemorySession, SQLiteSession
 from pyrogram.raw.functions.account import GetPassword
 from pyrogram.raw.functions.auth import CheckPassword
@@ -75,7 +71,8 @@ from .inline.utils import Utils as inutils
 from .inline.token_obtainment import TokenObtainment
 from .qr import QRCode
 from .secure import patcher
-from .tl_cache import CustomTelegramClient
+from .types import SQLiteStringStorage
+from .tl_cache import CustomClient
 from .translations import Translator
 from .version import __version__
 
@@ -510,7 +507,8 @@ class Heroku:
 
     async def save_client_session(
         self,
-        client: CustomTelegramClient,
+        client: CustomClient,
+        init_kwargs: dict,
         *,
         delay_restart: bool = False,
     ):
@@ -527,6 +525,18 @@ class Heroku:
             client.heroku_me = me
 
         session = f"heroku-{telegram_id}"
+        session_str = await client.storage.auth_key()
+
+        cli = CustomClient(
+            session,
+            self.api_token.ID,
+            self.api_token.HASH,
+            **init_kwargs
+        )
+
+        storage = SQLiteStringStorage(cli)
+        await storage.import_session_string(session_str)
+        cli.storage = storage
 
         if not delay_restart:
             client.disconnect()
@@ -563,7 +573,7 @@ class Heroku:
 
         return False
 
-    async def _phone_login(self, client: CustomTelegramClient) -> bool:
+    async def _phone_login(self, client: CustomClient) -> bool:
         # phone = input(
         #     "\033[0;96mEnter phone: \033[0m"
         #     if self.arguments.tty
@@ -600,18 +610,17 @@ class Heroku:
 
     async def _check_bot(
         self,
-        client: CustomTelegramClient,
+        client: CustomClient,
         username: str,
     ) -> bool:
         url: str = (
-            await client(herokutl.functions.messages.RequestWebViewRequest(
-                peer="@botfather",
-                bot="@botfather",
+            await client.open_web_app(
+                chat_id="@botfather",
+                bot_user_id="@botfather",
                 platform="android",
-                from_bot_menu=False,
-                url="https://webappinternal.telegram.org/botfather?")
+                url="https://webappinternal.telegram.org/botfather?"
             )
-        ).url
+        )
         for _ in range(5):
             await asyncio.sleep(1.5)
             try:
@@ -630,7 +639,7 @@ class Heroku:
             return True
 
         try:
-            await client.get_entity(f"{username}")
+            await client.get_chat(f"{username}", force_full=False)
         except:
             return True
 
@@ -641,17 +650,20 @@ class Heroku:
             return False
 
         if not self.web:
-            client = Client(
-                f"temp-session-{utils.rand(6)}",
+            init_kwargs = {
+                "proxy": self.proxy,
+                "device_model": get_app_name(),
+                "system_version": generate_random_system_version(),
+                "app_version": ".".join(map(str, __version__)) + " x64",
+                "lang_code": "en",
+                "system_lang_code": "en-US",
+            }
+            client = CustomClient(
+                "",
                 self.api_token.ID,
                 self.api_token.HASH,
-                proxy=self.proxy,
-                connection_retries=None,
-                device_model=get_app_name(),
-                system_version=generate_random_system_version(),
-                app_version=".".join(map(str, __version__)) + " x64",
-                lang_code="en",
-                system_lang_code="en-US",
+                in_memory=True,
+                **init_kwargs
             )
             await client.connect()
 
@@ -741,8 +753,8 @@ class Heroku:
 
             print_banner("success.txt")
             print("\033[0;92mLogged in successfully!\033[0m")
-            await self.save_client_session(client)
-            self.clients += [client]
+            cli = await self.save_client_session(client, init_kwargs)
+            self.clients += [cli]
             return True
 
         if not self.web.running.is_set():
@@ -763,21 +775,19 @@ class Heroku:
         """
         for session in self.sessions.copy():
             try:
-                client = CustomTelegramClient(
+                client = CustomClient(
                     session,
                     self.api_token.ID,
                     self.api_token.HASH,
-                    connection=self.conn,
                     proxy=self.proxy,
-                    connection_retries=None,
                     device_model=get_app_name(),
                     system_version=generate_random_system_version(),
                     app_version=".".join(map(str, __version__)) + " x64",
                     lang_code="en",
                     system_lang_code="en-US",
                 )
-                if session.server_address == "0.0.0.0":
-                    patcher.patch(client, session)
+                # if session.server_address == "0.0.0.0":
+                #     patcher.patch(client, session)
 
                 await client.connect()
                 client.phone_number = "None"
@@ -787,11 +797,11 @@ class Heroku:
                 logging.error(
                     "Check that this is the only instance running. "
                     "If that doesn't help, delete the file '%s'",
-                    session.filename,
+                    session,
                 )
                 continue
             except (TypeError, AuthKeyDuplicated):
-                Path(session.filename).unlink(missing_ok=True)
+                Path(session).unlink(missing_ok=True)
                 self.sessions.remove(session)
             except (ValueError, ApiIdInvalid):
                 # Bad API hash/ID
@@ -806,13 +816,13 @@ class Heroku:
             except InteractiveAuthRequired:
                 logging.error(
                     "Session %s was terminated and re-auth is required",
-                    session.filename,
+                    session,
                 )
                 self.sessions.remove(session)
 
         return bool(self.sessions)
 
-    async def amain_wrapper(self, client: CustomTelegramClient):
+    async def amain_wrapper(self, client: CustomClient):
         """Wrapper around amain"""
         async with client:
             first = True
@@ -836,7 +846,7 @@ class Heroku:
             while await self.amain(first, client):
                 first = False
 
-    async def _badge(self, client: CustomTelegramClient):
+    async def _badge(self, client: CustomClient):
         """Call the badge in shell"""
         try:
             import git
@@ -900,7 +910,7 @@ class Heroku:
 
     async def _add_dispatcher(
         self,
-        client: CustomTelegramClient,
+        client: CustomClient,
         modules: loader.Modules,
         db: database.Database,
     ):
@@ -933,7 +943,7 @@ class Heroku:
             handlers.RawUpdateHandler(dispatcher.handle_raw),
         )
 
-    async def amain(self, first: bool, client: CustomTelegramClient):
+    async def amain(self, first: bool, client: CustomClient):
         """Entrypoint for async init, run once for each user"""
         client.parse_mode = "HTML"
         await client.start()

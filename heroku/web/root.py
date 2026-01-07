@@ -45,7 +45,7 @@ from .. import database, main, utils
 from .._internal import restart
 from ..inline.utils import Utils as inutils
 from ..inline.token_obtainment import TokenObtainment
-from ..tl_cache import CustomTelegramClient
+from ..tl_cache import CustomClient
 from ..version import __version__
 
 DATA_DIR = (
@@ -131,7 +131,7 @@ class Web:
 
     async def _check_bot(
         self,
-        client: CustomTelegramClient,
+        client: CustomClient,
         username: str,
     ) -> bool:
         url: str = (
@@ -294,8 +294,8 @@ class Web:
 
         return web.Response(status=201, body=self._qr_login.url)
 
-    def _get_client(self) -> CustomTelegramClient:
-        return CustomTelegramClient(
+    def _get_client(self) -> CustomClient:
+        return CustomClient(
             f"temp-session-{utils.rand(6)}",
             self.api_token.ID,
             self.api_token.HASH,

@@ -35,7 +35,7 @@ from aiohttp import web
 
 from ..database import Database
 from ..loader import Modules
-from ..tl_cache import CustomTelegramClient
+from ..tl_cache import CustomClient
 from . import proxypass, root
 
 logger = logging.getLogger(__name__)
@@ -122,7 +122,7 @@ class Web(root.Web):
 
     async def add_loader(
         self,
-        client: CustomTelegramClient,
+        client: CustomClient,
         loader: Modules,
         db: Database,
     ):

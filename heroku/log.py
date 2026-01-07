@@ -33,7 +33,7 @@ from pyrogram.errors.rpcbaseerrors import (
 )
 
 from . import utils
-from .tl_cache import CustomTelegramClient
+from .tl_cache import CustomClient
 from .types import BotInlineCall, Module, CoreOverwriteError
 
 INTERNET_ERRORS = (
@@ -136,7 +136,7 @@ class HerokuException:
                             dictionary[key] = "<Database>"
                         elif isinstance(
                             value,
-                            (pyrogram.TelegramClient, CustomTelegramClient),
+                            (pyrogram.TelegramClient, CustomClient),
                         ):
                             dictionary[key] = f"<{value.__class__.__name__}>"
                         elif len(str(value)) > 512:

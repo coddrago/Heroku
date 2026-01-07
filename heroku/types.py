@@ -13,6 +13,7 @@
 
 import ast
 import asyncio
+import base64
 import contextlib
 import copy
 import importlib
@@ -22,6 +23,7 @@ import inspect
 import logging
 import os
 import re
+import struct
 import sys
 import time
 import typing
@@ -30,6 +32,12 @@ from importlib.abc import SourceLoader
 
 import requests
 from pyrogram import raw
+from pyrogram.client import Client
+from pyrogram.storage.sqlite_storage import (
+    SQLiteStorage,
+    TEST,
+    PROD
+)
 from pyrogram.raw.types import (
     Channel,
     ChannelForbidden,
@@ -981,6 +989,65 @@ def _get_members(
             and getattr(getattr(mod, method_name), attribute, False)
         )
     }
+
+
+class SQLiteStringStorage(SQLiteStorage):
+    def __init__(self, client: Client):
+        name = client.name
+        workdir = client.WORKDIR
+        super().__init__(name, workdir)
+
+    async def import_session_string(self, session_string: str):
+        # Old format
+        if len(session_string) in [
+            self.SESSION_STRING_SIZE,
+            self.SESSION_STRING_SIZE_64,
+        ]:
+            dc_id, test_mode, auth_key, user_id, is_bot = struct.unpack(
+                (
+                    self.OLD_SESSION_STRING_FORMAT
+                    if len(session_string) == self.SESSION_STRING_SIZE
+                    else self.OLD_SESSION_STRING_FORMAT_64
+                ),
+                base64.urlsafe_b64decode(
+                    session_string + "=" * (-len(session_string) % 4)
+                ),
+            )
+
+            await self.dc_id(dc_id)
+            await self.test_mode(test_mode)
+            await self.auth_key(auth_key)
+            await self.user_id(user_id)
+            await self.is_bot(is_bot)
+            await self.date(0)
+
+            logger.warning(
+                "You are using an old session string format. Use export_session_string to update"
+            )
+            return
+
+        dc_id, api_id, test_mode, auth_key, user_id, is_bot = struct.unpack(
+            self.SESSION_STRING_FORMAT,
+            base64.urlsafe_b64decode(
+                session_string + "=" * (-len(session_string) % 4)
+            ),
+        )
+
+        await self.dc_id(dc_id)
+
+        if test_mode:
+            await self.server_address(TEST[dc_id])
+            await self.port(80)
+        else:
+            await self.server_address(PROD[dc_id])
+            await self.port(443)
+
+        await self.api_id(api_id)
+        await self.test_mode(test_mode)
+        await self.auth_key(auth_key)
+        await self.user_id(user_id)
+        await self.is_bot(is_bot)
+        await self.date(0)
 
 
 class CacheRecordEntity:

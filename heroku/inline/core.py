@@ -31,7 +31,7 @@ from pyrogram.utils import get_display_name
 
 from .. import utils
 from ..database import Database
-from ..tl_cache import CustomTelegramClient
+from ..tl_cache import CustomClient
 from ..translations import Translator
 from .bot_pm import BotPM
 from .events import Events
@@ -69,7 +69,7 @@ class InlineManager(
 
     def __init__(
         self,
-        client: CustomTelegramClient,
+        client: CustomClient,
         db: Database,
         allmodules: "Modules",  # type: ignore  # noqa: F821
     ):

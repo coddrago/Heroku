@@ -58,7 +58,7 @@ from .types import (
 )
 
 if typing.TYPE_CHECKING:
-    from .tl_cache import CustomTelegramClient
+    from .tl_cache import CustomClient
 
 __all__ = [
     "Modules",
@@ -500,7 +500,7 @@ class Modules:
 
     def __init__(
         self,
-        client: "CustomTelegramClient",  # type: ignore  # noqa: F821
+        client: "CustomClient",  # type: ignore  # noqa: F821
         db: Database,
         allclients: list,
         translator: Translator,

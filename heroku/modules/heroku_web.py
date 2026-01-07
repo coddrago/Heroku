@@ -31,7 +31,7 @@ from pyrogram.types import Message, User
 from .. import loader, main, utils
 from .._internal import restart
 from ..inline.types import InlineCall
-from ..tl_cache import CustomTelegramClient
+from ..tl_cache import CustomClient
 from ..version import __version__
 from ..web import core
 
@@ -224,8 +224,8 @@ class HerokuWebMod(loader.Module):
         )
 
 
-    def _get_client(self) -> CustomTelegramClient:
-        return CustomTelegramClient(
+    def _get_client(self) -> CustomClient:
+        return CustomClient(
             MemorySession(),
             main.heroku.api_token.ID,
             main.heroku.api_token.HASH,
