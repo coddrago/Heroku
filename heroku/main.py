@@ -60,6 +60,8 @@ from pyrogram.errors import (
     YouBlockedUser,
 )
 from herokutl.sessions import MemorySession, SQLiteSession
+from pyrogram.enums import ParseMode
+from pyrogram.methods.utilities import idle
 from pyrogram.raw.functions.account import GetPassword
 from pyrogram.raw.functions.auth import CheckPassword
 from pyrogram.raw.functions.contacts import Unblock
@@ -508,7 +510,6 @@ class Heroku:
     async def save_client_session(
         self,
         client: CustomClient,
-        init_kwargs: dict,
         *,
         delay_restart: bool = False,
     ):
@@ -525,6 +526,7 @@ class Heroku:
             client.heroku_me = me
 
         session = f"heroku-{telegram_id}"
+        init_kwargs = client._export_init_kwargs()
         session_str = await client.storage.auth_key()
 
         cli = CustomClient(
@@ -650,20 +652,17 @@ class Heroku:
             return False
 
         if not self.web:
-            init_kwargs = {
-                "proxy": self.proxy,
-                "device_model": get_app_name(),
-                "system_version": generate_random_system_version(),
-                "app_version": ".".join(map(str, __version__)) + " x64",
-                "lang_code": "en",
-                "system_lang_code": "en-US",
-            }
             client = CustomClient(
                 "",
                 self.api_token.ID,
                 self.api_token.HASH,
                 in_memory=True,
-                **init_kwargs
+                proxy = self.proxy,
+                device_model = get_app_name(),
+                system_version = generate_random_system_version(),
+                app_version = ".".join(map(str, __version__)) + " x64",
+                lang_code = "en",
+                system_lang_code = "en-US",
             )
             await client.connect()
 
@@ -753,7 +752,7 @@ class Heroku:
 
             print_banner("success.txt")
             print("\033[0;92mLogged in successfully!\033[0m")
-            cli = await self.save_client_session(client, init_kwargs)
+            cli = await self.save_client_session(client)
             self.clients += [cli]
             return True
 
@@ -945,7 +944,7 @@ class Heroku:
 
     async def amain(self, first: bool, client: CustomClient):
         """Entrypoint for async init, run once for each user"""
-        client.parse_mode = "HTML"
+        client.parse_mode = ParseMode.HTML
         await client.start()
 
         db = database.Database(client)
@@ -978,7 +977,7 @@ class Heroku:
         if first:
             await self._badge(client)
 
-        await client.run_until_disconnected()
+        await idle.idle()
 
     async def _main(self):
         """Main entrypoint"""

@@ -427,6 +427,18 @@ async def get_user(message: Message) -> typing.Optional[User]:
     logger.error("`peer_id` is not a user, chat or channel")
     return None
 
+def get_display_name(entity: 'Entity'):
+    """
+    Get the full name of entity
+    """
+    if not (name := getattr(entity, "full_name", None)):
+        if isinstance(entity, User):
+            name = " ".join(filter(None, [entity.first_name, entity.last_name])) or None
+        else:
+            name = getattr(entity, "title", "")
+
+    return name
+
 def get_chat_id(message: typing.Union[Message, AiogramMessage]) -> int:
     """
     Get the chat ID, but without -100 if its a channel

@@ -16,7 +16,7 @@ import ssl
 from typing import Optional, Dict, List
 
 from .. import loader, utils
-from telethon.tl.functions.contacts import UnblockRequest
+from pyrogram.raw.functions.contacts import Unblock
 
 
 @loader.tds
@@ -127,7 +127,7 @@ class HSearch(loader.Module):
 
     async def client_ready(self, client, db):
         try:
-            await client(UnblockRequest("@FHeta_robot"))
+            await client(Unblock("@FHeta_robot"))
         except:
             pass
 
@@ -191,7 +191,7 @@ class HSearch(loader.Module):
             
     async def on_dlmod(self, client, db):
         try:
-            await client(UnblockRequest("@FHeta_robot"))
+            await client(Unblock("@FHeta_robot"))
             await utils.dnd(client, "@FHeta_robot", archive=True)
         except:
             pass

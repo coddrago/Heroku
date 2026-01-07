@@ -25,9 +25,9 @@ from aiogram.client.default import DefaultBotProperties
 from pyrogram.errors import InputUserDeactivated, YouBlockedUser
 from pyrogram.raw.functions.contacts.unblock import Unblock
 from pyrogram.raw.functions.messages import GetDialogFilters, UpdateDialogFilter
-from pyrogram.types import Message, InputPeerUser
+from pyrogram.raw.types import Message, InputPeerUser
 from pyrogram.types.user_and_chats.folder import Folder
-from pyrogram.utils import get_display_name
+from ..utils import get_display_name
 
 from .. import utils
 from ..database import Database

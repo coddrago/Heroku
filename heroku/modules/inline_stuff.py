@@ -15,7 +15,7 @@ import string
 import random
 
 from pyrogram.errors import YouBlockedUser
-from pyrogram.tl.functions.contacts import UnblockRequest
+from pyrogram.raw.functions.contacts import Unblock
 from pyrogram.types import Message
 
 from .. import loader, utils

@@ -20,7 +20,7 @@ import random
 import typing
 
 from pyrogram.errors import YouBlockedUser
-from pyrogram.tl.functions.contacts import UnblockRequest
+from pyrogram.raw.functions.contacts import Unblock
 
 from .. import utils
 from .. import main

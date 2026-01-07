@@ -28,7 +28,7 @@ except ImportError as e:
 import typing
 
 from pyrogram.errors import ChannelsTooMuch
-from pyrogram.types import Message, User
+from pyrogram.raw.types import Message, User
 
 from . import main, utils
 from .pointers import (

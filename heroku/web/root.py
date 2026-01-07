@@ -371,9 +371,9 @@ class Web:
             await self._pending_client._on_login(
                 (
                     await self._pending_client.invoke(
-                        CheckPasswordRequest(
+                        CheckPassword(
                             compute_check(
-                                await self._pending_client.invoke(GetPasswordRequest()),
+                                await self._pending_client.invoke(GetPassword()),
                                 text.strip(),
                             )
                         )

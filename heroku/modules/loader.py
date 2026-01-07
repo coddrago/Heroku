@@ -35,8 +35,8 @@ from urllib.parse import urlparse
 import requests
 from pyrogram.errors.common import ScamDetectionError
 from pyrogram.errors import MediaCaptionTooLong
-from pyrogram.tl.functions.channels import JoinChannelRequest
-from pyrogram.types import Channel, Message
+from pyrogram.raw.functions.channels import JoinChannel
+from pyrogram.raw.types import Channel, Message
 
 from .. import loader, main, utils
 from .._local_storage import RemoteStorage
@@ -496,7 +496,7 @@ class LoaderMod(loader.Module):
         """
         Don't you dare call it externally
         """
-        await self._client.invoke(JoinChannelRequest(channel))
+        await self._client.invoke(JoinChannel(channel))
         event.status = True
         event.set()
 
@@ -1101,7 +1101,7 @@ class LoaderMod(loader.Module):
             await call.answer(self.strings("not_subscribed"))
             return
 
-        await self._client.invoke(JoinChannelRequest(entity))
+        await self._client.invoke(JoinChannel(entity))
         await utils.answer(call, msg())
         await call.answer(self.strings("subscribed"))
 

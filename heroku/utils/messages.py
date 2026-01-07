@@ -14,7 +14,7 @@ import typing
 
 import grapheme
 import pyrogram
-from pyrogram.types import (
+from pyrogram.raw.types import (
     Channel,
     Chat,
     InputDocument,

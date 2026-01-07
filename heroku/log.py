@@ -136,7 +136,7 @@ class HerokuException:
                             dictionary[key] = "<Database>"
                         elif isinstance(
                             value,
-                            (pyrogram.TelegramClient, CustomClient),
+                            (pyrogram.Client, CustomClient),
                         ):
                             dictionary[key] = f"<{value.__class__.__name__}>"
                         elif len(str(value)) > 512:

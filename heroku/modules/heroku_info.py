@@ -28,7 +28,7 @@ from io import BytesIO
 from pyrogram.errors import WebpageMediaEmpty
 from pyrogram.types import InputMediaWebPage
 from pyrogram.types import Message
-from pyrogram.utils import get_display_name
+from ..utils import get_display_name
 from .. import loader, utils, version
 import platform as lib_platform
 import getpass

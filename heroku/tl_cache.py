@@ -124,6 +124,18 @@ class CustomClient(TelegramClient): # TODO: rewrite the cache specifically for K
         self.loader: "Modules"
         self.heroku_inline: "InlineManager"
 
+    def _export_init_kwargs(self) -> dict:
+        return {
+            "api_id": self.api_id,
+            "api_hash": self.api_hash,
+            "app_version": self.app_version,
+            "device_model": self.device_model,
+            "system_version": self.system_version,
+            "lang_code": self.lang_code,
+            "system_lang_code": self.system_lang_code,
+            "proxy": self.proxy,
+        }
+
     # async def connect(self, unix_socket_path: typing.Optional[str] = None):
     #     if self.session is None:
     #         raise ValueError(
@@ -233,7 +245,7 @@ class CustomClient(TelegramClient): # TODO: rewrite the cache specifically for K
 
     async def get_chat(
         self,
-        chat_id: Union[int, str],
+        chat_id: int | str,
         force_full: bool = False
     ) -> "Chat":
         """Get up to date information about a chat.

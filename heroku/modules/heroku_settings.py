@@ -14,12 +14,12 @@ import logging
 import random
 
 import pyrogram
-from pyrogram.tl.functions.messages import (
-    GetDialogFiltersRequest,
-    UpdateDialogFilterRequest,
+from pyrogram.raw.functions.messages import (
+    GetDialogFilters,
+    UpdateDialogFilter,
 )
 from pyrogram.types import Message
-from pyrogram.utils import get_display_name
+from ..utils import get_display_name
 
 from .. import loader, log, main, utils
 from .._internal import fw_protect, restart
@@ -104,7 +104,7 @@ class HerokuSettingsMod(loader.Module):
 
         await fw_protect()
 
-        folders = await self._client.invoke(GetDialogFiltersRequest())
+        folders = await self._client.invoke(GetDialogFilters())
 
         if any(folder.title == "heroku" for folder in folders):
             folder_id = max(
@@ -112,7 +112,7 @@ class HerokuSettingsMod(loader.Module):
                 key=lambda x: x.id,
             ).id
             await fw_protect()
-            await self._client.invoke(UpdateDialogFilterRequest(id=folder_id))
+            await self._client.invoke(UpdateDialogFilter(id=folder_id))
 
         for handler in logging.getLogger().handlers:
             handler.setLevel(logging.CRITICAL)

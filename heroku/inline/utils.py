@@ -41,7 +41,7 @@ from aiogram.exceptions import (
     TelegramAPIError,
     TelegramRetryAfter,
 )
-from herokutl.tl.functions.messages import RequestWebViewRequest
+from pyrogram.raw.functions.messages import RequestWebView
 
 from .. import utils
 from ..types import HerokuReplyMarkup
@@ -834,7 +834,7 @@ class Utils(InlineUnit):
         username: str = ""
     ) -> bool | None:
         url: str = (
-            await self._client(RequestWebViewRequest(
+            await self._client(RequestWebView(
                 peer="@botfather",
                 bot="@botfather",
                 platform="android",

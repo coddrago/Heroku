@@ -34,7 +34,7 @@ import typing
 
 from pyrogram.raw.functions.messages import GetFullChat
 from pyrogram.raw.types import ChatParticipantAdmin, ChatParticipantCreator, Message
-from pyrogram.utils import get_display_name
+from .utils import get_display_name
 
 from . import main, utils
 from .database import Database

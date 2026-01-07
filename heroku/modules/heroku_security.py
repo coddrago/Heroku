@@ -16,7 +16,7 @@ import time
 import typing
 
 from pyrogram.raw.types import Message, PeerUser, User
-from pyrogram.utils import get_display_name
+from ..utils import get_display_name
 
 from .. import loader, main, security, utils
 from ..inline.types import InlineCall, InlineMessage
