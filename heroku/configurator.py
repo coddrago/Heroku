@@ -66,7 +66,7 @@ def api_config(tty: typing.Optional[bool] = None):
         if api_id.isdigit():
             break
 
-        tty_print("\033[0;91mInvalid ID\033[0m", tty)
+        tty_print("\033[38;2;255;165;0mInvalid ID\033[0m", tty)
 
     if not api_id:
         tty_print("\033[0;91mCancelled\033[0m", tty)
