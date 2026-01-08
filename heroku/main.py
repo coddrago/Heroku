@@ -72,7 +72,6 @@ from .dispatcher import CommandDispatcher
 from .inline.utils import Utils as inutils
 from .inline.token_obtainment import TokenObtainment
 from .qr import QRCode
-from .secure import patcher
 from .types import SQLiteStringStorage
 from .tl_cache import CustomClient
 from .translations import Translator
