@@ -39,6 +39,7 @@ MEME_LANGUAGES = {
     "leet": "🏴‍☠️ 1337",
     "uwu": "🏴‍☠️ UwU",
     "tiktok": "🏴‍☠️ TikTokKid",
+    "son": "🏴‍☠️ Son of a bit*h"
 }
 
 
