@@ -28,7 +28,7 @@ from aiogram.types import (
 )
 from aiogram.exceptions import TelegramRetryAfter
 from pyrogram.errors import ChatSendInlineForbidden
-from pyrogram.extensions.html import CUSTOM_EMOJIS
+# from pyrogram.extensions.html import CUSTOM_EMOJIS
 from pyrogram.types import Message
 
 from .. import main, utils

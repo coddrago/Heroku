@@ -30,7 +30,7 @@ from pathlib import Path
 from types import FunctionType
 from uuid import uuid4
 
-from pyrogram.tlobject import TLObject
+# from pyrogram.tlobject import TLObject
 
 from . import security, utils, validators
 from .database import Database
@@ -477,7 +477,7 @@ def callback_handler(*args, **kwargs):
     return _mark_method("is_callback_handler", *args, **kwargs)
 
 
-def raw_handler(*updates: TLObject):
+def raw_handler(*updates: "TLObject"):
     """
     Decorator that marks function as raw telethon events handler
     Use it to prevent zombie-event-handlers, left by unloaded modules

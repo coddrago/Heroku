@@ -33,7 +33,7 @@ from importlib.machinery import ModuleSpec
 from urllib.parse import urlparse
 
 import requests
-from pyrogram.errors.common import ScamDetectionError
+# from pyrogram.errors.common import ScamDetectionError
 from pyrogram.errors import MediaCaptionTooLong
 from pyrogram.raw.functions.channels import JoinChannel
 from pyrogram.raw.types import Channel, Message

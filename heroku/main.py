@@ -1051,6 +1051,6 @@ class Heroku:
             except:
                 pass
 
-pyrogram.extensions.html.CUSTOM_EMOJIS = not get_config_key("disable_custom_emojis")
+# pyrogram.extensions.html.CUSTOM_EMOJIS = not get_config_key("disable_custom_emojis")
 
 heroku = Heroku()

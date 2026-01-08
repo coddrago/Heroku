@@ -27,8 +27,8 @@ from logging.handlers import RotatingFileHandler
 import pyrogram
 from aiogram.exceptions import TelegramNetworkError, TelegramRetryAfter
 from pyrogram.errors import PersistentTimestampOutdated
-from pyrogram.errors.rpcbaseerrors import (
-    ServerError,
+from pyrogram.errors import (
+    # ServerError,
     RPCError
 )
 
@@ -38,7 +38,7 @@ from .types import BotInlineCall, Module, CoreOverwriteError
 
 INTERNET_ERRORS = (
     TelegramNetworkError, asyncio.exceptions.TimeoutError,
-    ServerError, PersistentTimestampOutdated
+    PersistentTimestampOutdated
 )
 old = linecache.getlines
 
@@ -83,9 +83,6 @@ def override_text(exception: Exception) -> typing.Optional[str]:
 
     if isinstance(exception, CoreOverwriteError):
         return f"⚠️ {str(exception)}"
-
-    if isinstance(exception, ServerError):
-        return "📡 <b>Telegram servers are currently experiencing issues. Please try again later.</b>"
 
     if isinstance(exception, RPCError) and "TRANSLATION_TIMEOUT" in str(exception):
         return ("🕓 <b>Telegram translation service timed out. Please try again later.</b>")

@@ -40,7 +40,7 @@ import traceback
 import typing
 
 import requests
-from pyrogram import events
+# from pyrogram import events
 from pyrogram.errors import FloodWait, RPCError
 from pyrogram.types import ChatEvent, ChatEventFilter, Message
 
@@ -279,7 +279,7 @@ class CommandDispatcher:
 
     async def _handle_command(
         self,
-        event: typing.Union[events.NewMessage, events.MessageDeleted],
+        event: "typing.Union[events.NewMessage, events.MessageDeleted]",
         watcher: bool = False,
     ) -> typing.Union[bool, typing.Tuple[Message, str, str, callable]]:
         if not hasattr(event, "message") or not hasattr(event.message, "message"):
@@ -438,7 +438,7 @@ class CommandDispatcher:
 
         return message, prefix, txt, func
 
-    async def handle_raw(self, event: events.Raw):
+    async def handle_raw(self, event: "events.Raw"):
         """Handle raw events."""
         for handler in self.raw_handlers:
             if isinstance(event, tuple(handler.updates)):
@@ -449,7 +449,7 @@ class CommandDispatcher:
 
     async def handle_command(
         self,
-        event: typing.Union[events.NewMessage, events.MessageDeleted],
+        event: "typing.Union[events.NewMessage, events.MessageDeleted]",
     ):
         """Handle all commands"""
         message = await self._handle_command(event)
@@ -527,14 +527,14 @@ class CommandDispatcher:
 
     async def _handle_tags(
         self,
-        event: typing.Union[events.NewMessage, events.MessageDeleted],
+        event: "typing.Union[events.NewMessage, events.MessageDeleted]",
         func: callable,
     ) -> bool:
         return bool(await self._handle_tags_ext(event, func))
 
     async def _handle_tags_ext(
         self,
-        event: typing.Union[events.NewMessage, events.MessageDeleted],
+        event: "typing.Union[events.NewMessage, events.MessageDeleted]",
         func: callable,
     ) -> str:
         """
@@ -636,7 +636,7 @@ class CommandDispatcher:
 
     async def handle_incoming(
         self,
-        event: typing.Union[events.NewMessage, events.MessageDeleted],
+        event: "typing.Union[events.NewMessage, events.MessageDeleted]",
     ):
         """Handle all incoming messages"""
         message = utils.censor(getattr(event, "message", event))

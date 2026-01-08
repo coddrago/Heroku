@@ -33,13 +33,13 @@ from pyrogram.errors import (
     SessionPasswordNeeded,
     YouBlockedUser,
 )
-from pyrogram.password import compute_check
-from pyrogram.sessions import MemorySession
+# from pyrogram.password import compute_check
+# from pyrogram.sessions import MemorySession
 from pyrogram.raw.functions.account import GetPassword
 from pyrogram.raw.functions.auth import CheckPassword
 from pyrogram.raw.functions.contacts import Unblock
 from pyrogram.raw.functions.messages.request_app_web_view import RequestAppWebView
-from pyrogram.utils import parse_phone
+# from pyrogram.utils import parse_phone
 
 from .. import database, main, utils
 from .._internal import restart

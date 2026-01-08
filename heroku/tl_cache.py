@@ -22,7 +22,7 @@ import pyrogram
 from pyrogram.client import Client as TelegramClient
 # from herokutl.client import TelegramClient
 from pyrogram import __name__ as __base_name__
-from pyrogram._updates import ChannelState, Entity, EntityType, SessionState
+# from pyrogram._updates import ChannelState, Entity, EntityType, SessionState
 from pyrogram.errors import RPCError
 from pyrogram.errors import TopicDeleted
 from pyrogram.types import User, Chat
@@ -30,7 +30,7 @@ from pyrogram.raw import functions
 from pyrogram.raw.all import layer as LAYER
 from pyrogram.raw.functions.channels import GetFullChannel
 from pyrogram.raw.functions.users import GetFullUser
-from pyrogram.tl.tlobject import TLRequest
+# from pyrogram.tl.tlobject import TLRequest
 from pyrogram.raw.types import (
     ChannelFull,
     Message,
@@ -39,7 +39,7 @@ from pyrogram.raw.types import (
     UpdateShort,
     UserFull,
 )
-from pyrogram.utils import is_list_like
+# from pyrogram.utils import is_list_like
 
 from .types import (
     CacheRecordEntity,

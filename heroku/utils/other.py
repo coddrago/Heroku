@@ -29,7 +29,7 @@ from ..types import ListLike
 if typing.TYPE_CHECKING:
     from ..types import EntityLike
 
-parser = pyrogram.utils.sanitize_parse_mode("html")
+# parser = pyrogram.utils.sanitize_parse_mode("html")
 logger = logging.getLogger(__name__)
 
 

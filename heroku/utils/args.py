@@ -10,13 +10,13 @@ import shlex
 import typing
 
 import pyrogram
-import pyrogram.extensions
-import pyrogram.extensions.html
-from pyrogram.tl.custom.message import Message
+# import pyrogram.extensions
+# import pyrogram.extensions.html
+from pyrogram.types import Message
 
 from .entity import escape_html, relocate_entities
 
-parser = pyrogram.utils.sanitize_parse_mode("html")
+# parser = pyrogram.utils.sanitize_parse_mode("html")
 logger = logging.getLogger(__name__)
 
 def iter_attrs(obj: typing.Any, /) -> typing.List[typing.Tuple[str, typing.Any]]:

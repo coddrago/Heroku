@@ -42,7 +42,7 @@ emoji_pattern = re.compile(
     flags=re.UNICODE,
 )
 
-parser = pyrogram.utils.sanitize_parse_mode("html")
+# parser = pyrogram.utils.sanitize_parse_mode("html")
 logger = logging.getLogger(__name__)
 
 def get_topic(message: Message) -> typing.Optional[int]:

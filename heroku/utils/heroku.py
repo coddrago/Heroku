@@ -8,7 +8,7 @@ import logging
 import os
 import pyrogram
 
-parser = pyrogram.utils.sanitize_parse_mode("html")
+# parser = pyrogram.utils.sanitize_parse_mode("html")
 logger = logging.getLogger(__name__)
 
 def get_version_raw() -> str:

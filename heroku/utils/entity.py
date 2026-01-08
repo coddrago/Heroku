@@ -89,7 +89,7 @@ FormattingEntity = typing.Union[
 if typing.TYPE_CHECKING:
     from ..types import Entity
 
-parser = pyrogram.utils.sanitize_parse_mode("html")
+# parser = pyrogram.utils.sanitize_parse_mode("html")
 logger = logging.getLogger(__name__)
 
 def get_lang_flag(countrycode: str) -> str:
