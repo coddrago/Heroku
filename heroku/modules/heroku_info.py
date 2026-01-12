@@ -19,6 +19,7 @@ import glob
 import requests
 import re
 import emoji
+import herokutl
 
 from bs4 import BeautifulSoup
 from typing import Optional
