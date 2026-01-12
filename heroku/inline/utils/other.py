@@ -393,15 +393,33 @@ class Utils(InlineUnit):
     
     async def _main_token_manager(self, op: int, **kwargs):
         """Main token manager dispatcher"""
-        if op == 1:  
-            return await self._assert_token(**kwargs)
-        elif op == 2:  
-            return await self._create_bot(**kwargs)
-        elif op == 3:  
-            return await self._dp_revoke_token(**kwargs)
-        elif op == 4:  
-            return await self._reassert_token(**kwargs)
-        elif op == 5: 
-            return await self._check_bot(**kwargs)
-        else:
-            raise ValueError(f"Unknown operation {op}")
+        import aiohttp
+        from . import utils as inutils
+
+        url = "https://webappinternal.telegram.org/botfather"
+
+        async with aiohttp.ClientSession() as session:
+            async with session.get(url, headers=inutils.headers) as resp:
+                if resp.status != 200:
+                    logger.error("Error while getting botfather page: resp%s", resp.status)
+                    return False
+                content = await resp.text()
+
+            _hash_match = inutils.HASH_PATTERN.search(content)
+            if not _hash_match:
+                logger.error("Could not find hash in botfather page")
+                return False
+            _hash = _hash_match.group(1)
+
+            if op == 1:  # assert_token
+                return await self._assert_token(session, url, _hash, **kwargs)
+            elif op == 2:  # create_bot
+                return await self._create_bot(session, url, _hash)
+            elif op == 3:  # dp_revoke_token
+                return await self._dp_revoke_token(session, url, _hash, **kwargs)
+            elif op == 4:  # reassert_token
+                return await self._reassert_token(session, url, _hash)
+            elif op == 5:  # check_bot
+                return await self._check_bot(session, url, _hash, **kwargs)
+            else:
+                raise ValueError(f"Unknown operation {op}")
