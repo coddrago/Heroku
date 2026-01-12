@@ -459,7 +459,7 @@ heroku_info:
   _ihandle_doc_info: "Надіслати інформацію про юзербота"
   up-to-date: "<b>Актуальна версія</b>"
   update_required: "<b>Потрібне оновлення</b> <code>{prefix}update</code>"
-  _cfg_cst_msg: "Кастомний текст повідомлення в info. Може містити ключові слова {me}, {version}, {build}, {prefix}, {platform}, {upd}, {uptime}, {cpu_usage}, {ram_usage}, {branch}, {hostname}, {user}, {os}, {kernel}, {cpu}, {ping}"
+  _cfg_cst_msg: "Кастомний текст повідомлення в info. Може містити ключові слова {me}, {version}, {build}, {prefix}, {platform}, {upd}, {uptime}, {cpu_usage}, {ram_usage}, {branch}, {hostname}, {user}, {os}, {kernel}, {cpu}, {ping}, {python_ver}, {htl_ver}, {git_status}"
   _cfg_cst_btn: "Кастомна кнопка в повідомленні в info. Залиш порожнім, щоб прибрати кнопку"
   _cfg_banner: "Посилання на банер-картинку"
   switchinfo_on: "<emoji document_id=5118861066981344121>✅</emoji> Інформація про зображення успішно увімкнена"
