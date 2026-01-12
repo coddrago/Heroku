@@ -506,3 +506,22 @@ def is_serializable(x: typing.Any, /) -> bool:
         return True
     except Exception:
         return False
+
+
+def extract_urls(text: str) -> typing.List[str]:
+    """
+    Extract all URLs from text
+    :param text: Text to extract URLs from
+    :return: List of URLs
+    """
+    url_regex = re.compile(r'https?://[^\s]+')
+    return url_regex.findall(text)
+
+
+def has_media(message: Message) -> bool:
+    """
+    Check if message contains media
+    :param message: Message to check
+    :return: True if message has media, False otherwise
+    """
+    return isinstance(message.media, (MessageMediaPhoto, MessageMediaDocument, MessageMediaWebPage))

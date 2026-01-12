@@ -46,6 +46,7 @@ from .inline.types import (
     BotInlineCall,
     BotInlineMessage,
     BotMessage,
+    HerokuReplyMarkup,
     InlineCall,
     InlineMessage,
     InlineQuery,
@@ -81,7 +82,6 @@ logger = logging.getLogger(__name__)
 
 
 JSONSerializable = typing.Union[str, int, float, bool, list, dict, None]
-HerokuReplyMarkup = typing.Union[typing.List[typing.List[dict]], typing.List[dict], dict]
 ListLike = typing.Union[list, set, tuple]
 Command = typing.Callable[..., typing.Awaitable[typing.Any]]
 

@@ -209,3 +209,51 @@ def get_cpu_usage():
 init_ts = time.perf_counter()
 
 get_platform_name = get_named_platform
+
+def get_ip_address() -> str:
+    """
+    Get the public IP address
+    :return: IP address string
+    """
+    try:
+        import requests
+        response = requests.get('https://api.ipify.org?format=json', timeout=5)
+        return response.json()['ip']
+    except Exception:
+        return "Unknown"
+
+
+def get_cpu_temperature() -> float:
+    """
+    Get CPU temperature if available
+    :return: Temperature in Celsius or 0 if not available
+    """
+    try:
+        import psutil
+        temps = psutil.sensors_temperatures()
+        if 'coretemp' in temps:
+            return temps['coretemp'][0].current
+        elif 'cpu-thermal' in temps:
+            return temps['cpu-thermal'][0].current
+        else:
+            return 0.0
+    except Exception:
+        return 0.0
+
+
+def get_disk_usage() -> dict:
+    """
+    Get disk usage information
+    :return: Dictionary with total, used, free in GB
+    """
+    try:
+        import psutil
+        disk = psutil.disk_usage('/')
+        return {
+            'total': round(disk.total / (1024**3), 2),
+            'used': round(disk.used / (1024**3), 2),
+            'free': round(disk.free / (1024**3), 2),
+            'percent': disk.percent
+        }
+    except Exception:
+        return {'total': 0, 'used': 0, 'free': 0, 'percent': 0}

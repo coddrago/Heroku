@@ -74,3 +74,27 @@ async def get_git_status() -> str:
 
     except Exception:
         return "Unknown"
+
+
+def get_last_commit_message() -> str:
+    """
+    Get the message of the last commit
+    :return: Last commit message
+    """
+    try:
+        repo = git.Repo()
+        return repo.head.commit.message.strip()
+    except Exception:
+        return "Unknown"
+
+
+def get_commit_count() -> int:
+    """
+    Get the total number of commits in the repository
+    :return: Number of commits
+    """
+    try:
+        repo = git.Repo()
+        return len(list(repo.iter_commits()))
+    except Exception:
+        return 0

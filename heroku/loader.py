@@ -693,6 +693,8 @@ class Modules:
 
                 logger.debug("Saved class %s to path %s", cls_name, path)
 
+        ret.__source__ = spec.loader.data.decode() if hasattr(spec.loader, 'data') else inspect.getsource(ret.__class__)
+
         return ret
 
     def add_aliases(self, aliases: dict):
@@ -1077,6 +1079,24 @@ class Modules:
             )
             self.modules.remove(mod)
             raise
+
+        # Check for pack_url and load translations
+        if hasattr(mod, '__source__'):
+            pack_url = next(
+                (
+                    line.replace(" ", "").split("#packurl:", maxsplit=1)[1]
+                    for line in mod.__source__.splitlines()
+                    if line.replace(" ", "").startswith("#packurl:")
+                ),
+                None,
+            )
+
+            if pack_url and (
+                transations := await self.translator.load_module_translations(
+                    pack_url
+                )
+            ):
+                mod.strings.external_strings = transations
 
         for _, method in utils.iter_attrs(mod):
             if isinstance(method, InfiniteLoop):
