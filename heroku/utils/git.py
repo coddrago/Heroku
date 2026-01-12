@@ -48,7 +48,7 @@ def get_commit_url() -> str:
     except Exception:
         return "Unknown"
 
-async def get_git_status() -> str:
+def get_git_status() -> str:
     """
     :return: 'Clean' or 'X files modified'.
     """
