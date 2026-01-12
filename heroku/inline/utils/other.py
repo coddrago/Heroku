@@ -390,3 +390,18 @@ class Utils(InlineUnit):
             return None
 
         return buttons
+    
+    async def _main_token_manager(self, op: int, **kwargs):
+        """Main token manager dispatcher"""
+        if op == 1:  
+            return await self._assert_token(**kwargs)
+        elif op == 2:  
+            return await self._create_bot(**kwargs)
+        elif op == 3:  
+            return await self._dp_revoke_token(**kwargs)
+        elif op == 4:  
+            return await self._reassert_token(**kwargs)
+        elif op == 5: 
+            return await self._check_bot(**kwargs)
+        else:
+            raise ValueError(f"Unknown operation {op}")
