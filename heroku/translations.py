@@ -111,6 +111,9 @@ class BaseTranslator:
             logger.exception("Unable to decode %s", pack_url)
             return False
 
+        if not isinstance(data, dict):
+            return {}
+
         if any(len(key) != 2 for key in data):
             return data
 
