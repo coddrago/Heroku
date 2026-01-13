@@ -34,6 +34,22 @@
 - add tiktokkid to meme pack
 - remove support python 3.9
 - rework if else to match/case
+- add utils.formet_file_size
+- add utils.is_url
+- add utils.get_iso_time
+- add utils.safe_getattr
+- add utils.get_last_commit_message
+- add utils.get_commit_count
+- add utils.get_hostname
+- add utils.resolve_domain
+- add utils.is_port_open
+- add utils.get_network_interfaces
+- add utils.get_disk_usage
+- add utils.get_ip_address
+- add utils.get_cpu_temperature
+- add utils.get_args_bool
+- add utils.get_args_int
+- fix pack_url
 
 ## 🪐 Heroku 1.7.2
 - added autoupdate
