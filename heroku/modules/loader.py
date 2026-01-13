@@ -1216,6 +1216,7 @@ class LoaderMod(loader.Module):
             if worked
             else self.strings("not_unloaded")
         )
+        placeholders = utils.get_placeholders()
         return msg
 
 

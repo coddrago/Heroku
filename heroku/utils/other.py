@@ -215,6 +215,7 @@ def register_placeholder(placeholder: str, callback: typing.Callable):
         "module_name": module_name,
         "module_instance": module_instance,
         "callback": callback,
+        "placeholder_name": placeholder,
     }
     return True
 
@@ -228,3 +229,13 @@ async def get_placeholder(placeholder: str):
 
 def get_placeholders():
     return list(custom_placeholders.values())
+
+def unregister_placeholders(module_name: str) -> int:
+    placeholders_to_remove = []
+    for placeholder_name, placeholder_data in custom_placeholders.items():
+        if placeholder_data.get("module_name") == module_name:
+            placeholders_to_remove.append(placeholder_name)
+    for placeholder_name in placeholders_to_remove:
+        del custom_placeholders[placeholder_name]
+    
+    return True

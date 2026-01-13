@@ -185,7 +185,7 @@ class HerokuInfoMod(loader.Module):
         }
         placeholders = utils.get_placeholders()
         for placeholder in placeholders:
-            data[placeholder["placeholder"]] = placeholder["callback"]()
+            data[placeholder["placeholder_name"]] = utils.get_placeholder(placeholder["placeholder_name"])
         return (
             (
                 "🪐 Heroku\n"
