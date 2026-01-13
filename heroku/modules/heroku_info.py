@@ -116,7 +116,7 @@ class HerokuInfoMod(loader.Module):
         metatag = soup.find("meta", property="og:image")
         return metatag['content']
 
-    def _render_info(self, start: float) -> str:
+    async def _render_info(self, start: float) -> str:
         try:
             repo = git.Repo(search_parent_directories=True)
             diff = repo.git.log([f"HEAD..origin/{version.branch}", "--oneline"])
@@ -215,7 +215,7 @@ class HerokuInfoMod(loader.Module):
             )
         )
     
-    def _get_info_photo(self, start: float) -> Optional[Path]:
+    async def _get_info_photo(self, start: float) -> Optional[Path]:
         imgform = self.config['banner_url'].split('.')[-1]
         imgset = self.config['imgSettings']
         if imgform in ['jpg', 'jpeg', 'png', 'bmp', 'webp']:
@@ -230,7 +230,7 @@ class HerokuInfoMod(loader.Module):
             draw = ImageDraw.Draw(img)
             draw.text(
                 (int(w/2), int(h/2)) if imgset[3] == '0|0' else tuple([int(i) for i in imgset[3].split('|')]),
-                f'{utils.remove_html(self._render_info(start))}', 
+                f'{utils.remove_html(await self._render_info(start))}', 
                 anchor=imgset[4],
                 font=font,
                 fill=imgset[2] if imgset[2].startswith('#') else '#000',
@@ -301,7 +301,7 @@ class HerokuInfoMod(loader.Module):
         try:
             match True:
                 case _ if self.config['switchInfo']:
-                    if self._get_info_photo(start) is None:
+                    if await self._get_info_photo(start) is None:
                         await utils.answer(
                             message, 
                             self.strings["incorrect_img_format"]
@@ -317,7 +317,7 @@ class HerokuInfoMod(loader.Module):
                 case _ if self.config["custom_message"] is None:
                     await utils.answer(
                         message,
-                        self._render_info(start),
+                        await self._render_info(start),
                         file = media,
                         reply_to=getattr(message, "reply_to_msg_id", None),
                         invert_media = self.config["invert_media"],
@@ -327,7 +327,7 @@ class HerokuInfoMod(loader.Module):
                         message = await utils.answer(message, self.config["ping_emoji"])
                     await utils.answer(
                         message,
-                        self._render_info(start),
+                        await self._render_info(start),
                         file = media,
                         reply_to=getattr(message, "reply_to_msg_id", None),
                         invert_media = self.config["invert_media"],
