@@ -230,6 +230,7 @@ async def get_placeholder(placeholder: str):
 async def get_placeholders(data):
     for placeholder in custom_placeholders.values():
         data[placeholder["placeholder_name"]] = await get_placeholder(placeholder["placeholder_name"])
+    return data
 
 def unregister_placeholders(module_name: str) -> int:
     placeholders_to_remove = []
