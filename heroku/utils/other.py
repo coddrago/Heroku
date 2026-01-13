@@ -219,12 +219,9 @@ def register_placeholder(placeholder: str, callback: typing.Callable):
     }
     return True
 
-async def get_placeholder(placeholder: str):
+def get_placeholder(placeholder: str):
     callback = custom_placeholders[placeholder]["callback"]
-    if inspect.iscoroutinefunction(callback):
-        callback_data = str(await callback())
-    else:
-        callback_data = str(callback())
+    callback_data = str(callback())
     return callback_data
 
 def get_placeholders():
