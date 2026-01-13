@@ -29,7 +29,7 @@ from functools import wraps
 from pathlib import Path
 from types import FunctionType
 from uuid import uuid4
-import main
+from . import main
 
 from herokutl.tl.tlobject import TLObject
 
