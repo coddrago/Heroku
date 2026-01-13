@@ -223,6 +223,7 @@ def get_placeholder(placeholder: str):
     callback = custom_placeholders[placeholder]["callback"]
     if inspect.iscoroutinefunction(callback):
         import asyncio
+        loop = asyncio.get_event_loop()
         callback_data = str(loop.run_until_complete(callback()))
     else:
         callback_data = str(callback())
