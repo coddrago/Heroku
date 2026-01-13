@@ -50,6 +50,9 @@
 - add utils.get_args_bool
 - add utils.get_args_int
 - fix pack_url
+- add togglecmd cmd for disable or enable any cmd
+- add togglemod cmd for disable or enable any module
+- add clearmodule cmd
 
 ## 🪐 Heroku 1.7.2
 - added autoupdate

@@ -29,10 +29,10 @@ from functools import wraps
 from pathlib import Path
 from types import FunctionType
 from uuid import uuid4
-from . import main
 
 from herokutl.tl.tlobject import TLObject
 
+from . import main
 from . import security, utils, validators
 from .database import Database
 from .inline.core import InlineManager

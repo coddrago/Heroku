@@ -337,11 +337,11 @@ class CoreMod(loader.Module):
         await utils.answer(call, self.strings("db_cleared"))
 
     @loader.command()
-    async def togglecmd(self, message: Message):
+    async def togglecmdcmd(self, message: Message):
         """Toggle disable specific command of a module: togglecmd <module> <command> or togglecmd <command>"""
         args = utils.get_args(message)
         if not args:
-            return await utils.answer(message, "Usage: togglecmd <module> <command> or togglecmd <command>") # стрингсов не будэ я принял ислам
+            await utils.answer(message, "Usage: togglecmd <module> <command> or togglecmd <command>") # стрингсов не будэ я принял ислам
 
         if len(args) == 1:
             cmd = args[0]

@@ -408,7 +408,7 @@ updater:
   more: "\n<i><b>🎥 И еще {} штук...</b></i>"
   latest_disabled: "Уведомление о ласт обнове оффнуто"
   _cfg_doc_disable_notifications: "Оффнуть уведомления об обновах"
-  changelog: '<emoji document_id=5434144690511290129>📰</emoji> <b>Че было в жирной обнове:</b><pre><code class="language-heroku">{}</code></pre>'
+  changelog: '<emoji document_id=5434144690511290129>📰</emoji> <b>Че было в жирной обнове:</b><blockquote expandable>{}</blockquote>'
   _cfg_doc_autoupdate: "💫 Авто-апдейт Heroku"
   _cmd_doc_restart: "Ребутает юб"
   _cmd_doc_source: "Ссылка на гит"

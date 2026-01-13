@@ -413,7 +413,7 @@ updater:
   latest_disabled: "Benachrichtigungen über das neueste Update wurden deaktiviert"
   update: "🔄 Aktualisieren"
   ignore: "🚫 Ignorieren"
-  changelog: '<emoji document_id=5434144690511290129>📰</emoji> <b>Änderungsprotokoll des letzten großen Updates:</b><pre><code class="language-heroku">{}</code></pre>'
+  changelog: '<emoji document_id=5434144690511290129>📰</emoji> <b>Änderungsprotokoll des letzten großen Updates:</b><blockquote expandable>{}</blockquote>'
 
 api_protection:
   warning: "⚠️ <b>ACHTUNG!</b>\n\nDas Konto hat die in der Konfiguration angegebenen Anfrageratenlimits überschritten. Um Telegram API-Fluten zu vermeiden, wurde der Userbot <b>vollständig eingefroren</b> für {} Sekunden. Weitere Informationen befinden sich in der beigefügten Datei unten. \n\nEs wird empfohlen, die Hilfe der <code>{prefix}support</code> Gruppe in Anspruch zu nehmen!\n\nWenn du davon ausgehst, dass dies ein geplantes Verhalten des Userbots ist, warte einfach, bis der Timer abläuft, und beim nächsten Mal, wenn du eine ressourcenintensive Aufgabe planst, benutze <code>{prefix}suspend_api_protect</code> Zeit in Sekunden"

@@ -444,7 +444,7 @@ updater:
   latest_disabled: "最新のアップデートに関する通知は抑制されました"
   update: "🔄 アップデート"
   ignore: "🚫 無視"
-  changelog: '<emoji document_id=5434144690511290129>📰</emoji> <b>最後のメジャーアップデートの変更履歴:</b><pre><code class="language-heroku">{}</code></pre>'
+  changelog: '<emoji document_id=5434144690511290129>📰</emoji> <b>最後のメジャーアップデートの変更履歴:</b><blockquote expandable>{}</blockquote>'
 
 
 api_protection:

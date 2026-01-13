@@ -444,7 +444,7 @@ updater:
   latest_disabled: "Les notifications concernant la dernière mise à jour ont été supprimées"
   update: "🔄 Mettre à jour"
   ignore: "🚫 Ignorer"
-  changelog: '<emoji document_id=5434144690511290129>📰</emoji> <b>Journal des modifications de la dernière mise à jour majeure :</b><pre><code class="language-heroku">{}</code></pre>'
+  changelog: '<emoji document_id=5434144690511290129>📰</emoji> <b>Journal des modifications de la dernière mise à jour majeure :</b><blockquote expandable>{}</blockquote>'
 
 
 api_protection:

@@ -444,7 +444,7 @@ updater:
   latest_disabled: "Nyotifications about da watest update have been suppwessed"
   update: "🔄 Update"
   ignore: "🚫 Ignyowe"
-  changelog: '<emoji document_id=5434144690511290129>📰</emoji> <b>Changewog of da wast majow update:</b><pre><code class="language-heroku">{}</code></pre>'
+  changelog: '<emoji document_id=5434144690511290129>📰</emoji> <b>Changewog of da wast majow update:</b><blockquote expandable>{}</blockquote>'
 
 
 api_protection:

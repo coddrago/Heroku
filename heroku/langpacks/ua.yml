@@ -413,7 +413,7 @@ updater:
   latest_disabled: "Повідомлення про останнє оновлення було вимкнено"
   update: "🔄 Оновити"
   ignore: "🚫 Ігнорувати"
-  changelog: '<emoji document_id=5434144690511290129>📰</emoji> <b>Список змін останнього великого оновлення:</b><pre><code class="language-heroku">{}</code></pre>'
+  changelog: '<emoji document_id=5434144690511290129>📰</emoji> <b>Список змін останнього великого оновлення:</b><blockquote expandable>{}</blockquote>'
 
 
 api_protection:
