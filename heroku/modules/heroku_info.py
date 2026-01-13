@@ -161,34 +161,38 @@ class HerokuInfoMod(loader.Module):
             ("🍏", "<emoji document_id=5372908412604525258>🍏</emoji>")
         ]:
             platform_emoji = platform_emoji.replace(emoji, icon)
+        data = {
+            'me': me,
+            'version': _version,
+            'build': build,
+            'prefix': prefix,
+            'platform': platform,
+            'platform_emoji': platform_emoji,
+            'upd': upd,
+            'python_ver': lib_platform.python_version(),
+            'uptime': utils.formatted_uptime(),
+            'cpu_usage': utils.get_cpu_usage(),
+            'ram_usage': f"{utils.get_ram_usage()} MB",
+            'branch': version.branch,
+            'hostname': lib_platform.node(),
+            'user': getpass.getuser(),
+            'os': self._get_os_name() or self.strings('non_detectable'),
+            'kernel': lib_platform.release(),
+            'cpu': f"{psutil.cpu_count(logical=False)} ({psutil.cpu_count()}) core(-s); {psutil.cpu_percent()}% total",
+            'ping': round((time.perf_counter_ns() - start) / 10**6, 3),
+            'htl_ver': herokutl.__version__,
+            'git_status': utils.get_git_status(),
+        }
+        placeholders = utils.get_placeholders()
+        for placeholder in placeholders:
+            data[placeholder["placeholder"]] = placeholder["callback"]()
         return (
             (
                 "🪐 Heroku\n"
                 if self.config["show_heroku"]
                 else ""
             )
-            + self.config["custom_message"].format(
-                me=me,
-                version=_version,
-                build=build,
-                prefix=prefix,
-                platform=platform,
-                platform_emoji=platform_emoji,
-                upd=upd,
-                python_ver=lib_platform.python_version(),
-                uptime=utils.formatted_uptime(),
-                cpu_usage=utils.get_cpu_usage(),
-                ram_usage=f"{utils.get_ram_usage()} MB",
-                branch=version.branch,
-                hostname=lib_platform.node(),
-                user=getpass.getuser(),
-                os=self._get_os_name() or self.strings('non_detectable'),
-                kernel=lib_platform.release(),
-                cpu=f"{psutil.cpu_count(logical=False)} ({psutil.cpu_count()}) core(-s); {psutil.cpu_percent()}% total",
-                ping=round((time.perf_counter_ns() - start) / 10**6, 3),
-                htl_ver = herokutl.__version__,
-                git_status = utils.get_git_status()
-            )
+            + self.config["custom_message"].format(**data)
             if self.config["custom_message"]
             else self.strings["info_message"].format(
                 (

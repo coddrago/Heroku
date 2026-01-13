@@ -30,6 +30,7 @@ from ..types import ListLike
 parser = herokutl.utils.sanitize_parse_mode("html")
 logger = logging.getLogger(__name__)
 
+custom_placeholders = {}
 
 def rand(size: int, /) -> str:
     """
@@ -202,3 +203,27 @@ def safe_getattr(obj, attr, default=None):
         return getattr(obj, attr, default)
     except AttributeError:
         return default
+
+def register_placeholder(placeholder: str, callback: typing.Callable):
+    """
+    Register placeholder for Ping or Info commands
+    """
+    module_name = callback.__self__.__class__.__name__
+    module_instance = callback.__self__
+    custom_placeholders[placeholder] = {
+        "module_name": module_name,
+        "module_instance": module_instance,
+        "callback": callback,
+    }
+    return True
+
+async def get_placeholder(placeholder: str):
+    callback = custom_placeholders[placeholder]["callback"]
+    if inspect.iscoroutinefunction(callback):
+        callback_data = str(await callback())
+    else:
+        callback_data = str(callback())
+    return callback_data
+
+def get_placeholders():
+    return list(custom_placeholders.values())
