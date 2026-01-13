@@ -402,18 +402,21 @@ class TestMod(loader.Module):
         banner = self.config["banner_url"]
         if self.config["banner_url"] and self.config["quote_media"] is True:
             banner = InputMediaWebPage(self.config["banner_url"], optional = True)
-        
+        data = {
+            "ping": round((time.perf_counter_ns() - start) / 10**6, 3),
+            "uptime": utils.formatted_uptime(),
+            "ping_hint": (
+                (self.config["hint"]) if random.choice([0, 0, 1]) == 1 else ""
+            ),
+            "hostname": lib_platform.node(),
+            "user": getpass.getuser(),
+        }
+        placeholders = utils.get_placeholders()
+        for placeholder in placeholders:
+            data[placeholder["placeholder_name"]] = utils.get_placeholder(placeholder["placeholder_name"])
         await utils.answer(
             message,
-            self.config["Text_Of_Ping"].format(
-                ping=round((time.perf_counter_ns() - start) / 10**6, 3),
-                uptime=utils.formatted_uptime(),
-                ping_hint=(
-                    (self.config["hint"]) if random.choice([0, 0, 1]) == 1 else ""
-                ),
-                hostname=lib_platform.node(),
-                user=getpass.getuser(),
-            ),
+            self.config["Text_Of_Ping"].format(**data),
             file = banner,
             invert_media = self.config["invert_media"]
         )

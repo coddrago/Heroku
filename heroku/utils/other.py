@@ -221,7 +221,11 @@ def register_placeholder(placeholder: str, callback: typing.Callable):
 
 def get_placeholder(placeholder: str):
     callback = custom_placeholders[placeholder]["callback"]
-    callback_data = str(callback())
+    if inspect.iscoroutinefunction(callback):
+        import asyncio
+        callback_data = str(loop.run_until_complete(callback()))
+    else:
+        callback_data = str(callback())
     return callback_data
 
 def get_placeholders():
