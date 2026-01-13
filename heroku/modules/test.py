@@ -411,9 +411,7 @@ class TestMod(loader.Module):
             "hostname": lib_platform.node(),
             "user": getpass.getuser(),
         }
-        placeholders = utils.get_placeholders()
-        for placeholder in placeholders:
-            data[placeholder["placeholder_name"]] = utils.get_placeholder(placeholder["placeholder_name"])
+        data = utils.get_placeholders(data)
         await utils.answer(
             message,
             self.config["Text_Of_Ping"].format(**data),

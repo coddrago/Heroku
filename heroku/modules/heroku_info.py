@@ -183,9 +183,7 @@ class HerokuInfoMod(loader.Module):
             'htl_ver': herokutl.__version__,
             'git_status': utils.get_git_status(),
         }
-        placeholders = utils.get_placeholders()
-        for placeholder in placeholders:
-            data[placeholder["placeholder_name"]] = utils.get_placeholder(placeholder["placeholder_name"])
+        data = utils.get_placeholders(data)
         return (
             (
                 "🪐 Heroku\n"

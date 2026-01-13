@@ -221,11 +221,15 @@ def register_placeholder(placeholder: str, callback: typing.Callable):
 
 async def get_placeholder(placeholder: str):
     callback = custom_placeholders[placeholder]["callback"]
-    callback_data = str(await callback())
+    try:
+        callback_data = str(await callback())
+    except:
+        callback_data = str(callback())
     return callback_data
 
-def get_placeholders():
-    return list(custom_placeholders.values())
+async def get_placeholders(data):
+    for placeholder in custom_placeholders.values():
+        data[placeholder["placeholder_name"]] = await get_placeholder(placeholder["placeholder_name"])
 
 def unregister_placeholders(module_name: str) -> int:
     placeholders_to_remove = []
