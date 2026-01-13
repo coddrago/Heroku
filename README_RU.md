@@ -214,7 +214,7 @@ sudo apt update && sudo apt upgrade -y && sudo apt install python3 git python3-p
 
 ## 📋 Требования
 
-- Python 3.9-3.13
+- Python 3.10+
 - Учетные данные API из [Telegram Apps](https://my.telegram.org/apps)
 
 ---

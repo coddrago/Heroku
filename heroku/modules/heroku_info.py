@@ -19,6 +19,7 @@ import glob
 import requests
 import re
 import emoji
+import herokutl
 
 from bs4 import BeautifulSoup
 from typing import Optional
@@ -184,7 +185,9 @@ class HerokuInfoMod(loader.Module):
                 os=self._get_os_name() or self.strings('non_detectable'),
                 kernel=lib_platform.release(),
                 cpu=f"{psutil.cpu_count(logical=False)} ({psutil.cpu_count()}) core(-s); {psutil.cpu_percent()}% total",
-                ping=round((time.perf_counter_ns() - start) / 10**6, 3)
+                ping=round((time.perf_counter_ns() - start) / 10**6, 3),
+                htl_ver = herokutl.__version__,
+                git_status = utils.get_git_status()
             )
             if self.config["custom_message"]
             else self.strings["info_message"].format(

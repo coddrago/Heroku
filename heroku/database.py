@@ -156,6 +156,9 @@ class Database(dict):
             if re.search(r'"(hikka\.)(\S+\":)', db):
                 logging.warning("Converting db after update")
                 db = re.sub(r'(hikka\.)(\S+\":)', lambda m: 'heroku.' + m.group(2), db)
+            if re.search(r'"(legacy\.)(\S+\":)', db):
+                logging.warning("Converting db after update")
+                db = re.sub(r'(legacy\.)(\S+\":)', lambda m: 'heroku.' + m.group(2), db)
             self.update(**json.loads(db))
         except json.decoder.JSONDecodeError:
             logger.warning("Database read failed! Creating new one...")

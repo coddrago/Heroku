@@ -147,3 +147,58 @@ def _copy_tl(o, **kwargs):
     del d["_"]
     d.update(kwargs)
     return o.__class__(**d)
+
+
+def format_file_size(size_bytes: int) -> str:
+    """
+    Format file size in bytes to human-readable format
+    :param size_bytes: Size in bytes
+    :return: Formatted string (e.g., '1.5 MB')
+    """
+    if size_bytes == 0:
+        return "0 B"
+    size_names = ["B", "KB", "MB", "GB", "TB"]
+    i = 0
+    while size_bytes >= 1024 and i < len(size_names) - 1:
+        size_bytes /= 1024.0
+        i += 1
+    return ".1f"
+
+def is_url(string: str) -> bool:
+    """
+    Check if string is a valid URL
+    :param string: String to check
+    :return: True if valid URL, False otherwise
+    """
+    import re
+    url_pattern = re.compile(
+        r'^https?://'  # http:// or https://
+        r'(?:(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+[A-Z]{2,6}\.?|'  # domain...
+        r'localhost|'  # localhost...
+        r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})'  # ...or ip
+        r'(?::\d+)?'  # optional port
+        r'(?:/?|[/?]\S+)$', re.IGNORECASE)
+    return url_pattern.match(string) is not None
+
+
+def get_iso_time() -> str:
+    """
+    Get current time in ISO format
+    :return: ISO formatted time string
+    """
+    from datetime import datetime
+    return datetime.utcnow().isoformat() + "Z"
+
+
+def safe_getattr(obj, attr, default=None):
+    """
+    Safely get attribute from object, returning default if not found
+    :param obj: Object to get attribute from
+    :param attr: Attribute name
+    :param default: Default value if attribute not found
+    :return: Attribute value or default
+    """
+    try:
+        return getattr(obj, attr, default)
+    except AttributeError:
+        return default

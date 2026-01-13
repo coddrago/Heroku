@@ -19,12 +19,12 @@ from aiogram.types import InlineQueryResultArticle, InputTextMessageContent
 from aiogram.types import Message as AiogramMessage
 from pydantic import ConfigDict
 
-from .. import utils
+HerokuReplyMarkup = typing.Union[typing.List[typing.List[dict]], typing.List[dict], dict]
 
 logger = logging.getLogger(__name__)
 
 if typing.TYPE_CHECKING:
-    from ..inline.core import InlineManager
+    from .core import InlineManager
 
 
 class InlineMessage:
@@ -212,9 +212,10 @@ class InlineQuery(AiogramInlineQuery):
 
     @staticmethod
     def _get_res(title: str, description: str, thumbnail_url: str) -> list:
+        from ..utils.other import rand
         return [
             InlineQueryResultArticle(
-                id=utils.rand(20),
+                id=rand(20),
                 title=title,
                 description=description,
                 input_message_content=InputTextMessageContent(
