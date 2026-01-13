@@ -336,6 +336,133 @@ class CoreMod(loader.Module):
         self._db.save()
         await utils.answer(call, self.strings("db_cleared"))
 
+    @loader.command()
+    async def togglecmd(self, message: Message):
+        """Toggle disable specific command of a module: togglecmd <module> <command> or togglecmd <command>"""
+        args = utils.get_args(message)
+        if not args:
+            return await utils.answer(message, "Usage: togglecmd <module> <command> or togglecmd <command>") # стрингсов не будэ я принял ислам
+
+        if len(args) == 1:
+            cmd = args[0]
+            func = self.allmodules.commands.get(cmd.lower())
+            if not func:
+                await utils.answer(message, self.strings("no_command"))
+            mod_inst = func.__self__
+        else:
+            mod_arg, cmd = args[0], args[1]
+            mod_inst = self.allmodules.lookup(mod_arg)
+            if not mod_inst:
+                await utils.answer(message, self.strings("mod404").format(mod_arg))
+
+        module_key = mod_inst.__class__.__name__
+
+        disabled_commands = self._db.get(main.__name__, "disabled_commands", {})
+        current = [x for x in disabled_commands.get(module_key, [])]
+
+        if cmd.lower() not in [c.lower() for c in mod_inst.heroku_commands.keys()]:
+            await utils.answer(message, self.strings("cmd404"))
+
+        if any(c.lower() == cmd.lower() for c in current):
+            current = [c for c in current if c.lower() != cmd.lower()]
+            if current:
+                disabled_commands[module_key] = current
+            else:
+                disabled_commands.pop(module_key, None)
+
+            self._db.set(main.__name__, "disabled_commands", disabled_commands)
+            try:
+                self.allmodules.register_commands(mod_inst)
+            except Exception:
+                pass
+
+            await utils.answer(message, f"Command {cmd} enabled in module {module_key}")
+        else:
+            current.append(cmd)
+            disabled_commands[module_key] = current
+            self._db.set(main.__name__, "disabled_commands", disabled_commands)
+
+            try:
+                self.allmodules.commands.pop(cmd.lower(), None)
+            except Exception:
+                pass
+
+            for alias, target in list(self.allmodules.aliases.items()):
+                if target.split()[0].lower() == cmd.lower():
+                    self.allmodules.aliases.pop(alias, None)
+
+            await utils.answer(message, f"Command {cmd} disabled in module {module_key}")
+
+    @loader.command()
+    async def togglemod(self, message: Message):
+        """Toggle disable entire module: togglemod <module>"""
+        args = utils.get_args(message)
+        if not args:
+            await utils.answer(message, "Usage: togglemod <module>") # стрингсов не будэ я принял ислам
+
+        mod_arg = args[0]
+        mod_inst = self.allmodules.lookup(mod_arg)
+        if not mod_inst:
+            await utils.answer(message, self.strings("mod404").format(mod_arg))
+
+        module_key = mod_inst.__class__.__name__
+        disabled = self._db.get(main.__name__, "disabled_modules", [])
+
+        if module_key in disabled:
+            disabled = [m for m in disabled if m != module_key]
+            self._db.set(main.__name__, "disabled_modules", disabled)
+            try:
+                self.allmodules.register_commands(mod_inst)
+                self.allmodules.register_watchers(mod_inst)
+                self.allmodules.register_raw_handlers(mod_inst)
+                self.allmodules.register_inline_stuff(mod_inst)
+            except Exception:
+                pass
+            await utils.answer(message, f"Module {module_key} enabled") # стрингсов не будэ я принял ислам
+        else:
+            disabled += [module_key]
+            self._db.set(main.__name__, "disabled_modules", disabled)
+            try:
+                self.allmodules.unregister_commands(mod_inst, "disable")
+                self.allmodules.unregister_watchers(mod_inst, "disable")
+                self.allmodules.unregister_raw_handlers(mod_inst, "disable")
+                self.allmodules.unregister_inline_stuff(mod_inst, "disable")
+            except Exception:
+                pass
+            await utils.answer(message, f"Module {module_key} disabled") # стрингсов не будэ я принял ислам
+
+    @loader.command()
+    async def clearmodule(self, message: Message):
+        """Clear all DB entries for module: clearmodule <module>"""
+        args = utils.get_args(message)
+        if not args:
+            await utils.answer(message, "Usage: clearmodule <module>") # стрингсов не будэ я принял ислам
+
+        mod_arg = args[0]
+        mod_inst = self.allmodules.lookup(mod_arg)
+        if mod_inst:
+            module_key = mod_inst.__class__.__name__
+        else:
+            module_key = mod_arg
+
+        if module_key in self._db:
+            try:
+                del self._db[module_key]
+                self._db.save()
+            except Exception:
+                pass
+
+        disabled_commands = self._db.get(main.__name__, "disabled_commands", {})
+        disabled_commands.pop(module_key, None)
+        self._db.set(main.__name__, "disabled_commands", disabled_commands)
+
+        disabled_modules = self._db.get(main.__name__, "disabled_modules", [])
+        if module_key in disabled_modules:
+            disabled_modules = [m for m in disabled_modules if m != module_key]
+            self._db.set(main.__name__, "disabled_modules", disabled_modules)
+
+        await utils.answer(message, f"Cleared DB for module {module_key}") # стрингсов не будэ я принял ислам
+
     async def installationcmd(self, message: Message):
         """| Guide of installation"""
 
@@ -375,4 +502,3 @@ class CoreMod(loader.Module):
                 self.strings(f'{platform}_install'),
                 reply_markup=self._markup,
             )
-
