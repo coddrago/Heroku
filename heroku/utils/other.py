@@ -13,6 +13,7 @@ import logging
 import random
 import signal
 import typing
+import inspect
 
 import herokutl
 from herokutl import hints
@@ -30,6 +31,7 @@ from ..types import ListLike
 parser = herokutl.utils.sanitize_parse_mode("html")
 logger = logging.getLogger(__name__)
 
+custom_placeholders = {}
 
 def rand(size: int, /) -> str:
     """
@@ -202,3 +204,40 @@ def safe_getattr(obj, attr, default=None):
         return getattr(obj, attr, default)
     except AttributeError:
         return default
+
+def register_placeholder(placeholder: str, callback: typing.Callable):
+    """
+    Register placeholder for Ping or Info commands
+    """
+    module_name = callback.__self__.__class__.__name__
+    module_instance = callback.__self__
+    custom_placeholders[placeholder] = {
+        "module_name": module_name,
+        "module_instance": module_instance,
+        "callback": callback,
+        "placeholder_name": placeholder,
+    }
+    return True
+
+async def get_placeholder(placeholder: str):
+    callback = custom_placeholders[placeholder]["callback"]
+    try:
+        callback_data = str(await callback())
+    except:
+        callback_data = str(callback())
+    return callback_data
+
+async def get_placeholders(data):
+    for placeholder in custom_placeholders.values():
+        data[placeholder["placeholder_name"]] = await get_placeholder(placeholder["placeholder_name"])
+    return data
+
+def unregister_placeholders(module_name: str) -> int:
+    placeholders_to_remove = []
+    for placeholder_name, placeholder_data in custom_placeholders.items():
+        if placeholder_data.get("module_name") == module_name:
+            placeholders_to_remove.append(placeholder_name)
+    for placeholder_name in placeholders_to_remove:
+        del custom_placeholders[placeholder_name]
+    
+    return True

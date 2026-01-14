@@ -1275,8 +1275,9 @@ class LoaderMod(loader.Module):
             if worked
             else self.strings("not_unloaded")
         )
+        for mod_name in worked:
+            utils.unregister_placeholders(mod_name)
         return msg
-
 
     @loader.command()
     async def clearmodules(self, message: Message):
