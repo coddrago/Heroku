@@ -444,7 +444,7 @@ updater:
   latest_disabled: "N071f1c4710n5 4b0u7 7h3 l47357 upd473 h4v3 b33n suppr3553d"
   update: "🔄 Upd473"
   ignore: "🚫 1gn0r3"
-  changelog: '<emoji document_id=5434144690511290129>📰</emoji> <b>Ch4ng3l0g 0f 7h3 l457 m4j0r upd473:</b><pre><code class="language-heroku">{}</code></pre>'
+  changelog: '<emoji document_id=5434144690511290129>📰</emoji> <b>Ch4ng3l0g 0f 7h3 l457 m4j0r upd473:</b><blockquote expandable>{}</blockquote>'
 
 
 api_protection:

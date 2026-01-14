@@ -535,20 +535,72 @@ class LoaderMod(loader.Module):
         return True
 
     async def install_packages(self, packages: list):
-        is_root = (os.geteuid() == 0)
-        if is_root:
-            apt = await asyncio.create_subprocess_exec(
-                "apt",
-                "install",
-                *packages
+        try:
+            is_root = (os.geteuid() == 0)
+
+            def _which(names):
+                for n in names:
+                    p = shutil.which(n)
+                    if p:
+                        return p
+                return None
+
+            pm = None
+            if _which(["apt", "apt-get"]):
+                pm = "apt"
+            elif _which(["apk"]):
+                pm = "apk"
+            elif _which(["dnf"]):
+                pm = "dnf"
+            elif _which(["yum"]):
+                pm = "yum"
+            elif _which(["pacman"]):
+                pm = "pacman"
+            elif _which(["brew"]):
+                pm = "brew"
+
+            if not pm:
+                logger.debug("No supported package manager found")
+                return False
+
+            cmd = []
+            if pm == "apt":
+                tool = _which(["apt", "apt-get"])
+                cmd = [tool, "install", "-y", *packages]
+            elif pm == "apk":
+                cmd = ["apk", "add", "--no-cache", *packages]
+            elif pm == "dnf":
+                cmd = ["dnf", "install", "-y", *packages]
+            elif pm == "yum":
+                cmd = ["yum", "install", "-y", *packages]
+            elif pm == "pacman":
+                cmd = ["pacman", "-Syu", "--noconfirm", *packages]
+            elif pm == "brew":
+                cmd = ["brew", "install", *packages]
+
+            if not is_root and shutil.which("sudo"):
+                cmd = ["sudo", *cmd]
+
+            proc = await asyncio.create_subprocess_exec(
+                *cmd,
+                stdout=asyncio.subprocess.PIPE,
+                stderr=asyncio.subprocess.PIPE,
             )
-        else: 
-            apt = await asyncio.create_subprocess_exec(
-                "sudo",
-                "apt",
-                "install",
-                *packages
-            )
+
+            out, err = await proc.communicate()
+
+            if proc.returncode != 0:
+                logger.debug(
+                    "Package install failed (%s): %s",
+                    " ".join(cmd),
+                    err.decode(errors="ignore") if err else out.decode(errors="ignore"),
+                )
+                return False
+
+            return True
+        except Exception:
+            logger.exception("install_packages failed")
+            return False
 
     async def load_module(
         self,
@@ -648,7 +700,14 @@ class LoaderMod(loader.Module):
                 pass
             
             if packages:
-                await self.install_packages(packages)
+                result = await self.install_packages(packages)
+
+                if not result:
+                    if message is not None:
+                        await utils.answer(message, self.strings("requirements_failed"))
+                    return
+
+                importlib.invalidate_caches()
 
                 kwargs = utils.get_kwargs()
                 kwargs["did_packages"] = True

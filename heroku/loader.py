@@ -32,6 +32,7 @@ from uuid import uuid4
 
 from herokutl.tl.tlobject import TLObject
 
+from . import main
 from . import security, utils, validators
 from .database import Database
 from .inline.core import InlineManager
@@ -953,7 +954,7 @@ class Modules:
     def dispatch(self, _command: str) -> typing.Tuple[str, typing.Optional[str]]:
         """Dispatch command to appropriate module"""
 
-        return next(
+        resolved = next(
             (
                 (cmd, self.commands[cmd.split()[0].lower()])
                 for cmd in [
@@ -965,6 +966,33 @@ class Modules:
             ),
             (_command, None),
         )
+
+        cmd, func = resolved
+        if not func:
+            return resolved
+
+        try:
+            disabled_modules = self._db.get(main.__name__, "disabled_modules", [])
+            disabled_commands = self._db.get(main.__name__, "disabled_commands", {})
+        except Exception:
+            disabled_modules = []
+            disabled_commands = {}
+
+        module_name = None
+        try:
+            module_name = func.__self__.__class__.__name__
+        except Exception:
+            module_name = None
+
+        if module_name and module_name in disabled_modules:
+            return (_command, None)
+
+        if module_name and module_name in disabled_commands:
+            disabled_for_mod = [x.lower() for x in disabled_commands.get(module_name, [])]
+            if cmd.split()[0].lower() in disabled_for_mod:
+                return (_command, None)
+
+        return (cmd, func)
 
     def send_config(self, skip_hook: bool = False):
         """Configure modules"""
