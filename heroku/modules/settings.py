@@ -341,7 +341,7 @@ class CoreMod(loader.Module):
         """Toggle disable specific command of a module: togglecmd <module> <command> or togglecmd <command>"""
         args = utils.get_args(message)
         if not args:
-            await utils.answer(message, "Usage: togglecmd <module> <command> or togglecmd <command>") # стрингсов не будэ я принял ислам
+            await utils.answer(message, self.strings("wrong_usage_tcc")) # стрингсов не будэ я принял ислам | А я не принимал, поэтому они будут. | А я не принимал, поэтому они будут.
 
         if len(args) == 1:
             cmd = args[0]
@@ -398,12 +398,12 @@ class CoreMod(loader.Module):
         """Toggle disable entire module: togglemod <module>"""
         args = utils.get_args(message)
         if not args:
-            await utils.answer(message, "Usage: togglemod <module>") # стрингсов не будэ я принял ислам
+            await utils.answer(message, self.strings("wrong_usage_tmc")) # стрингсов не будэ я принял ислам | А я не принимал, поэтому они будут.
 
         mod_arg = args[0]
         mod_inst = self.allmodules.lookup(mod_arg)
         if not mod_inst:
-            await utils.answer(message, self.strings("mod404").format(mod_arg))
+            await utils.answer(message, self.strings("mod404").format(mod_arg)) 
 
         module_key = mod_inst.__class__.__name__
         disabled = self._db.get(main.__name__, "disabled_modules", [])
@@ -418,7 +418,7 @@ class CoreMod(loader.Module):
                 self.allmodules.register_inline_stuff(mod_inst)
             except Exception:
                 pass
-            await utils.answer(message, f"Module {module_key} enabled") # стрингсов не будэ я принял ислам
+            await utils.answer(message, self.strings("mod_enabled").format(module_key)) # стрингсов не будэ я принял ислам | А я не принимал, поэтому они будут.
         else:
             disabled += [module_key]
             self._db.set(main.__name__, "disabled_modules", disabled)
@@ -429,14 +429,14 @@ class CoreMod(loader.Module):
                 self.allmodules.unregister_inline_stuff(mod_inst, "disable")
             except Exception:
                 pass
-            await utils.answer(message, f"Module {module_key} disabled") # стрингсов не будэ я принял ислам
+            await utils.answer(message, self.strings("mod_disabled").format(module_key)) # стрингсов не будэ я принял ислам | А я не принимал, поэтому они будут.
 
     @loader.command()
     async def clearmodule(self, message: Message):
         """Clear all DB entries for module: clearmodule <module>"""
         args = utils.get_args(message)
         if not args:
-            await utils.answer(message, "Usage: clearmodule <module>") # стрингсов не будэ я принял ислам
+            await utils.answer(message, self.strings("wrong_usage_cmc")) # стрингсов не будэ я принял ислам | А я не принимал, поэтому они будут.
 
         mod_arg = args[0]
         mod_inst = self.allmodules.lookup(mod_arg)
@@ -461,7 +461,7 @@ class CoreMod(loader.Module):
             disabled_modules = [m for m in disabled_modules if m != module_key]
             self._db.set(main.__name__, "disabled_modules", disabled_modules)
 
-        await utils.answer(message, f"Cleared DB for module {module_key}") # стрингсов не будэ я принял ислам
+        await utils.answer(message, f"Cleared DB for module {module_key}") # стрингсов не будэ я принял ислам | А я не принимал, поэтому они будут.
 
     async def installationcmd(self, message: Message):
         """| Guide of installation"""
