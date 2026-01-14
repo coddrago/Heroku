@@ -312,7 +312,7 @@ settings:
   cancel: "🚫 Cancew"
   wrong_usage_tcc: "Usagwe: toggwecmd <moduwule> <command> ow toggwecmd <command>"
   wrong_usage_tmc: "Usagwe: toggwemod <moduwule>"
-  wrong_usage_cmc: "Cleawed DB fow moduwule {moduwule_key}"
+  wrong_usage_cmc: "Cleawed DB fow moduwule {}"
   mod_enabled: "Moduwule {} enabwed"
   mod_disabled: "Moduwule {} disabwed"
   who_to_blacklist: "<emoji document_id=5382187118216879236>❓</emoji> <b>Who to bwackwist?</b>"

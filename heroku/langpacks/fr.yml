@@ -312,7 +312,7 @@ settings:
   cancel: "🚫 Annuler"
   wrong_usage_tcc: "Utilisation : togglecmd <module> <commande> ou togglecmd <commande>"
   wrong_usage_tmc: "Utilisation : togglemod <module>"
-  wrong_usage_cmc: "Base de données effacée pour le module {module_key}"
+  wrong_usage_cmc: "Base de données effacée pour le module {}"
   mod_enabled: "Module {} activé"
   mod_disabled: "Module {} désactivé"
   who_to_blacklist: "<emoji document_id=5382187118216879236>❓</emoji> <b>Qui mettre sur liste noire ?</b>"
