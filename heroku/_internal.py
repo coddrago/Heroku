@@ -17,6 +17,8 @@ import os
 import random
 import signal
 import sys
+import subprocess
+import re
 
 
 async def fw_protect():
@@ -92,3 +94,95 @@ def print_banner(banner: str):
         "r",
     ) as f:
         print(f.read())
+
+
+def check_commit_ancestor(commit, repo_path):
+    """Check if commit is ancestor of origin/master"""
+    try:
+        proc = subprocess.run(
+            ["git", "merge-base", "--is-ancestor", commit, "refs/remotes/origin/master"],
+            cwd=repo_path,
+        )
+        return proc.returncode == 0
+    except Exception:
+        return False
+
+
+def get_branch_name(repo_path):
+    """Get the current branch name using multiple methods (gitpython, HEAD, git cmd)"""
+    branch_name = None
+
+    try:
+        import git
+
+        repo = git.Repo(path=repo_path)
+        branch_name = repo.active_branch.name
+    except Exception:
+        pass
+
+    if not branch_name:
+        try:
+            head_path = os.path.join(repo_path, ".git", "HEAD")
+            with open(head_path, "r", encoding="utf-8") as f:
+                content = f.read().strip()
+            if content.startswith("ref:"):
+                branch_name = content.split("/")[-1]
+        except Exception:
+            pass
+
+    if not branch_name:
+        try:
+            proc = subprocess.run(
+                ["git", "rev-parse", "--abbrev-ref", "HEAD"],
+                cwd=repo_path,
+                capture_output=True,
+                text=True,
+                timeout=3,
+            )
+            if proc.returncode == 0:
+                candidate = proc.stdout.strip()
+                if candidate:
+                    branch_name = candidate
+        except Exception:
+            pass
+
+    if isinstance(branch_name, str):
+        branch_name = branch_name.strip().lstrip("refs/heads/")
+
+    return branch_name
+
+
+def reset_to_master(repo_path):
+    """Reset repository to master branch using gitpython or subprocess fallback"""
+    try:
+        import git
+
+        repo = git.Repo(path=repo_path)
+        repo.git.reset("--hard", "HEAD")
+        repo.git.checkout("master", force=True)
+    except Exception:
+        try:
+            subprocess.run(["git", "reset", "--hard", "HEAD"], cwd=repo_path)
+            subprocess.run(["git", "checkout", "master", "-f"], cwd=repo_path)
+        except Exception:
+            pass
+
+
+def restore_worktree(repo_path):
+    """Restore working tree for allowed users. Try `git restore .`, fallback to `git reset --hard`.
+
+    Returns True if an operation succeeded, False otherwise.
+    """
+
+    try:
+        proc = subprocess.run(["git", "restore", "."], cwd=repo_path)
+        if proc.returncode == 0:
+            return True
+    except Exception:
+        pass
+
+    try:
+        proc = subprocess.run(["git", "reset", "--hard"], cwd=repo_path)
+        return proc.returncode == 0
+    except Exception:
+        return False
