@@ -53,6 +53,7 @@
 - add togglecmd cmd for disable or enable any cmd
 - add togglemod cmd for disable or enable any module
 - add clearmodule cmd
+- add placeholder system
 
 ## 🪐 Heroku 1.7.2
 - added autoupdate
