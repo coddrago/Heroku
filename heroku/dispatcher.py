@@ -266,34 +266,34 @@ class CommandDispatcher:
         event: typing.Union[events.NewMessage, events.MessageDeleted],
         watcher: bool = False,
     ) -> typing.Union[bool, typing.Tuple[Message, str, str, callable]]:
-        logger.debug("DEBUG: Called _handle_command with event=%s, watcher=%s", event, watcher)
+        logger.info("info: Called _handle_command with event=%s, watcher=%s", event, watcher)
         if not hasattr(event, "message") or not hasattr(event.message, "message"):
-            logger.debug("DEBUG: Event has no 'message' attribute or 'message.message'")
+            logger.info("info: Event has no 'message' attribute or 'message.message'")
             return False
 
         initiator = getattr(event, "sender_id", 0)
-        logger.debug(f"DEBUG: initiator={initiator}")
+        logger.info(f"info: initiator={initiator}")
 
         main_prefix = self._db.get(main.__name__, "command_prefix", ".")
-        logger.debug(f"DEBUG: main_prefix={main_prefix}")
+        logger.info(f"info: main_prefix={main_prefix}")
         if initiator == self._client.tg_id:
-            logger.debug("DEBUG: initiator is self._client.tg_id")
+            logger.info("info: initiator is self._client.tg_id")
             prefix = main_prefix
         else:
             prefix = self._db.get(main.__name__, "command_prefixes", {})
-            logger.debug(f"DEBUG: prefix map={prefix}")
+            logger.info(f"info: prefix map={prefix}")
             prefix = prefix.get(str(initiator), main_prefix)
         
-        logger.debug(f"DEBUG: Using prefix={prefix}")
+        logger.info(f"info: Using prefix={prefix}")
 
         change = str.maketrans(ru_keys + en_keys, en_keys + ru_keys)
-        logger.debug(f"DEBUG: change mapping created.")
+        logger.info(f"info: change mapping created.")
 
         message = utils.censor(event.message)
-        logger.debug(f"DEBUG: message after censoring: {message}")
+        logger.info(f"info: message after censoring: {message}")
 
         if not event.message.message:
-            logger.debug("DEBUG: event.message.message is empty")
+            logger.info("info: event.message.message is empty")
             return False
 
         if (
@@ -306,7 +306,7 @@ class CommandDispatcher:
                 and any(s != str.translate(prefix, change) for s in message.message)
             )
         ):
-            logger.debug("DEBUG: Allow escaping commands with doubled prefix, will edit message")
+            logger.info("info: Allow escaping commands with doubled prefix, will edit message")
             # Allow escaping commands using .'s
             if not watcher:
                 await message.edit(
@@ -324,11 +324,11 @@ class CommandDispatcher:
                 event.message.message.startswith(str.translate(prefix, change))
                 and str.translate(prefix, change) != prefix
             ):
-                logger.debug("DEBUG: Command prefix matched after layout change, translating")
+                logger.info("info: Command prefix matched after layout change, translating")
                 message.message = str.translate(message.message, change)
                 message.text = str.translate(message.text, change)
             case _ if not event.message.message.startswith(prefix):
-                logger.debug("DEBUG: event.message.message does not start with prefix")
+                logger.info("info: event.message.message does not start with prefix")
                 return False
 
         if (
@@ -338,13 +338,13 @@ class CommandDispatcher:
             or event.via_bot_id
             or getattr(event, "reactions", False)
         ):
-            logger.debug("DEBUG: Message is sticker/dice/audio/via_bot_id/reactions")
+            logger.info("info: Message is sticker/dice/audio/via_bot_id/reactions")
             return False
 
         blacklist_chats = self._db.get(main.__name__, "blacklist_chats", [])
         whitelist_chats = self._db.get(main.__name__, "whitelist_chats", [])
         whitelist_modules = self._db.get(main.__name__, "whitelist_modules", [])
-        logger.debug(f"DEBUG: blacklist_chats={blacklist_chats}, whitelist_chats={whitelist_chats}, whitelist_modules={whitelist_modules}")
+        logger.info(f"info: blacklist_chats={blacklist_chats}, whitelist_chats={whitelist_chats}, whitelist_modules={whitelist_modules}")
 
         # ⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️
         # It's not recommended to remove the security check below (external_bl)
@@ -358,26 +358,26 @@ class CommandDispatcher:
             or chat_id in blacklist_chats
             or (whitelist_chats and chat_id not in whitelist_chats)
         ):
-            logger.debug(f"DEBUG: chat_id={chat_id} blocked by blacklist/whitelist/external_bl")
+            logger.info(f"info: chat_id={chat_id} blocked by blacklist/whitelist/external_bl")
             return False
 
         if not message.message or len(message.message.strip()) == len(prefix):
-            logger.debug("DEBUG: Message is just the prefix")
+            logger.info("info: Message is just the prefix")
             return False  # Message is just the prefix
 
         command = message.message[len(prefix):].strip().split(maxsplit=1)[0]
-        logger.debug(f"DEBUG: command extracted: {command}")
+        logger.info(f"info: command extracted: {command}")
         tag = command.split("@", maxsplit=1)
-        logger.debug(f"DEBUG: tag split: {tag}")
+        logger.info(f"info: tag split: {tag}")
 
         if len(tag) == 2:
             if tag[1] == "me":
-                logger.debug("DEBUG: Command directed to 'me'")
+                logger.info("info: Command directed to 'me'")
                 if not message.out:
-                    logger.debug("DEBUG: Not outbound message, ignored")
+                    logger.info("info: Not outbound message, ignored")
                     return False
             elif tag[1].lower() not in self._cached_usernames:
-                logger.debug(f"DEBUG: tag[1] ({tag[1].lower()}) not in cached_usernames")
+                logger.info(f"info: tag[1] ({tag[1].lower()}) not in cached_usernames")
                 return False
         elif (
             event.out
@@ -389,7 +389,7 @@ class CommandDispatcher:
                 for username in self._cached_usernames
             )
         ):
-            logger.debug("DEBUG: Command is outbound or user mentioned")
+            logger.info("info: Command is outbound or user mentioned")
             pass
         elif (
             not event.is_private
@@ -400,11 +400,11 @@ class CommandDispatcher:
             and utils.get_chat_id(event)
             not in self._db.get(main.__name__, "nonickchats", [])
         ):
-            logger.debug("DEBUG: Message rejected because nick check failed")
+            logger.info("info: Message rejected because nick check failed")
             return False
 
         txt, func = self._modules.dispatch(tag[0])
-        logger.debug(f"DEBUG: Dispatched txt={txt}, func={func}")
+        logger.info(f"info: Dispatched txt={txt}, func={func}")
 
         if (
             not func
@@ -415,46 +415,46 @@ class CommandDispatcher:
                 usernames=self._cached_usernames,
             )
         ):
-            logger.debug("DEBUG: func not found or ratelimit or security check failed; func = %s", func)
+            logger.info("info: func not found or ratelimit or security check failed; func = %s", func)
             return False
 
         if message.is_channel and message.edit_date and not message.is_group:
-            logger.debug("DEBUG: Message is edit in channel, will check admin log")
+            logger.info("info: Message is edit in channel, will check admin log")
             async for event in self._client.iter_admin_log(
                 chat_id,
                 limit=10,
                 edit=True,
             ):
                 if event.action.prev_message.id == message.id:
-                    logger.debug(f"DEBUG: Found previous edit in admin log for message {message.id}")
+                    logger.info(f"info: Found previous edit in admin log for message {message.id}")
                     if event.user_id != self._client.tg_id:
-                        logger.debug("Ignoring edit in channel - not from self")
+                        logger.info("Ignoring edit in channel - not from self")
                         return False
 
                     break
-            logger.debug("DEBUG: Returning False after admin log check")
+            logger.info("info: Returning False after admin log check")
             return False
 
         message.message = prefix + txt + message.message[len(prefix + command) :]
-        logger.debug(f"DEBUG: message.message updated: {message.message}")
+        logger.info(f"info: message.message updated: {message.message}")
 
         if (
             f"{str(chat_id)}.{func.__self__.__module__}" in blacklist_chats
             or whitelist_modules
             and f"{chat_id}.{func.__self__.__module__}" not in whitelist_modules
         ):
-            logger.debug("DEBUG: Module chat blacklisted or not in whitelist_modules")
+            logger.info("info: Module chat blacklisted or not in whitelist_modules")
             return False
 
         if await self._handle_tags(event, func):
-            logger.debug("DEBUG: _handle_tags returned True")
+            logger.info("info: _handle_tags returned True")
             return False
 
         if self._db.get(main.__name__, "grep", False) and not watcher:
-            logger.debug("DEBUG: Grep enabled and not watcher, applying _handle_grep")
+            logger.info("info: Grep enabled and not watcher, applying _handle_grep")
             message = self._handle_grep(message)
 
-        logger.debug("DEBUG: Returning from _handle_command: message, prefix, txt, func")
+        logger.info("info: Returning from _handle_command: message, prefix, txt, func")
         return message, prefix, txt, func
 
     async def handle_raw(self, event: events.Raw):
@@ -676,7 +676,7 @@ class CommandDispatcher:
             or chat_id in blacklist_chats
             or (whitelist_chats and chat_id not in whitelist_chats)
         ):
-            logger.debug("Message is blacklisted")
+            logger.info("Message is blacklisted")
             return
 
         for func in self._modules.watchers:
