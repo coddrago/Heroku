@@ -290,7 +290,7 @@ settings:
   cancel: "🚫 Abbrechen"
   wrong_usage_tcc: "Verwendung: togglecmd <Modul> <Befehl> oder togglecmd <Befehl>"
   wrong_usage_tmc: "Verwendung: togglemod <Modul>"
-  wrong_usage_cmc: "Datenbank für Modul {module_key} geleert"
+  wrong_usage_cmc: "Datenbank für Modul {} geleert"
   mod_enabled: "Modul {} aktiviert"
   mod_disabled: "Modul {} deaktiviert"
   who_to_blacklist: "<emoji document_id=5382187118216879236>❓</emoji> <b>Wen möchtest du blockieren?</b>"

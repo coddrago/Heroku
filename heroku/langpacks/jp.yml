@@ -312,7 +312,7 @@ settings:
   cancel: "🚫 キャンセル"
   wrong_usage_tcc: "使用法：togglecmd <モジュール> <コマンド> または togglecmd <コマンド>"
   wrong_usage_tmc: "使用法：togglemod <モジュール>"
-  wrong_usage_cmc: "モジュール {module_key} のデータベースをクリアしました"
+  wrong_usage_cmc: "モジュール {} のデータベースをクリアしました"
   mod_enabled: "モジュール {} を有効にしました"
   mod_disabled: "モジュール {} を無効にしました"
   who_to_blacklist: "<emoji document_id=5382187118216879236>❓</emoji> <b>誰をブラックリストに追加しますか？</b>"

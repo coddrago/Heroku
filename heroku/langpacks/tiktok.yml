@@ -290,7 +290,7 @@ settings:
   cancel: "🚫 Отмена"
   wrong_usage_tcc: "Как юзать: togglecmd <модуль> <команда> или togglecmd <команда>"
   wrong_usage_tmc: "Как юзать: togglemod <модуль>"
-  wrong_usage_cmc: "Почистил базу для модуля {module_key}"
+  wrong_usage_cmc: "Почистил базу для модуля {}"
   mod_enabled: "Модуль {} врублен"
   mod_disabled: "Модуль {} вырублен"
   who_to_blacklist: "<emoji document_id=5382187118216879236>❓</emoji> <b>Кого банить?</b>"
