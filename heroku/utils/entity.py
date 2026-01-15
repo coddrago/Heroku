@@ -30,6 +30,9 @@ from herokutl.tl.functions.messages import (
     GetDialogFiltersRequest,
     SetHistoryTTLRequest,
     UpdateDialogFilterRequest,
+    CreateForumTopicRequest,
+    GetForumTopicIDRequest,
+    EditForumTopicRequest
 )
 from herokutl.tl.types import (
     Channel,
