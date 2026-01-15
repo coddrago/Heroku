@@ -54,6 +54,10 @@
 - add togglemod cmd for disable or enable any module
 - add clearmodule cmd
 - add placeholder system
+- move all log chat to forumTopics
+- add execution in .e from reply
+- add utils.asset_forum_topic
+- add utils.create_topic
 
 ## 🪐 Heroku 1.7.2
 - added autoupdate
