@@ -119,10 +119,10 @@ class Database(dict):
         self.read()
 
         try:
-            self._content_channel_id = self.get("legacy.forums", "channel_id", None)
+            self._content_channel_id = self.get("heroku.forums", "channel_id", None)
 
             if not self._content_channel_id:
-                raise KeyError("Legacy content channel not found in database")
+                raise KeyError("Heroku content channel not found in database")
 
             self._assets_topic = await utils.asset_forum_topic(
                 client=self._client,
