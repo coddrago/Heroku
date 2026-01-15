@@ -294,7 +294,7 @@ async def asset_channel(
 
     if hide_general and forum:
         await fw_protect()
-        await client(EditForumTopicRequest(channel=peer, topic_id=1, hidden=True))
+        await client(EditForumTopicRequest(peer=peer, topic_id=1, hidden=True))
 
     if ttl:
         await fw_protect()
