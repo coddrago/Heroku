@@ -421,16 +421,18 @@ class TestMod(loader.Module):
 
 
     async def client_ready(self):
-        chat, _ = await utils.asset_channel(
-            self._client,
-            "heroku-logs",
-            "🪐 Your Heroku logs will appear in this chat",
-            silent=True,
-            invite_bot=True,
-            avatar="https://raw.githubusercontent.com/coddrago/assets/refs/heads/main/heroku/heroku_logs.png",
+        self._content_channel_id = await utils.wait_for_content_channel(self._db)
+
+        self._logs_topic = await utils.asset_forum_topic(
+            client=self._client,
+            db=self._db,
+            peer=self._content_channel_id,
+            title="Logs",
+            description="🪐 Your Heroku logs will appear in this topic",
+            icon_emoji_id=5256230583717079814,
         )
 
-        self.logchat = int(f"-100{chat.id}")
+        self.logchat = int(f"-100{self._content_channel_id}")
 
         logging.getLogger().handlers[0].install_tg_log(self)
         logger.debug("Bot logging installed for %s", self.logchat)
