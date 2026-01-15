@@ -39,12 +39,16 @@ class Evaluator(loader.Module):
 
     @loader.command(alias="eval")
     async def e(self, message: Message):
+        args = utils.get_args_raw(message)
+        reply = await message.get_reply_message()
+        if not args and reply and reply.text:
+            args = reply.text
         try:
             start_time = time.time()
             output_print = StringIO()
             with contextlib.redirect_stdout(output_print):
                 result = await meval(
-                    utils.get_args_raw(message),
+                    args,
                     globals(),
                     **await self.getattrs(message),
                 )
