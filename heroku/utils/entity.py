@@ -25,6 +25,9 @@ from herokutl.tl.functions.account import UpdateNotifySettingsRequest
 from herokutl.tl.functions.channels import (
     CreateChannelRequest,
     EditPhotoRequest,
+    GetForumTopicsByIDRequest,
+    CreateForumTopicRequest,
+    EditForumTopicRequest,
 )
 from herokutl.tl.functions.messages import (
     GetDialogFiltersRequest,
