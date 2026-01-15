@@ -415,7 +415,7 @@ class TestMod(loader.Module):
         data = await utils.get_placeholders(data)
         await utils.answer(
             message,
-            self.config["Text_Of_Ping"].format(**data),
+            self.config["custom_message"].format(**data),
             file = banner,
             invert_media = self.config["invert_media"]
         )
