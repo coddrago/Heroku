@@ -300,9 +300,6 @@ class TelegramLogsHandler(logging.Handler):
         for chunk in chunks[1:]:
             await bot.send_message(chat_id=call.chat_id, text=chunk)
 
-    def get_logid_by_client(self, client_id: int) -> int:
-        return self._mods[client_id].logchat
-
     def get_logs_topic_id_by_client(self, client_id: int) -> int:
         return self._mods[client_id]._logs_topic.id
 
