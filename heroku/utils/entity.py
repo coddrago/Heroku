@@ -350,7 +350,7 @@ async def asset_forum_topic(
 
     async def create_topic() -> ForumTopic:
         result = await client(CreateForumTopicRequest(
-            channel=entity,
+            peer=entity,
             title=title,
             icon_emoji_id=(icon_emoji_id if client.heroku_me.premium else None)
         ))
@@ -361,7 +361,7 @@ async def asset_forum_topic(
 
         await fw_protect()
 
-        result = await client(GetForumTopicsByIDRequest(channel=entity, topics=[result.updates[0].id]))
+        result = await client(GetForumTopicsByIDRequest(peer=entity, topics=[result.updates[0].id]))
 
         return result.topics[0]
 
@@ -369,7 +369,7 @@ async def asset_forum_topic(
 
     if (topic_id := forums_cache.get(entity.title, {}).get(title)):
         await fw_protect()
-        topic = await client(GetForumTopicsByIDRequest(channel=entity, topics=[topic_id]))
+        topic = await client(GetForumTopicsByIDRequest(peer=entity, topics=[topic_id]))
         topic = topic.topics[0]
 
         if not isinstance(topic, ForumTopicDeleted):
