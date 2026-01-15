@@ -222,25 +222,6 @@ def get_ip_address() -> str:
     except Exception:
         return "Unknown"
 
-
-def get_cpu_temperature() -> float:
-    """
-    Get CPU temperature if available
-    :return: Temperature in Celsius or 0 if not available
-    """
-    try:
-        import psutil
-        temps = psutil.sensors_temperatures()
-        if 'coretemp' in temps:
-            return temps['coretemp'][0].current
-        elif 'cpu-thermal' in temps:
-            return temps['cpu-thermal'][0].current
-        else:
-            return 0.0
-    except Exception:
-        return 0.0
-
-
 def get_disk_usage() -> dict:
     """
     Get disk usage information
