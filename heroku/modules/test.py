@@ -89,7 +89,7 @@ class TestMod(loader.Module):
                 validator=loader.validators.Boolean(),
             ),
             loader.ConfigValue(
-                "Text_Of_Ping",
+                "custom_text",
                 "<emoji document_id=5920515922505765329>⚡️</emoji> <b>𝙿𝚒𝚗𝚐: </b><code>{ping}</code><b> 𝚖𝚜 </b>\n<emoji document_id=5900104897885376843>🕓</emoji><b> 𝚄𝚙𝚝𝚒𝚖𝚎: </b><code>{uptime}</code>",
                 lambda: self.strings["configping"],
                 validator=loader.validators.String(),
@@ -410,6 +410,7 @@ class TestMod(loader.Module):
             ),
             "hostname": lib_platform.node(),
             "user": getpass.getuser(),
+            "platform": utils.get_platform_name()
         }
         data = await utils.get_placeholders(data)
         await utils.answer(
