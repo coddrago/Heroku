@@ -157,7 +157,7 @@ class HerokuBackupMod(loader.Module):
             archive.seek(0)
 
             await self.inline.bot.send_document(
-                int(f"-100{self.content_channel_id}"),
+                int(f"-100{self._content_channel_id}"),
                 BufferedInputFile(archive.getvalue(), filename=archive.name),
                 reply_markup=self.inline.generate_markup(
                     [
