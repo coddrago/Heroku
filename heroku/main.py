@@ -1021,7 +1021,7 @@ class Heroku:
                     self.omit_log = True
 
             await client.heroku_inline.bot.send_photo(
-                logging.getLogger().handlers[0].get_logid_by_client(client.tg_id),
+                logging.getLogger().handlers[0].get_logs_topic_id_by_client(client.tg_id),
                 "https://raw.githubusercontent.com/coddrago/assets/refs/heads/main/heroku/heroku_started.png",
                 caption=(
                     "🪐 <b>Heroku {} started!</b>\n\n⚙ <b>GitHub commit SHA: <a"
