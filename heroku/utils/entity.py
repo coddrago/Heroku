@@ -31,7 +31,7 @@ from herokutl.tl.functions.messages import (
     SetHistoryTTLRequest,
     UpdateDialogFilterRequest,
     CreateForumTopicRequest,
-    GetForumTopicIDRequest,
+    GetForumTopicsIDRequest,
     EditForumTopicRequest
 )
 from herokutl.tl.types import (
