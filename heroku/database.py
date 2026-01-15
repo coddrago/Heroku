@@ -130,6 +130,7 @@ class Database(dict):
                 peer=self._content_channel_id,
                 title="Assets",
                 description="🌆 Your Heroku assets will be stored here",
+                icon_emoji_id=5877307202888273539,
             )
 
         except Exception:
