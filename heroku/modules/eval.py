@@ -62,7 +62,7 @@ class Evaluator(loader.Module):
                 self.strings("err").format(
                     "4985626654563894116",
                     "python",
-                    utils.escape_html(utils.get_args_raw(message)),
+                    utils.escape_html(args),
                     "error",
                     self.censor(
                         (
@@ -89,7 +89,7 @@ class Evaluator(loader.Module):
                 self.strings("eval_py").format(
                     "4985626654563894116",
                     "python",
-                    utils.escape_html(utils.get_args_raw(message)),
+                    utils.escape_html(args),
                 ) + (self.strings["eval_result"].format(
                     "python",
                      utils.escape_html(self.censor(str(result)))
