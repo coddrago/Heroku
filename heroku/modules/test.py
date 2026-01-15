@@ -410,7 +410,7 @@ class TestMod(loader.Module):
             ),
             "hostname": lib_platform.node(),
             "user": getpass.getuser(),
-            "platform": utils.get_platform_name()
+            "platform": utils.get_platform_name(),
         }
         data = await utils.get_placeholders(data)
         await utils.answer(
