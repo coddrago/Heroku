@@ -512,9 +512,6 @@ heroku_info:
 
 loader:
   name: "L04d3r"
-  loadmod_pm_timeout: "Plz, w417 4 10 s3c5 b4 c0nf1rm1ng 7h15 4c710n"
-  loadmod_not_allowed_fresh_pm: "<emoji document_id=5447644880824181073>⚠️</emoji> <b><u>R34d 7h15 c4r3fully!</u></b> <emoji document_id=5447644880824181073>⚠️</emoji>\n\n<b>U r 4773mp71ng 2 l04d 4 m0dul3 1n p3r50n4l m5g5 w17h 4 u53r u d0 n07 kn0w.</b> M0dul35, n07 v3r1f13d by 7h3 d3v, m1gh7 c4u53 4 l07 0f 7r0ubl3, fr0m <b>m3551ng w17h ur 4cc 2 4cc d3l3710n 0r s35510n c0mpr0m374710n</b>. 1f u kn0w 7h15 u53r & <b><u>100%</u></b> 7ru57 h1m, w417 4 f3w d4y5 & 7ry 4g41n."
-  loadmod_confirm_pm_message: "<emoji document_id=5451732530048802485>⏳</emoji> <i>W4171ng 4 ur c0nf1rm4710n...</i>"
   link: "<emoji document_id=5256113064821926998>📁</emoji> <b>F1l3 0f</b> {class_name}\n\n<emoji document_id=5134452506935427991>🪐</emoji> <b>{prefix}lm 1n r3ply 2 7h15 m5g 2 1n574ll</b>\n\n<emoji document_id=4916086774649848789>🔗</emoji> <code>{prefix}dlm {url}</code>\n\n{not_exact}"
   file: "<emoji document_id=5256113064821926998>📁</emoji> <b>F1l3 0f</b> {class_name}\n\n<emoji document_id=5134452506935427991>🪐</emoji> <b>{prefix}lm 1n r3ply 2 7h15 m5g 2 1n574ll</b>\n\n{not_exact}"
   finding_module_in_repos: "<emoji document_id=5873204392429096339>🔄</emoji> L00k1ng 4 m0dul35 1n r3p05."
@@ -522,10 +519,6 @@ loader:
   ml_load_module: "<emoji document_id=5873204392429096339>🔄</emoji> I'm d0wnl04d1ng 7h3 m0dul3 45 4 f1l3."
   not_exact: "<emoji document_id=5355133243773435190>⚠️</emoji> <i>N0 3x4c7 m47ch h45 b33n f0und, 50 7h3 cl05357 r35ul7 15 sh0wn 1n5734d</i>"
   args: "<emoji document_id=5210952531676504517>❌</emoji> <b>U mu57 sp3c1fy 4rg5</b>"
-  loadmod_cancelled: "<emoji document_id=5210952531676504517>🚫</emoji> <b>M0dul3 l04d1ng c4nc3ll3d</b>"
-  loadmod_confirm_pm: "⚠️ <b>W4rn1ng!</b>\n\nL04d1ng m0dul35 fr0m unkn0wn s0urc35 15 <b><u>v3ry d4ng3r0u5</u></b> & c4n l34d 2 <b>4cc d3l3710n 0r s35510n c0mpr0m374710n</b>. M4k3 5ur3 7h47 u kn0w 7h15 u53r & <b><u>100%</u></b> 7ru57 h1m.\n\n<b>D0 u w4n7 2 c0n71nu3 w17h m0dul3 l04d1ng?</b>"
-  loadmod_confirm_pm_yes: "✅ Y35, c0n71nu3"
-  loadmod_confirm_pm_no: "🚫 N0, c4nc3l"
   repo_config_doc: "URL 2 4 m0dul3 r3p0"
   avail_header: "🎢 <b>M0dul35 fr0m r3p0</b>"
   no_module: "<emoji document_id=5210952531676504517>🚫</emoji> <b>M0dul3 n07 4v41l4bl3 1n r3p0.</b>"

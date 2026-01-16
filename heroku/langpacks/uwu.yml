@@ -512,9 +512,6 @@ heroku_info:
 
 loader:
   name: "Woadew"
-  loadmod_pm_timeout: "Pwease, wait fow 10 seconds befowe confiwming dis action"
-  loadmod_not_allowed_fresh_pm: "<emoji document_id=5447644880824181073>⚠️</emoji> <b><u>Wead dis cawefuwwy!</u></b> <emoji document_id=5447644880824181073>⚠️</emoji>\n\n<b>You awe attempting to woad a moduwe in pewsonaw messages with a usew you do nyot knyow.</b> Moduwes, nyot vewified by da devewopew, might cause a wot of twoubwe, fwom <b>messing with youw account to account dewetion ow session compwometation</b>. If you knyow dis usew and <b><u>100%</u></b> twust him, wait a few days and twy again."
-  loadmod_confirm_pm_message: "<emoji document_id=5451732530048802485>⏳</emoji> <i>Waiting fow youw confiwmation...</i>"
   link: "<emoji document_id=5256113064821926998>📁</emoji> <b>Fiwe of</b> {class_name}\n\n<emoji document_id=5134452506935427991>🪐</emoji> <b>{prefix}lm in wepwy to dis message to instaww</b>\n\n<emoji document_id=4916086774649848789>🔗</emoji> <code>{prefix}dlm {url}</code>\n\n{not_exact}"
   file: "<emoji document_id=5256113064821926998>📁</emoji> <b>Fiwe of</b> {class_name}\n\n<emoji document_id=5134452506935427991>🪐</emoji> <b>{prefix}lm in wepwy to dis message to instaww</b>\n\n{not_exact}"
   finding_module_in_repos: "<emoji document_id=5873204392429096339>🔄</emoji> Wooking fow moduwes in wepositowies."
@@ -522,10 +519,6 @@ loader:
   ml_load_module: "<emoji document_id=5873204392429096339>🔄</emoji> I'm downwoading da moduwe as a fiwe."
   not_exact: "<emoji document_id=5355133243773435190>⚠️</emoji> <i>Nyo exact match has been found, so da cwosest wesuwt is shown instead</i>"
   args: "<emoji document_id=5210952531676504517>❌</emoji> <b>You must specify awguments</b>"
-  loadmod_cancelled: "<emoji document_id=5210952531676504517>🚫</emoji> <b>Moduwe woading cancewwed</b>"
-  loadmod_confirm_pm: "⚠️ <b>Wawning!</b>\n\nWoading moduwes fwom unknyown souwces is <b><u>vewy dangewous</u></b> and can wead to <b>account dewetion ow session compwometation</b>. Make suwe dat you knyow dis usew and <b><u>100%</u></b> twust him.\n\n<b>Do you want to continyue with moduwe woading? ;w;</b>"
-  loadmod_confirm_pm_yes: "✅ Yes, continyue"
-  loadmod_confirm_pm_no: "🚫 Nyo, cancew"
   repo_config_doc: "UWW to a moduwe wepo"
   avail_header: "🎢 <b>Moduwes fwom wepo</b>"
   no_module: "<emoji document_id=5210952531676504517>🚫</emoji> <b>Moduwe nyot avaiwabwe in wepo.</b>"

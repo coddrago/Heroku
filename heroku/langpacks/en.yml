@@ -526,7 +526,7 @@ loader:
   provide_module: "<emoji document_id=5312383351217201533>⚠️</emoji> <b>Provide a module to load</b>"
   bad_unicode: "<emoji document_id=5210952531676504517>🚫</emoji> <b>Invalid Unicode formatting in module</b>"
   load_failed: "<emoji document_id=5210952531676504517>🚫</emoji> <b>Loading failed. See logs for details</b>"
-  loaded: "<emoji document_id=5134452506935427991>🪐</emoji> <b>Module</b> <code>{}</code>{} <b>loaded {}</b><blockquote expandable>{}</blockquote>{}{}{}{}{}"
+  loaded: "<emoji document_id=5134452506935427991>🪐</emoji> <b>Module</b> <code>{}</code>{} <b>loaded {}</b>{}{}{}{}{}{}"
   no_class: "<b>What class needs to be unloaded?</b>"
   unloaded: "{} <b>Module {} unloaded.</b>"
   modules_unloaded: "<emoji document_id=5784993237412351403>✅</emoji> <b>Unloaded {unloaded_num} modules:</b>\n<blockquote expandable>{unloaded}</blockquote>"

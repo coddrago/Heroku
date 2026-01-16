@@ -1085,7 +1085,7 @@ class LoaderMod(loader.Module):
             nonlocal \
                 modname, \
                 version, \
-                modhelp, \
+                f"<blockquote expandable>{modhelp}</blockquote>", \
                 developer, \
                 origin, \
                 subscribe, \
@@ -1095,7 +1095,7 @@ class LoaderMod(loader.Module):
                 modname.strip(),
                 version,
                 utils.ascii_face(),
-                modhelp,
+                f"<blockquote expandable>{modhelp}</blockquote>",
                 developer if not subscribe or not use_subscribe else "",
                 depends_from,
                 (
