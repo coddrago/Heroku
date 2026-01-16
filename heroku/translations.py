@@ -220,11 +220,12 @@ class Strings:
                     next(
                         (
                             f"strings_{lang}"
-                            for lang in self._translator.db.get(
+                            for original_lang in self._translator.db.get(
                                 __name__,
                                 "lang",
                                 "en",
                             ).split(" ")
+                            for lang in ["en" if original_lang in ["leet", "uwu"] else "ru" if original_lang == "tiktok" else original_lang]
                             if hasattr(self._mod, f"strings_{lang}")
                             and isinstance(getattr(self._mod, f"strings_{lang}"), dict)
                             and key in getattr(self._mod, f"strings_{lang}")
