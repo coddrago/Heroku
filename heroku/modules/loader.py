@@ -1053,7 +1053,7 @@ class LoaderMod(loader.Module):
         if instance.__doc__:
             mod_doc += (
                 "<i>\n<emoji document_id=5879813604068298387>ℹ️</emoji>"
-                f" {utils.escape_html(inspect.getdoc(instance))}</i>\n"
+                f" {utils.escape_html(inspect.getdoc(instance))}</i>\n\n"
             )
 
         subscribe = ""
@@ -1162,7 +1162,7 @@ class LoaderMod(loader.Module):
             instance.commands.items(),
             key=lambda x: x[0],
         ):
-            modhelp += "\n{} <code>{}{}</code> {}".format(
+            modhelp += "{} <code>{}{}</code> {}".format(
                 f"{self.config['command_emoji']}",
                 utils.escape_html(self.get_prefix()),
                 _name,
