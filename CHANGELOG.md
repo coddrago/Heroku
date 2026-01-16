@@ -57,6 +57,9 @@
 - add execution in .e from reply
 - add utils.asset_forum_topic
 - add utils.create_topic
+- add operator to fcfg
+- remove invokecmd
+- remove uninstall_herokucmd
 
 ## 🪐 Heroku 1.7.2
 - added autoupdate
