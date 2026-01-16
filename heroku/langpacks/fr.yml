@@ -526,7 +526,7 @@ loader:
   provide_module: "<emoji document_id=5312383351217201533>⚠️</emoji> <b>Fournissez un module à charger</b>"
   bad_unicode: "<emoji document_id=5210952531676504517>🚫</emoji> <b>Formatage Unicode invalide dans le module</b>"
   load_failed: "<emoji document_id=5210952531676504517>🚫</emoji> <b>Le chargement a échoué. Voir les logs pour les détails</b>"
-  loaded: "<emoji document_id=5134452506935427991>🪐</emoji> <b>Module</b> <code>{}</code>{} <b>chargé {}</b>{}{}{}{}{}{}"
+  loaded: "<emoji document_id=5134452506935427991>🪐</emoji> <b>Module</b> <code>{}</code>{} <b>chargé {}</b>{}{}{}{}{}{}{}"
   no_class: "<b>Quelle classe doit être déchargée ?</b>"
   unloaded: "{} <b>Module {} déchargé.</b>"
   modules_unloaded: "<emoji document_id=5784993237412351403>✅</emoji> <b>Déchargé {unloaded_num} modules :</b>\n<blockquote expandable>{unloaded}</blockquote>"

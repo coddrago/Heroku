@@ -526,7 +526,7 @@ loader:
   provide_module: "<emoji document_id=5312383351217201533>⚠️</emoji> <b>Pr0v1d3 4 m0dul3 2 l04d</b>"
   bad_unicode: "<emoji document_id=5210952531676504517>🚫</emoji> <b>1nv4l1d Un1c0d3 f0rm4771ng 1n m0dul3</b>"
   load_failed: "<emoji document_id=5210952531676504517>🚫</emoji> <b>L04d1ng f41l3d. S33 l0g5 4 d3741l5</b>"
-  loaded: "<emoji document_id=5134452506935427991>🪐</emoji> <b>M0dul3</b> <code>{}</code>{} <b>l04d3d {}</b>{}{}{}{}{}{}"
+  loaded: "<emoji document_id=5134452506935427991>🪐</emoji> <b>M0dul3</b> <code>{}</code>{} <b>l04d3d {}</b>{}{}{}{}{}{}{}"
   no_class: "<b>Wh47 cl455 n33d5 2 b3 unl04d3d?</b>"
   unloaded: "{} <b>M0dul3 {} unl04d3d.</b>"
   modules_unloaded: "<emoji document_id=5784993237412351403>✅</emoji> <b>Unl04d3d {unloaded_num} m0dul35:</b>\n<blockquote expandable>{unloaded}</blockquote>"

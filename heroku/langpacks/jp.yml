@@ -526,7 +526,7 @@ loader:
   provide_module: "<emoji document_id=5312383351217201533>⚠️</emoji> <b>読み込むモジュールを提供してください</b>"
   bad_unicode: "<emoji document_id=5210952531676504517>🚫</emoji> <b>モジュール内のUnicode形式が無効です</b>"
   load_failed: "<emoji document_id=5210952531676504517>🚫</emoji> <b>読み込みに失敗しました。詳細はログを確認してください</b>"
-  loaded: "<emoji document_id=5134452506935427991>🪐</emoji> <b>モジュール</b> <code>{}</code>{} <b>が読み込まれました {}</b>{}{}{}{}{}{}"
+  loaded: "<emoji document_id=5134452506935427991>🪐</emoji> <b>モジュール</b> <code>{}</code>{} <b>が読み込まれました {}</b>{}{}{}{}{}{}{}"
   no_class: "<b>どのクラスをアンロードする必要がありますか？</b>"
   unloaded: "{} <b>モジュール {} がアンロードされました。</b>"
   modules_unloaded: "<emoji document_id=5784993237412351403>✅</emoji> <b>{unloaded_num} 個のモジュールをアンロードしました:</b>\n<blockquote expandable>{unloaded}</blockquote>"

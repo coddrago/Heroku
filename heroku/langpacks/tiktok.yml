@@ -494,7 +494,7 @@ loader:
   provide_module: "<emoji document_id=5312383351217201533>⚠️</emoji> <b>Че качать то?</b>"
   bad_unicode: "<emoji document_id=5210952531676504517>🚫</emoji> <b>Кодировка кривая</b>"
   load_failed: "<emoji document_id=5210952531676504517>🚫</emoji> <b>Не загрузилось (F). Чекни логи.</b>"
-  loaded: "<emoji document_id=5134452506935427991>🪐</emoji> <b>Модуль</b> <code>{}</code>{} <b>залетел {}</b>{}{}{}{}{}{}"
+  loaded: "<emoji document_id=5134452506935427991>🪐</emoji> <b>Модуль</b> <code>{}</code>{} <b>залетел {}</b>{}{}{}{}{}{}{}"
   no_class: "<b>Че выгружать?</b>"
   unloaded: "{} <b>Модуль {} выкинул.</b>"
   modules_unloaded: "<emoji document_id=5784993237412351403>✅</emoji> <b>Выкинул {unloaded_num} модов:</b>\n<blockquote expandable>{unloaded}</blockquote>"

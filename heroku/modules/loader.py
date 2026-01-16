@@ -1048,9 +1048,10 @@ class LoaderMod(loader.Module):
             return
 
         modhelp = ""
+        mod_doc = ""
 
         if instance.__doc__:
-            modhelp += (
+            mod_doc += (
                 "<i>\n<emoji document_id=5879813604068298387>ℹ️</emoji>"
                 f" {utils.escape_html(inspect.getdoc(instance))}</i>\n"
             )
@@ -1085,6 +1086,7 @@ class LoaderMod(loader.Module):
             nonlocal \
                 modname, \
                 version, \
+                mod_doc, \
                 modhelp, \
                 developer, \
                 origin, \
@@ -1095,6 +1097,7 @@ class LoaderMod(loader.Module):
                 modname.strip(),
                 version,
                 utils.ascii_face(),
+                mod_doc, 
                 f"<blockquote expandable>{modhelp}</blockquote>",
                 developer if not subscribe or not use_subscribe else "",
                 depends_from,

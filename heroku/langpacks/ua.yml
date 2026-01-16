@@ -494,7 +494,7 @@ loader:
   provide_module: "<emoji document_id=5312383351217201533>⚠️</emoji> <b>Вкажи модуль для завантаження</b>"
   bad_unicode: "<emoji document_id=5210952531676504517>🚫</emoji> <b>Неправильне кодування модуля</b>"
   load_failed: "<emoji document_id=5210952531676504517>🚫</emoji> <b>Завантаження не увінчалося успіхом. Дивись логи.</b>"
-  loaded: "<emoji document_id=5134452506935427991>🪐</emoji> <b>Модуль</b> <code>{}</code>{} <b>завантажено {}</b>{}{}{}{}{}{}"
+  loaded: "<emoji document_id=5134452506935427991>🪐</emoji> <b>Модуль</b> <code>{}</code>{} <b>завантажено {}</b>{}{}{}{}{}{}{}"
   no_class: "<b>Мені самому придумати що вивантажити?</b>"
   unloaded: "{} <b>Модуль {} вивантажено.</b>"
   modules_unloaded: "<emoji document_id=5784993237412351403>✅</emoji> <b>Вивантажено {unloaded_num} модулів:</b>\n<blockquote expandable>{unloaded}</blockquote>"
