@@ -1085,7 +1085,7 @@ class LoaderMod(loader.Module):
             nonlocal \
                 modname, \
                 version, \
-                f"<blockquote expandable>{modhelp}</blockquote>", \
+                modhelp, \
                 developer, \
                 origin, \
                 subscribe, \
