@@ -185,59 +185,6 @@ class TestMod(loader.Module):
             return
 
     @loader.command()
-    async def debugmod(self, message: Message):
-        """| debug mod for your modules!"""
-        args = utils.get_args_raw(message)
-        instance = None
-        for module in self.allmodules.modules:
-            if (
-                module.__class__.__name__.lower() == args.lower()
-                or module.strings["name"].lower() == args.lower()
-            ):
-                if os.path.isfile(
-                    os.path.join(
-                        DEBUG_MODS_DIR,
-                        f"{module.__class__.__name__}.py",
-                    )
-                ):
-                    os.remove(
-                        os.path.join(
-                            DEBUG_MODS_DIR,
-                            f"{module.__class__.__name__}.py",
-                        )
-                    )
-
-                    try:
-                        delattr(module, "heroku_debug")
-                    except AttributeError:
-                        pass
-
-                    await utils.answer(message, self.strings("debugging_disabled"))
-                    return
-
-                module.heroku_debug = True
-                instance = module
-                break
-
-        if not instance:
-            await utils.answer(message, self.strings("bad_module"))
-            return
-
-        with open(
-            os.path.join(
-                DEBUG_MODS_DIR,
-                f"{instance.__class__.__name__}.py",
-            ),
-            "wb",
-        ) as f:
-            f.write(inspect.getmodule(instance).__loader__.data)
-
-        await utils.answer(
-            message,
-            self.strings("debugging_enabled").format(instance.__class__.__name__),
-        )
-
-    @loader.command()
     async def logs(
         self,
         message: typing.Union[Message, InlineCall],

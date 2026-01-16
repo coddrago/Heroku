@@ -60,6 +60,7 @@
 - add operator to fcfg
 - remove invokecmd
 - remove uninstall_herokucmd
+- remove debugmodcmd
 
 ## 🪐 Heroku 1.7.2
 - added autoupdate
