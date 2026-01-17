@@ -32,7 +32,6 @@ logger = logging.getLogger(__name__)
 
 custom_placeholders = {}
 
-
 def rand(size: int, /) -> str:
     """
     Return random string of len `size`
@@ -42,7 +41,6 @@ def rand(size: int, /) -> str:
     return "".join(
         [random.choice("abcdefghijklmnopqrstuvwxyz1234567890") for _ in range(size)]
     )
-
 
 async def invite_inline_bot(
     client: CustomTelegramClient,
@@ -73,7 +71,6 @@ async def invite_inline_bot(
             )
         )
 
-
 def run_sync(func, *args, **kwargs):
     """
     Run a non-async function in a new thread and return an awaitable
@@ -85,7 +82,6 @@ def run_sync(func, *args, **kwargs):
         functools.partial(func, *args, **kwargs),
     )
 
-
 def run_async(loop: asyncio.AbstractEventLoop, coro: typing.Awaitable) -> typing.Any:
     """
     Run an async function as a non-async function, blocking till it's done
@@ -94,7 +90,6 @@ def run_async(loop: asyncio.AbstractEventLoop, coro: typing.Awaitable) -> typing
     :return: Result of the coroutine
     """
     return asyncio.run_coroutine_threadsafe(coro, loop).result()
-
 
 def merge(
     a: dict,
@@ -128,7 +123,6 @@ def merge(
 
     return b
 
-
 def chunks(_list: ListLike, n: int, /) -> typing.List[typing.List[typing.Any]]:
     """
     Split provided `_list` into chunks of `n`
@@ -137,7 +131,6 @@ def chunks(_list: ListLike, n: int, /) -> typing.List[typing.List[typing.Any]]:
     :return: List of chunks
     """
     return [_list[i : i + n] for i in range(0, len(_list), n)]
-
 
 def atexit(
     func: typing.Callable,
@@ -159,13 +152,11 @@ def atexit(
 
     _atexit.register(functools.partial(func, *args, **kwargs))
 
-
 def _copy_tl(o, **kwargs):
     d = o.to_dict()
     del d["_"]
     d.update(kwargs)
     return o.__class__(**d)
-
 
 def format_file_size(size_bytes: int) -> str:
     """
@@ -181,7 +172,6 @@ def format_file_size(size_bytes: int) -> str:
         size_bytes /= 1024.0
         i += 1
     return ".1f"
-
 
 def is_url(string: str) -> bool:
     """
@@ -202,7 +192,6 @@ def is_url(string: str) -> bool:
     )
     return url_pattern.match(string) is not None
 
-
 def get_iso_time() -> str:
     """
     Get current time in ISO format
@@ -211,7 +200,6 @@ def get_iso_time() -> str:
     from datetime import datetime
 
     return datetime.utcnow().isoformat() + "Z"
-
 
 def safe_getattr(obj, attr, default=None):
     """
@@ -225,7 +213,6 @@ def safe_getattr(obj, attr, default=None):
         return getattr(obj, attr, default)
     except AttributeError:
         return default
-
 
 def register_placeholder(placeholder: str, callback: typing.Callable):
     """
@@ -241,7 +228,6 @@ def register_placeholder(placeholder: str, callback: typing.Callable):
     }
     return True
 
-
 async def get_placeholder(placeholder: str):
     callback = custom_placeholders[placeholder]["callback"]
     try:
@@ -253,11 +239,8 @@ async def get_placeholder(placeholder: str):
 
 async def get_placeholders(data):
     for placeholder in custom_placeholders.values():
-        data[placeholder["placeholder_name"]] = await get_placeholder(
-            placeholder["placeholder_name"]
-        )
+        data[placeholder["placeholder_name"]] = await get_placeholder(placeholder["placeholder_name"])
     return data
-
 
 def unregister_placeholders(module_name: str) -> int:
     placeholders_to_remove = []
@@ -266,5 +249,4 @@ def unregister_placeholders(module_name: str) -> int:
             placeholders_to_remove.append(placeholder_name)
     for placeholder_name in placeholders_to_remove:
         del custom_placeholders[placeholder_name]
-
     return True

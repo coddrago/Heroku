@@ -42,14 +42,9 @@ def get_named_platform() -> str:
     with contextlib.suppress(Exception):
         if os.path.isfile("/proc/device-tree/model"):
             with open("/proc/device-tree/model") as f:
-                model = f.read()
-                if "Orange" in model:
-                    return f"{model}"
-
-                if "Raspberry" in model:
-                    return f"{model}"
-                else:
-                    return f"{model}"
+                model = f.read().strip()
+                if any(board in model for board in ("Orange", "Raspberry")):
+                    return model
 
     match True:
         case _ if IS_WSL:
