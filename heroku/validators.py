@@ -209,64 +209,6 @@ class Integer(Validator):
 
         return value
 
-class RandomStringList(list):
-    """
-    Helper class that behaves like a list for storage/editing,
-    but behaves like a random string from that list when converted to str.
-    """
-    def __str__(self):
-        import random
-        if not self:
-            return ""
-        return str(random.choice(self))
-
-    def __repr__(self):
-        return super().__repr__()
-    
-    def __bytes__(self):
-        return str(self).encode('utf-8')
-
-
-class RandomLink(Validator):
-    """
-    Validates a list of links (comma separated)
-    """
-
-    def __init__(self):
-        super().__init__(
-            self._validate,
-            {
-                "en": "List of URLs. Use str(self.config.VAL) to get a random one.",
-                "ru": "Список ссылок. Используйте str(self.config.VAL) для получения случайной.",
-            },
-            _internal_id="RandomLink",
-        )
-
-    @staticmethod
-    def _validate(value: ConfigAllowedTypes, /) -> RandomStringList:
-        if not isinstance(value, (list, tuple, set)):
-            value = str(value).split(",")
-
-        clean_links = []
-        
-        for item in value:
-            item = str(item).strip()
-            if not item:
-                continue
-            try:
-                if not utils.check_url(item):
-                     raise ValidationError(f"Invalid URL: {item}")
-                clean_links.append(item)
-            except Exception:
-                raise ValidationError(f"Item '{item}' is not a valid URL")
-
-        if not clean_links:
-            raise ValidationError("List cannot be empty")
-
-        return RandomStringList(clean_links)
-
-
-
 class Choice(Validator):
     """
     Check whether entered value is in the allowed list
@@ -893,3 +835,46 @@ class EntityLike(RegExp):
             value = f"@{value}"
 
         return value
+        
+class RandomLinkList(list):
+
+    def __str__(self):
+        import random
+        if not self:
+            return ""
+        return str(random.choice(self))
+
+    def __bytes__(self):
+        return str(self).encode("utf-8")
+
+    def __repr__(self):
+        return super().__repr__()
+
+
+class RandomLink(Series):
+
+    def __init__(self):
+
+        super().__init__(
+            validator=Link(), 
+            min_len=1
+        )
+        
+        self.doc = {
+            "en": "A list of links that will be rotated randomly when accessed.",
+            "ru": "Список ссылок, которые будут выбираться случайным образом при обращении.",
+        }
+        self.internal_id = "RandomLink"
+
+    @staticmethod
+    def _validate(value: ConfigAllowedTypes, /, **kwargs) -> RandomLinkList:
+
+        val_args = kwargs.copy()
+        if 'validator' not in val_args:
+            val_args['validator'] = Link()
+        if 'min_len' not in val_args:
+            val_args['min_len'] = 1
+
+        clean_list = Series._validate(value, **val_args)
+
+        return RandomLinkList(clean_list)

@@ -110,7 +110,7 @@ class TestMod(loader.Module):
                 "banner_url",
                 None,
                 lambda: self.strings["banner_url"],
-                validator=loader.validators.Link(),
+                validator=loader.validators.RandomLink(),
             ),
             loader.ConfigValue(
                 "quote_media",
@@ -363,7 +363,7 @@ class TestMod(loader.Module):
         await utils.answer(
             message,
             self.config["custom_message"].format(**data),
-            file = banner,
+            file = str(banner),
             invert_media = self.config["invert_media"]
         )
 
