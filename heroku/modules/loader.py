@@ -1098,7 +1098,7 @@ class LoaderMod(loader.Module):
                 version,
                 utils.ascii_face(),
                 mod_doc, 
-                f"<blockquote expandable>{modhelp}</blockquote>",
+                f"<blockquote expandable>{'\n'.join(modhelp)}</blockquote>",
                 developer if not subscribe or not use_subscribe else "",
                 depends_from,
                 (
