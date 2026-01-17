@@ -42,14 +42,9 @@ def get_named_platform() -> str:
     with contextlib.suppress(Exception):
         if os.path.isfile("/proc/device-tree/model"):
             with open("/proc/device-tree/model") as f:
-                model = f.read()
-                if "Orange" in model:
-                    return f"{model}"
-
-                if "Raspberry" in model:
-                    return f"{model}"
-                else:
-                    return f"{model}"
+                model = f.read().strip()
+                if any(board in model for board in ("Orange", "Raspberry")):
+                    return model
 
     match True:
         case _ if IS_WSL:
@@ -221,25 +216,6 @@ def get_ip_address() -> str:
         return response.json()['ip']
     except Exception:
         return "Unknown"
-
-
-def get_cpu_temperature() -> float:
-    """
-    Get CPU temperature if available
-    :return: Temperature in Celsius or 0 if not available
-    """
-    try:
-        import psutil
-        temps = psutil.sensors_temperatures()
-        if 'coretemp' in temps:
-            return temps['coretemp'][0].current
-        elif 'cpu-thermal' in temps:
-            return temps['cpu-thermal'][0].current
-        else:
-            return 0.0
-    except Exception:
-        return 0.0
-
 
 def get_disk_usage() -> dict:
     """

@@ -419,6 +419,7 @@ updater:
   _cmd_doc_source: "Ссылка на гит"
   _cmd_doc_update: "Качает обнову"
   _cmd_doc_rollback: "Откатывает обнову"
+
 api_protection:
   warning: "⚠️ <b>ЭЭЭ СТОПЭ!</b>\n\nТы превысил лимиты запросов. Чтоб телега не дала спамбан, юзербот <b>ушел в фриз</b> на {} секунд. Инфа в файле. \n\nИди в <code>{prefix}support</code> поплачь!\n\nЕсли так и надо, жди таймер, а потом юзай <code>{prefix}suspend_api_protect</code> &lt;секунды&gt;"
   args_invalid: "<emoji document_id=5210952531676504517>🚫</emoji> <b>Аргументы кривые</b>"
@@ -478,8 +479,6 @@ heroku_info:
   _cmd_doc_setinfo: "<текст> - Поменять текст в .info"
 
 loader:
-  loadmod_pm_timeout: "Жди 10 сек, не суетись"
-  loadmod_not_allowed_fresh_pm: "<emoji document_id=5447644880824181073>⚠️</emoji> <b><u>ЧИТАЙ!</u></b> <emoji document_id=5447644880824181073>⚠️</emoji>\n\n<b>Ты качаешь модуль из ЛС с нн-ом.</b> Если там скам, тебе <b>снесут акк или угонят сессию</b>. Если знаешь чела и он ровный на <b><u>100%</u></b>, жди пару дней и пробуй."
   link: "<emoji document_id=5256113064821926998>📁</emoji> <b>Файл</b> {class_name}\n\n<emoji document_id=5134452506935427991>🪐</emoji> <b>{prefix}lm реплаем сюда, чтоб поставить</b>\n\n<emoji document_id=4916086774649848789>🔗</emoji> <code>{prefix}dlm {url}</code>\n\n{not_exact}"
   file: "<emoji document_id=5256113064821926998>📁</emoji> <b>Файл</b> {class_name}\n\n<emoji document_id=5134452506935427991>🪐</emoji> <b>{prefix}lm реплаем сюда, чтоб поставить</b>\n\n{not_exact}"
   finding_module_in_repos: "<emoji document_id=5873204392429096339>🔄</emoji> Ищу в репо..."
@@ -487,11 +486,6 @@ loader:
   ml_load_module: "<emoji document_id=5873204392429096339>🔄</emoji> Качаю как файл..."
   not_exact: "<emoji document_id=5355133243773435190>⚠️</emoji> <i>Точно такого нет, вот похожее</i>"
   args: "<emoji document_id=5210952531676504517>❌</emoji> <b>Аргументы где?</b>"
-  loadmod_confirm_pm_message: "<emoji document_id=5451732530048802485>⏳</emoji> <i>Жду пока ты нажмешь...</i>"
-  loadmod_cancelled: "<emoji document_id=5210952531676504517>🚫</emoji> <b>Отмена, не качаем</b>"
-  loadmod_confirm_pm: "⚠️ <b>Ахтунг!</b>\n\nКачать левые модули <b><u>опасно</u></b> — могут <b>угнать акк</b>. Если доверяешь челу на <b><u>100%</u></b> - жми.\n\n<b>Качаем?</b>"
-  loadmod_confirm_pm_yes: "✅ Да, го"
-  loadmod_confirm_pm_no: "🚫 Не, ну нафиг"
   repo_config_doc: "Ссылка на репо"
   add_repo_config_doc: "Доп. репозитории"
   avail_header: "🎢 <b>Офф. модули</b>"
@@ -500,7 +494,7 @@ loader:
   provide_module: "<emoji document_id=5312383351217201533>⚠️</emoji> <b>Че качать то?</b>"
   bad_unicode: "<emoji document_id=5210952531676504517>🚫</emoji> <b>Кодировка кривая</b>"
   load_failed: "<emoji document_id=5210952531676504517>🚫</emoji> <b>Не загрузилось (F). Чекни логи.</b>"
-  loaded: "<emoji document_id=5134452506935427991>🪐</emoji> <b>Модуль</b> <code>{}</code>{} <b>залетел {}</b>{}{}{}{}{}{}"
+  loaded: "<emoji document_id=5134452506935427991>🪐</emoji> <b>Модуль</b> <code>{}</code>{} <b>залетел {}</b>{}{}{}{}{}{}{}"
   no_class: "<b>Че выгружать?</b>"
   unloaded: "{} <b>Модуль {} выкинул.</b>"
   modules_unloaded: "<emoji document_id=5784993237412351403>✅</emoji> <b>Выкинул {unloaded_num} модов:</b>\n<blockquote expandable>{unloaded}</blockquote>"

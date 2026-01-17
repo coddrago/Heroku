@@ -44,7 +44,7 @@ async def check_branch(me_id: int, allowed_ids: list):
         return
     else:
         branch_name = get_branch_name(repo_path)
-        is_ancestor = check_commit_ancestor(repo, branch_name, "master")
+        is_ancestor = check_commit_ancestor(repo, branch_name)
         if is_ancestor:
             return
         else:

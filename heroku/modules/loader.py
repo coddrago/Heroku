@@ -1047,12 +1047,13 @@ class LoaderMod(loader.Module):
         if message is None:
             return
 
-        modhelp = ""
+        modhelp = []
+        mod_doc = ""
 
         if instance.__doc__:
-            modhelp += (
+            mod_doc += (
                 "<i>\n<emoji document_id=5879813604068298387>ℹ️</emoji>"
-                f" {utils.escape_html(inspect.getdoc(instance))}</i>\n"
+                f" {utils.escape_html(inspect.getdoc(instance))}</i>\n\n"
             )
 
         subscribe = ""
@@ -1085,6 +1086,7 @@ class LoaderMod(loader.Module):
             nonlocal \
                 modname, \
                 version, \
+                mod_doc, \
                 modhelp, \
                 developer, \
                 origin, \
@@ -1095,7 +1097,10 @@ class LoaderMod(loader.Module):
                 modname.strip(),
                 version,
                 utils.ascii_face(),
-                modhelp,
+                mod_doc, 
+                "<blockquote expandable>{}</blockquote>".format(
+                    '\n'.join(modhelp)
+                ),
                 developer if not subscribe or not use_subscribe else "",
                 depends_from,
                 (
@@ -1159,15 +1164,17 @@ class LoaderMod(loader.Module):
             instance.commands.items(),
             key=lambda x: x[0],
         ):
-            modhelp += "\n{} <code>{}{}</code> {}".format(
-                f"{self.config['command_emoji']}",
-                utils.escape_html(self.get_prefix()),
-                _name,
-                (
-                    utils.escape_html(inspect.getdoc(fun))
-                    if fun.__doc__
-                    else self.strings("undoc")
-                ),
+            modhelp.append(
+                "{} <code>{}{}</code> {}".format(
+                    f"{self.config['command_emoji']}",
+                    utils.escape_html(self.get_prefix()),
+                    _name,
+                    (
+                        utils.escape_html(inspect.getdoc(fun))
+                        if fun.__doc__
+                        else self.strings("undoc")
+                    ),
+                )
             )
 
         if self.inline.init_complete:
@@ -1175,13 +1182,15 @@ class LoaderMod(loader.Module):
                 instance.inline_handlers.items(),
                 key=lambda x: x[0],
             ):
-                modhelp += self.strings("ihandler").format(
-                    f"@{self.inline.bot_username} {_name}",
-                    (
-                        utils.escape_html(inspect.getdoc(fun))
-                        if fun.__doc__
-                        else self.strings("undoc")
-                    ),
+                modhelp.append(
+                    self.strings("ihandler").format(
+                        f"@{self.inline.bot_username} {_name}",
+                        (
+                            utils.escape_html(inspect.getdoc(fun))
+                            if fun.__doc__
+                            else self.strings("undoc")
+                        ),
+                    )
                 )
 
         try:

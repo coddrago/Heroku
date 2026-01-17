@@ -28,7 +28,7 @@ except ImportError as e:
 import typing
 
 from herokutl.errors.rpcerrorlist import ChannelsTooMuchError
-from herokutl.tl.types import Message, User
+from herokutl.tl.types import Message, User, ForumTopic
 
 from . import main, utils
 from .pointers import (
@@ -65,7 +65,7 @@ class Database(dict):
         self._client: CustomTelegramClient = client
         self._next_revision_call: int = 0
         self._revisions: typing.List[dict] = []
-        self._assets: int = None
+        self._assets_topic: typing.Optional[ForumTopic] = None
         self._me: User = None
         self._redis: redis.Redis = None
         self._saving_task: asyncio.Future = None
@@ -119,17 +119,24 @@ class Database(dict):
         self.read()
 
         try:
-            self._assets, _ = await utils.asset_channel(
-                self._client,
-                "heroku-assets",
-                "🌆 Your Heroku assets will be stored here",
-                archive=True,
-                avatar="https://raw.githubusercontent.com/coddrago/assets/refs/heads/main/heroku/heroku_assets.png"
+            self._content_channel_id = self.get("heroku.forums", "channel_id", None)
+
+            if not self._content_channel_id:
+                raise KeyError("Heroku content channel not found in database")
+
+            self._assets_topic = await utils.asset_forum_topic(
+                client=self._client,
+                db=self,
+                peer=self._content_channel_id,
+                title="Assets",
+                description="🌆 Your Heroku assets will be stored here",
+                icon_emoji_id=5877307202888273539,
             )
-        except ChannelsTooMuchError:
-            self._assets = None
+
+        except Exception:
+            self._assets_topic = None
             logger.error(
-                "Can't find and/or create assets folder\n"
+                "Can't find and/or create assets topic\n"
                 "This may cause several consequences, such as:\n"
                 "- Non working assets feature (e.g. notes)\n"
                 "- This error will occur every restart\n\n"
@@ -249,29 +256,30 @@ class Database(dict):
         Save assets
         returns asset_id as integer
         """
-        if not self._assets:
-            raise NoAssetsChannel("Tried to save asset to non-existing asset channel")
+        if not self._assets_topic:
+            raise NoAssetsChannel("Tried to save asset to non-existing asset topic")
 
         return (
-            (await self._client.send_message(self._assets, message)).id
+            (await self._client.send_message(self._content_channel_id, message, reply_to=self._assets_topic.id)).id
             if isinstance(message, Message)
             else (
                 await self._client.send_message(
-                    self._assets,
+                    self._content_channel_id,
                     file=message,
                     force_document=True,
+                    message_thread_id=self._assets_topic.id
                 )
             ).id
         )
 
     async def fetch_asset(self, asset_id: int) -> typing.Optional[Message]:
         """Fetch previously saved asset by its asset_id"""
-        if not self._assets:
+        if not self._assets_topic:
             raise NoAssetsChannel(
-                "Tried to fetch asset from non-existing asset channel"
+                "Tried to fetch asset from non-existing asset topic"
             )
 
-        asset = await self._client.get_messages(self._assets, ids=[asset_id])
+        asset = await self._client.get_messages(self._content_channel_id, ids=[asset_id])
 
         return asset[0] if asset else None
 

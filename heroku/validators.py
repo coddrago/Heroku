@@ -72,6 +72,14 @@ class Boolean(Validator):
     `1`, `"1"` etc. will be automatically converted to bool
     """
 
+    _TRUE_VALUES = frozenset(
+        ("True", "true", "1", 1, True, "yes", "Yes", "on", "On", "y", "Y")
+    )
+    _FALSE_VALUES = frozenset(
+        ("False", "false", "0", 0, False, "no", "No", "off", "Off", "n", "N")
+    )
+    _ALL_VALUES = _TRUE_VALUES | _FALSE_VALUES
+
     def __init__(self):
         super().__init__(
             self._validate,
@@ -81,12 +89,10 @@ class Boolean(Validator):
 
     @staticmethod
     def _validate(value: ConfigAllowedTypes, /) -> bool:
-        true = ["True", "true", "1", 1, True, "yes", "Yes", "on", "On", "y", "Y"]
-        false = ["False", "false", "0", 0, False, "no", "No", "off", "Off", "n", "N"]
-        if value not in true + false:
+        if value not in Boolean._ALL_VALUES:
             raise ValidationError("Passed value must be a boolean")
 
-        return value in true
+        return value in Boolean._TRUE_VALUES
 
 
 class Integer(Validator):
@@ -159,7 +165,9 @@ class Integer(Validator):
                         digits=_digits.get(lang, ""),
                         maximum=maximum,
                     )
-                    for lang, text in translator.getdict("validators.integer_max").items()
+                    for lang, text in translator.getdict(
+                        "validators.integer_max"
+                    ).items()
                 }
 
         super().__init__(
@@ -200,7 +208,6 @@ class Integer(Validator):
             )
 
         return value
-
 
 class Choice(Validator):
     """
@@ -434,7 +441,9 @@ class String(Validator):
                         "validators.string_len_range", min_len=min_len, max_len=max_len
                     )
                 case _:
-                    doc = translator.getdict("validators.string_min_len", min_len=min_len)
+                    doc = translator.getdict(
+                        "validators.string_min_len", min_len=min_len
+                    )
 
         super().__init__(
             functools.partial(
@@ -826,3 +835,45 @@ class EntityLike(RegExp):
             value = f"@{value}"
 
         return value
+        
+class RandomLinkList(list):
+
+    def __str__(self):
+        import random
+        if not self:
+            return ""
+        return str(random.choice(self))
+
+    def __bytes__(self):
+        return str(self).encode("utf-8")
+
+    def __repr__(self):
+        return super().__repr__()
+
+
+class RandomLink(Series):
+
+    def __init__(self):
+        super().__init__(
+            validator=Link(), 
+            min_len=1         
+        )
+        
+        self.doc = {
+            "en": "A list of links, one of which will be chosen randomly",
+            "ru": "Список ссылок, одна из которых будет выбрана случайным образом",
+        }
+        self.internal_id = "RandomLink"
+
+    @staticmethod
+    def _validate(value: ConfigAllowedTypes, /, **kwargs) -> RandomLinkList:
+
+        val_args = kwargs.copy()
+        if 'validator' not in val_args:
+            val_args['validator'] = Link()
+        if 'min_len' not in val_args:
+            val_args['min_len'] = 1
+
+        clean_list = Series._validate(value, **val_args)
+        
+        return RandomLinkList(clean_list)

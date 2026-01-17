@@ -51,7 +51,7 @@ class HerokuInfoMod(loader.Module):
                 "banner_url",
                 "https://raw.githubusercontent.com/coddrago/assets/refs/heads/main/heroku/heroku_info.png",
                 lambda: self.strings("_cfg_banner"),
-                validator=loader.validators.Link(),
+                validator=loader.validators.RandomLink(),
             ),
 
             loader.ConfigValue(
@@ -214,7 +214,7 @@ class HerokuInfoMod(loader.Module):
         )
     
     async def _get_info_photo(self, start: float) -> Optional[Path]:
-        imgform = self.config['banner_url'].split('.')[-1]
+        imgform = str(self.config['banner_url']).split('.')[-1]
         imgset = self.config['imgSettings']
         if imgform in ['jpg', 'jpeg', 'png', 'bmp', 'webp']:
             response = requests.get(self.config['banner_url'] if not self.config['banner_url'].startswith('https://imgur') else self.imgur(self.config['banner_url']), stream=True, headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"})
@@ -292,9 +292,9 @@ class HerokuInfoMod(loader.Module):
     @loader.command()
     async def infocmd(self, message: Message):
         start = time.perf_counter_ns()
-        media = self.config["banner_url"]
+        media = str(self.config["banner_url"])
         if self.config["banner_url"] and self.config["quote_media"] is True:
-            media = InputMediaWebPage(self.config["banner_url"], optional = True)
+            media = InputMediaWebPage(str(self.config["banner_url"]), optional = True)
 
         try:
             match True:

@@ -1026,15 +1026,16 @@ class Heroku:
                 caption=(
                     "🪐 <b>Heroku {} started!</b>\n\n⚙ <b>GitHub commit SHA: <a"
                     ' href="https://github.com/coddrago/Heroku/commit/{}">{}</a></b>\n🔎'
-                    " <b>Update status: {}</b>\n<b>{}</b>\n🕶 <b>Prefix:</b> <code>{}</code>".format(
-                        ".".join(list(map(str, list(__version__)))),
-                        build,
-                        build[:7],
-                        upd,
-                        web_url,
-                        "." if pref is None else pref,
-                    )
+                    " <b>Update status: {}</b>\n<b>{}</b>\n🕶 <b>Prefix:</b> <code>{}</code>"
+                ).format(
+                    ".".join(list(map(str, list(__version__)))),
+                    build,
+                    build[:7],
+                    upd,
+                    web_url,
+                    "." if pref is None else pref,
                 ),
+                message_thread_id=logging.getLogger().handlers[0].get_logs_topic_id_by_client(client.tg_id),
             )
             logging.debug(
                 "· Started for %s · Prefix: «%s» ·",

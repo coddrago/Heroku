@@ -89,7 +89,7 @@ class TestMod(loader.Module):
                 validator=loader.validators.Boolean(),
             ),
             loader.ConfigValue(
-                "Text_Of_Ping",
+                "custom_message",
                 "<emoji document_id=5920515922505765329>⚡️</emoji> <b>𝙿𝚒𝚗𝚐: </b><code>{ping}</code><b> 𝚖𝚜 </b>\n<emoji document_id=5900104897885376843>🕓</emoji><b> 𝚄𝚙𝚝𝚒𝚖𝚎: </b><code>{uptime}</code>",
                 lambda: self.strings["configping"],
                 validator=loader.validators.String(),
@@ -110,7 +110,7 @@ class TestMod(loader.Module):
                 "banner_url",
                 None,
                 lambda: self.strings["banner_url"],
-                validator=loader.validators.Link(),
+                validator=loader.validators.RandomLink(),
             ),
             loader.ConfigValue(
                 "quote_media",
@@ -183,59 +183,6 @@ class TestMod(loader.Module):
         except Exception:
             logger.exception("Failed debugging watchdog")
             return
-
-    @loader.command()
-    async def debugmod(self, message: Message):
-        """| debug mod for your modules!"""
-        args = utils.get_args_raw(message)
-        instance = None
-        for module in self.allmodules.modules:
-            if (
-                module.__class__.__name__.lower() == args.lower()
-                or module.strings["name"].lower() == args.lower()
-            ):
-                if os.path.isfile(
-                    os.path.join(
-                        DEBUG_MODS_DIR,
-                        f"{module.__class__.__name__}.py",
-                    )
-                ):
-                    os.remove(
-                        os.path.join(
-                            DEBUG_MODS_DIR,
-                            f"{module.__class__.__name__}.py",
-                        )
-                    )
-
-                    try:
-                        delattr(module, "heroku_debug")
-                    except AttributeError:
-                        pass
-
-                    await utils.answer(message, self.strings("debugging_disabled"))
-                    return
-
-                module.heroku_debug = True
-                instance = module
-                break
-
-        if not instance:
-            await utils.answer(message, self.strings("bad_module"))
-            return
-
-        with open(
-            os.path.join(
-                DEBUG_MODS_DIR,
-                f"{instance.__class__.__name__}.py",
-            ),
-            "wb",
-        ) as f:
-            f.write(inspect.getmodule(instance).__loader__.data)
-
-        await utils.answer(
-            message,
-            self.strings("debugging_enabled").format(instance.__class__.__name__),
-        )
 
     @loader.command()
     async def logs(
@@ -399,9 +346,9 @@ class TestMod(loader.Module):
         """- Find out your userbot ping"""
         start = time.perf_counter_ns()
         message = await utils.answer(message, self.config["ping_emoji"])
-        banner = self.config["banner_url"]
+        banner = str(self.config["banner_url"])
         if self.config["banner_url"] and self.config["quote_media"] is True:
-            banner = InputMediaWebPage(self.config["banner_url"], optional = True)
+            banner = InputMediaWebPage(str(self.config["banner_url"]), optional = True)
         data = {
             "ping": round((time.perf_counter_ns() - start) / 10**6, 3),
             "uptime": utils.formatted_uptime(),
@@ -410,27 +357,30 @@ class TestMod(loader.Module):
             ),
             "hostname": lib_platform.node(),
             "user": getpass.getuser(),
+            "platform": utils.get_platform_name(),
         }
         data = await utils.get_placeholders(data)
         await utils.answer(
             message,
-            self.config["Text_Of_Ping"].format(**data),
+            self.config["custom_message"].format(**data),
             file = banner,
             invert_media = self.config["invert_media"]
         )
 
 
     async def client_ready(self):
-        chat, _ = await utils.asset_channel(
-            self._client,
-            "heroku-logs",
-            "🪐 Your Heroku logs will appear in this chat",
-            silent=True,
-            invite_bot=True,
-            avatar="https://raw.githubusercontent.com/coddrago/assets/refs/heads/main/heroku/heroku_logs.png",
+        self._content_channel_id = await utils.wait_for_content_channel(self._db)
+
+        self._logs_topic = await utils.asset_forum_topic(
+            client=self._client,
+            db=self._db,
+            peer=self._content_channel_id,
+            title="Logs",
+            description="🪐 Your Heroku logs will appear in this topic",
+            icon_emoji_id=5256230583717079814,
         )
 
-        self.logchat = int(f"-100{chat.id}")
+        self.logchat = int(f"-100{self._content_channel_id}")
 
         logging.getLogger().handlers[0].install_tg_log(self)
         logger.debug("Bot logging installed for %s", self.logchat)

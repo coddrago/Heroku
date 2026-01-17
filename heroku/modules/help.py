@@ -62,7 +62,7 @@ class Help(loader.Module):
                 "banner_url",
                 None,
                 lambda: "Banner for .help",
-                validator=loader.validators.Link(),
+                validator=loader.validators.RandomLink(),
             ),
             loader.ConfigValue(
                 "media_quote",
@@ -255,10 +255,10 @@ class Help(loader.Module):
 
         args = utils.get_args_raw(message)
 
-        banner = self.config["banner_url"]
+        banner = str(self.config["banner_url"])
 
         if self.config["banner_url"] and self.config["media_quote"] is True:
-            banner = InputMediaWebPage(self.config["banner_url"])
+            banner = InputMediaWebPage(str(self.config["banner_url"]))
 
         force = False
         if "-f" in args:
