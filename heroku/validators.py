@@ -837,7 +837,6 @@ class EntityLike(RegExp):
         return value
         
 class RandomLinkList(list):
-
     def __str__(self):
         import random
         if not self:
@@ -852,22 +851,19 @@ class RandomLinkList(list):
 
 
 class RandomLink(Series):
-
     def __init__(self):
         super().__init__(
-            validator=Link(), 
-            min_len=1         
+            validator=Link(),
+            min_len=1
         )
-        
+        self.internal_id = "Series"
         self.doc = {
             "en": "A list of links, one of which will be chosen randomly",
             "ru": "Список ссылок, одна из которых будет выбрана случайным образом",
         }
-        self.internal_id = "RandomLink"
 
     @staticmethod
     def _validate(value: ConfigAllowedTypes, /, **kwargs) -> RandomLinkList:
-
         val_args = kwargs.copy()
         if 'validator' not in val_args:
             val_args['validator'] = Link()
@@ -875,5 +871,4 @@ class RandomLink(Series):
             val_args['min_len'] = 1
 
         clean_list = Series._validate(value, **val_args)
-        
         return RandomLinkList(clean_list)
