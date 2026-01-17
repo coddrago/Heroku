@@ -72,6 +72,14 @@ class Boolean(Validator):
     `1`, `"1"` etc. will be automatically converted to bool
     """
 
+    _TRUE_VALUES = frozenset(
+        ("True", "true", "1", 1, True, "yes", "Yes", "on", "On", "y", "Y")
+    )
+    _FALSE_VALUES = frozenset(
+        ("False", "false", "0", 0, False, "no", "No", "off", "Off", "n", "N")
+    )
+    _ALL_VALUES = _TRUE_VALUES | _FALSE_VALUES
+
     def __init__(self):
         super().__init__(
             self._validate,
@@ -81,12 +89,10 @@ class Boolean(Validator):
 
     @staticmethod
     def _validate(value: ConfigAllowedTypes, /) -> bool:
-        true = ["True", "true", "1", 1, True, "yes", "Yes", "on", "On", "y", "Y"]
-        false = ["False", "false", "0", 0, False, "no", "No", "off", "Off", "n", "N"]
-        if value not in true + false:
+        if value not in Boolean._ALL_VALUES:
             raise ValidationError("Passed value must be a boolean")
 
-        return value in true
+        return value in Boolean._TRUE_VALUES
 
 
 class Integer(Validator):
@@ -159,7 +165,9 @@ class Integer(Validator):
                         digits=_digits.get(lang, ""),
                         maximum=maximum,
                     )
-                    for lang, text in translator.getdict("validators.integer_max").items()
+                    for lang, text in translator.getdict(
+                        "validators.integer_max"
+                    ).items()
                 }
 
         super().__init__(
@@ -434,7 +442,9 @@ class String(Validator):
                         "validators.string_len_range", min_len=min_len, max_len=max_len
                     )
                 case _:
-                    doc = translator.getdict("validators.string_min_len", min_len=min_len)
+                    doc = translator.getdict(
+                        "validators.string_min_len", min_len=min_len
+                    )
 
         super().__init__(
             functools.partial(
