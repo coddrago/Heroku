@@ -209,6 +209,59 @@ class Integer(Validator):
 
         return value
 
+class RandomStringList(list):
+    """
+    Helper class that behaves like a list for storage/editing,
+    but behaves like a random string from that list when converted to str.
+    """
+    def __str__(self):
+        import random
+        if not self:
+            return ""
+        return str(random.choice(self))
+
+    def __repr__(self):
+        return super().__repr__()
+
+
+class RandomLink(Validator):
+    """
+    Validates a list of links (comma separated).
+    When the config value is accessed as a string, it returns a RANDOM link from the list.
+    """
+
+    def __init__(self):
+        super().__init__(
+            self._validate,
+            {
+                "en": "List of URLs separated by commas. Returns a random URL when accessed.",
+                "ru": "Список ссылок, разделенных запятыми. Возвращает случайную ссылку при обращении.",
+            },
+            _internal_id="RandomLink",
+        )
+
+    @staticmethod
+    def _validate(value: ConfigAllowedTypes, /) -> RandomStringList:
+        if not isinstance(value, (list, tuple, set)):
+            value = str(value).split(",")
+
+        clean_links = []
+        
+        for item in value:
+            item = str(item).strip()
+            if not item:
+                continue
+                
+            try:
+                Link._validate(item)
+                clean_links.append(item)
+            except ValidationError:
+                raise ValidationError(f"Item '{item}' is not a valid URL")
+
+        if not clean_links:
+            raise ValidationError("You must provide at least one valid URL")
+        return RandomStringList(clean_links)
+
 
 class Choice(Validator):
     """

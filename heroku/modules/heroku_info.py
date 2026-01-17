@@ -51,7 +51,7 @@ class HerokuInfoMod(loader.Module):
                 "banner_url",
                 "https://raw.githubusercontent.com/coddrago/assets/refs/heads/main/heroku/heroku_info.png",
                 lambda: self.strings("_cfg_banner"),
-                validator=loader.validators.Link(),
+                validator=loader.validators.RandomLink(),
             ),
 
             loader.ConfigValue(
