@@ -347,8 +347,13 @@ class TestMod(loader.Module):
         start = time.perf_counter_ns()
         message = await utils.answer(message, self.config["ping_emoji"])
         banner = str(self.config["banner_url"])
+        
         if self.config["banner_url"] and self.config["quote_media"] is True:
             banner = InputMediaWebPage(str(self.config["banner_url"]), optional = True)
+
+        elif not self.config["banner_url"]:
+            banner = None
+
         data = {
             "ping": round((time.perf_counter_ns() - start) / 10**6, 3),
             "uptime": utils.formatted_uptime(),

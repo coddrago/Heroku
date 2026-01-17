@@ -259,6 +259,9 @@ class Help(loader.Module):
 
         if self.config["banner_url"] and self.config["media_quote"] is True:
             banner = InputMediaWebPage(str(self.config["banner_url"]))
+            
+        elif not self.config["banner_url"]:
+            banner = None
 
         force = False
         if "-f" in args:

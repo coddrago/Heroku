@@ -293,8 +293,12 @@ class HerokuInfoMod(loader.Module):
     async def infocmd(self, message: Message):
         start = time.perf_counter_ns()
         media = str(self.config["banner_url"])
+        
         if self.config["banner_url"] and self.config["quote_media"] is True:
             media = InputMediaWebPage(str(self.config["banner_url"]), optional = True)
+        
+        elif not self.config["banner_url"]:
+            media = None
 
         try:
             match True:
