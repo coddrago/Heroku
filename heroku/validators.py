@@ -854,15 +854,14 @@ class RandomLinkList(list):
 class RandomLink(Series):
 
     def __init__(self):
-
         super().__init__(
             validator=Link(), 
-            min_len=1
+            min_len=1         
         )
         
         self.doc = {
-            "en": "A list of links that will be rotated randomly when accessed.",
-            "ru": "Список ссылок, которые будут выбираться случайным образом при обращении.",
+            "en": "A list of links, one of which will be chosen randomly",
+            "ru": "Список ссылок, одна из которых будет выбрана случайным образом",
         }
         self.internal_id = "RandomLink"
 
@@ -876,5 +875,5 @@ class RandomLink(Series):
             val_args['min_len'] = 1
 
         clean_list = Series._validate(value, **val_args)
-
+        
         return RandomLinkList(clean_list)

@@ -346,9 +346,9 @@ class TestMod(loader.Module):
         """- Find out your userbot ping"""
         start = time.perf_counter_ns()
         message = await utils.answer(message, self.config["ping_emoji"])
-        banner = self.config["banner_url"]
+        banner = str(self.config["banner_url"])
         if self.config["banner_url"] and self.config["quote_media"] is True:
-            banner = InputMediaWebPage(self.config["banner_url"], optional = True)
+            banner = InputMediaWebPage(str(self.config["banner_url"]), optional = True)
         data = {
             "ping": round((time.perf_counter_ns() - start) / 10**6, 3),
             "uptime": utils.formatted_uptime(),
@@ -363,7 +363,7 @@ class TestMod(loader.Module):
         await utils.answer(
             message,
             self.config["custom_message"].format(**data),
-            file = str(banner),
+            file = banner,
             invert_media = self.config["invert_media"]
         )
 
