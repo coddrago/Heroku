@@ -427,7 +427,7 @@ updater:
   cancel: "🚫 Cancew"
   full_success: "<emoji document_id=6028215594707324419>👍</emoji> <b>Usewbot is fuwwy woaded! {}</b>\n<i>Fuww westawt took {}s</i>"
   ub_stop: "Youw {emoji} has been stopped"
-  full_fail: "<emoji document_id=5210952531676504517>❌</emoji> <b>Usewbot is fuwwy woaded, but an ewwow occuwwed!\n<i>Fuww westawt took {}s\nFaiwed to woad {} moduwes</i>"
+  full_fail: "<emoji document_id=5210952531676504517>❌</emoji> <b>Usewbot is fuwwy woaded, but an ewwow occuwwed! {}\n<i>Fuww westawt took {}s\nFaiwed to woad {} moduwes</i>"
   secure_boot_complete: "<emoji document_id=5472308992514464048>🔐</emoji> <b>Secuwe boot compweted! {}</b>\n<i>Westawt took {}s</i>"
   secure_boot_fail: "<emoji document_id=5472308992514464048>🔐</emoji> <b>Secuwe boot compweted, but an ewwow occuwwed! {}</b>\n<i>Westawt took {}s\nFaiwed to woad {} moduwes</i>"
   invalid_args: "<emoji document_id=5210952531676504517>🚫</emoji> <b>You must pwovide nyumbew of commits to wowwback!</b>"

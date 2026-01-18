@@ -427,7 +427,7 @@ updater:
   cancel: "🚫 C4nc3l"
   full_success: "<emoji document_id=6028215594707324419>👍</emoji> <b>Us3rb07 15 fully l04d3d! {}</b>\n<i>Full r3574r7 700k {}s</i>"
   ub_stop: "Ur {emoji} h45 b33n 570pp3d"
-  full_fail: "<emoji document_id=5210952531676504517>❌</emoji> <b>Us3rb07 15 fully l04d3d, bu7 4n 3rr0r 0ccurr3d!\n<i>Full r3574r7 700k {}s\nF41l3d 2 l04d {} m0d5</i>"
+  full_fail: "<emoji document_id=5210952531676504517>❌</emoji> <b>Us3rb07 15 fully l04d3d, bu7 4n 3rr0r 0ccurr3d! {}\n<i>Full r3574r7 700k {}s\nF41l3d 2 l04d {} m0d5</i>"
   secure_boot_complete: "<emoji document_id=5472308992514464048>🔐</emoji> <b>S3cur3 b007 c0mpl373d! {}</b>\n<i>R3574r7 700k {}s</i>"
   secure_boot_fail: "<emoji document_id=5472308992514464048>🔐</emoji> <b>S3cur3 b007 c0mpl373d, bu7 4n 3rr0r 0ccurr3d! {}</b>\n<i>R3574r7 700k {}s\nF41l3d 2 l04d {} m0d5</i>"
   invalid_args: "<emoji document_id=5210952531676504517>🚫</emoji> <b>U mu57 pr0v1d3 numb3r 0f c0mm175 2 r0llb4ck!</b>"
