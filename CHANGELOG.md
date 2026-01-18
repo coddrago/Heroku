@@ -61,6 +61,15 @@
 - remove invokecmd
 - remove uninstall_herokucmd
 - remove debugmodcmd
+- add new validator RandomLink
+- replace validators in help, herokuinfo, tester to RandomLink
+- add and remove some modules in presets
+- replace TgCrypto to TgCrypto-pyrofork
+- impove keyboard layout
+- refactor clean up socket path assignment handling
+- improve platform model detection
+- add blockquote to dlm and lm cmds
+- improve boolean validation
 
 ## 🪐 Heroku 1.7.2
 - added autoupdate
