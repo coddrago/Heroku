@@ -322,6 +322,8 @@ class UpdaterMod(loader.Module):
 
         await self.process_restart_message(msg_obj)
 
+        self.db.set("Updater", "modules_count", len(self.allmodules.modules))
+
         self.set("restart_ts", time.time())
 
         # await self._db.remote_force_save()
@@ -661,11 +663,17 @@ class UpdaterMod(loader.Module):
             took = "n/a"
 
         self.set("restart_ts", None)
-
         ms = self.get("selfupdatemsg")
-        msg = self.strings(
-            "secure_boot_complete" if secure_boot else "full_success"
-        ).format(utils.ascii_face(), took)
+
+        if self.db.get("Updater", "modules_count") <= len(self.allmodules.modules):
+            msg = self.strings(
+                "secure_boot_complete" if secure_boot else "full_success"
+            ).format(utils.ascii_face(), took)
+        else:
+            fails = self.db.get("Updater", "modules_count") - len(self.allmodules.modules)
+            msg = self.strings(
+                "secure_boot_fail" if secure_boot else "full_fail"
+            ).format(utils.ascii_face(), took, fails)
 
         if ms is None:
             return
