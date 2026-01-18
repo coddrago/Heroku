@@ -665,12 +665,12 @@ class UpdaterMod(loader.Module):
         self.set("restart_ts", None)
         ms = self.get("selfupdatemsg")
 
-        if self.db.get("Updater", "modules_count") >= len(self.allmodules.modules):
+        if self.db.get("Updater", "modules_count") <= len(self.allmodules.modules):
             msg = self.strings(
                 "secure_boot_complete" if secure_boot else "full_success"
             ).format(utils.ascii_face(), took)
         else:
-            fails: self.db.get("Updater", "modules_count") - len(self.allmodules.modules)
+            fails = self.db.get("Updater", "modules_count") - len(self.allmodules.modules)
             msg = self.strings(
                 "secure_boot_fail" if secure_boot else "full_fail"
             ).format(utils.ascii_face(), took, fails)
