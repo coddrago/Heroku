@@ -37,12 +37,35 @@ class Evaluator(loader.Module):
 
     strings = {"name": "Evaluator"}
 
+    class _SecureDB:
+        """
+        Proxy class to protect sensitive DB fields from eval
+        """
+        def __init__(self, original_db):
+            self._db = original_db
+
+        def __getattr__(self, name):
+            return getattr(self._db, name)
+
+        def __getitem__(self, item):
+            return self._db[item]
+
+        def set(self, *args, **kwargs):
+            if len(args) >= 2 and args[0] == "heroku.security" and args[1] == "owner":
+                raise ValueError("⚠️ Security Protection: You cannot change the bot owner via evaluator.")
+            
+            return self._db.set(*args, **kwargs)
+
     @loader.command(alias="eval")
     async def e(self, message: Message):
         args = utils.get_args_raw(message)
         reply = await message.get_reply_message()
         if not args and reply and reply.text:
             args = reply.text
+        
+        real_db = self.db
+        self.db = self._SecureDB(real_db)
+
         try:
             start_time = time.time()
             output_print = StringIO()
@@ -76,6 +99,8 @@ class Evaluator(loader.Module):
             )
 
             return
+        finally:
+            self.db = real_db
 
         if callable(getattr(result, "stringify", None)):
             with contextlib.suppress(Exception):
@@ -286,4 +311,3 @@ class Evaluator(loader.Module):
                 )
             ),
         }
-        
