@@ -332,7 +332,7 @@ async def asset_channel(
     return peer, True
 
 if typing.TYPE_CHECKING:
-    from .database import Database
+    from ..database import Database
 
 async def asset_forum_topic(
     client: CustomTelegramClient,
