@@ -657,7 +657,50 @@ class Modules:
 
         module = importlib.util.module_from_spec(spec)
         sys.modules[module_name] = module
-        spec.loader.exec_module(module)
+
+        async def _exec_module():
+            attempted = False
+            while True:
+                try:
+                    spec.loader.exec_module(module)
+                    break
+                except ImportError as e:
+                    if attempted:
+                        raise
+
+                    requirements = list(
+                        filter(
+                            lambda x: not x.startswith(("-", "_", ".")),
+                            map(
+                                str.strip,
+                                VALID_PIP_PACKAGES.search(spec.loader.data)[1].split(),
+                            ),
+                        )
+                    )
+
+                    exc_name = (getattr(e, "name", None) or "").lower()
+
+                    requirements.extend(
+                        [
+                            {
+                                "sklearn": "scikit-learn",
+                                "pil": "Pillow",
+                                "herokutl": "Heroku-TL-New",
+                            }.get(exc_name, exc_name or e.name or "")
+                        ]
+                    )
+
+                    result = await self.lookup("loader").install_requirements(requirements)
+
+                    importlib.invalidate_caches()
+
+                    if not result:
+                        raise
+
+                    attempted = True
+
+        await _exec_module()
+
 
         ret = None
 
