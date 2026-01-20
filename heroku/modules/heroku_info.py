@@ -44,9 +44,11 @@ class HerokuInfoMod(loader.Module):
         self.config = loader.ModuleConfig(
             loader.ConfigValue(
                 "custom_message",
-                doc=lambda: self.strings("_cfg_cst_msg").format(
-                    custom=utils.config_placeholders()
-                ),
+                doc=lambda: (
+                    self.strings("_cfg_cst_msg") + "\n" + self.strings("_cfg_cst_ph").format(
+                        utils.config_placeholders()
+                    )
+                )
             ),
 
             loader.ConfigValue(
