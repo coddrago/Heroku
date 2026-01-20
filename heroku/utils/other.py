@@ -255,7 +255,7 @@ def config_placeholders():
     result = ""
     for placeholder_name, placeholder_data in custom_placeholders.items():
         module_name = placeholder_data.get("module_name")
-        result = result + f"{placeholder_name} (из модуля {module_name})\n"
+        result = result + f"{{{placeholder_name}}} - {module_name} "
     if result == "":
         return "None"
     else:
