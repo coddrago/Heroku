@@ -668,12 +668,20 @@ class Modules:
                     if not spec.loader.data or attempted:
                         raise
 
+                    data = spec.loader.data
+                    if isinstance(data, bytes):
+                        data = data.decode("utf-8", errors="ignore")
+
+                    match = VALID_PIP_PACKAGES.search(data)
+                    if not match:
+                        raise
+
                     requirements = list(
                         filter(
                             lambda x: not x.startswith(("-", "_", ".")),
                             map(
                                 str.strip,
-                                VALID_PIP_PACKAGES.search(spec.loader.data)[1].split(),
+                                match.group(1).split(),
                             ),
                         )
                     )
@@ -700,7 +708,6 @@ class Modules:
                     attempted = True
 
         await _exec_module()
-
 
         ret = None
 
