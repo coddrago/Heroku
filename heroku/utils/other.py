@@ -254,7 +254,7 @@ def unregister_placeholders(module_name: str) -> int:
 def config_placeholders():
     result = ""
     for placeholder_data in custom_placeholders.items():
-        result = result + f" {{{placeholder_data.get("module_name")}}}\n"
+        result = result + f" {{{placeholder_data.get('module_name')}}}\n"
     if result == "":
         return "None"
     else:
