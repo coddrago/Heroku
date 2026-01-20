@@ -665,7 +665,7 @@ class Modules:
                     spec.loader.exec_module(module)
                     break
                 except ImportError as e:
-                    if attempted:
+                    if not spec.loader.data or attempted:
                         raise
 
                     requirements = list(
