@@ -391,53 +391,52 @@ class Help(loader.Module):
         core_.sort(key=str.lower)
         no_commands_.sort(key=str.lower)
 
-        match True:
-            case _ if only_core:
-                await utils.answer(
-                    message,
-                    (self.config["desc_icon"] + " {}\n <blockquote expandable>{}</blockquote><blockquote expandable>{}</blockquote>").format(
-                        reply,
-                        "".join(core_),
-                        (
-                            ""
-                            if self.lookup("Loader").fully_loaded
-                            else f"\n\n{self.strings('partial_load')}"
-                        ),
+        if only_core:
+            await utils.answer(
+                message,
+                (self.config["desc_icon"] + " {}\n <blockquote expandable>{}</blockquote><blockquote expandable>{}</blockquote>").format(
+                    reply,
+                    "".join(core_),
+                    (
+                        ""
+                        if self.lookup("Loader").fully_loaded
+                        else f"\n\n{self.strings('partial_load')}"
                     ),
-                    file = banner,
-                    invert_media = self.config["invert_media"],
-                )
-            case _ if only_loaded:
-                await utils.answer(
-                    message,
-                    (self.config["desc_icon"] + " {}\n <blockquote expandable>{}</blockquote><blockquote expandable>{}</blockquote>").format(
-                        reply,
-                        "".join(plain_ + (no_commands_ if force else [])),
-                        (
-                            ""
-                            if self.lookup("Loader").fully_loaded
-                            else f"\n\n{self.strings('partial_load')}"
-                        ),
+                ),
+                file=banner,
+                invert_media=self.config["invert_media"],
+            )
+        elif only_loaded:
+            await utils.answer(
+                message,
+                (self.config["desc_icon"] + " {}\n <blockquote expandable>{}</blockquote><blockquote expandable>{}</blockquote>").format(
+                    reply,
+                    "".join(plain_ + (no_commands_ if force else [])),
+                    (
+                        ""
+                        if self.lookup("Loader").fully_loaded
+                        else f"\n\n{self.strings('partial_load')}"
                     ),
-                    file = banner,
-                    invert_media = self.config["invert_media"],
-                )
-            case _:
-                await utils.answer(
-                    message,
-                    (self.config["desc_icon"] + " {}\n <blockquote expandable>{}</blockquote><blockquote expandable>{}</blockquote><blockquote expandable>{}</blockquote>").format(
-                        reply,
-                        "".join(core_),
-                        "".join(plain_ + (no_commands_ if force else [])),
-                        (
-                            ""
-                            if self.lookup("Loader").fully_loaded
-                            else f"\n\n{self.strings('partial_load')}"
-                        ),
+                ),
+                file=banner,
+                invert_media=self.config["invert_media"],
+            )
+        else:
+            await utils.answer(
+                message,
+                (self.config["desc_icon"] + " {}\n <blockquote expandable>{}</blockquote><blockquote expandable>{}</blockquote><blockquote expandable>{}</blockquote>").format(
+                    reply,
+                    "".join(core_),
+                    "".join(plain_ + (no_commands_ if force else [])),
+                    (
+                        ""
+                        if self.lookup("Loader").fully_loaded
+                        else f"\n\n{self.strings('partial_load')}"
                     ),
-                    file = banner,
-                    invert_media = self.config["invert_media"],
-                )
+                ),
+                file=banner,
+                invert_media=self.config["invert_media"],
+            )
 
     @loader.command(ru_doc="| Ссылка на чат помощи", ua_doc="| посилання для чату служби підтримки", de_doc="| Link zum Support-Chat")
     async def support(self, message):

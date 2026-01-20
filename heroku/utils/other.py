@@ -250,3 +250,16 @@ def unregister_placeholders(module_name: str) -> int:
     for placeholder_name in placeholders_to_remove:
         del custom_placeholders[placeholder_name]
     return True
+
+def config_placeholders():
+    result = ""
+    for placeholder_name, placeholder_data in custom_placeholders.items():
+        module_name = placeholder_data.get("module_name")
+        result = result + f"{{{placeholder_name}}} - {module_name} "
+    if result == "":
+        return "None"
+    else:
+        return result
+
+def debug_placeholders():
+    return custom_placeholders
