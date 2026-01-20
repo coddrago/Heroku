@@ -380,7 +380,7 @@ class SecurityManager:
         user_id: typing.Optional[int] = None,
         inline_cmd: typing.Optional[str] = None,
         *,
-        usernames: typing.Optional[typing.List[str]] = None,
+        usernames: typing.Optional[typing.Set[str]] = None,
     ) -> bool:
         """
         Checks if message sender is permitted to execute certain function

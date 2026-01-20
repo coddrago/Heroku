@@ -35,7 +35,7 @@ from .tl_cache import CustomTelegramClient
 
 logger = logging.getLogger(__name__)
 
-# Keyboard layout translation table (created once at module load)
+# Keys for layout switch
 _LAYOUT_TRANSLATION = str.maketrans(
     'ёйцукенгшщзхъфывапролджэячсмитьбю.Ё"№;%:?ЙЦУКЕНГШЩЗХЪФЫВАПРОЛДЖЭ/ЯЧСМИТЬБЮ,'
     + "`qwertyuiop[]asdfghjkl;'zxcvbnm,./~@#$%^&QWERTYUIOP{}ASDFGHJKL:\"|ZXCVBNM<>?",
@@ -118,19 +118,15 @@ class CommandDispatcher:
 
         self.check_security = self.security.check
         self._me = self._client.heroku_me.id
-        self._cached_usernames = [
-            (
-                self._client.heroku_me.username.lower()
-                if self._client.heroku_me.username
-                else str(self._client.heroku_me.id)
-            )
-        ]
+        self._cached_usernames = set()
 
-        self._cached_usernames.extend(
+        if self._client.heroku_me.username:
+            self._cached_usernames.add(self._client.heroku_me.username.lower())
+        self._cached_usernames.update(
             u.username.lower()
             for u in getattr(self._client.heroku_me, "usernames", [])
-            or []
         )
+        self._cached_usernames.add(str(self._client.heroku_me.id))
 
         self.raw_handlers = []
         self._external_bl: typing.List[int] = []
@@ -367,7 +363,7 @@ class CommandDispatcher:
             and event.message is not None
             and event.message.message is not None
             and not any(
-                f"@{username}" not in command.lower()
+                f"@{username}" in command.lower()
                 for username in self._cached_usernames
             )
         ):
