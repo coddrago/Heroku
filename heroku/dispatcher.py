@@ -122,10 +122,13 @@ class CommandDispatcher:
 
         if self._client.heroku_me.username:
             self._cached_usernames.add(self._client.heroku_me.username.lower())
-        self._cached_usernames.update(
-            u.username.lower()
-            for u in getattr(self._client.heroku_me, "usernames", [])
-        )
+
+        if self._client.heroku_me.usernames:
+            self._cached_usernames.update(
+                u.username.lower()
+                for u in getattr(self._client.heroku_me, "usernames", [])
+            )
+
         self._cached_usernames.add(str(self._client.heroku_me.id))
 
         self.raw_handlers = []
