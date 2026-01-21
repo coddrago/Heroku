@@ -214,7 +214,7 @@ def safe_getattr(obj, attr, default=None):
     except AttributeError:
         return default
 
-def register_placeholder(placeholder: str, callback: typing.Callable):
+def register_placeholder(placeholder: str, callback: typing.Callable, description: typing.Optional[str] = None):
     """
     Register placeholder for Ping or Info commands
     """
@@ -224,6 +224,7 @@ def register_placeholder(placeholder: str, callback: typing.Callable):
         "module_name": module_name,
         "module_instance": module_instance,
         "callback": callback,
+        "description": description,
         "placeholder_name": placeholder,
     }
     return True
@@ -261,12 +262,15 @@ def config_placeholders():
     else:
         return result
 
-def debug_placeholders():
-    return custom_placeholders
-
 def help_placeholders(module_name):
     result = ""
     for placeholder_name, placeholder_data in custom_placeholders.items():
         if placeholder_data.get("module_name") == module_name:
-            result = result + f"{{{placeholder_name}}},"
+            if placeholder_data.get("description") is not None:
+                result = result + f"{{{placeholder_name}}} - {placeholder_data.get("description")},"
+            else:
+                result = result + f"{{{placeholder_name}}},"
     return result
+
+def debug_placeholders():
+    return custom_placeholders
