@@ -480,6 +480,7 @@ help:
   undoc: "🦥 Pas de docs"
   all_header: "<b>{} mods disponibles, {} masqués :</b>"
   no_mod: "🚫 <b>Spécifiez le module à masquer</b>"
+  custom_placeholders: "<emoji document_id=5372981976804366741>🤖</emoji>Espaces réservés personnalisés : "
   help_lib: "<emoji document_id=5404553572727660202>❌</emoji> <b>Le paquet</b> <code>{}</code> <b>est une bibliothèque.</b>\n<emoji document_id=5404553572727660202>❌</emoji> <b>Les bibliothèques n'ont pas de descriptions...</b>"
   hidden_shown: "<b>{} modules masqués, {} modules affichés :</b>\n{}\n{}"
   offchats: "<emoji document_id=6019130940012370273>❔</emoji> <a href=\"https://t.me/heroku_talks\"><b>Chat de support</b></a>\n\n<emoji document_id=6019151079114021083>💬</emoji> <a href=\"https://t.me/heroku_offtop\"><b>Chat Offtop</b></a>\n\n<emoji document_id=6019094432790354513>📢</emoji> <a href=\"https://t.me/heroku_ub\"><b>Canal officiel</b></a>"
