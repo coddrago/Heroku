@@ -297,8 +297,15 @@ class TelegramLogsHandler(logging.Handler):
             chunks[0]
         )
 
+        thread_id = call.message.message_thread_id
+
         for chunk in chunks[1:]:
-            await bot.send_message(chat_id=call.chat_id, text=chunk)
+            await bot.send_message(
+                chat_id=call.chat_id, 
+                text=chunk,
+                message_thread_id=thread_id
+            )
+
 
     def get_logid_by_client(self, client_id: int) -> int:
         return self._mods[client_id].logchat
