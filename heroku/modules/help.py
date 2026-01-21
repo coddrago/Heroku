@@ -238,7 +238,7 @@ class Help(loader.Module):
             )
         cmds = "\n".join(lines)
 
-        placeholders = utils.help_placeholders(module.__class__.__name__)
+        placeholders = utils.help_placeholders(module.__class__.__name__).replace("No docs", self.strings('undoc'))
         if placeholders != "":
             await utils.answer(
                 message,
