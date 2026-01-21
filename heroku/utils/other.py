@@ -267,9 +267,9 @@ def help_placeholders(module_name):
     for placeholder_name, placeholder_data in custom_placeholders.items():
         if placeholder_data.get("module_name") == module_name:
             if placeholder_data.get("description") is not None:
-                result = result + f"{{{placeholder_name}}} - {placeholder_data.get("description")},"
+                result = result + f"{{{placeholder_name}}} - {placeholder_data.get('description')}\n,"
             else:
-                result = result + f"{{{placeholder_name}}},"
+                result = result + f"{{{placeholder_name}}} - No docs\n"
     return result
 
 def debug_placeholders():
