@@ -34,7 +34,7 @@
 - add tiktokkid to meme pack
 - remove support python 3.9
 - rework if else to match/case
-- add utils.formet_file_size
+- add utils.format_file_size
 - add utils.is_url
 - add utils.get_iso_time
 - add utils.safe_getattr
@@ -46,10 +46,30 @@
 - add utils.get_network_interfaces
 - add utils.get_disk_usage
 - add utils.get_ip_address
-- add utils.get_cpu_temperature
 - add utils.get_args_bool
 - add utils.get_args_int
 - fix pack_url
+- add togglecmd cmd for disable or enable any cmd
+- add togglemod cmd for disable or enable any module
+- add clearmodule cmd
+- add placeholder system
+- move all log chat to forumTopics
+- add execution in .e from reply
+- add utils.asset_forum_topic
+- add utils.create_topic
+- add operator to fcfg
+- remove invokecmd
+- remove uninstall_herokucmd
+- remove debugmodcmd
+- add new validator RandomLink
+- replace validators in help, herokuinfo, tester to RandomLink
+- add and remove some modules in presets
+- replace TgCrypto to TgCrypto-pyrofork
+- impove keyboard layout
+- refactor clean up socket path assignment handling
+- improve platform model detection
+- add blockquote to dlm and lm cmds
+- improve boolean validation
 
 ## 🪐 Heroku 1.7.2
 - added autoupdate

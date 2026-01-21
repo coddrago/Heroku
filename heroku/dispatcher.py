@@ -35,9 +35,15 @@ from .tl_cache import CustomTelegramClient
 
 logger = logging.getLogger(__name__)
 
-# Keys for layout switch
-ru_keys = 'ёйцукенгшщзхъфывапролджэячсмитьбю.Ё"№;%:?ЙЦУКЕНГШЩЗХЪФЫВАПРОЛДЖЭ/ЯЧСМИТЬБЮ,'
-en_keys = "`qwertyuiop[]asdfghjkl;'zxcvbnm,./~@#$%^&QWERTYUIOP{}ASDFGHJKL:\"|ZXCVBNM<>?"
+# Keyboard layout translation table (created once at module load)
+_LAYOUT_TRANSLATION = str.maketrans(
+    'ёйцукенгшщзхъфывапролджэячсмитьбю.Ё"№;%:?ЙЦУКЕНГШЩЗХЪФЫВАПРОЛДЖЭ/ЯЧСМИТЬБЮ,'
+    + "`qwertyuiop[]asdfghjkl;'zxcvbnm,./~@#$%^&QWERTYUIOP{}ASDFGHJKL:\"|ZXCVBNM<>?",
+    
+    "`qwertyuiop[]asdfghjkl;'zxcvbnm,./~@#$%^&QWERTYUIOP{}ASDFGHJKL:\"|ZXCVBNM<>?"
+    + 'ёйцукенгшщзхъфывапролджэячсмитьбю.Ё"№;%:?ЙЦУКЕНГШЩЗХЪФЫВАПРОЛДЖЭ/ЯЧСМИТЬБЮ,'
+)
+
 ALL_TAGS = [
     "no_commands",
     "only_commands",
@@ -278,7 +284,6 @@ class CommandDispatcher:
             prefix = self._db.get(main.__name__, "command_prefixes", {})
             prefix = prefix.get(str(initiator), main_prefix)
             
-        change = str.maketrans(ru_keys + en_keys, en_keys + ru_keys)
         message = utils.censor(event.message)
 
         if not event.message.message:
@@ -290,8 +295,8 @@ class CommandDispatcher:
             and (
                 message.message.startswith(prefix * 2)
                 and any(s != prefix for s in message.message)
-                or message.message.startswith(str.translate(prefix * 2, change))
-                and any(s != str.translate(prefix, change) for s in message.message)
+                or message.message.startswith(str.translate(prefix * 2, _LAYOUT_TRANSLATION))
+                and any(s != str.translate(prefix, _LAYOUT_TRANSLATION) for s in message.message)
             )
         ):
             # Allow escaping commands using .'s
@@ -308,11 +313,11 @@ class CommandDispatcher:
 
         match True:
             case _ if (
-                event.message.message.startswith(str.translate(prefix, change))
-                and str.translate(prefix, change) != prefix
+                event.message.message.startswith(str.translate(prefix, _LAYOUT_TRANSLATION))
+                and str.translate(prefix, _LAYOUT_TRANSLATION) != prefix
             ):
-                message.message = str.translate(message.message, change)
-                message.text = str.translate(message.text, change)
+                message.message = str.translate(message.message, _LAYOUT_TRANSLATION)
+                message.text = str.translate(message.text, _LAYOUT_TRANSLATION)
             case _ if not event.message.message.startswith(prefix):
                 return False
 

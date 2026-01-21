@@ -310,6 +310,11 @@ settings:
   confirm_cleardb: "⚠️ <b>Are you sure, that you want to clear database?</b>"
   cleardb_confirm: "🗑 Clear database"
   cancel: "🚫 Cancel"
+  wrong_usage_tcc: "Usage: togglecmd <module> <command> or togglecmd <command>"
+  wrong_usage_tmc: "Usage: togglemod <module>"
+  wrong_usage_cmc: "Cleared DB for module {}"
+  mod_enabled: "Module {} enabled"
+  mod_disabled: "Module {} disabled"
   who_to_blacklist: "<emoji document_id=5382187118216879236>❓</emoji> <b>Who to blacklist?</b>"
   who_to_unblacklist: "<emoji document_id=5382187118216879236>❓</emoji> <b>Who to unblacklist?</b>"
   _cmd_doc_addalias: "Set an alias for a command"
@@ -381,6 +386,7 @@ test:
   set_loglevel: "<emoji document_id=5355133243773435190>🚫</emoji> <b>Please specify verbosity as an integer or string</b>"
   no_logs: "<emoji document_id=5355133243773435190>🤷‍♀️</emoji> <b>You don't have any logs at verbosity</b> <code>{}</code><b>.</b>"
   configping: "Your custom text. You can use placeholders: {ping} - That's your ping. {uptime} - It's your uptime. {ping_hint} - This is the same hint as in the heroku module, it is chosen with random chance, also you can specify this hint in the config. You can use the {hostname} placeholder if you need the hostname of your server"
+  configpingph: "🤖Custom placeholders: {}"
   hint: "Set a hint"
   ping_emoji: "Emoji that appears when ping does not increase significantly"
   back: "↩️ Back"
@@ -422,7 +428,9 @@ updater:
   cancel: "🚫 Cancel"
   full_success: "<emoji document_id=6028215594707324419>👍</emoji> <b>Userbot is fully loaded! {}</b>\n<i>Full restart took {}s</i>"
   ub_stop: "Your {emoji} has been stopped"
+  full_fail: "<emoji document_id=5210952531676504517>❌</emoji> <b>Userbot is fully loaded, but an error occurred! {}\n<i>Full restart took {}s\nFailed to load {} modules</i>"
   secure_boot_complete: "<emoji document_id=5472308992514464048>🔐</emoji> <b>Secure boot completed! {}</b>\n<i>Restart took {}s</i>"
+  secure_boot_fail: "<emoji document_id=5472308992514464048>🔐</emoji> <b>Secure boot completed, but an error occurred! {}</b>\n<i>Restart took {}s\nFailed to load {} modules</i>"
   invalid_args: "<emoji document_id=5210952531676504517>🚫</emoji> <b>You must provide number of commits to rollback!</b>"
   rollback_too_far: "<emoji document_id=5210952531676504517>🚫</emoji> <b>You're rolling back too far!</b>"
   rollback_confirm: "❓ <b>Are you sure you want to rollback {num} commit(-s)?</b>"
@@ -444,7 +452,7 @@ updater:
   latest_disabled: "Notifications about the latest update have been suppressed"
   update: "🔄 Update"
   ignore: "🚫 Ignore"
-  changelog: '<emoji document_id=5434144690511290129>📰</emoji> <b>Changelog of the last major update:</b><pre><code class="language-heroku">{}</code></pre>'
+  changelog: '<emoji document_id=5434144690511290129>📰</emoji> <b>Changelog of the last major update:</b><blockquote expandable>{}</blockquote>'
 
 
 api_protection:
@@ -491,6 +499,7 @@ heroku_info:
   switchinfo_on: "<emoji document_id=5118861066981344121>✅</emoji> Image Info turned on successfully"
   switchinfo_off: "<emoji document_id=5118861066981344121>✅</emoji> Image Info turned off successfully"
   _cfg_cst_msg: "Custom message for info. May contain {me}, {version}, {build}, {prefix}, {platform}, {upd}, {uptime}, {cpu_usage}, {ram_usage}, {branch}, {hostname}, {user}, {os}, {kernel}, {cpu}, {ping}, {python_ver}, {htl_ver}, {git_status} keywords"
+  _cfg_cst_ph: "🤖Custom placeholders: {}"
   _cfg_cst_btn: "Custom button for info. Leave empty to remove button"
   _cfg_banner: "URL to image banner"
   desc: "<emoji document_id=5188377234380954537>🪐</emoji> <b>Userbot — what is it?</b>\n\n<emoji document_id=5472238129849048175>😎</emoji> A userbot refers to a <b>third-party program</b> that interacts with the Telegram API to perform <b>automated tasks on behalf of a user</b>. These userbots can be used to automate various tasks such as <b>sending messages, joining channels, downloading media, and much more</b>.\n\n<emoji document_id=5474667187258006816>😎</emoji> Userbots are different from regular Telegram bots as <b>they run on the user's account</b> rather than a bot account. This means that userbots can access more features and have greater flexibility in terms of the actions they can perform.\n\n<emoji document_id=5472267631979405211>🚫</emoji> However, it is important to note that <b>userbots are not officially supported by Telegram</b> and their use may violate the platform's terms of service. As such, <b>users should exercise caution when using userbots</b> and ensure that they are not being used for malicious purposes.\n\n"
@@ -507,9 +516,6 @@ heroku_info:
 
 loader:
   name: "Loader"
-  loadmod_pm_timeout: "Please, wait for 10 seconds before confirming this action"
-  loadmod_not_allowed_fresh_pm: "<emoji document_id=5447644880824181073>⚠️</emoji> <b><u>Read this carefully!</u></b> <emoji document_id=5447644880824181073>⚠️</emoji>\n\n<b>You are attempting to load a module in personal messages with a user you do not know.</b> Modules, not verified by the developer, might cause a lot of trouble, from <b>messing with your account to account deletion or session comprometation</b>. If you know this user and <b><u>100%</u></b> trust him, wait a few days and try again."
-  loadmod_confirm_pm_message: "<emoji document_id=5451732530048802485>⏳</emoji> <i>Waiting for your confirmation...</i>"
   link: "<emoji document_id=5256113064821926998>📁</emoji> <b>File of</b> {class_name}\n\n<emoji document_id=5134452506935427991>🪐</emoji> <b>{prefix}lm in reply to this message to install</b>\n\n<emoji document_id=4916086774649848789>🔗</emoji> <code>{prefix}dlm {url}</code>\n\n{not_exact}"
   file: "<emoji document_id=5256113064821926998>📁</emoji> <b>File of</b> {class_name}\n\n<emoji document_id=5134452506935427991>🪐</emoji> <b>{prefix}lm in reply to this message to install</b>\n\n{not_exact}"
   finding_module_in_repos: "<emoji document_id=5873204392429096339>🔄</emoji> Looking for modules in repositories."
@@ -517,10 +523,6 @@ loader:
   ml_load_module: "<emoji document_id=5873204392429096339>🔄</emoji> I'm downloading the module as a file."
   not_exact: "<emoji document_id=5355133243773435190>⚠️</emoji> <i>No exact match has been found, so the closest result is shown instead</i>"
   args: "<emoji document_id=5210952531676504517>❌</emoji> <b>You must specify arguments</b>"
-  loadmod_cancelled: "<emoji document_id=5210952531676504517>🚫</emoji> <b>Module loading cancelled</b>"
-  loadmod_confirm_pm: "⚠️ <b>Warning!</b>\n\nLoading modules from unknown sources is <b><u>very dangerous</u></b> and can lead to <b>account deletion or session comprometation</b>. Make sure that you know this user and <b><u>100%</u></b> trust him.\n\n<b>Do you want to continue with module loading?</b>"
-  loadmod_confirm_pm_yes: "✅ Yes, continue"
-  loadmod_confirm_pm_no: "🚫 No, cancel"
   repo_config_doc: "URL to a module repo"
   avail_header: "🎢 <b>Modules from repo</b>"
   no_module: "<emoji document_id=5210952531676504517>🚫</emoji> <b>Module not available in repo.</b>"
@@ -528,7 +530,7 @@ loader:
   provide_module: "<emoji document_id=5312383351217201533>⚠️</emoji> <b>Provide a module to load</b>"
   bad_unicode: "<emoji document_id=5210952531676504517>🚫</emoji> <b>Invalid Unicode formatting in module</b>"
   load_failed: "<emoji document_id=5210952531676504517>🚫</emoji> <b>Loading failed. See logs for details</b>"
-  loaded: "<emoji document_id=5134452506935427991>🪐</emoji> <b>Module</b> <code>{}</code>{} <b>loaded {}</b>{}{}{}{}{}{}"
+  loaded: "<emoji document_id=5134452506935427991>🪐</emoji> <b>Module</b> <code>{}</code>{} <b>loaded {}</b>{}{}{}{}{}{}{}"
   no_class: "<b>What class needs to be unloaded?</b>"
   unloaded: "{} <b>Module {} unloaded.</b>"
   modules_unloaded: "<emoji document_id=5784993237412351403>✅</emoji> <b>Unloaded {unloaded_num} modules:</b>\n<blockquote expandable>{unloaded}</blockquote>"

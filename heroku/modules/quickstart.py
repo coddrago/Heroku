@@ -14,7 +14,7 @@ import logging
 import os
 from random import choice
 
-from .. import loader, translations, utils
+from .. import loader, translations, utils, main
 from ..inline.types import BotInlineCall
 
 logger = logging.getLogger(__name__)
@@ -36,7 +36,7 @@ class Quickstart(loader.Module):
 
     strings = {"name": "Quickstart"}
 
-    async def client_ready(self):
+    async def client_ready(self, client, db):
         await self.request_join(
             "heroku_talks", 
             "Heroku help is only available in this chat. By agreeing to join the chat, you agree to the Heroku federation rules and if you violate them, you will be permanently banned."
@@ -69,6 +69,20 @@ class Quickstart(loader.Module):
                 )
             ).rstrip()
         )
+
+        content_channel, _ = await utils.asset_channel(
+            client=client,
+            title='heroku-userbot',
+            description='🪐 Content related to Heroku will be here',
+            silent=True,
+            invite_bot=True,
+            avatar="https://raw.githubusercontent.com/coddrago/assets/main/heroku/heroku.png",
+            forum=True,
+            hide_general=True,
+            _folder='heroku',
+        )
+
+        db.set("heroku.forums", "channel_id", int(content_channel.id))
 
         if self.get("no_msg"):
             return

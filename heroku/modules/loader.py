@@ -535,20 +535,72 @@ class LoaderMod(loader.Module):
         return True
 
     async def install_packages(self, packages: list):
-        is_root = (os.geteuid() == 0)
-        if is_root:
-            apt = await asyncio.create_subprocess_exec(
-                "apt",
-                "install",
-                *packages
+        try:
+            is_root = (os.geteuid() == 0)
+
+            def _which(names):
+                for n in names:
+                    p = shutil.which(n)
+                    if p:
+                        return p
+                return None
+
+            pm = None
+            if _which(["apt", "apt-get"]):
+                pm = "apt"
+            elif _which(["apk"]):
+                pm = "apk"
+            elif _which(["dnf"]):
+                pm = "dnf"
+            elif _which(["yum"]):
+                pm = "yum"
+            elif _which(["pacman"]):
+                pm = "pacman"
+            elif _which(["brew"]):
+                pm = "brew"
+
+            if not pm:
+                logger.debug("No supported package manager found")
+                return False
+
+            cmd = []
+            if pm == "apt":
+                tool = _which(["apt", "apt-get"])
+                cmd = [tool, "install", "-y", *packages]
+            elif pm == "apk":
+                cmd = ["apk", "add", "--no-cache", *packages]
+            elif pm == "dnf":
+                cmd = ["dnf", "install", "-y", *packages]
+            elif pm == "yum":
+                cmd = ["yum", "install", "-y", *packages]
+            elif pm == "pacman":
+                cmd = ["pacman", "-Syu", "--noconfirm", *packages]
+            elif pm == "brew":
+                cmd = ["brew", "install", *packages]
+
+            if not is_root and shutil.which("sudo"):
+                cmd = ["sudo", *cmd]
+
+            proc = await asyncio.create_subprocess_exec(
+                *cmd,
+                stdout=asyncio.subprocess.PIPE,
+                stderr=asyncio.subprocess.PIPE,
             )
-        else: 
-            apt = await asyncio.create_subprocess_exec(
-                "sudo",
-                "apt",
-                "install",
-                *packages
-            )
+
+            out, err = await proc.communicate()
+
+            if proc.returncode != 0:
+                logger.debug(
+                    "Package install failed (%s): %s",
+                    " ".join(cmd),
+                    err.decode(errors="ignore") if err else out.decode(errors="ignore"),
+                )
+                return False
+
+            return True
+        except Exception:
+            logger.exception("install_packages failed")
+            return False
 
     async def load_module(
         self,
@@ -648,7 +700,14 @@ class LoaderMod(loader.Module):
                 pass
             
             if packages:
-                await self.install_packages(packages)
+                result = await self.install_packages(packages)
+
+                if not result:
+                    if message is not None:
+                        await utils.answer(message, self.strings("requirements_failed"))
+                    return
+
+                importlib.invalidate_caches()
 
                 kwargs = utils.get_kwargs()
                 kwargs["did_packages"] = True
@@ -988,12 +1047,13 @@ class LoaderMod(loader.Module):
         if message is None:
             return
 
-        modhelp = ""
+        modhelp = []
+        mod_doc = ""
 
         if instance.__doc__:
-            modhelp += (
+            mod_doc += (
                 "<i>\n<emoji document_id=5879813604068298387>ℹ️</emoji>"
-                f" {utils.escape_html(inspect.getdoc(instance))}</i>\n"
+                f" {utils.escape_html(inspect.getdoc(instance))}</i>\n\n"
             )
 
         subscribe = ""
@@ -1026,6 +1086,7 @@ class LoaderMod(loader.Module):
             nonlocal \
                 modname, \
                 version, \
+                mod_doc, \
                 modhelp, \
                 developer, \
                 origin, \
@@ -1036,7 +1097,10 @@ class LoaderMod(loader.Module):
                 modname.strip(),
                 version,
                 utils.ascii_face(),
-                modhelp,
+                mod_doc, 
+                "<blockquote expandable>{}</blockquote>".format(
+                    '\n'.join(modhelp)
+                ),
                 developer if not subscribe or not use_subscribe else "",
                 depends_from,
                 (
@@ -1100,15 +1164,17 @@ class LoaderMod(loader.Module):
             instance.commands.items(),
             key=lambda x: x[0],
         ):
-            modhelp += "\n{} <code>{}{}</code> {}".format(
-                f"{self.config['command_emoji']}",
-                utils.escape_html(self.get_prefix()),
-                _name,
-                (
-                    utils.escape_html(inspect.getdoc(fun))
-                    if fun.__doc__
-                    else self.strings("undoc")
-                ),
+            modhelp.append(
+                "{} <code>{}{}</code> {}".format(
+                    f"{self.config['command_emoji']}",
+                    utils.escape_html(self.get_prefix()),
+                    _name,
+                    (
+                        utils.escape_html(inspect.getdoc(fun))
+                        if fun.__doc__
+                        else self.strings("undoc")
+                    ),
+                )
             )
 
         if self.inline.init_complete:
@@ -1116,13 +1182,15 @@ class LoaderMod(loader.Module):
                 instance.inline_handlers.items(),
                 key=lambda x: x[0],
             ):
-                modhelp += self.strings("ihandler").format(
-                    f"@{self.inline.bot_username} {_name}",
-                    (
-                        utils.escape_html(inspect.getdoc(fun))
-                        if fun.__doc__
-                        else self.strings("undoc")
-                    ),
+                modhelp.append(
+                    self.strings("ihandler").format(
+                        f"@{self.inline.bot_username} {_name}",
+                        (
+                            utils.escape_html(inspect.getdoc(fun))
+                            if fun.__doc__
+                            else self.strings("undoc")
+                        ),
+                    )
                 )
 
         try:
@@ -1216,8 +1284,9 @@ class LoaderMod(loader.Module):
             if worked
             else self.strings("not_unloaded")
         )
+        for mod_name in worked:
+            utils.unregister_placeholders(mod_name)
         return msg
-
 
     @loader.command()
     async def clearmodules(self, message: Message):

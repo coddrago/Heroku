@@ -7,6 +7,7 @@
 import logging
 import typing
 import asyncio
+import subprocess
 
 import git
 import herokutl
@@ -48,22 +49,22 @@ def get_commit_url() -> str:
     except Exception:
         return "Unknown"
 
-async def get_git_status() -> str:
+def get_git_status() -> str:
     """
     :return: 'Clean' or 'X files modified'.
     """
     try:
-        process = await asyncio.create_subprocess_shell(
+        process = subprocess.run(
             "git status --porcelain",
-            stdout=asyncio.subprocess.PIPE,
-            stderr=asyncio.subprocess.PIPE
+            shell=True,
+            capture_output=True,
+            text=True
         )
-        stdout, _ = await process.communicate()
 
         if process.returncode != 0:
             return "Not a Git repo"
 
-        output = stdout.decode().strip()
+        output = process.stdout.strip()
 
         if not output:
             return "Clean"

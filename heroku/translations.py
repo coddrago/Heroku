@@ -39,7 +39,6 @@ MEME_LANGUAGES = {
     "leet": "🏴‍☠️ 1337",
     "uwu": "🏴‍☠️ UwU",
     "tiktok": "🏴‍☠️ TikTokKid",
-    "son": "🏴‍☠️ Son of a bit*h"
 }
 
 
@@ -221,11 +220,16 @@ class Strings:
                     next(
                         (
                             f"strings_{lang}"
-                            for lang in self._translator.db.get(
+                            for original_lang in (self._translator.db.get(
                                 __name__,
                                 "lang",
                                 "en",
-                            ).split(" ")
+                            ).split(" ") if self._translator is not None else ["en"])
+                            for lang in (
+                                [original_lang] + 
+                                (["en"] if original_lang in ["leet", "uwu"] else 
+                                 ["ru"] if original_lang == "tiktok" else [])
+                            )
                             if hasattr(self._mod, f"strings_{lang}")
                             and isinstance(getattr(self._mod, f"strings_{lang}"), dict)
                             and key in getattr(self._mod, f"strings_{lang}")
@@ -233,13 +237,11 @@ class Strings:
                         utils.rand(32),
                     ),
                     self._base_strings,
-                )
+                ).get(key)
                 if self._translator is not None
-                else self._base_strings
-            ).get(
-                key,
-                self._base_strings.get(key, "Unknown strings"),
+                else self._base_strings.get(key)
             )
+            or self._base_strings.get(key, "Unknown strings")
         )
 
     def __call__(

@@ -39,12 +39,16 @@ class Evaluator(loader.Module):
 
     @loader.command(alias="eval")
     async def e(self, message: Message):
+        args = utils.get_args_raw(message)
+        reply = await message.get_reply_message()
+        if not args and reply and reply.text:
+            args = reply.text
         try:
             start_time = time.time()
             output_print = StringIO()
             with contextlib.redirect_stdout(output_print):
                 result = await meval(
-                    utils.get_args_raw(message),
+                    args,
                     globals(),
                     **await self.getattrs(message),
                 )
@@ -58,7 +62,7 @@ class Evaluator(loader.Module):
                 self.strings("err").format(
                     "4985626654563894116",
                     "python",
-                    utils.escape_html(utils.get_args_raw(message)),
+                    utils.escape_html(args),
                     "error",
                     self.censor(
                         (
@@ -85,7 +89,7 @@ class Evaluator(loader.Module):
                 self.strings("eval_py").format(
                     "4985626654563894116",
                     "python",
-                    utils.escape_html(utils.get_args_raw(message)),
+                    utils.escape_html(args),
                 ) + (self.strings["eval_result"].format(
                     "python",
                      utils.escape_html(self.censor(str(result)))

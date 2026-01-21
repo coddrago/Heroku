@@ -310,6 +310,11 @@ settings:
   confirm_cleardb: "⚠️ <b>Êtes-vous sûr de vouloir effacer la base de données ?</b>"
   cleardb_confirm: "🗑 Effacer la base de données"
   cancel: "🚫 Annuler"
+  wrong_usage_tcc: "Utilisation : togglecmd <module> <commande> ou togglecmd <commande>"
+  wrong_usage_tmc: "Utilisation : togglemod <module>"
+  wrong_usage_cmc: "Base de données effacée pour le module {}"
+  mod_enabled: "Module {} activé"
+  mod_disabled: "Module {} désactivé"
   who_to_blacklist: "<emoji document_id=5382187118216879236>❓</emoji> <b>Qui mettre sur liste noire ?</b>"
   who_to_unblacklist: "<emoji document_id=5382187118216879236>❓</emoji> <b>Qui retirer de la liste noire ?</b>"
   _cmd_doc_addalias: "Définir un alias pour une commande"
@@ -381,6 +386,7 @@ test:
   set_loglevel: "<emoji document_id=5355133243773435190>🚫</emoji> <b>Veuillez spécifier la verbosité comme un entier ou une chaîne</b>"
   no_logs: "<emoji document_id=5355133243773435190>🤷‍♀️</emoji> <b>Vous n'avez aucun log à la verbosité</b> <code>{}</code><b>.</b>"
   configping: "Votre texte personnalisé. Vous pouvez utiliser des espaces réservés : {ping} - C'est votre ping. {uptime} - C'est votre temps de disponibilité. {ping_hint} - C'est le même indice que dans le module heroku, choisi au hasard, vous pouvez aussi spécifier cet indice dans la config. Vous pouvez utiliser l'espace réservé {hostname} si vous avez besoin du nom d'hôte de votre serveur"
+  configpingph: "🤖Espaces réservés personnalisés : {}"
   hint: "Définir un indice"
   ping_emoji: "Emoji qui apparaît quand le ping n'augmente pas significativement"
   back: "↩️ Retour"
@@ -422,7 +428,9 @@ updater:
   cancel: "🚫 Annuler"
   full_success: "<emoji document_id=6028215594707324419>👍</emoji> <b>Userbot entièrement chargé ! {}</b>\n<i>Le redémarrage complet a pris {}s</i>"
   ub_stop: "Votre {emoji} a été arrêté"
+  full_fail: "<emoji document_id=5210952531676504517>❌</emoji> <b>Le userbot est entièrement chargé, mais une erreur s'est produite ! {}\n<i>Le redémarrage complet a pris {}s\n{} modules n'ont pas pu être chargés</i>"
   secure_boot_complete: "<emoji document_id=5472308992514464048>🔐</emoji> <b>Démarrage sécurisé terminé ! {}</b>\n<i>Le redémarrage a pris {}s</i>"
+  secure_boot_fail: "<emoji document_id=5472308992514464048>🔐</emoji> <b>Démarrage sécurisé terminé, mais une erreur s'est produite ! {}</b>\n<i>Le redémarrage a pris {}s\n{} modules n'ont pas pu être chargés</i>"
   invalid_args: "<emoji document_id=5210952531676504517>🚫</emoji> <b>Vous devez fournir le nombre de commits à annuler !</b>"
   rollback_too_far: "<emoji document_id=5210952531676504517>🚫</emoji> <b>Vous remontez trop loin !</b>"
   rollback_confirm: "❓ <b>Êtes-vous sûr de vouloir annuler {num} commit(s) ?</b>"
@@ -444,7 +452,7 @@ updater:
   latest_disabled: "Les notifications concernant la dernière mise à jour ont été supprimées"
   update: "🔄 Mettre à jour"
   ignore: "🚫 Ignorer"
-  changelog: '<emoji document_id=5434144690511290129>📰</emoji> <b>Journal des modifications de la dernière mise à jour majeure :</b><pre><code class="language-heroku">{}</code></pre>'
+  changelog: '<emoji document_id=5434144690511290129>📰</emoji> <b>Journal des modifications de la dernière mise à jour majeure :</b><blockquote expandable>{}</blockquote>'
 
 
 api_protection:
@@ -491,6 +499,7 @@ heroku_info:
   switchinfo_on: "<emoji document_id=5118861066981344121>✅</emoji> Infos Image activées avec succès"
   switchinfo_off: "<emoji document_id=5118861066981344121>✅</emoji> Infos Image désactivées avec succès"
   _cfg_cst_msg: "Message personnalisé pour les infos. Peut contenir les mots-clés {me}, {version}, {build}, {prefix}, {platform}, {upd}, {uptime}, {cpu_usage}, {ram_usage}, {branch}, {hostname}, {user}, {os}, {kernel}, {cpu}, {ping}, {python_ver}, {htl_ver}, {git_status}"
+  _cfg_cst_ph: "🤖Espaces réservés personnalisés : {}"
   _cfg_cst_btn: "Bouton personnalisé pour les infos. Laisser vide pour supprimer le bouton"
   _cfg_banner: "URL vers l'image bannière"
   desc: "<emoji document_id=5188377234380954537>🪐</emoji> <b>Userbot — qu'est-ce que c'est ?</b>\n\n<emoji document_id=5472238129849048175>😎</emoji> Un userbot désigne un <b>programme tiers</b> qui interagit avec l'API Telegram pour effectuer des <b>tâches automatisées au nom d'un utilisateur</b>. Ces userbots peuvent être utilisés pour automatiser diverses tâches telles que <b>l'envoi de messages, rejoindre des chaînes, télécharger des médias, et bien plus encore</b>.\n\n<emoji document_id=5474667187258006816>😎</emoji> Les userbots sont différents des bots Telegram réguliers car <b>ils fonctionnent sur le compte de l'utilisateur</b> plutôt que sur un compte bot. Cela signifie que les userbots peuvent accéder à plus de fonctionnalités et avoir une plus grande flexibilité en termes d'actions qu'ils peuvent effectuer.\n\n<emoji document_id=5472267631979405211>🚫</emoji> Cependant, il est important de noter que <b>les userbots ne sont pas officiellement supportés par Telegram</b> et leur utilisation peut violer les conditions d'utilisation de la plateforme. En tant que tel, <b>les utilisateurs doivent faire preuve de prudence lors de l'utilisation de userbots</b> et s'assurer qu'ils ne sont pas utilisés à des fins malveillantes.\n\n"
@@ -507,9 +516,6 @@ heroku_info:
 
 loader:
   name: "Loader"
-  loadmod_pm_timeout: "Veuillez attendre 10 secondes avant de confirmer cette action"
-  loadmod_not_allowed_fresh_pm: "<emoji document_id=5447644880824181073>⚠️</emoji> <b><u>Lisez ceci attentivement !</u></b> <emoji document_id=5447644880824181073>⚠️</emoji>\n\n<b>Vous tentez de charger un module dans des messages personnels avec un utilisateur que vous ne connaissez pas.</b> Les modules, non vérifiés par le développeur, peuvent causer beaucoup de problèmes, allant du <b>bricolage avec votre compte à la suppression de compte ou à la compromission de session</b>. Si vous connaissez cet utilisateur et lui faites confiance à <b><u>100%</u></b>, attendez quelques jours et réessayez."
-  loadmod_confirm_pm_message: "<emoji document_id=5451732530048802485>⏳</emoji> <i>En attente de votre confirmation...</i>"
   link: "<emoji document_id=5256113064821926998>📁</emoji> <b>Fichier de</b> {class_name}\n\n<emoji document_id=5134452506935427991>🪐</emoji> <b>{prefix}lm en réponse à ce message pour installer</b>\n\n<emoji document_id=4916086774649848789>🔗</emoji> <code>{prefix}dlm {url}</code>\n\n{not_exact}"
   file: "<emoji document_id=5256113064821926998>📁</emoji> <b>Fichier de</b> {class_name}\n\n<emoji document_id=5134452506935427991>🪐</emoji> <b>{prefix}lm en réponse à ce message pour installer</b>\n\n{not_exact}"
   finding_module_in_repos: "<emoji document_id=5873204392429096339>🔄</emoji> Recherche de modules dans les dépôts."
@@ -517,10 +523,6 @@ loader:
   ml_load_module: "<emoji document_id=5873204392429096339>🔄</emoji> Je télécharge le module sous forme de fichier."
   not_exact: "<emoji document_id=5355133243773435190>⚠️</emoji> <i>Aucune correspondance exacte n'a été trouvée, donc le résultat le plus proche est affiché à la place</i>"
   args: "<emoji document_id=5210952531676504517>❌</emoji> <b>Vous devez spécifier des arguments</b>"
-  loadmod_cancelled: "<emoji document_id=5210952531676504517>🚫</emoji> <b>Chargement du module annulé</b>"
-  loadmod_confirm_pm: "⚠️ <b>Attention !</b>\n\nLe chargement de modules provenant de sources inconnues est <b><u>très dangereux</u></b> et peut mener à la <b>suppression du compte ou à la compromission de la session</b>. Assurez-vous de connaître cet utilisateur et de lui faire confiance à <b><u>100%</u></b>.\n\n<b>Voulez-vous continuer le chargement du module ?</b>"
-  loadmod_confirm_pm_yes: "✅ Oui, continuer"
-  loadmod_confirm_pm_no: "🚫 Non, annuler"
   repo_config_doc: "URL vers un dépôt de module"
   avail_header: "🎢 <b>Modules depuis le dépôt</b>"
   no_module: "<emoji document_id=5210952531676504517>🚫</emoji> <b>Module non disponible dans le dépôt.</b>"
@@ -528,7 +530,7 @@ loader:
   provide_module: "<emoji document_id=5312383351217201533>⚠️</emoji> <b>Fournissez un module à charger</b>"
   bad_unicode: "<emoji document_id=5210952531676504517>🚫</emoji> <b>Formatage Unicode invalide dans le module</b>"
   load_failed: "<emoji document_id=5210952531676504517>🚫</emoji> <b>Le chargement a échoué. Voir les logs pour les détails</b>"
-  loaded: "<emoji document_id=5134452506935427991>🪐</emoji> <b>Module</b> <code>{}</code>{} <b>chargé {}</b>{}{}{}{}{}{}"
+  loaded: "<emoji document_id=5134452506935427991>🪐</emoji> <b>Module</b> <code>{}</code>{} <b>chargé {}</b>{}{}{}{}{}{}{}"
   no_class: "<b>Quelle classe doit être déchargée ?</b>"
   unloaded: "{} <b>Module {} déchargé.</b>"
   modules_unloaded: "<emoji document_id=5784993237412351403>✅</emoji> <b>Déchargé {unloaded_num} modules :</b>\n<blockquote expandable>{unloaded}</blockquote>"

@@ -26,6 +26,7 @@ import socket
 import sqlite3
 import sys
 import typing
+import string
 from getpass import getpass
 from pathlib import Path
 
@@ -106,8 +107,9 @@ LATIN_MOCK = [
     "Tigris", "Trans", "Tribuo", "Tristis", "Ultimus",
     "Unitas", "Universus", "Uterque", "Valde", "Vates",
     "Veritas", "Verus", "Vester", "Via", "Victoria",
-    "Vita", "Vox", "Vultus", "Zephyrus", "Hewoku", "Bimbalas", "Nywuctuu",
-    "Sodrago", "Anyone", "Draher", "Hackimo", "Silvyr",
+    "Vita", "Vox", "Vultus", "Zephyrus", "Bimbalas", "Nywuctuu",
+    "Anyone", "Draher", "Hackimo", "Silvyr", 
+
 ]
 # fmt: on
 
@@ -147,33 +149,142 @@ def generate_random_system_version():
     :example: "Windows 10.0.19042.1234" or "Ubuntu 20.04.19042.1234"
     """
     os_choices = [
-        ("Windows", "Vista"),
+        ("Windows", "3.1"),
+        ("Windows", "95"),
+        ("Windows", "98"),
+        ("Windows", "ME"),
+        ("Windows", "NT 4.0"),
+        ("Windows", "2000"),
         ("Windows", "XP"),
+        ("Windows", "Server 2003"),
+        ("Windows", "Vista"),
         ("Windows", "7"),
         ("Windows", "8"),
+        ("Windows", "8.1"),
         ("Windows", "10"),
-        ("Ubuntu", "20.04"),
-        ("Debian", "10"),
-        ("Fedora", "33"),
-        ("Arch Linux", "2021.05"),
-        ("CentOS", "8"),
-        ("NixOS", "23.05"),
-        ("Puppy Linux", "9.5"),
-        ("Alpine Linux", "3.18.0"),
-        ("Android", "14"),
-        ("Android", "15"),
-        ("Android", "13"),
-        ("Solus", "4.4"),
-        ("Gentoo", "2023.0"),
-        ("Void Linux", "2023-07-01"),
-        ("IOS", "18.0.1"),
+        ("Windows", "11"),
+        ("Windows", "Server 2016"),
+        ("Windows", "Server 2019"),
+        ("Windows", "Server 2022"),
+        ("macOS", "10.9 Mavericks"),
+        ("macOS", "10.10 Yosemite"),
+        ("macOS", "10.11 El Capitan"),
+        ("macOS", "10.12 Sierra"),
+        ("macOS", "10.13 High Sierra"),
+        ("macOS", "10.14 Mojave"),
+        ("macOS", "10.15 Catalina"),
+        ("macOS", "11 Big Sur"),
+        ("macOS", "12 Monterey"),
+        ("macOS", "13 Ventura"),
+        ("macOS", "14 Sonoma"),
+        ("iOS", "12.5.7"),
+        ("iOS", "13.7"),
+        ("iOS", "14.8"),
+        ("iOS", "15.7"),
+        ("iOS", "16.6"),
+        ("iOS", "17.4"),
+        ("iPadOS", "16.4"),
+        ("Android", "4.4 KitKat"),
+        ("Android", "5.0 Lollipop"),
+        ("Android", "6.0 Marshmallow"),
+        ("Android", "7.0 Nougat"),
+        ("Android", "8.0 Oreo"),
+        ("Android", "9 Pie"),
         ("Android", "10"),
         ("Android", "11"),
         ("Android", "12"),
+        ("Android", "13"),
+        ("Android", "14"),
+        ("Android", "15"),
         ("Android", "16"),
-        ("IOS", "17.0"),
-        ("IOS", "16.0"),
-        ("IOS", "26.0"),
+        ("ChromeOS", "89"),
+        ("ChromeOS", "96"),
+        ("ChromeOS", "100"),
+        ("ChromeOS", "110"),
+        ("Ubuntu", "14.04"),
+        ("Ubuntu", "16.04"),
+        ("Ubuntu", "18.04"),
+        ("Ubuntu", "19.10"),
+        ("Ubuntu", "20.04"),
+        ("Ubuntu", "21.04"),
+        ("Ubuntu", "21.10"),
+        ("Ubuntu", "22.04"),
+        ("Ubuntu", "22.10"),
+        ("Ubuntu", "23.04"),
+        ("Ubuntu", "23.10"),
+        ("Ubuntu", "24.04"),
+        ("Debian", "7 wheezy"),
+        ("Debian", "8 jessie"),
+        ("Debian", "9 stretch"),
+        ("Debian", "10 buster"),
+        ("Debian", "11 bullseye"),
+        ("Debian", "12 bookworm"),
+        ("Fedora", "28"),
+        ("Fedora", "29"),
+        ("Fedora", "30"),
+        ("Fedora", "31"),
+        ("Fedora", "32"),
+        ("Fedora", "33"),
+        ("Fedora", "34"),
+        ("Fedora", "35"),
+        ("Fedora", "36"),
+        ("Fedora", "37"),
+        ("Fedora", "38"),
+        ("Fedora", "39"),
+        ("CentOS", "6"),
+        ("CentOS", "7"),
+        ("CentOS", "8"),
+        ("CentOS Stream", "8"),
+        ("CentOS Stream", "9"),
+        ("AlmaLinux", "8.6"),
+        ("AlmaLinux", "9.1"),
+        ("Rocky Linux", "8.6"),
+        ("Rocky Linux", "9.0"),
+        ("Arch Linux", "rolling-2021.05.01"),
+        ("Arch Linux", "rolling-2022.11.01"),
+        ("Manjaro", "21.0"),
+        ("Manjaro", "22.0"),
+        ("Linux Mint", "18 Sarah"),
+        ("Linux Mint", "19 Tara"),
+        ("Linux Mint", "20 Ulyana"),
+        ("Linux Mint", "21 Vanessa"),
+        ("elementary OS", "5 Hera"),
+        ("elementary OS", "6 Odin"),
+        ("Pop!_OS", "20.04"),
+        ("Pop!_OS", "22.04"),
+        ("openSUSE Leap", "15.0"),
+        ("openSUSE Leap", "15.3"),
+        ("SUSE Enterprise", "15 SP1"),
+        ("FreeBSD", "11.4"),
+        ("FreeBSD", "12.3"),
+        ("FreeBSD", "13.0"),
+        ("FreeBSD", "14.0"),
+        ("OpenBSD", "6.7"),
+        ("OpenBSD", "7.0"),
+        ("NetBSD", "9.2"),
+        ("Solaris", "10"),
+        ("Solaris", "11.4"),
+        ("Haiku", "R1/beta3"),
+        ("BeOS", "R5"),
+        ("MorphOS", "3.18"),
+        ("AROS", "2019"),
+        ("ReactOS", "0.4.13"),
+        ("QNX", "7.0"),
+        ("Tizen", "5.5"),
+        ("HarmonyOS", "2.0"),
+        ("KaiOS", "2.5"),
+        ("Raspberry Pi OS", "9 stretch"),
+        ("Raspberry Pi OS", "10 buster"),
+        ("Raspberry Pi OS", "11 bullseye"),
+        ("Puppy Linux", "9.5"),
+        ("Alpine Linux", "3.18.0"),
+        ("Gentoo", "2023.0"),
+        ("Slackware", "14.2"),
+        ("TV OS", "Samsung Tizen 6"),
+        ("Amazon Fire OS", "7"),
+        ("MS-DOS", "6.22"),
+        ("AmigaOS", "3.1"),
+        ("Commodore", "64 OS"),
     ]
     os_name, os_version = random.choice(os_choices)
 
@@ -532,6 +643,33 @@ class Heroku:
         client.heroku_db = database.Database(client)
         await client.heroku_db.init()
 
+        try:
+            db = client.heroku_db
+            existing = db.get("heroku.inline", "custom_bot", False)
+        except Exception:
+            existing = False
+
+        if getattr(self, "arguments", None) and getattr(self.arguments, "tty", False) and not existing:
+            while (bot := input("You can enter a custom bot username or leave it empty and Heroku will generate a random one: ")):
+                bot = bot.strip()
+                bot = bot.lstrip("@")
+                if any(ch not in (string.ascii_letters + string.digits + "_") for ch in bot):
+                    print("Invalid username: use only ASCII letters, digits and underscore (_).")
+                    continue
+                if not (bot.lower().endswith("bot")):
+                    print("Invalid username: must end with 'bot'.")
+                    continue
+                try:
+                    if await self._check_bot(client, bot):
+                        db.set("heroku.inline", "custom_bot", bot)
+                        print("Bot username saved!")
+                        break
+                    else:
+                        print("Bot username is occupied. Try again or leave it empty")
+                        continue
+                except Exception:
+                    print("Something went wrong")
+
         if delay_restart:
             client.disconnect()
             await asyncio.sleep(3600)  # Will be restarted from web anyway
@@ -888,15 +1026,16 @@ class Heroku:
                 caption=(
                     "🪐 <b>Heroku {} started!</b>\n\n⚙ <b>GitHub commit SHA: <a"
                     ' href="https://github.com/coddrago/Heroku/commit/{}">{}</a></b>\n🔎'
-                    " <b>Update status: {}</b>\n<b>{}</b>\n🕶 <b>Prefix:</b> <code>{}</code>".format(
-                        ".".join(list(map(str, list(__version__)))),
-                        build,
-                        build[:7],
-                        upd,
-                        web_url,
-                        "." if pref is None else pref,
-                    )
+                    " <b>Update status: {}</b>\n<b>{}</b>\n🕶 <b>Prefix:</b> <code>{}</code>"
+                ).format(
+                    ".".join(list(map(str, list(__version__)))),
+                    build,
+                    build[:7],
+                    upd,
+                    web_url,
+                    "." if pref is None else pref,
                 ),
+                message_thread_id=logging.getLogger().handlers[0].get_logs_topic_id_by_client(client.tg_id),
             )
             logging.debug(
                 "· Started for %s · Prefix: «%s» ·",

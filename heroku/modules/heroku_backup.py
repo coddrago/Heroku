@@ -36,7 +36,10 @@ class HerokuBackupMod(loader.Module):
 
     strings = {"name": "HerokuBackup"}
 
-    async def client_ready(self):
+    async def client_ready(self, client, db):
+        self._client = client
+        self._db = db
+
         if not self.get("period"):
             await self.inline.bot.send_photo(
                 self.tg_id,
@@ -66,15 +69,15 @@ class HerokuBackupMod(loader.Module):
                 ),
             )
 
-        self._backup_channel, _ = await utils.asset_channel(
-            self._client,
-            "heroku-backups",
-            "📼 Your database backups will appear here",
-            silent=True,
-            archive=True,
-            avatar="https://raw.githubusercontent.com/coddrago/assets/refs/heads/main/heroku/heroku_backups.png",
-            _folder="heroku",
-            invite_bot=True,
+        self._content_channel_id = await utils.wait_for_content_channel(self._db)
+
+        self._backup_topic = await utils.asset_forum_topic(
+            client=self._client,
+            db=self._db,
+            peer=self._content_channel_id,
+            title="Backups",
+            description="📼 Your database backups will appear here",
+            icon_emoji_id=6024106569430472546,
         )
 
     async def _set_backup_period(self, call: BotInlineCall, value: int):
@@ -154,7 +157,7 @@ class HerokuBackupMod(loader.Module):
             archive.seek(0)
 
             await self.inline.bot.send_document(
-                int(f"-100{self._backup_channel.id}"),
+                int(f"-100{self._content_channel_id}"),
                 BufferedInputFile(archive.getvalue(), filename=archive.name),
                 reply_markup=self.inline.generate_markup(
                     [
@@ -166,6 +169,7 @@ class HerokuBackupMod(loader.Module):
                         ]
                     ]
                 ),
+                message_thread_id=self._backup_topic.id,
             )
 
             self.set("last_backup", round(time.time()))
@@ -194,7 +198,7 @@ class HerokuBackupMod(loader.Module):
         try:
             file = await (
                 await self._client.get_messages(
-                    self._backup_channel, call.message.message_id
+                    self._content_channel_id, call.message.message_id
                 )
             )[0].download_media(bytes)
 

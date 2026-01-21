@@ -310,6 +310,11 @@ settings:
   confirm_cleardb: "⚠️ <b>Awe you suwe, dat you want to cweaw database?</b>"
   cleardb_confirm: "🗑 Cweaw database"
   cancel: "🚫 Cancew"
+  wrong_usage_tcc: "Usagwe: toggwecmd <moduwule> <command> ow toggwecmd <command>"
+  wrong_usage_tmc: "Usagwe: toggwemod <moduwule>"
+  wrong_usage_cmc: "Cleawed DB fow moduwule {}"
+  mod_enabled: "Moduwule {} enabwed"
+  mod_disabled: "Moduwule {} disabwed"
   who_to_blacklist: "<emoji document_id=5382187118216879236>❓</emoji> <b>Who to bwackwist?</b>"
   who_to_unblacklist: "<emoji document_id=5382187118216879236>❓</emoji> <b>Who to unbwackwist?</b>"
   _cmd_doc_addalias: "Set an awias fow a command"
@@ -381,6 +386,7 @@ test:
   set_loglevel: "<emoji document_id=5355133243773435190>🚫</emoji> <b>Pwease specify vewbosity as an integew ow stwing</b>"
   no_logs: "<emoji document_id=5355133243773435190>🤷‍♀️</emoji> <b>You don't have any wogs at vewbosity</b> <code>{}</code><b>.</b>"
   configping: "Youw custom text. You can use pwacehowdews: {ping} - Dat's youw ping. {uptime} - It's youw uptime. {ping_hint} - Dis is da same hint as in da heroku moduwe, it is chosen with wandom chance, awso you can specify dis hint in da config. You can use da {hostname} pwacehowdew if you nyeed da hostnyame of youw sewvew"
+  configpingph: "🤖Cu5t0m pw4c3h0ld3r5: {}"
   hint: "Set a hint"
   ping_emoji: "Emoji dat appeaws when ping does nyot incwease signyificantwy"
   back: "↩️ Back"
@@ -422,7 +428,9 @@ updater:
   cancel: "🚫 Cancew"
   full_success: "<emoji document_id=6028215594707324419>👍</emoji> <b>Usewbot is fuwwy woaded! {}</b>\n<i>Fuww westawt took {}s</i>"
   ub_stop: "Youw {emoji} has been stopped"
+  full_fail: "<emoji document_id=5210952531676504517>❌</emoji> <b>Usewbot is fuwwy woaded, but an ewwow occuwwed! {}\n<i>Fuww westawt took {}s\nFaiwed to woad {} moduwes</i>"
   secure_boot_complete: "<emoji document_id=5472308992514464048>🔐</emoji> <b>Secuwe boot compweted! {}</b>\n<i>Westawt took {}s</i>"
+  secure_boot_fail: "<emoji document_id=5472308992514464048>🔐</emoji> <b>Secuwe boot compweted, but an ewwow occuwwed! {}</b>\n<i>Westawt took {}s\nFaiwed to woad {} moduwes</i>"
   invalid_args: "<emoji document_id=5210952531676504517>🚫</emoji> <b>You must pwovide nyumbew of commits to wowwback!</b>"
   rollback_too_far: "<emoji document_id=5210952531676504517>🚫</emoji> <b>You'we wowwing back too faw!</b>"
   rollback_confirm: "❓ <b>Awe you suwe you want to wowwback {num} commit(-s)?</b>"
@@ -444,7 +452,7 @@ updater:
   latest_disabled: "Nyotifications about da watest update have been suppwessed"
   update: "🔄 Update"
   ignore: "🚫 Ignyowe"
-  changelog: '<emoji document_id=5434144690511290129>📰</emoji> <b>Changewog of da wast majow update:</b><pre><code class="language-heroku">{}</code></pre>'
+  changelog: '<emoji document_id=5434144690511290129>📰</emoji> <b>Changewog of da wast majow update:</b><blockquote expandable>{}</blockquote>'
 
 
 api_protection:
@@ -491,6 +499,7 @@ heroku_info:
   switchinfo_on: "<emoji document_id=5118861066981344121>✅</emoji> Image Info tuwned on successfuwwy"
   switchinfo_off: "<emoji document_id=5118861066981344121>✅</emoji> Image Info tuwned off successfuwwy"
   _cfg_cst_msg: "Custom message fow info. May contain {me}, {version}, {build}, {prefix}, {platform}, {upd}, {uptime}, {cpu_usage}, {ram_usage}, {branch}, {hostname}, {user}, {os}, {kernel}, {cpu}, {ping}, {python_ver}, {htl_ver}, {git_status} keywowds"
+  _cfg_cst_ph: "🤖Cu5t0m pw4c3h0ld3r5: {}"
   _cfg_cst_btn: "Custom button fow info. Weave empty to wemove button"
   _cfg_banner: "UWW to image bannew"
   desc: "<emoji document_id=5188377234380954537>🪐</emoji> <b>Usewbot — what is it?</b>\n\n<emoji document_id=5472238129849048175>😎</emoji> A usewbot wefews to a <b>diwd-pawty pwogwam</b> dat intewacts with da Tewegwam API to pewfowm <b>automated tasks on behawf of a usew</b>. Dese usewbots can be used to automate vawious tasks such as <b>sending messages, joining channyews, downwoading media, and much mowe</b>.\n\n<emoji document_id=5474667187258006816>😎</emoji> Usewbots awe diffewent fwom weguwaw Tewegwam bots as <b>dey wun on da usew's account</b> wader dan a bot account. Dis means dat usewbots can access mowe featuwes and have gweatew fwexibiwity in tewms of da actions dey can pewfowm.\n\n<emoji document_id=5472267631979405211>🚫</emoji> Howevew, it is impowtant to nyote dat <b>usewbots awe nyot officiawwy suppowted by Tewegwam</b> and deiw use may viowate da pwatfowm's tewms of sewvice. As such, <b>usews shouwd exewcise caution when using usewbots</b> and ensuwe dat dey awe nyot being used fow mawicious puwposes.\n\n"
@@ -507,9 +516,6 @@ heroku_info:
 
 loader:
   name: "Woadew"
-  loadmod_pm_timeout: "Pwease, wait fow 10 seconds befowe confiwming dis action"
-  loadmod_not_allowed_fresh_pm: "<emoji document_id=5447644880824181073>⚠️</emoji> <b><u>Wead dis cawefuwwy!</u></b> <emoji document_id=5447644880824181073>⚠️</emoji>\n\n<b>You awe attempting to woad a moduwe in pewsonaw messages with a usew you do nyot knyow.</b> Moduwes, nyot vewified by da devewopew, might cause a wot of twoubwe, fwom <b>messing with youw account to account dewetion ow session compwometation</b>. If you knyow dis usew and <b><u>100%</u></b> twust him, wait a few days and twy again."
-  loadmod_confirm_pm_message: "<emoji document_id=5451732530048802485>⏳</emoji> <i>Waiting fow youw confiwmation...</i>"
   link: "<emoji document_id=5256113064821926998>📁</emoji> <b>Fiwe of</b> {class_name}\n\n<emoji document_id=5134452506935427991>🪐</emoji> <b>{prefix}lm in wepwy to dis message to instaww</b>\n\n<emoji document_id=4916086774649848789>🔗</emoji> <code>{prefix}dlm {url}</code>\n\n{not_exact}"
   file: "<emoji document_id=5256113064821926998>📁</emoji> <b>Fiwe of</b> {class_name}\n\n<emoji document_id=5134452506935427991>🪐</emoji> <b>{prefix}lm in wepwy to dis message to instaww</b>\n\n{not_exact}"
   finding_module_in_repos: "<emoji document_id=5873204392429096339>🔄</emoji> Wooking fow moduwes in wepositowies."
@@ -517,10 +523,6 @@ loader:
   ml_load_module: "<emoji document_id=5873204392429096339>🔄</emoji> I'm downwoading da moduwe as a fiwe."
   not_exact: "<emoji document_id=5355133243773435190>⚠️</emoji> <i>Nyo exact match has been found, so da cwosest wesuwt is shown instead</i>"
   args: "<emoji document_id=5210952531676504517>❌</emoji> <b>You must specify awguments</b>"
-  loadmod_cancelled: "<emoji document_id=5210952531676504517>🚫</emoji> <b>Moduwe woading cancewwed</b>"
-  loadmod_confirm_pm: "⚠️ <b>Wawning!</b>\n\nWoading moduwes fwom unknyown souwces is <b><u>vewy dangewous</u></b> and can wead to <b>account dewetion ow session compwometation</b>. Make suwe dat you knyow dis usew and <b><u>100%</u></b> twust him.\n\n<b>Do you want to continyue with moduwe woading? ;w;</b>"
-  loadmod_confirm_pm_yes: "✅ Yes, continyue"
-  loadmod_confirm_pm_no: "🚫 Nyo, cancew"
   repo_config_doc: "UWW to a moduwe wepo"
   avail_header: "🎢 <b>Moduwes fwom wepo</b>"
   no_module: "<emoji document_id=5210952531676504517>🚫</emoji> <b>Moduwe nyot avaiwabwe in wepo.</b>"
