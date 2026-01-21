@@ -480,7 +480,7 @@ help:
   undoc: "🦥 Nyo docs"
   all_header: "<b>{} mods avaiwabwe, {} hidden:</b>"
   no_mod: "🚫 <b>Specify moduwe to hide</b>"
-  custom_placeholders: "🤖Cu5t0m pw4c3h0ld3r5: {}"
+  custom_placeholders: "🤖Cu5t0m pw4c3h0ld3r5:"
   help_lib: "<emoji document_id=5404553572727660202>❌</emoji> <b>Package</b> <code>{}</code> <b>is a wibwawy.</b>\n<emoji document_id=5404553572727660202>❌</emoji> <b>Wibwawies do nyot have descwiptions...</b>"
   hidden_shown: "<b>{} moduwes hidden, {} moduwes shown:</b>\n{}\n{}"
   offchats: "<emoji document_id=6019130940012370273>❔</emoji> <a href=\"https://t.me/heroku_talks\"><b>Suppowt chat</b></a>\n\n<emoji document_id=6019151079114021083>💬</emoji> <a href=\"https://t.me/heroku_offtop\"><b>Offtop chat</b></a>\n\n<emoji document_id=6019094432790354513>📢</emoji> <a href=\"https://t.me/heroku_ub\"><b>Officiaw channyew</b></a>"
