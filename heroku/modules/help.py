@@ -62,7 +62,7 @@ class Help(loader.Module):
                 "banner_url",
                 None,
                 lambda: "Banner for .help",
-                validator=loader.validators.RandomLink(),
+                validator=loader.validators.Link(),
             ),
             loader.ConfigValue(
                 "media_quote",
@@ -189,7 +189,11 @@ class Help(loader.Module):
                 )
             )
 
-        commands = dict(module.commands)
+        commands = {
+            name: func
+            for name, func in module.commands.items()
+            if await self.allmodules.check_security(message, func)
+        }
 
         if hasattr(module, "inline_handlers"):
             for name, fun in module.inline_handlers.items():
@@ -264,13 +268,10 @@ class Help(loader.Module):
 
         args = utils.get_args_raw(message)
 
-        banner = str(self.config["banner_url"])
+        banner = self.config["banner_url"]
 
         if self.config["banner_url"] and self.config["media_quote"] is True:
-            banner = InputMediaWebPage(str(self.config["banner_url"]))
-            
-        elif not self.config["banner_url"]:
-            banner = None
+            banner = InputMediaWebPage(self.config["banner_url"])
 
         force = False
         if "-f" in args:
@@ -358,7 +359,23 @@ class Help(loader.Module):
 
             icommands = []
 
-            icommands = list(mod.inline_handlers.keys())
+            if force:
+                icommands.extend([*mod.inline_handlers.keys()])
+            else:            
+                results = await asyncio.gather(
+                    *(
+                        self.inline.check_inline_security(
+                            func=func,
+                            user=message.sender_id if not message.out else self._client.tg_id,
+                        ) for func in mod.inline_handlers.values()
+                    )
+                )
+
+                icommands = [
+                    name for name, passed
+                    in zip(mod.inline_handlers.keys(), results)
+                    if passed is True
+                ]
 
             for cmd in icommands:
                 if first:
@@ -384,52 +401,53 @@ class Help(loader.Module):
         core_.sort(key=str.lower)
         no_commands_.sort(key=str.lower)
 
-        if only_core:
-            await utils.answer(
-                message,
-                (self.config["desc_icon"] + " {}\n <blockquote expandable>{}</blockquote><blockquote expandable>{}</blockquote>").format(
-                    reply,
-                    "".join(core_),
-                    (
-                        ""
-                        if self.lookup("Loader").fully_loaded
-                        else f"\n\n{self.strings('partial_load')}"
+        match True:
+            case _ if only_core:
+                await utils.answer(
+                    message,
+                    (self.config["desc_icon"] + " {}\n <blockquote expandable>{}</blockquote><blockquote expandable>{}</blockquote>").format(
+                        reply,
+                        "".join(core_),
+                        (
+                            ""
+                            if self.lookup("Loader").fully_loaded
+                            else f"\n\n{self.strings('partial_load')}"
+                        ),
                     ),
-                ),
-                file=banner,
-                invert_media=self.config["invert_media"],
-            )
-        elif only_loaded:
-            await utils.answer(
-                message,
-                (self.config["desc_icon"] + " {}\n <blockquote expandable>{}</blockquote><blockquote expandable>{}</blockquote>").format(
-                    reply,
-                    "".join(plain_ + (no_commands_ if force else [])),
-                    (
-                        ""
-                        if self.lookup("Loader").fully_loaded
-                        else f"\n\n{self.strings('partial_load')}"
+                    file = banner,
+                    invert_media = self.config["invert_media"],
+                )
+            case _ if only_loaded:
+                await utils.answer(
+                    message,
+                    (self.config["desc_icon"] + " {}\n <blockquote expandable>{}</blockquote><blockquote expandable>{}</blockquote>").format(
+                        reply,
+                        "".join(plain_ + (no_commands_ if force else [])),
+                        (
+                            ""
+                            if self.lookup("Loader").fully_loaded
+                            else f"\n\n{self.strings('partial_load')}"
+                        ),
                     ),
-                ),
-                file=banner,
-                invert_media=self.config["invert_media"],
-            )
-        else:
-            await utils.answer(
-                message,
-                (self.config["desc_icon"] + " {}\n <blockquote expandable>{}</blockquote><blockquote expandable>{}</blockquote><blockquote expandable>{}</blockquote>").format(
-                    reply,
-                    "".join(core_),
-                    "".join(plain_ + (no_commands_ if force else [])),
-                    (
-                        ""
-                        if self.lookup("Loader").fully_loaded
-                        else f"\n\n{self.strings('partial_load')}"
+                    file = banner,
+                    invert_media = self.config["invert_media"],
+                )
+            case _:
+                await utils.answer(
+                    message,
+                    (self.config["desc_icon"] + " {}\n <blockquote expandable>{}</blockquote><blockquote expandable>{}</blockquote><blockquote expandable>{}</blockquote>").format(
+                        reply,
+                        "".join(core_),
+                        "".join(plain_ + (no_commands_ if force else [])),
+                        (
+                            ""
+                            if self.lookup("Loader").fully_loaded
+                            else f"\n\n{self.strings('partial_load')}"
+                        ),
                     ),
-                ),
-                file=banner,
-                invert_media=self.config["invert_media"],
-            )
+                    file = banner,
+                    invert_media = self.config["invert_media"],
+                )
 
     @loader.command(ru_doc="| Ссылка на чат помощи", ua_doc="| посилання для чату служби підтримки", de_doc="| Link zum Support-Chat")
     async def support(self, message):
