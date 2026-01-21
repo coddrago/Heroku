@@ -189,11 +189,7 @@ class Help(loader.Module):
                 )
             )
 
-        commands = {
-            name: func
-            for name, func in module.commands.items()
-            if await self.allmodules.check_security(message, func)
-        }
+        commands = dict(module.commands)
 
         if hasattr(module, "inline_handlers"):
             for name, fun in module.inline_handlers.items():
@@ -346,23 +342,7 @@ class Help(loader.Module):
 
             icommands = []
 
-            if force:
-                icommands.extend([*mod.inline_handlers.keys()])
-            else:            
-                results = await asyncio.gather(
-                    *(
-                        self.inline.check_inline_security(
-                            func=func,
-                            user=message.sender_id if not message.out else self._client.tg_id,
-                        ) for func in mod.inline_handlers.values()
-                    )
-                )
-
-                icommands = [
-                    name for name, passed
-                    in zip(mod.inline_handlers.keys(), results)
-                    if passed is True
-                ]
+            icommands = list(mod.inline_handlers.keys())
 
             for cmd in icommands:
                 if first:
