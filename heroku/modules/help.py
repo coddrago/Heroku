@@ -253,7 +253,7 @@ class Help(loader.Module):
         else:
             await utils.answer(
                 message,
-                f'{reply}<blockquote expandable>{cmds}{inline_cmd}</blockquote>\n\n'
+                f'{reply}<blockquote expandable>{cmds}{inline_cmd}</blockquote>'
                 + (f"\n\n{self.strings('not_exact')}" if not exact else "")
                 + (
                     f"\n\n{self.strings('core_notice')}"
