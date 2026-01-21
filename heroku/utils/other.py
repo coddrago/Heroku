@@ -263,3 +263,10 @@ def config_placeholders():
 
 def debug_placeholders():
     return custom_placeholders
+
+def help_placeholders(module_name):
+    result = ""
+    for placeholder_name, placeholder_data in custom_placeholders.items():
+        if placeholder_data.get("module_name") == module_name:
+            result = result + f"{{{placeholder_name}}}\n"
+    return result
