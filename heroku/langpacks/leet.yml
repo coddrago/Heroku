@@ -543,6 +543,7 @@ loader:
   requirements_restart: "<emoji document_id=5875145601682771643>🚀</emoji> <b>R3qu1r3m3n75 1n574ll3d, bu7 4 r3574r7 15 r3qu1r3d 4</b> <code>{}</code> <b>2 4pply</b>"
   all_modules_deleted: "<emoji document_id=5784993237412351403>✅</emoji> <b>4ll m0dul35 d3l373d</b>"
   undoc: "<emoji document_id=5427052514094619126>🤷‍♀️</emoji> N0 d0c5"
+  custom_placeholders: "<emoji document_id=5372981976804366741>🤖</emoji>Cu570m pl4c3h0ld3r5: "
   ihandler: "\n<emoji document_id=5372981976804366741>🤖</emoji> <code>{}</code> {}"
   inline_init_failed: "<emoji document_id=5454225457916420314>😖</emoji> <b>7h15 m0dul3 r3qu1r35 H3r0ku 1nl1n3 f347ur3 & 1n1714l1z4710n 0f 1nl1n3M4n4g3r f41l3d</b>\n<i>Plz, r3m0v3 1 0f ur 0ld b075 fr0m @BotFather & r3574r7 u53rb07 2 l04d 7h15 m0dul3</i>"
   version_incompatible: "<emoji document_id=5454225457916420314>😖</emoji> <b>7h15 m0dul3 r3qu1r35 H3r0ku {}+\nPlz, upd473 w17h</b> <code>.update</code>"

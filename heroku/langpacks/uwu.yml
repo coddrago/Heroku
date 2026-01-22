@@ -543,6 +543,7 @@ loader:
   requirements_restart: "<emoji document_id=5875145601682771643>🚀</emoji> <b>Wequiwements instawwed, but a westawt is wequiwed fow</b> <code>{}</code> <b>to appwy</b>"
   all_modules_deleted: "<emoji document_id=5784993237412351403>✅</emoji> <b>Aww moduwes deweted</b>"
   undoc: "<emoji document_id=5427052514094619126>🤷‍♀️</emoji> Nyo docs"
+  custom_placeholders: "<emoji document_id=5372981976804366741>🤖</emoji>Cu5t0m pw4c3h0ld3r5: "
   ihandler: "\n<emoji document_id=5372981976804366741>🤖</emoji> <code>{}</code> {}"
   inline_init_failed: "<emoji document_id=5454225457916420314>😖</emoji> <b>Dis moduwe wequiwes Hewoku inwine featuwe and initiawization of InwineManyagew faiwed</b>\n<i>Pwease, wemove onye of youw owd bots fwom @BotFadew and westawt usewbot to woad dis moduwe</i>"
   version_incompatible: "<emoji document_id=5454225457916420314>😖</emoji> <b>Dis moduwe wequiwes Hewoku {}+\nPwease, update with</b> <code>.update</code>"

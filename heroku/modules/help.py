@@ -242,7 +242,7 @@ class Help(loader.Module):
         if placeholders != "":
             await utils.answer(
                 message,
-                f"{reply}<blockquote expandable>{cmds}{inline_cmd}</blockquote>\n<blockquote expandable>{self.strings('custom_placeholders')}{placeholders}</blockquote>"
+                f"{reply}<blockquote expandable>{cmds}{inline_cmd}</blockquote>\n<blockquote expandable>{self.strings('custom_placeholders')}\n{placeholders}</blockquote>"
                 + (f"\n\n{self.strings('not_exact')}" if not exact else "")
                 + (
                     f"\n\n{self.strings('core_notice')}"

@@ -511,6 +511,7 @@ loader:
   requirements_restart: "<emoji document_id=5875145601682771643>🚀</emoji> <b>Залежності встановлено, але потрібне перезавантаження для застосування</b> <code>{}</code>"
   all_modules_deleted: "<emoji document_id=5784993237412351403>✅</emoji> <b>Модулі видалено</b>"
   undoc: "<emoji document_id=5427052514094619126>🤷‍♀️</emoji> Немає опису"
+  custom_placeholders: "<emoji document_id=5372981976804366741>🤖</emoji>Кастомні плейсхолдери: "
   ihandler: "\n<emoji document_id=5372981976804366741>🤖</emoji> <code>{}</code> {}"
   version_incompatible: "<emoji document_id=5454225457916420314>😖</emoji> <b>Цей модуль потребує Heroku версії {}+\nОновіться за допомогою</b> <code>.update</code>"
   ffmpeg_required: "<emoji document_id=5454225457916420314>😖</emoji> <b>Цьому модулю потрібен FFMPEG, який не встановлено</b>"
