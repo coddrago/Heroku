@@ -6,7 +6,7 @@
 # You can redistribute it and/or modify it under the terms of the GNU AGPLv3
 # 🔑 https://www.gnu.org/licenses/agpl-3.0.html
 
-# ©️ Codrago, 2024-2025
+# ©️ Codrago, 2024-2030
 # This file is a part of Heroku Userbot
 # 🌐 https://github.com/coddrago/Heroku
 # You can redistribute it and/or modify it under the terms of the GNU AGPLv3
@@ -69,8 +69,8 @@ if (
         print("Added NO_SUDO in your environment variables")
         restart()
 
-if sys.version_info < (3, 9, 0):
-    print("\U0001F6AB Error: you must use at least Python version 3.9.0")
+if sys.version_info < (3, 10, 0):
+    print("\U0001F6AB Error: you must use at least Python version 3.10.0")
 elif __package__ != "heroku":
     print("\U0001F6AB Error: you cannot run this as a script; you must execute as a package")
 else:
@@ -81,7 +81,7 @@ else:
     else:
         try:
             import pyrogram  # noqa: F811
-            if tuple(map(int, pyrogram.__version__.split("."))) < (1, 1, 0):
+            if tuple(map(int, pyrogram.__version__.split("."))) < (1, 7, 2):
                 raise ImportError
         except ImportError:
             print("\U0001F504 Installing dependencies...")

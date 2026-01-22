@@ -216,7 +216,7 @@ To install, just go to [@lavhostbot](https://t.me/lavhostbot) and follow these s
 
 ## 📋 Requirements
 
-- **Python 3.9-3.13**
+- **Python 3.10+**
 - **API Credentials** from [Telegram Apps](https://my.telegram.org/apps)
 
 ---

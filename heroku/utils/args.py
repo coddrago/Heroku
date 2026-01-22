@@ -1,4 +1,4 @@
-# ©️ Codrago, 2024-2025
+# ©️ Codrago, 2024-2030
 # This file is a part of Heroku Userbot
 # 🌐 https://github.com/coddrago/Heroku
 # You can redistribute it and/or modify it under the terms of the GNU AGPLv3
@@ -135,5 +135,39 @@ def get_args_split_by(
                 new_section.extend(section.split(sep))
             sections = new_section
     return [section.strip() for section in sections if section.strip()]
+
+
+def get_args_int(message: typing.Union[Message, str]) -> typing.List[int]:
+    """
+    Get arguments as integers
+    :param message: Message or string to get arguments from
+    :return: List of integers
+    """
+    args = get_args(message)
+    result = []
+    for arg in args:
+        try:
+            result.append(int(arg))
+        except ValueError:
+            continue
+    return result
+
+
+def get_args_bool(message: typing.Union[Message, str]) -> typing.List[bool]:
+    """
+    Get arguments as booleans (true/false, yes/no, 1/0)
+    :param message: Message or string to get arguments from
+    :return: List of booleans
+    """
+    args = get_args(message)
+    result = []
+    for arg in args:
+        lower_arg = arg.lower()
+        if lower_arg in ['true', 'yes', '1', 'on']:
+            result.append(True)
+        elif lower_arg in ['false', 'no', '0', 'off']:
+            result.append(False)
+    return result
+
 
 

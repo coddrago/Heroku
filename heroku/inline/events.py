@@ -4,7 +4,7 @@
 # You can redistribute it and/or modify it under the terms of the GNU AGPLv3
 # 🔑 https://www.gnu.org/licenses/agpl-3.0.html
 
-# ©️ Codrago, 2024-2025
+# ©️ Codrago, 2024-2030
 # This file is a part of Heroku Userbot
 # 🌐 https://github.com/coddrago/Heroku
 # You can redistribute it and/or modify it under the terms of the GNU AGPLv3
@@ -40,8 +40,9 @@ logger = logging.getLogger(__name__)
 class Events(InlineUnit):
     async def _message_handler(self: "InlineManager", message: AiogramMessage):
         """Processes incoming messages"""
-        if message.chat.type != "private" or message.text == "/start heroku init":
-            return
+        match True:
+            case _ if message.chat.type != "private" or message.text == "/start heroku init":
+                return
 
         for mod in self._allmodules.modules:
             if (
@@ -256,34 +257,35 @@ class Events(InlineUnit):
                     continue
 
                 if button.get("_callback_data") == call.data:
-                    if (
-                        button.get("disable_security", False)
-                        or unit.get("disable_security", False)
-                        or (
-                            unit.get("force_me", False)
-                            and call.from_user.id == self._me
-                        )
-                        or not unit.get("force_me", False)
-                        and (
-                            await self.check_inline_security(
-                                func=unit.get(
-                                    "perms_map",
-                                    lambda: self._client.dispatcher.security._default,
-                                )(),  # we call it so we can get reloaded rights in runtime
-                                user=call.from_user.id,
+                    match True:
+                        case _ if (
+                            button.get("disable_security", False)
+                            or unit.get("disable_security", False)
+                            or (
+                                unit.get("force_me", False)
+                                and call.from_user.id == self._me
                             )
-                            if "message" in unit
-                            else False
-                        )
-                    ):
-                        pass
-                    elif call.from_user.id not in (
-                        self._client.dispatcher.security._owner
-                        + unit.get("always_allow", [])
-                        + button.get("always_allow", [])
-                    ):
-                        await call.answer(self.translator.getkey("inline.button403"))
-                        return
+                            or not unit.get("force_me", False)
+                            and (
+                                await self.check_inline_security(
+                                    func=unit.get(
+                                        "perms_map",
+                                        lambda: self._client.dispatcher.security._default,
+                                    )(),
+                                    user=call.from_user.id,
+                                )
+                                if "message" in unit
+                                else False
+                            )
+                        ):
+                            pass
+                        case _ if call.from_user.id not in (
+                            self._client.dispatcher.security._owner
+                            + unit.get("always_allow", [])
+                            + button.get("always_allow", [])
+                        ):
+                            await call.answer(self.translator.getkey("inline.button403"))
+                            return
 
                     try:
                         result = await button["callback"](
@@ -309,33 +311,34 @@ class Events(InlineUnit):
                     return result
 
         if call.data in self._custom_map:
-            if (
-                self._custom_map[call.data].get("disable_security", False)
-                or (
-                    self._custom_map[call.data].get("force_me", False)
-                    and call.from_user.id == self._me
-                )
-                or not self._custom_map[call.data].get("force_me", False)
-                and (
-                    await self.check_inline_security(
-                        func=self._custom_map[call.data].get(
-                            "perms_map",
-                            lambda: self._client.dispatcher.security._default,
-                        )(),
-                        user=call.from_user.id,
+            match True:
+                case _ if (
+                    self._custom_map[call.data].get("disable_security", False)
+                    or (
+                        self._custom_map[call.data].get("force_me", False)
+                        and call.from_user.id == self._me
                     )
-                    if "message" in self._custom_map[call.data]
-                    else False
-                )
-            ):
-                pass
-            elif (
-                call.from_user.id not in self._client.dispatcher.security._owner
-                and call.from_user.id
-                not in self._custom_map[call.data].get("always_allow", [])
-            ):
-                await call.answer(self.translator.getkey("inline.button403"))
-                return
+                    or not self._custom_map[call.data].get("force_me", False)
+                    and (
+                        await self.check_inline_security(
+                            func=self._custom_map[call.data].get(
+                                "perms_map",
+                                lambda: self._client.dispatcher.security._default,
+                            )(),
+                            user=call.from_user.id,
+                        )
+                        if "message" in self._custom_map[call.data]
+                        else False
+                    )
+                ):
+                    pass
+                case _ if (
+                    call.from_user.id not in self._client.dispatcher.security._owner
+                    and call.from_user.id
+                    not in self._custom_map[call.data].get("always_allow", [])
+                ):
+                    await call.answer(self.translator.getkey("inline.button403"))
+                    return
 
             await self._custom_map[call.data]["handler"](
                 (

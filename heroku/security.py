@@ -1,28 +1,12 @@
 """Checks the commands' security"""
 
-#    Friendly Telegram (telegram userbot)
-#    Copyright (C) 2018-2021 The Authors
-
-#    This program is free software: you can redistribute it and/or modify
-#    it under the terms of the GNU Affero General Public License as published by
-#    the Free Software Foundation, either version 3 of the License, or
-#    (at your option) any later version.
-
-#    This program is distributed in the hope that it will be useful,
-#    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#    GNU Affero General Public License for more details.
-
-#    You should have received a copy of the GNU Affero General Public License
-#    along with this program.  If not, see <https://www.gnu.org/licenses/>.
-
 # ©️ Dan Gazizullin, 2021-2023
 # This file is a part of Hikka Userbot
 # 🌐 https://github.com/hikariatama/Hikka
 # You can redistribute it and/or modify it under the terms of the GNU AGPLv3
 # 🔑 https://www.gnu.org/licenses/agpl-3.0.html
 
-# ©️ Codrago, 2024-2025
+# ©️ Codrago, 2024-2030
 # This file is a part of Heroku Userbot
 # 🌐 https://github.com/coddrago/Heroku
 # You can redistribute it and/or modify it under the terms of the GNU AGPLv3
@@ -245,9 +229,13 @@ class SecurityManager:
         :param duration: rule duration in seconds
         :return: None
         """
-
-        if target_type not in {"chat", "user"}:
-            raise ValueError(f"Invalid target_type: {target_type}")
+        match target_type:
+            case "chat":
+                target_list = self._tsec_chat
+            case "user":
+                target_list = self._tsec_user
+            case _:
+                raise ValueError(f"Invalid target_type: {target_type}")
 
         if all(
             not rule.startswith(rule_type)
@@ -258,7 +246,7 @@ class SecurityManager:
         if duration < 0:
             raise ValueError(f"Invalid duration: {duration}")
 
-        (self._tsec_chat if target_type == "chat" else self._tsec_user).append(
+        target_list.append(
             {
                 "target": target.id,
                 "rule_type": rule.split("/")[0],
@@ -277,19 +265,19 @@ class SecurityManager:
         :param target_id: target entity ID
         :return: True if any rules were removed
         """
+        match target_type:
+            case "user":
+                target_list = self.tsec_user
+            case "chat":
+                target_list = self.tsec_chat
+            case _:
+                return False
 
         any_ = False
-
-        if target_type == "user":
-            for rule in self.tsec_user.copy():
-                if rule["target"] == target_id:
-                    self.tsec_user.remove(rule)
-                    any_ = True
-        elif target_type == "chat":
-            for rule in self.tsec_chat.copy():
-                if rule["target"] == target_id:
-                    self.tsec_chat.remove(rule)
-                    any_ = True
+        for rule in target_list.copy():
+            if rule["target"] == target_id:
+                target_list.remove(rule)
+                any_ = True
 
         return any_
 
@@ -302,19 +290,19 @@ class SecurityManager:
         :param rule_cont: rule name (module or command)
         :return: True if any rules were removed
         """
+        match target_type:
+            case "user":
+                target_list = self.tsec_user
+            case "chat":
+                target_list = self.tsec_chat
+            case _:
+                return False
 
         any_ = False
-
-        if target_type == "user":
-            for rule in self.tsec_user.copy():
-                if rule["target"] == target_id and rule["rule"] == rule_cont:
-                    self.tsec_user.remove(rule)
-                    any_ = True
-        elif target_type == "chat":
-            for rule in self.tsec_chat.copy():
-                if rule["target"] == target_id and rule["rule"] == rule_cont:
-                    self.tsec_chat.remove(rule)
-                    any_ = True
+        for rule in target_list.copy():
+            if rule["target"] == target_id and rule["rule"] == rule_cont:
+                target_list.remove(rule)
+                any_ = True
 
         return any_
 
@@ -394,7 +382,7 @@ class SecurityManager:
         user_id: typing.Optional[int] = None,
         inline_cmd: typing.Optional[str] = None,
         *,
-        usernames: typing.Optional[typing.List[str]] = None,
+        usernames: typing.Optional[typing.Set[str]] = None,
     ) -> bool:
         """
         Checks if message sender is permitted to execute certain function

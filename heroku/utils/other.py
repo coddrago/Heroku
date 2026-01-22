@@ -1,5 +1,4 @@
-
-# ©️ Codrago, 2024-2025
+# ©️ Codrago, 2024-2030
 # This file is a part of Heroku Userbot
 # 🌐 https://github.com/coddrago/Heroku
 # You can redistribute it and/or modify it under the terms of the GNU AGPLv3
@@ -13,6 +12,7 @@ import logging
 import random
 import signal
 import typing
+import inspect
 
 import pyrogram
 from pyrogram.raw.functions.channels import (
@@ -32,6 +32,7 @@ if typing.TYPE_CHECKING:
 # parser = pyrogram.utils.sanitize_parse_mode("html")
 logger = logging.getLogger(__name__)
 
+custom_placeholders = {}
 
 def rand(size: int, /) -> str:
     """
@@ -72,7 +73,6 @@ async def invite_inline_bot(
             )
         )
 
-
 def run_sync(func, *args, **kwargs):
     """
     Run a non-async function in a new thread and return an awaitable
@@ -84,7 +84,6 @@ def run_sync(func, *args, **kwargs):
         functools.partial(func, *args, **kwargs),
     )
 
-
 def run_async(loop: asyncio.AbstractEventLoop, coro: typing.Awaitable) -> typing.Any:
     """
     Run an async function as a non-async function, blocking till it's done
@@ -94,23 +93,35 @@ def run_async(loop: asyncio.AbstractEventLoop, coro: typing.Awaitable) -> typing
     """
     return asyncio.run_coroutine_threadsafe(coro, loop).result()
 
-def merge(a: dict, b: dict, /) -> dict:
+def merge(
+    a: dict,
+    b: dict,
+    /,
+    *,
+    deep: bool = True,
+) -> dict:
     """
     Merge with replace dictionary a to dictionary b
     :param a: Dictionary to merge
     :param b: Dictionary to merge to
     :return: Merged dictionary
     """
-    for key in a:
-        if key in b:
-            if isinstance(a[key], dict) and isinstance(b[key], dict):
-                b[key] = merge(a[key], b[key])
-            elif isinstance(a[key], list) and isinstance(b[key], list):
-                b[key] = list(set(b[key] + a[key]))
-            else:
-                b[key] = a[key]
+    for key, a_value in a.items():
+        b_value = b.get(key)
 
-        b[key] = a[key]
+        match (
+            key not in b,
+            isinstance(a_value, dict) and isinstance(b_value, dict) and deep,
+            isinstance(a_value, list) and isinstance(b_value, list),
+        ):
+            case (True, _, _):
+                b[key] = a_value
+            case (False, True, _):
+                b[key] = merge(a_value, b_value, deep=deep)
+            case (False, False, True):
+                b[key] = list(dict.fromkeys(b_value + a_value))
+            case _:
+                b[key] = a_value
 
     return b
 
@@ -148,3 +159,120 @@ def _copy_tl(o, **kwargs):
     del d["_"]
     d.update(kwargs)
     return o.__class__(**d)
+
+def format_file_size(size_bytes: int) -> str:
+    """
+    Format file size in bytes to human-readable format
+    :param size_bytes: Size in bytes
+    :return: Formatted string (e.g., '1.5 MB')
+    """
+    if size_bytes == 0:
+        return "0 B"
+    size_names = ["B", "KB", "MB", "GB", "TB"]
+    i = 0
+    while size_bytes >= 1024 and i < len(size_names) - 1:
+        size_bytes /= 1024.0
+        i += 1
+    return ".1f"
+
+def is_url(string: str) -> bool:
+    """
+    Check if string is a valid URL
+    :param string: String to check
+    :return: True if valid URL, False otherwise
+    """
+    import re
+
+    url_pattern = re.compile(
+        r"^https?://"  # http:// or https://
+        r"(?:(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+[A-Z]{2,6}\.?|"  # domain...
+        r"localhost|"  # localhost...
+        r"\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})"  # ...or ip
+        r"(?::\d+)?"  # optional port
+        r"(?:/?|[/?]\S+)$",
+        re.IGNORECASE,
+    )
+    return url_pattern.match(string) is not None
+
+def get_iso_time() -> str:
+    """
+    Get current time in ISO format
+    :return: ISO formatted time string
+    """
+    from datetime import datetime
+
+    return datetime.utcnow().isoformat() + "Z"
+
+def safe_getattr(obj, attr, default=None):
+    """
+    Safely get attribute from object, returning default if not found
+    :param obj: Object to get attribute from
+    :param attr: Attribute name
+    :param default: Default value if attribute not found
+    :return: Attribute value or default
+    """
+    try:
+        return getattr(obj, attr, default)
+    except AttributeError:
+        return default
+
+def register_placeholder(placeholder: str, callback: typing.Callable, description: typing.Optional[str] = None):
+    """
+    Register placeholder for Ping or Info commands
+    """
+    module_name = callback.__self__.__class__.__name__
+    module_instance = callback.__self__
+    custom_placeholders[placeholder] = {
+        "module_name": module_name,
+        "module_instance": module_instance,
+        "callback": callback,
+        "description": description,
+        "placeholder_name": placeholder,
+    }
+    return True
+
+async def get_placeholder(placeholder: str):
+    callback = custom_placeholders[placeholder]["callback"]
+    try:
+        callback_data = str(await callback())
+    except:
+        callback_data = str(callback())
+    return callback_data
+
+
+async def get_placeholders(data):
+    for placeholder in custom_placeholders.values():
+        data[placeholder["placeholder_name"]] = await get_placeholder(placeholder["placeholder_name"])
+    return data
+
+def unregister_placeholders(module_name: str) -> int:
+    placeholders_to_remove = []
+    for placeholder_name, placeholder_data in custom_placeholders.items():
+        if placeholder_data.get("module_name") == module_name:
+            placeholders_to_remove.append(placeholder_name)
+    for placeholder_name in placeholders_to_remove:
+        del custom_placeholders[placeholder_name]
+    return True
+
+def config_placeholders():
+    result = ""
+    for placeholder_name, placeholder_data in custom_placeholders.items():
+        module_name = placeholder_data.get("module_name")
+        result = result + f"{{{placeholder_name}}} - {module_name} "
+    if result == "":
+        return "None"
+    else:
+        return result
+
+def help_placeholders(module_name):
+    result = ""
+    for placeholder_name, placeholder_data in custom_placeholders.items():
+        if placeholder_data.get("module_name") == module_name:
+            if placeholder_data.get("description") is not None:
+                result = result + f"{{{placeholder_name}}} - {placeholder_data.get('description')}\n"
+            else:
+                result = result + f"{{{placeholder_name}}} - No docs\n"
+    return result
+
+def debug_placeholders():
+    return custom_placeholders

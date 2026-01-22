@@ -4,7 +4,7 @@
 # You can redistribute it and/or modify it under the terms of the GNU AGPLv3
 # 🔑 https://www.gnu.org/licenses/agpl-3.0.html
 
-# ©️ Codrago, 2024-2025
+# ©️ Codrago, 2024-2030
 # This file is a part of Heroku Userbot
 # 🌐 https://github.com/coddrago/Heroku
 # You can redistribute it and/or modify it under the terms of the GNU AGPLv3
@@ -257,15 +257,15 @@ class List(InlineUnit):
         page: typing.Union[int, str],
         unit_id: str = None,
     ):
-        if page == "close":
-            await self._delete_unit_message(call, unit_id=unit_id)
-            return
-
-        if self._units[unit_id]["current_index"] < 0 or page >= len(
-            self._units[unit_id]["strings"]
-        ):
-            await call.answer("Can't go to this page", show_alert=True)
-            return
+        match True:
+            case _ if page == "close":
+                await self._delete_unit_message(call, unit_id=unit_id)
+                return
+            case _ if self._units[unit_id]["current_index"] < 0 or page >= len(
+                self._units[unit_id]["strings"]
+            ):
+                await call.answer("Can't go to this page", show_alert=True)
+                return
 
         self._units[unit_id]["current_index"] = page
 

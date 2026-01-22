@@ -6,7 +6,7 @@
 # You can redistribute it and/or modify it under the terms of the GNU AGPLv3
 # 🔑 https://www.gnu.org/licenses/agpl-3.0.html
 
-# ©️ Codrago, 2024-2025
+# ©️ Codrago, 2024-2030
 # This file is a part of Heroku Userbot
 # 🌐 https://github.com/coddrago/Heroku
 # You can redistribute it and/or modify it under the terms of the GNU AGPLv3
@@ -32,6 +32,7 @@ from uuid import uuid4
 
 # from pyrogram.tlobject import TLObject
 
+from . import main
 from . import security, utils, validators
 from .database import Database
 from .inline.core import InlineManager
@@ -135,6 +136,13 @@ class Placeholder:
 
 VALID_PIP_PACKAGES = re.compile(
     r"^\s*# ?requires:(?: ?)((?:{url} )*(?:{url}))\s*$".format(
+        url=r"[-[\]_.~:/?#@!$&'()*+,;%<=>a-zA-Z0-9]+"
+    ),
+    re.MULTILINE,
+)
+
+VALID_APT_PACKAGES = re.compile(
+    r"^\s*# ?packages:(?: ?)((?:{url} )*(?:{url}))\s*$".format(
         url=r"[-[\]_.~:/?#@!$&'()*+,;%<=>a-zA-Z0-9]+"
     ),
     re.MULTILINE,
@@ -648,7 +656,57 @@ class Modules:
 
         module = importlib.util.module_from_spec(spec)
         sys.modules[module_name] = module
-        spec.loader.exec_module(module)
+
+        async def _exec_module():
+            attempted = False
+            while True:
+                try:
+                    spec.loader.exec_module(module)
+                    break
+                except ImportError as e:
+                    if not spec.loader.data or attempted:
+                        raise
+
+                    data = spec.loader.data
+                    if isinstance(data, bytes):
+                        data = data.decode("utf-8", errors="ignore")
+
+                    match = VALID_PIP_PACKAGES.search(data)
+                    if not match:
+                        raise
+
+                    requirements = list(
+                        filter(
+                            lambda x: not x.startswith(("-", "_", ".")),
+                            map(
+                                str.strip,
+                                match.group(1).split(),
+                            ),
+                        )
+                    )
+
+                    exc_name = (getattr(e, "name", None) or "").lower()
+
+                    requirements.extend(
+                        [
+                            {
+                                "sklearn": "scikit-learn",
+                                "pil": "Pillow",
+                                "herokutl": "Heroku-TL-New",
+                            }.get(exc_name, exc_name or e.name or "")
+                        ]
+                    )
+
+                    result = await self.lookup("loader").install_requirements(requirements)
+
+                    importlib.invalidate_caches()
+
+                    if not result:
+                        raise
+
+                    attempted = True
+
+        await _exec_module()
 
         ret = None
 
@@ -684,6 +742,8 @@ class Modules:
                 Path(path).write_text(spec.loader.data.decode(), encoding="utf-8")
 
                 logger.debug("Saved class %s to path %s", cls_name, path)
+
+        ret.__source__ = spec.loader.data.decode() if hasattr(spec.loader, 'data') else inspect.getsource(ret.__class__)
 
         return ret
 
@@ -943,7 +1003,7 @@ class Modules:
     def dispatch(self, _command: str) -> typing.Tuple[str, typing.Optional[str]]:
         """Dispatch command to appropriate module"""
 
-        return next(
+        resolved = next(
             (
                 (cmd, self.commands[cmd.split()[0].lower()])
                 for cmd in [
@@ -955,6 +1015,33 @@ class Modules:
             ),
             (_command, None),
         )
+
+        cmd, func = resolved
+        if not func:
+            return resolved
+
+        try:
+            disabled_modules = self._db.get(main.__name__, "disabled_modules", [])
+            disabled_commands = self._db.get(main.__name__, "disabled_commands", {})
+        except Exception:
+            disabled_modules = []
+            disabled_commands = {}
+
+        module_name = None
+        try:
+            module_name = func.__self__.__class__.__name__
+        except Exception:
+            module_name = None
+
+        if module_name and module_name in disabled_modules:
+            return (_command, None)
+
+        if module_name and module_name in disabled_commands:
+            disabled_for_mod = [x.lower() for x in disabled_commands.get(module_name, [])]
+            if cmd.split()[0].lower() in disabled_for_mod:
+                return (_command, None)
+
+        return (cmd, func)
 
     def send_config(self, skip_hook: bool = False):
         """Configure modules"""
@@ -1069,6 +1156,24 @@ class Modules:
             )
             self.modules.remove(mod)
             raise
+
+        # Check for pack_url and load translations
+        if hasattr(mod, '__source__'):
+            pack_url = next(
+                (
+                    line.replace(" ", "").split("#packurl:", maxsplit=1)[1]
+                    for line in mod.__source__.splitlines()
+                    if line.replace(" ", "").startswith("#packurl:")
+                ),
+                None,
+            )
+
+            if pack_url and (
+                transations := await self.translator.load_module_translations(
+                    pack_url
+                )
+            ):
+                mod.strings.external_strings = transations
 
         for _, method in utils.iter_attrs(mod):
             if isinstance(method, InfiniteLoop):

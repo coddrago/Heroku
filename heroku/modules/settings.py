@@ -3,15 +3,14 @@
 # 🌐 https://github.com/hikariatama/Hikka
 # You can redistribute it and/or modify it under the terms of the GNU AGPLv3
 # 🔑 https://www.gnu.org/licenses/agpl-3.0.html
-import contextlib
 
-# ©️ Codrago, 2024-2025
+# ©️ Codrago, 2024-2030
 # This file is a part of Heroku Userbot
 # 🌐 https://github.com/coddrago/Heroku
 # You can redistribute it and/or modify it under the terms of the GNU AGPLv3
 # 🔑 https://www.gnu.org/licenses/agpl-3.0.html
 
-
+import contextlib
 import pyrogram
 from pyrogram.extensions.html import CUSTOM_EMOJIS
 from pyrogram.types import Message, User
@@ -337,6 +336,133 @@ class CoreMod(loader.Module):
         self._db.save()
         await utils.answer(call, self.strings("db_cleared"))
 
+    @loader.command()
+    async def togglecmdcmd(self, message: Message):
+        """Toggle disable specific command of a module: togglecmd <module> <command> or togglecmd <command>"""
+        args = utils.get_args(message)
+        if not args:
+            await utils.answer(message, self.strings("wrong_usage_tcc")) # стрингсов не будэ я принял ислам | А я не принимал, поэтому они будут. | А я не принимал, поэтому они будут.
+
+        if len(args) == 1:
+            cmd = args[0]
+            func = self.allmodules.commands.get(cmd.lower())
+            if not func:
+                await utils.answer(message, self.strings("no_command"))
+            mod_inst = func.__self__
+        else:
+            mod_arg, cmd = args[0], args[1]
+            mod_inst = self.allmodules.lookup(mod_arg)
+            if not mod_inst:
+                await utils.answer(message, self.strings("mod404").format(mod_arg))
+
+        module_key = mod_inst.__class__.__name__
+
+        disabled_commands = self._db.get(main.__name__, "disabled_commands", {})
+        current = [x for x in disabled_commands.get(module_key, [])]
+
+        if cmd.lower() not in [c.lower() for c in mod_inst.heroku_commands.keys()]:
+            await utils.answer(message, self.strings("cmd404"))
+
+        if any(c.lower() == cmd.lower() for c in current):
+            current = [c for c in current if c.lower() != cmd.lower()]
+            if current:
+                disabled_commands[module_key] = current
+            else:
+                disabled_commands.pop(module_key, None)
+
+            self._db.set(main.__name__, "disabled_commands", disabled_commands)
+            try:
+                self.allmodules.register_commands(mod_inst)
+            except Exception:
+                pass
+
+            await utils.answer(message, f"Command {cmd} enabled in module {module_key}")
+        else:
+            current.append(cmd)
+            disabled_commands[module_key] = current
+            self._db.set(main.__name__, "disabled_commands", disabled_commands)
+
+            try:
+                self.allmodules.commands.pop(cmd.lower(), None)
+            except Exception:
+                pass
+
+            for alias, target in list(self.allmodules.aliases.items()):
+                if target.split()[0].lower() == cmd.lower():
+                    self.allmodules.aliases.pop(alias, None)
+
+            await utils.answer(message, f"Command {cmd} disabled in module {module_key}")
+
+    @loader.command()
+    async def togglemod(self, message: Message):
+        """Toggle disable entire module: togglemod <module>"""
+        args = utils.get_args(message)
+        if not args:
+            await utils.answer(message, self.strings("wrong_usage_tmc")) # стрингсов не будэ я принял ислам | А я не принимал, поэтому они будут.
+
+        mod_arg = args[0]
+        mod_inst = self.allmodules.lookup(mod_arg)
+        if not mod_inst:
+            await utils.answer(message, self.strings("mod404").format(mod_arg)) 
+
+        module_key = mod_inst.__class__.__name__
+        disabled = self._db.get(main.__name__, "disabled_modules", [])
+
+        if module_key in disabled:
+            disabled = [m for m in disabled if m != module_key]
+            self._db.set(main.__name__, "disabled_modules", disabled)
+            try:
+                self.allmodules.register_commands(mod_inst)
+                self.allmodules.register_watchers(mod_inst)
+                self.allmodules.register_raw_handlers(mod_inst)
+                self.allmodules.register_inline_stuff(mod_inst)
+            except Exception:
+                pass
+            await utils.answer(message, self.strings("mod_enabled").format(module_key)) # стрингсов не будэ я принял ислам | А я не принимал, поэтому они будут.
+        else:
+            disabled += [module_key]
+            self._db.set(main.__name__, "disabled_modules", disabled)
+            try:
+                self.allmodules.unregister_commands(mod_inst, "disable")
+                self.allmodules.unregister_watchers(mod_inst, "disable")
+                self.allmodules.unregister_raw_handlers(mod_inst, "disable")
+                self.allmodules.unregister_inline_stuff(mod_inst, "disable")
+            except Exception:
+                pass
+            await utils.answer(message, self.strings("mod_disabled").format(module_key)) # стрингсов не будэ я принял ислам | А я не принимал, поэтому они будут.
+
+    @loader.command()
+    async def clearmodule(self, message: Message):
+        """Clear all DB entries for module: clearmodule <module>"""
+        args = utils.get_args(message)
+        if not args:
+            await utils.answer(message, self.strings("wrong_usage_cmc")) # стрингсов не будэ я принял ислам | А я не принимал, поэтому они будут.
+
+        mod_arg = args[0]
+        mod_inst = self.allmodules.lookup(mod_arg)
+        if mod_inst:
+            module_key = mod_inst.__class__.__name__
+        else:
+            module_key = mod_arg
+
+        if module_key in self._db:
+            try:
+                del self._db[module_key]
+                self._db.save()
+            except Exception:
+                pass
+
+        disabled_commands = self._db.get(main.__name__, "disabled_commands", {})
+        disabled_commands.pop(module_key, None)
+        self._db.set(main.__name__, "disabled_commands", disabled_commands)
+
+        disabled_modules = self._db.get(main.__name__, "disabled_modules", [])
+        if module_key in disabled_modules:
+            disabled_modules = [m for m in disabled_modules if m != module_key]
+            self._db.set(main.__name__, "disabled_modules", disabled_modules)
+
+        await utils.answer(message, f"Cleared DB for module {module_key}") # стрингсов не будэ я принял ислам | А я не принимал, поэтому они будут.
+
     async def installationcmd(self, message: Message):
         """| Guide of installation"""
 
@@ -355,18 +481,19 @@ class CoreMod(loader.Module):
                 message.peer_id,
                 "https://raw.githubusercontent.com/coddrago/assets/refs/heads/main/heroku/heroku_installation.png",
                 caption=self.strings("vds_install"), reply_to=getattr(message, "reply_to_msg_id", None),)
-        elif "-vds" in args:
-            await utils.answer(message, self.strings("vds_install"))
-        elif "-wsl" in args:
-            await utils.answer(message, self.strings("wsl_install"))
-        elif "-ul" in args:
-            await utils.answer(message, self.strings("userland_install"))
-        elif "-jh" in args:
-            await utils.answer(message, self.strings("jamhost_install"))
-        elif "-hh" in args:
-            await utils.answer(message, self.strings("hikkahost_install"))
-        elif "-lh" in args:
-            await utils.answer(message, self.strings("lavhost_install"))
+        match True:
+            case _ if "-vds" in args:
+                await utils.answer(message, self.strings("vds_install"))
+            case _ if "-wsl" in args:
+                await utils.answer(message, self.strings("wsl_install"))
+            case _ if "-ul" in args:
+                await utils.answer(message, self.strings("userland_install"))
+            case _ if "-jh" in args:
+                await utils.answer(message, self.strings("jamhost_install"))
+            case _ if "-hh" in args:
+                await utils.answer(message, self.strings("hikkahost_install"))
+            case _ if "-lh" in args:
+                await utils.answer(message, self.strings("lavhost_install"))
 
     async def _inline__choose__installation(self, call: InlineCall, platform: str):
         with contextlib.suppress(Exception):
@@ -375,4 +502,3 @@ class CoreMod(loader.Module):
                 self.strings(f'{platform}_install'),
                 reply_markup=self._markup,
             )
-

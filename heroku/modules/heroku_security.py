@@ -4,7 +4,7 @@
 # You can redistribute it and/or modify it under the terms of the GNU AGPLv3
 # 🔑 https://www.gnu.org/licenses/agpl-3.0.html
 
-# ©️ Codrago, 2024-2025
+# ©️ Codrago, 2024-2030
 # This file is a part of Heroku Userbot
 # 🌐 https://github.com/coddrago/Heroku
 # You can redistribute it and/or modify it under the terms of the GNU AGPLv3
@@ -961,33 +961,33 @@ class HerokuSecurityMod(loader.Module):
         await self._confirm(message, "sgroup", target, possible_rules[0], duration)
 
     async def _tsec_user(self, message: Message, args: list):
-        if len(args) == 1:
-            if not message.is_private and not message.is_reply:
-                await utils.answer(message, self.strings("no_target"))
-                return
-            await utils.answer(message, self.strings("no_rule"))
-            return
-
-        if len(args) >= 2:
-            try:
-                if not args[1].isdigit() and not args[1].startswith("@"):
-                    raise ValueError
-
-                target = await self._client.get_entity(
-                    int(args[1]) if args[1].isdigit() else args[1],
-                    exp=0,
-                )
-            except (ValueError, TypeError):
-                if message.is_private:
-                    target = await self._client.get_entity(message.peer_id, exp=0)
-                elif message.is_reply:
-                    target = await self._client.get_entity(
-                        (await message.get_reply_message()).sender_id,
-                        exp=0,
-                    )
-                else:
+        match args:
+            case [single]:
+                if not message.is_private and not message.is_reply:
                     await utils.answer(message, self.strings("no_target"))
                     return
+                await utils.answer(message, self.strings("no_rule"))
+                return
+            case _ if len(args) >= 2:
+                try:
+                    if not args[1].isdigit() and not args[1].startswith("@"):
+                        raise ValueError
+
+                    target = await self._client.get_entity(
+                        int(args[1]) if args[1].isdigit() else args[1],
+                        exp=0,
+                    )
+                except (ValueError, TypeError):
+                    if message.is_private:
+                        target = await self._client.get_entity(message.peer_id, exp=0)
+                    elif message.is_reply:
+                        target = await self._client.get_entity(
+                            (await message.get_reply_message()).sender_id,
+                            exp=0,
+                        )
+                    else:
+                        await utils.answer(message, self.strings("no_target"))
+                        return
 
         if target.id in self._client.dispatcher.security.owner:
             await utils.answer(message, self.strings("owner_target"))

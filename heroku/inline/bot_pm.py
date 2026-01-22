@@ -4,7 +4,7 @@
 # You can redistribute it and/or modify it under the terms of the GNU AGPLv3
 # 🔑 https://www.gnu.org/licenses/agpl-3.0.html
 
-# ©️ Codrago, 2024-2025
+# ©️ Codrago, 2024-2030
 # This file is a part of Heroku Userbot
 # 🌐 https://github.com/coddrago/Heroku
 # You can redistribute it and/or modify it under the terms of the GNU AGPLv3
@@ -54,10 +54,11 @@ class BotPM(InlineUnit):
             )
             return False
 
-        if state:
-            self.fsm[str(user)] = state
-        elif str(user) in self.fsm:
-            del self.fsm[str(user)]
+        match True:
+            case _ if state:
+                self.fsm[str(user)] = state
+            case _ if str(user) in self.fsm:
+                del self.fsm[str(user)]
 
         return True
 

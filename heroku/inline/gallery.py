@@ -4,7 +4,7 @@
 # You can redistribute it and/or modify it under the terms of the GNU AGPLv3
 # 🔑 https://www.gnu.org/licenses/agpl-3.0.html
 
-# ©️ Codrago, 2024-2025
+# ©️ Codrago, 2024-2030
 # This file is a part of Heroku Userbot
 # 🌐 https://github.com/coddrago/Heroku
 # You can redistribute it and/or modify it under the terms of the GNU AGPLv3
@@ -344,23 +344,24 @@ class Gallery(InlineUnit):
         ],
     ) -> typing.Union[str, bool]:
         """Parses photo url from `callback`. Returns url on success, otherwise `False`"""
-        if isinstance(callback, str):
-            photo_url = callback
-        elif isinstance(callback, list):
-            photo_url = callback[0]
-        elif asyncio.iscoroutinefunction(callback):
-            photo_url = await callback()
-        elif callable(callback):
-            photo_url = callback()
-        else:
-            logger.error(
-                (
-                    "Invalid type for `next_handler`. Expected `str`, `list` or"
-                    " `callable`, got %s"
-                ),
-                type(callback),
-            )
-            return False
+        match True:
+            case _ if isinstance(callback, str):
+                photo_url = callback
+            case _ if isinstance(callback, list):
+                photo_url = callback[0]
+            case _ if asyncio.iscoroutinefunction(callback):
+                photo_url = await callback()
+            case _ if callable(callback):
+                photo_url = callback()
+            case _:
+                logger.error(
+                    (
+                        "Invalid type for `next_handler`. Expected `str`, `list` or"
+                        " `callable`, got %s"
+                    ),
+                    type(callback),
+                )
+                return False
 
         if not isinstance(photo_url, (str, list)):
             logger.error(
@@ -516,23 +517,21 @@ class Gallery(InlineUnit):
         page: typing.Union[int, str],
         unit_id: typing.Optional[str] = None,
     ):
-        if page == "slideshow":
-            await self._gallery_slideshow(call, unit_id)
-            return
-
-        if page == "close":
-            await self._delete_unit_message(call, unit_id=unit_id)
-            return
-
-        if page < 0:
-            await call.answer("No way back")
-            return
-
-        if page > len(self._units[unit_id]["photos"]) - 1 and isinstance(
-            self._units[unit_id]["next_handler"], ListGalleryHelper
-        ):
-            await call.answer("No way forward")
-            return
+        match True:
+            case _ if page == "slideshow":
+                await self._gallery_slideshow(call, unit_id)
+                return
+            case _ if page == "close":
+                await self._delete_unit_message(call, unit_id=unit_id)
+                return
+            case _ if page < 0:
+                await call.answer("No way back")
+                return
+            case _ if page > len(self._units[unit_id]["photos"]) - 1 and isinstance(
+                self._units[unit_id]["next_handler"], ListGalleryHelper
+            ):
+                await call.answer("No way forward")
+                return
 
         self._units[unit_id]["current_index"] = page
         if not isinstance(self._units[unit_id]["next_handler"], ListGalleryHelper):

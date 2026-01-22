@@ -4,7 +4,7 @@
 # You can redistribute it and/or modify it under the terms of the GNU AGPLv3
 # 🔑 https://www.gnu.org/licenses/agpl-3.0.html
 
-# ©️ Codrago, 2024-2025
+# ©️ Codrago, 2024-2030
 # This file is a part of Heroku Userbot
 # 🌐 https://github.com/coddrago/Heroku
 # You can redistribute it and/or modify it under the terms of the GNU AGPLv3
@@ -19,6 +19,7 @@ import glob
 import requests
 import re
 import emoji
+import herokutl
 
 from bs4 import BeautifulSoup
 from typing import Optional
@@ -43,13 +44,18 @@ class HerokuInfoMod(loader.Module):
         self.config = loader.ModuleConfig(
             loader.ConfigValue(
                 "custom_message",
-                doc=lambda: self.strings("_cfg_cst_msg"),
+                doc=lambda: (
+                    self.strings("_cfg_cst_msg") + "\n" + self.strings("_cfg_cst_ph").format(
+                        utils.config_placeholders()
+                    )
+                )
             ),
 
             loader.ConfigValue(
                 "banner_url",
                 "https://raw.githubusercontent.com/coddrago/assets/refs/heads/main/heroku/heroku_info.png",
                 lambda: self.strings("_cfg_banner"),
+                validator=loader.validators.RandomLink(),
             ),
 
             loader.ConfigValue(
@@ -114,7 +120,7 @@ class HerokuInfoMod(loader.Module):
         metatag = soup.find("meta", property="og:image")
         return metatag['content']
 
-    def _render_info(self, start: float) -> str:
+    async def _render_info(self, start: float) -> str:
         try:
             repo = git.Repo(search_parent_directories=True)
             diff = repo.git.log([f"HEAD..origin/{version.branch}", "--oneline"])
@@ -159,32 +165,36 @@ class HerokuInfoMod(loader.Module):
             ("🍏", "<emoji document_id=5372908412604525258>🍏</emoji>")
         ]:
             platform_emoji = platform_emoji.replace(emoji, icon)
+        data = {
+            'me': me,
+            'version': _version,
+            'build': build,
+            'prefix': prefix,
+            'platform': platform,
+            'platform_emoji': platform_emoji,
+            'upd': upd,
+            'python_ver': lib_platform.python_version(),
+            'uptime': utils.formatted_uptime(),
+            'cpu_usage': utils.get_cpu_usage(),
+            'ram_usage': f"{utils.get_ram_usage()} MB",
+            'branch': version.branch,
+            'hostname': lib_platform.node(),
+            'user': getpass.getuser(),
+            'os': self._get_os_name() or self.strings('non_detectable'),
+            'kernel': lib_platform.release(),
+            'cpu': f"{psutil.cpu_count(logical=False)} ({psutil.cpu_count()}) core(-s); {psutil.cpu_percent()}% total",
+            'ping': round((time.perf_counter_ns() - start) / 10**6, 3),
+            'htl_ver': herokutl.__version__,
+            'git_status': utils.get_git_status(),
+        }
+        data = await utils.get_placeholders(data)
         return (
             (
                 "🪐 Heroku\n"
                 if self.config["show_heroku"]
                 else ""
             )
-            + self.config["custom_message"].format(
-                me=me,
-                version=_version,
-                build=build,
-                prefix=prefix,
-                platform=platform,
-                platform_emoji=platform_emoji,
-                upd=upd,
-                python_ver=lib_platform.python_version(),
-                uptime=utils.formatted_uptime(),
-                cpu_usage=utils.get_cpu_usage(),
-                ram_usage=f"{utils.get_ram_usage()} MB",
-                branch=version.branch,
-                hostname=lib_platform.node(),
-                user=getpass.getuser(),
-                os=self._get_os_name() or self.strings('non_detectable'),
-                kernel=lib_platform.release(),
-                cpu=f"{psutil.cpu_count(logical=False)} ({psutil.cpu_count()}) core(-s); {psutil.cpu_percent()}% total",
-                ping=round((time.perf_counter_ns() - start) / 10**6, 3)
-            )
+            + self.config["custom_message"].format(**data)
             if self.config["custom_message"]
             else self.strings["info_message"].format(
                 (
@@ -207,8 +217,8 @@ class HerokuInfoMod(loader.Module):
             )
         )
     
-    def _get_info_photo(self, start: float) -> Optional[Path]:
-        imgform = self.config['banner_url'].split('.')[-1]
+    async def _get_info_photo(self, start: float) -> Optional[Path]:
+        imgform = str(self.config['banner_url']).split('.')[-1]
         imgset = self.config['imgSettings']
         if imgform in ['jpg', 'jpeg', 'png', 'bmp', 'webp']:
             response = requests.get(self.config['banner_url'] if not self.config['banner_url'].startswith('https://imgur') else self.imgur(self.config['banner_url']), stream=True, headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"})
@@ -222,7 +232,7 @@ class HerokuInfoMod(loader.Module):
             draw = ImageDraw.Draw(img)
             draw.text(
                 (int(w/2), int(h/2)) if imgset[3] == '0|0' else tuple([int(i) for i in imgset[3].split('|')]),
-                f'{utils.remove_html(self._render_info(start))}', 
+                f'{utils.remove_html(await self._render_info(start))}', 
                 anchor=imgset[4],
                 font=font,
                 fill=imgset[2] if imgset[2].startswith('#') else '#000',
@@ -238,45 +248,46 @@ class HerokuInfoMod(loader.Module):
     @loader.command()
     async def insfont(self, message: Message):
         "<Url|Reply to font> - Install font"
-        if message.is_reply:
-            reply = await message.get_reply_message()
-            fontform = reply.document.mime_type.split("/")[1]
-            if not fontform in ['ttf', 'otf']:
-                await utils.answer(
-                    message,
-                    self.strings["incorrect_format_font"]
-                )
-                return
-            origpath = glob.glob(f'{os.getcwd()}/assets/font.*')[0]
-            ptf = f'{os.getcwd()}/font.{fontform}'
-            os.rename(origpath, ptf)
-            photo = await reply.download_media(origpath)
-            if photo is None:
-                os.rename(ptf, origpath)
+        match True:
+            case _ if message.is_reply:
+                reply = await message.get_reply_message()
+                fontform = reply.document.mime_type.split("/")[1]
+                if not fontform in ['ttf', 'otf']:
+                    await utils.answer(
+                        message,
+                        self.strings["incorrect_format_font"]
+                    )
+                    return
+                origpath = glob.glob(f'{os.getcwd()}/assets/font.*')[0]
+                ptf = f'{os.getcwd()}/font.{fontform}'
+                os.rename(origpath, ptf)
+                photo = await reply.download_media(origpath)
+                if photo is None:
+                    os.rename(ptf, origpath)
+                    await utils.answer(
+                        message,
+                        self.strings["no_font"]
+                    )
+                    return
+                os.remove(ptf)
+            case _ if utils.check_url(utils.get_args_raw(message)):
+                fontform = utils.get_args_raw(message).split('.')[-1]
+                if not fontform in ['ttf', 'otf']:
+                    await utils.answer(
+                        message,
+                        self.strings["incorrect_format_font"]
+                    )
+                    return
+                response = requests.get(utils.get_args_raw(message), stream=True)
+                os.remove(glob.glob(f'{os.getcwd()}/assets/font.*')[0])
+                with open(f'{os.getcwd()}/assets/font.{fontform}', 'wb') as file:
+                    file.write(response.content)
+            case _:
                 await utils.answer(
                     message,
                     self.strings["no_font"]
                 )
                 return
-            os.remove(ptf)
-        elif utils.check_url(utils.get_args_raw(message)):
-            fontform = utils.get_args_raw(message).split('.')[-1]
-            if not fontform in ['ttf', 'otf']:
-                await utils.answer(
-                    message,
-                    self.strings["incorrect_format_font"]
-                )
-                return
-            response = requests.get(utils.get_args_raw(message), stream=True)
-            os.remove(glob.glob(f'{os.getcwd()}/assets/font.*')[0])
-            with open(f'{os.getcwd()}/assets/font.{fontform}', 'wb') as file:
-                file.write(response.content)
-        else:
-            await utils.answer(
-                message,
-                self.strings["no_font"]
-            )
-            return
         await utils.answer(
             message,
             self.strings["font_installed"]
@@ -285,17 +296,23 @@ class HerokuInfoMod(loader.Module):
     @loader.command()
     async def infocmd(self, message: Message):
         start = time.perf_counter_ns()
-        media = self.config["banner_url"]
+        media = str(self.config["banner_url"])
+        
         if self.config["banner_url"] and self.config["quote_media"] is True:
-            media = InputMediaWebPage(self.config["banner_url"], optional = True) 
+            media = InputMediaWebPage(str(self.config["banner_url"]), optional = True)
+        
+        elif not self.config["banner_url"]:
+            media = None
+
         try:
-            if self.config['switchInfo']:
-                if self._get_info_photo(start) is None:
-                    await utils.answer(
-                        message, 
-                        self.strings["incorrect_img_format"]
-                    )
-                    return
+            match True:
+                case _ if self.config['switchInfo']:
+                    if await self._get_info_photo(start) is None:
+                        await utils.answer(
+                            message, 
+                            self.strings["incorrect_img_format"]
+                        )
+                        return
 
                 await utils.answer(
                     message,
@@ -306,7 +323,7 @@ class HerokuInfoMod(loader.Module):
             elif self.config["custom_message"] is None:
                 await utils.answer(
                     message,
-                    self._render_info(start),
+                    await self._render_info(start),
                     file = media,
                     reply_to=getattr(message, "reply_to_msg_id", None),
                     invert_media = self.config["invert_media"],
@@ -316,12 +333,12 @@ class HerokuInfoMod(loader.Module):
                     message = await utils.answer(message, self.config["ping_emoji"])
                 await utils.answer(
                     message,
-                    self._render_info(start),
+                    await self._render_info(start),
                     file = media,
                     reply_to=getattr(message, "reply_to_msg_id", None),
                     invert_media = self.config["invert_media"],
                 )
-        except WebpageMediaEmpty:
+        except WebpageMediaEmptyError:
             await utils.answer(
                 message,
                 self.strings["no_banner"].format(

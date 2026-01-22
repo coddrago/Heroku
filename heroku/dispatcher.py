@@ -1,28 +1,12 @@
 """Processes incoming events and dispatches them to appropriate handlers"""
 
-#    Friendly Telegram (telegram userbot)
-#    Copyright (C) 2018-2022 The Authors
-
-#    This program is free software: you can redistribute it and/or modify
-#    it under the terms of the GNU Affero General Public License as published by
-#    the Free Software Foundation, either version 3 of the License, or
-#    (at your option) any later version.
-
-#    This program is distributed in the hope that it will be useful,
-#    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#    GNU Affero General Public License for more details.
-
-#    You should have received a copy of the GNU Affero General Public License
-#    along with this program.  If not, see <https://www.gnu.org/licenses/>.
-
 # ©️ Dan Gazizullin, 2021-2023
 # This file is a part of Hikka Userbot
 # 🌐 https://github.com/hikariatama/Hikka
 # You can redistribute it and/or modify it under the terms of the GNU AGPLv3
 # 🔑 https://www.gnu.org/licenses/agpl-3.0.html
 
-# ©️ Codrago, 2024-2025
+# ©️ Codrago, 2024-2030
 # This file is a part of Heroku Userbot
 # 🌐 https://github.com/coddrago/Heroku
 # You can redistribute it and/or modify it under the terms of the GNU AGPLv3
@@ -52,8 +36,14 @@ from .tl_cache import CustomClient
 logger = logging.getLogger(__name__)
 
 # Keys for layout switch
-ru_keys = 'ёйцукенгшщзхъфывапролджэячсмитьбю.Ё"№;%:?ЙЦУКЕНГШЩЗХЪФЫВАПРОЛДЖЭ/ЯЧСМИТЬБЮ,'
-en_keys = "`qwertyuiop[]asdfghjkl;'zxcvbnm,./~@#$%^&QWERTYUIOP{}ASDFGHJKL:\"|ZXCVBNM<>?"
+_LAYOUT_TRANSLATION = str.maketrans(
+    'ёйцукенгшщзхъфывапролджэячсмитьбю.Ё"№;%:?ЙЦУКЕНГШЩЗХЪФЫВАПРОЛДЖЭ/ЯЧСМИТЬБЮ,'
+    + "`qwertyuiop[]asdfghjkl;'zxcvbnm,./~@#$%^&QWERTYUIOP{}ASDFGHJKL:\"|ZXCVBNM<>?",
+    
+    "`qwertyuiop[]asdfghjkl;'zxcvbnm,./~@#$%^&QWERTYUIOP{}ASDFGHJKL:\"|ZXCVBNM<>?"
+    + 'ёйцукенгшщзхъфывапролджэячсмитьбю.Ё"№;%:?ЙЦУКЕНГШЩЗХЪФЫВАПРОЛДЖЭ/ЯЧСМИТЬБЮ,'
+)
+
 ALL_TAGS = [
     "no_commands",
     "only_commands",
@@ -128,19 +118,18 @@ class CommandDispatcher:
 
         self.check_security = self.security.check
         self._me = self._client.heroku_me.id
-        self._cached_usernames = [
-            (
-                self._client.heroku_me.username.lower()
-                if self._client.heroku_me.username
-                else str(self._client.heroku_me.id)
-            )
-        ]
+        self._cached_usernames = set()
 
-        self._cached_usernames.extend(
-            u.username.lower()
-            for u in getattr(self._client.heroku_me, "usernames", [])
-            or []
-        )
+        if self._client.heroku_me.username:
+            self._cached_usernames.add(self._client.heroku_me.username.lower())
+
+        if self._client.heroku_me.usernames:
+            self._cached_usernames.update(
+                u.username.lower()
+                for u in getattr(self._client.heroku_me, "usernames", [])
+            )
+
+        self._cached_usernames.add(str(self._client.heroku_me.id))
 
         self.raw_handlers = []
         self._external_bl: typing.List[int] = []
@@ -294,7 +283,6 @@ class CommandDispatcher:
             prefix = self._db.get(main.__name__, "command_prefixes", {})
             prefix = prefix.get(str(initiator), main_prefix)
             
-        change = str.maketrans(ru_keys + en_keys, en_keys + ru_keys)
         message = utils.censor(event.message)
 
         if not event.message.message:
@@ -306,8 +294,8 @@ class CommandDispatcher:
             and (
                 message.message.startswith(prefix * 2)
                 and any(s != prefix for s in message.message)
-                or message.message.startswith(str.translate(prefix * 2, change))
-                and any(s != str.translate(prefix, change) for s in message.message)
+                or message.message.startswith(str.translate(prefix * 2, _LAYOUT_TRANSLATION))
+                and any(s != str.translate(prefix, _LAYOUT_TRANSLATION) for s in message.message)
             )
         ):
             # Allow escaping commands using .'s
@@ -322,14 +310,15 @@ class CommandDispatcher:
                 )
             return False
 
-        if (
-            event.message.message.startswith(str.translate(prefix, change))
-            and str.translate(prefix, change) != prefix
-        ):
-            message.message = str.translate(message.message, change)
-            message.text = str.translate(message.text, change)
-        elif not event.message.message.startswith(prefix):
-            return False
+        match True:
+            case _ if (
+                event.message.message.startswith(str.translate(prefix, _LAYOUT_TRANSLATION))
+                and str.translate(prefix, _LAYOUT_TRANSLATION) != prefix
+            ):
+                message.message = str.translate(message.message, _LAYOUT_TRANSLATION)
+                message.text = str.translate(message.text, _LAYOUT_TRANSLATION)
+            case _ if not event.message.message.startswith(prefix):
+                return False
 
         if (
             event.sticker
@@ -377,7 +366,7 @@ class CommandDispatcher:
             and event.message is not None
             and event.message.message is not None
             and not any(
-                f"@{username}" not in command.lower()
+                f"@{username}" in command.lower()
                 for username in self._cached_usernames
             )
         ):

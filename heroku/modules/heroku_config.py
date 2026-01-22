@@ -4,7 +4,7 @@
 # You can redistribute it and/or modify it under the terms of the GNU AGPLv3
 # 🔑 https://www.gnu.org/licenses/agpl-3.0.html
 
-# ©️ Codrago, 2024-2025
+# ©️ Codrago, 2024-2030
 # This file is a part of Heroku Userbot
 # 🌐 https://github.com/coddrago/Heroku
 # You can redistribute it and/or modify it under the terms of the GNU AGPLv3
@@ -745,55 +745,53 @@ class HerokuConfigMod(loader.Module):
                     eng_art="n" if doc.lower().startswith(tuple("euioay")) else "",
                 )
             ]
-            if validator.internal_id == "Boolean":
-                await call.edit(
-                    self.strings(
-                        "configuring_option"
-                        if isinstance(obj_type, bool)
-                        else "configuring_option_lib"
-                    ).format(*args),
-                    reply_markup=additonal_button_row
-                    + self._generate_bool_markup(mod, config_opt, obj_type),
-                )
-                return
-
-            if validator.internal_id == "Series":
-                await call.edit(
-                    self.strings(
-                        "configuring_option"
-                        if isinstance(obj_type, bool)
-                        else "configuring_option_lib"
-                    ).format(*args),
-                    reply_markup=additonal_button_row
-                    + self._generate_series_markup(call, mod, config_opt, obj_type),
-                )
-                return
-
-            if validator.internal_id == "Choice":
-                await call.edit(
-                    self.strings(
-                        "configuring_option"
-                        if isinstance(obj_type, bool)
-                        else "configuring_option_lib"
-                    ).format(*args),
-                    reply_markup=additonal_button_row
-                    + self._generate_choice_markup(call, mod, config_opt, obj_type),
-                )
-                return
-
-            if validator.internal_id == "MultiChoice":
-                await call.edit(
-                    self.strings(
-                        "configuring_option"
-                        if isinstance(obj_type, bool)
-                        else "configuring_option_lib"
-                    ).format(*args),
-                    reply_markup=additonal_button_row
-                    + self._generate_multi_choice_markup(
-                        call, mod, config_opt, obj_type
-                    ),
-                )
-                return
+            match validator.internal_id:
+                case "Boolean":
+                    await call.edit(
+                        self.strings(
+                            "configuring_option"
+                            if isinstance(obj_type, bool)
+                            else "configuring_option_lib"
+                        ).format(*args),
+                        reply_markup=additonal_button_row
+                        + self._generate_bool_markup(mod, config_opt, obj_type),
+                    )
+                    return
+                case "Series":
+                    await call.edit(
+                        self.strings(
+                            "configuring_option"
+                            if isinstance(obj_type, bool)
+                            else "configuring_option_lib"
+                        ).format(*args),
+                        reply_markup=additonal_button_row
+                        + self._generate_series_markup(call, mod, config_opt, obj_type),
+                    )
+                    return
+                case "Choice":
+                    await call.edit(
+                        self.strings(
+                            "configuring_option"
+                            if isinstance(obj_type, bool)
+                            else "configuring_option_lib"
+                        ).format(*args),
+                        reply_markup=additonal_button_row
+                        + self._generate_choice_markup(call, mod, config_opt, obj_type),
+                    )
+                    return
+                case "MultiChoice":
+                    await call.edit(
+                        self.strings(
+                            "configuring_option"
+                            if isinstance(obj_type, bool)
+                            else "configuring_option_lib"
+                        ).format(*args),
+                        reply_markup=additonal_button_row
+                        + self._generate_multi_choice_markup(
+                            call, mod, config_opt, obj_type
+                        ),
+                    )
+                    return
             
         text = self.strings(
                 "configuring_option"
@@ -1032,32 +1030,62 @@ class HerokuConfigMod(loader.Module):
 
     @loader.command(alias="fcfg")
     async def fconfig(self, message: Message):
-        args = utils.get_args_raw(message).split(maxsplit=2)
+        raw = utils.get_args_raw(message).strip()
 
-        if len(args) < 3:
+        if not raw:
             await utils.answer(message, self.strings("args"))
             return
 
-        mod, option, value = args
+        parts = [p.strip() for p in raw.split("&&") if p.strip()]
+        if not parts:
+            await utils.answer(message, self.strings("args"))
+            return
+
+        first = parts[0].split(maxsplit=2)
+        if len(first) < 3:
+            await utils.answer(message, self.strings("args"))
+            return
+
+        mod, option, value = first
 
         if not (instance := self.lookup(mod)):
             await utils.answer(message, self.strings("no_mod"))
             return
 
-        if option not in instance.config:
+        updates = []
+
+        def apply_update(opt: str, val: str):
+            if opt not in instance.config:
+                return f"NO_OPTION::{opt}"
+            instance.config[opt] = val
+            return f"OK::{opt}"
+
+        res = apply_update(option, value)
+        if res.startswith("NO_OPTION::"):
             await utils.answer(message, self.strings("no_option"))
             return
+        updates.append((option, self._get_value(mod, option)))
 
-        instance.config[option] = value
-        await utils.answer(
-            message,
-            self.strings(
-                "option_saved"
-                if isinstance(instance, loader.Module)
-                else "option_saved_lib"
-            ).format(
-                utils.escape_html(option),
-                utils.escape_html(mod),
-                self._get_value(mod, option),
-            ),
-        )
+        for p in parts[1:]:
+            seg = p.split(maxsplit=1)
+            if len(seg) < 2:
+                await utils.answer(message, self.strings("args"))
+                return
+            opt, val = seg
+            res = apply_update(opt, val)
+            if res.startswith("NO_OPTION::"):
+                await utils.answer(message, self.strings("no_option"))
+                return
+            updates.append((opt, self._get_value(mod, opt)))
+
+        lines = []
+        for opt, val in updates:
+            lines.append(
+                self.strings(
+                    "option_saved"
+                    if isinstance(instance, loader.Module)
+                    else "option_saved_lib"
+                ).format(utils.escape_html(opt), utils.escape_html(mod), val)
+            )
+
+        await utils.answer(message, "\n".join(lines))
