@@ -4,13 +4,13 @@
 # You can redistribute it and/or modify it under the terms of the GNU AGPLv3
 # 🔑 https://www.gnu.org/licenses/agpl-3.0.html
 
-# ©️ Codrago, 2024-2025
+# ©️ Codrago, 2024-2030
 # This file is a part of Heroku Userbot
 # 🌐 https://github.com/coddrago/Heroku
 # You can redistribute it and/or modify it under the terms of the GNU AGPLv3
 # 🔑 https://www.gnu.org/licenses/agpl-3.0.html
 
-import re
+import asyncio
 import difflib
 import inspect
 import logging
@@ -62,6 +62,7 @@ class Help(loader.Module):
                 "banner_url",
                 None,
                 lambda: "Banner for .help",
+                validator=loader.validators.RandomLink(),
             ),
             loader.ConfigValue(
                 "media_quote",
@@ -237,16 +238,29 @@ class Help(loader.Module):
             )
         cmds = "\n".join(lines)
 
-        await utils.answer(
-            message,
-            f'{reply}<blockquote expandable>{cmds}{inline_cmd}</blockquote>'
-            + (f"\n\n{self.strings('not_exact')}" if not exact else "")
-            + (
-                f"\n\n{self.strings('core_notice')}"
-                if module.__origin__.startswith("<core")
-                else ""
-            ),
-        )
+        placeholders = utils.help_placeholders(module.__class__.__name__).replace("No docs", self.strings('undoc'))
+        if placeholders != "":
+            await utils.answer(
+                message,
+                f"{reply}<blockquote expandable>{cmds}{inline_cmd}</blockquote>\n<blockquote expandable>{self.strings('custom_placeholders')}{placeholders}</blockquote>"
+                + (f"\n\n{self.strings('not_exact')}" if not exact else "")
+                + (
+                    f"\n\n{self.strings('core_notice')}"
+                    if module.__origin__.startswith("<core")
+                    else ""
+                ),
+            )
+        else:
+            await utils.answer(
+                message,
+                f'{reply}<blockquote expandable>{cmds}{inline_cmd}</blockquote>'
+                + (f"\n\n{self.strings('not_exact')}" if not exact else "")
+                + (
+                    f"\n\n{self.strings('core_notice')}"
+                    if module.__origin__.startswith("<core")
+                    else ""
+                ),
+            )
 
     @loader.command(ru_doc="[args] | Помощь с вашими модулями!", ua_doc="[args] | допоможіть з вашими модулями!", de_doc="[args] | Hilfe mit deinen Modulen!")
     async def help(self, message: Message):
@@ -254,10 +268,13 @@ class Help(loader.Module):
 
         args = utils.get_args_raw(message)
 
-        banner = self.config["banner_url"]
+        banner = str(self.config["banner_url"])
 
         if self.config["banner_url"] and self.config["media_quote"] is True:
-            banner = InputMediaWebPage(self.config["banner_url"])
+            banner = InputMediaWebPage(str(self.config["banner_url"]))
+            
+        elif not self.config["banner_url"]:
+            banner = None
 
         force = False
         if "-f" in args:
@@ -343,15 +360,25 @@ class Help(loader.Module):
                 else:
                     tmp += f" | {cmd}"
 
-            icommands = [
-                name
-                for name, func in mod.inline_handlers.items()
-                if await self.inline.check_inline_security(
-                    func=func,
-                    user=message.sender_id if not message.out else self._client.tg_id,
+            icommands = []
+
+            if force:
+                icommands.extend([*mod.inline_handlers.keys()])
+            else:            
+                results = await asyncio.gather(
+                    *(
+                        self.inline.check_inline_security(
+                            func=func,
+                            user=message.sender_id if not message.out else self._client.tg_id,
+                        ) for func in mod.inline_handlers.values()
+                    )
                 )
-                or force
-            ]
+
+                icommands = [
+                    name for name, passed
+                    in zip(mod.inline_handlers.keys(), results)
+                    if passed is True
+                ]
 
             for cmd in icommands:
                 if first:
@@ -389,8 +416,8 @@ class Help(loader.Module):
                         else f"\n\n{self.strings('partial_load')}"
                     ),
                 ),
-                file = banner,
-                invert_media = self.config["invert_media"],
+                file=banner,
+                invert_media=self.config["invert_media"],
             )
         elif only_loaded:
             await utils.answer(
@@ -404,8 +431,8 @@ class Help(loader.Module):
                         else f"\n\n{self.strings('partial_load')}"
                     ),
                 ),
-                file = banner,
-                invert_media = self.config["invert_media"],
+                file=banner,
+                invert_media=self.config["invert_media"],
             )
         else:
             await utils.answer(
@@ -420,8 +447,8 @@ class Help(loader.Module):
                         else f"\n\n{self.strings('partial_load')}"
                     ),
                 ),
-                file = banner,
-                invert_media = self.config["invert_media"],
+                file=banner,
+                invert_media=self.config["invert_media"],
             )
 
     @loader.command(ru_doc="| Ссылка на чат помощи", ua_doc="| посилання для чату служби підтримки", de_doc="| Link zum Support-Chat")

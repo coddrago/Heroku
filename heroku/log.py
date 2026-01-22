@@ -6,7 +6,7 @@
 # You can redistribute it and/or modify it under the terms of the GNU AGPLv3
 # 🔑 https://www.gnu.org/licenses/agpl-3.0.html
 
-# ©️ Codrago, 2024-2025
+# ©️ Codrago, 2024-2030
 # This file is a part of Heroku Userbot
 # 🌐 https://github.com/coddrago/Heroku
 # You can redistribute it and/or modify it under the terms of the GNU AGPLv3
@@ -23,6 +23,7 @@ import sys
 import traceback
 import typing
 from logging.handlers import RotatingFileHandler
+from collections.abc import Coroutine
 
 import pyrogram
 from aiogram.exceptions import TelegramNetworkError, TelegramRetryAfter
@@ -296,11 +297,21 @@ class TelegramLogsHandler(logging.Handler):
             chunks[0]
         )
 
+        thread_id = call.message.message_thread_id
+
         for chunk in chunks[1:]:
-            await bot.send_message(chat_id=call.chat_id, text=chunk)
+            await bot.send_message(
+                chat_id=call.chat_id, 
+                text=chunk,
+                message_thread_id=thread_id
+            )
+
 
     def get_logid_by_client(self, client_id: int) -> int:
         return self._mods[client_id].logchat
+        
+    def get_logs_topic_id_by_client(self, client_id: int) -> int:
+        return self._mods[client_id]._logs_topic.id
 
     async def sender(self):
         async with self._send_lock:
@@ -343,6 +354,7 @@ class TelegramLogsHandler(logging.Handler):
                                 },
                             ],
                         ),
+                        message_thread_id=self._mods[client_id]._logs_topic.id,
                     )
                     for item in self.tg_buff
                     if isinstance(item[0], HerokuException)
@@ -359,9 +371,10 @@ class TelegramLogsHandler(logging.Handler):
                 for client_id in self._mods
             }
 
-            for exceptions in self._exc_queue.values():
-                for exc in exceptions:
-                    asyncio.create_task(self.avoid_floodwait(exc))
+            await asyncio.gather(
+                *(self._exc_sender(*exceptions)
+                for exceptions in self._exc_queue.values())
+            )
 
             self.tg_buff = []
 
@@ -382,6 +395,7 @@ class TelegramLogsHandler(logging.Handler):
                             "<b>🧳 Journals are too big to be sent as separate"
                             " messages</b>"
                         ),
+                        message_thread_id=self._mods[client_id]._logs_topic.id,
                     )
 
                     self._queue[client_id] = []
@@ -394,16 +408,20 @@ class TelegramLogsHandler(logging.Handler):
                                 self._mods[client_id].logchat,
                                 f"<code>{chunk}</code>",
                                 disable_notification=True,
+                                message_thread_id=self._mods[client_id]._logs_topic.id,
                             )
                         )
-    async def avoid_floodwait(self, exc):
-        try:
-            await exc
-        except TelegramRetryAfter as e:
-            await asyncio.sleep(e.retry_after)
-            await self.avoid_floodwait(exc)
-        except RuntimeError:
-            pass
+
+    async def _exc_sender(self, *coros: Coroutine):
+        for coro in coros:
+            try:
+                await coro
+            except TelegramRetryAfter as e:
+                await asyncio.sleep(e.retry_after)
+            except RuntimeError:
+                pass
+            except Exception:
+                return
 
     def emit(self, record: logging.LogRecord):
         try:

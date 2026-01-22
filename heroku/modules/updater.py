@@ -4,7 +4,7 @@
 # You can redistribute it and/or modify it under the terms of the GNU AGPLv3
 # 🔑 https://www.gnu.org/licenses/agpl-3.0.html
 
-# ©️ Codrago, 2024-2025
+# ©️ Codrago, 2024-2030
 # This file is a part of Heroku Userbot
 # 🌐 https://github.com/coddrago/Heroku
 # You can redistribute it and/or modify it under the terms of the GNU AGPLv3
@@ -121,15 +121,18 @@ class UpdaterMod(loader.Module):
                     headers={"Accept": "application/vnd.github.v3.raw"}
                 )
 
-                if r.status == 200:
-                    announcement = (await r.text()).strip()
-                    previous = self.get("announcement", "")
-                    if announcement and announcement != previous:
-                        await self.inline.bot.send_message(
-                            self.tg_id,
-                            self.strings("announcement").format(announcement)
-                        )
-                        self.set("announcement", announcement)
+                match r.status:
+                    case 200:
+                        announcement = (await r.text()).strip()
+                        previous = self.get("announcement", "")
+                        if announcement and announcement != previous:
+                            await self.inline.bot.send_message(
+                                self.tg_id,
+                                self.strings("announcement").format(announcement)
+                            )
+                            self.set("announcement", announcement)
+                    case _:
+                        pass
             except Exception:
                 pass
             
@@ -318,6 +321,8 @@ class UpdaterMod(loader.Module):
         )
 
         await self.process_restart_message(msg_obj)
+
+        self.db.set("Updater", "modules_count", len(self.allmodules.modules))
 
         self.set("restart_ts", time.time())
 
@@ -658,11 +663,17 @@ class UpdaterMod(loader.Module):
             took = "n/a"
 
         self.set("restart_ts", None)
-
         ms = self.get("selfupdatemsg")
-        msg = self.strings(
-            "secure_boot_complete" if secure_boot else "full_success"
-        ).format(utils.ascii_face(), took)
+
+        if self.db.get("Updater", "modules_count") <= len(self.allmodules.modules):
+            msg = self.strings(
+                "secure_boot_complete" if secure_boot else "full_success"
+            ).format(utils.ascii_face(), took)
+        else:
+            fails = self.db.get("Updater", "modules_count") - len(self.allmodules.modules)
+            msg = self.strings(
+                "secure_boot_fail" if secure_boot else "full_fail"
+            ).format(utils.ascii_face(), took, fails)
 
         if ms is None:
             return

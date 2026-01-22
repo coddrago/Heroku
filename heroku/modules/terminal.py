@@ -1,18 +1,3 @@
-#    Friendly Telegram (telegram userbot)
-#    Copyright (C) 2018-2019 The Authors
-
-#    This program is free software: you can redistribute it and/or modify
-#    it under the terms of the GNU Affero General Public License as published by
-#    the Free Software Foundation, either version 3 of the License, or
-#    (at your option) any later version.
-
-#    This program is distributed in the hope that it will be useful,
-#    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#    GNU Affero General Public License for more details.
-
-#    You should have received a copy of the GNU Affero General Public License
-#    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 # ©️ Dan Gazizullin, 2021-2023
 # This file is a part of Hikka Userbot
@@ -20,13 +5,11 @@
 # You can redistribute it and/or modify it under the terms of the GNU AGPLv3
 # 🔑 https://www.gnu.org/licenses/agpl-3.0.html
 
-# ©️ Codrago, 2024-2025
+# ©️ Codrago, 2024-2030
 # This file is a part of Heroku Userbot
 # 🌐 https://github.com/coddrago/Heroku
 # You can redistribute it and/or modify it under the terms of the GNU AGPLv3
 # 🔑 https://www.gnu.org/licenses/agpl-3.0.html
-
-# meta developer: @bsolute
 
 import asyncio
 import contextlib
@@ -272,24 +255,25 @@ class RawMessageEditor(SudoMessageEditor):
     async def redraw(self):
         logger.debug(self.rc)
 
-        if self.rc is None:
-            text = (
-                "<code>"
-                + utils.escape_html(self.stdout[max(len(self.stdout) - 4095, 0) :])
-                + "</code>"
-            )
-        elif self.rc == 0:
-            text = (
-                "<code>"
-                + utils.escape_html(self.stdout[max(len(self.stdout) - 4090, 0) :])
-                + "</code>"
-            )
-        else:
-            text = (
-                "<code>"
-                + utils.escape_html(self.stderr[max(len(self.stderr) - 4095, 0) :])
-                + "</code>"
-            )
+        match self.rc:
+            case None:
+                text = (
+                    "<code>"
+                    + utils.escape_html(self.stdout[max(len(self.stdout) - 4095, 0) :])
+                    + "</code>"
+                )
+            case 0:
+                text = (
+                    "<code>"
+                    + utils.escape_html(self.stdout[max(len(self.stdout) - 4090, 0) :])
+                    + "</code>"
+                )
+            case _:
+                text = (
+                    "<code>"
+                    + utils.escape_html(self.stderr[max(len(self.stderr) - 4095, 0) :])
+                    + "</code>"
+                )
 
         if self.rc is not None and self.show_done:
             text += "\n" + self.strings("done")
@@ -370,27 +354,27 @@ class TerminalMod(loader.Module):
         cmd: str,
         editor: typing.Optional[MessageEditor] = None,
     ):
-        if len(cmd.split(" ")) > 1 and cmd.split(" ")[0] == "sudo":
-            needsswitch = True
 
-            for word in cmd.split(" ", 1)[1].split(" "):
-                if word[0] != "-":
-                    break
+        shell = os.environ.get("SHELL", "/bin/sh")
 
-                if word == "-S":
-                    needsswitch = False
+        try:
+            sproc = await asyncio.create_subprocess_exec(
+                shell, "-c", cmd,
+                stdin=asyncio.subprocess.PIPE,
+                stdout=asyncio.subprocess.PIPE,
+                stderr=asyncio.subprocess.PIPE,
+                cwd=utils.get_base_dir(),
+                preexec_fn=os.setsid,
+            )
+        except Exception as e:
+            await utils.answer(
+                message,
+                self.strings("exec_error").format(
+                    utils.escape_html(str(e))
+                ),
+            )
+            return
 
-            if needsswitch:
-                cmd = " ".join([cmd.split(" ", 1)[0], "-S", cmd.split(" ", 1)[1]])
-
-        sproc = await asyncio.create_subprocess_exec(
-            "/bin/bash", "-c", cmd,
-            stdin=asyncio.subprocess.PIPE,
-            stdout=asyncio.subprocess.PIPE,
-            stderr=asyncio.subprocess.PIPE,
-            cwd=utils.get_base_dir(),
-            preexec_fn=os.setsid,
-        )
 
         if editor is None:
             editor = SudoMessageEditor(message, cmd, self.config, self.strings, message)

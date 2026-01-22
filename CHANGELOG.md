@@ -15,10 +15,64 @@
 - add multiload
 - fix error in help lib
 - add config to internet error ignore
-- add hsearch!!
 - update heroku-tl to 2.0.0
 - add time execution to eval and terminal
 - add type annotations (developer oriented)
+- add japanese language
+- add french language
+- add protection for messages from 777000 and 489000
+- add help -c (core modules) and help -l (loaded modules)
+- new info
+- fix folders
+- rework bot creation
+- add python version in info
+- remove -S flag from sudo
+- add link validator to help, info, ping
+- add meme lang packs
+- add UwU language to meme pack
+- add leet(1337) to meme pack
+- add tiktokkid to meme pack
+- remove support python 3.9
+- rework if else to match/case
+- add utils.format_file_size
+- add utils.is_url
+- add utils.get_iso_time
+- add utils.safe_getattr
+- add utils.get_last_commit_message
+- add utils.get_commit_count
+- add utils.get_hostname
+- add utils.resolve_domain
+- add utils.is_port_open
+- add utils.get_network_interfaces
+- add utils.get_disk_usage
+- add utils.get_ip_address
+- add utils.get_args_bool
+- add utils.get_args_int
+- fix pack_url
+- add togglecmd cmd for disable or enable any cmd
+- add togglemod cmd for disable or enable any module
+- add clearmodule cmd
+- add placeholder system
+- move all log chat to forumTopics
+- add execution in .e from reply
+- add utils.asset_forum_topic
+- add utils.create_topic
+- add operator to fcfg
+- remove invokecmd
+- remove uninstall_herokucmd
+- remove debugmodcmd
+- add new validator RandomLink
+- replace validators in help, herokuinfo, tester to RandomLink
+- add and remove some modules in presets
+- replace TgCrypto to TgCrypto-pyrofork
+- impove keyboard layout
+- refactor clean up socket path assignment handling
+- improve platform model detection
+- add blockquote to dlm and lm cmds
+- improve boolean validation
+- add requirements installation when launching the userbot
+- add mini protection in eval
+- fix database path
 
 ## 🪐 Heroku 1.7.2
 - added autoupdate

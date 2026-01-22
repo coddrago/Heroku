@@ -4,7 +4,7 @@
 # You can redistribute it and/or modify it under the terms of the GNU AGPLv3
 # 🔑 https://www.gnu.org/licenses/agpl-3.0.html
 
-# ©️ Codrago, 2024-2025
+# ©️ Codrago, 2024-2030
 # This file is a part of Heroku Userbot
 # 🌐 https://github.com/coddrago/Heroku
 # You can redistribute it and/or modify it under the terms of the GNU AGPLv3
@@ -135,116 +135,123 @@ class Utils(InlineUnit):
             line = []
             for button in row:
                 try:
-                    if "url" in button:
-                        if not utils.check_url(button["url"]):
-                            logger.warning(
-                                "Button have not been added to form, "
-                                "because its url is invalid"
-                            )
-                            continue
-
-                        line += [
-                            InlineKeyboardButton(
-                                text=str(button["text"]),
-                                url=button["url"],
-                            )
-                        ]
-                    elif "callback" in button:
-                        line += [
-                            InlineKeyboardButton(
-                                text=str(button["text"]),
-                                callback_data=button["_callback_data"],
-                            )
-                        ]
-                        if setup_callbacks:
-                            self._custom_map[button["_callback_data"]] = {
-                                "handler": button["callback"],
-                                **(
-                                    {"always_allow": button["always_allow"]}
-                                    if button.get("always_allow", False)
-                                    else {}
-                                ),
-                                **(
-                                    {"args": button["args"]}
-                                    if button.get("args", False)
-                                    else {}
-                                ),
-                                **(
-                                    {"kwargs": button["kwargs"]}
-                                    if button.get("kwargs", False)
-                                    else {}
-                                ),
-                                **(
-                                    {"force_me": True}
-                                    if button.get("force_me", False)
-                                    else {}
-                                ),
-                                **(
-                                    {"disable_security": True}
-                                    if button.get("disable_security", False)
-                                    else {}
-                                ),
-                            }
-                    elif "input" in button:
-                        line += [
-                            InlineKeyboardButton(
-                                text=str(button["text"]),
-                                switch_inline_query_current_chat=button["_switch_query"]
-                                + " ",
-                            )
-                        ]
-                    elif "data" in button:
-                        line += [
-                            InlineKeyboardButton(
-                                text=str(button["text"]),
-                                callback_data=button["data"],
-                            )
-                        ]
-                    elif "web_app" in button:
-                        line += [
-                            InlineKeyboardButton(
-                                text=str(button["text"]),
-                                web_app=WebAppInfo(button["data"]),
-                            )
-                        ]
-
-                    elif "copy" in button:
-                        line += [
-                            InlineKeyboardButton(
-                                text=str(button["text"]),
-                                copy_text=CopyTextButton(
-                                    text=button["copy"]
+                    match True:
+                        case _ if "url" in button:
+                            if not utils.check_url(button["url"]):
+                                logger.warning(
+                                    "Button have not been added to form, "
+                                    "because its url is invalid"
                                 )
+                                continue
+
+                            line += [
+                                InlineKeyboardButton(
+                                    text=str(button["text"]),
+                                    url=button["url"],
+                                )
+                            ]
+
+                        case _ if "callback" in button:
+                            line += [
+                                InlineKeyboardButton(
+                                    text=str(button["text"]),
+                                    callback_data=button["_callback_data"],
+                                )
+                            ]
+                            if setup_callbacks:
+                                self._custom_map[button["_callback_data"]] = {
+                                    "handler": button["callback"],
+                                    **(
+                                        {"always_allow": button["always_allow"]}
+                                        if button.get("always_allow", False)
+                                        else {}
+                                    ),
+                                    **(
+                                        {"args": button["args"]}
+                                        if button.get("args", False)
+                                        else {}
+                                    ),
+                                    **(
+                                        {"kwargs": button["kwargs"]}
+                                        if button.get("kwargs", False)
+                                        else {}
+                                    ),
+                                    **(
+                                        {"force_me": True}
+                                        if button.get("force_me", False)
+                                        else {}
+                                    ),
+                                    **(
+                                        {"disable_security": True}
+                                        if button.get("disable_security", False)
+                                        else {}
+                                    ),
+                                }
+
+                        case _ if "input" in button:
+                            line += [
+                                InlineKeyboardButton(
+                                    text=str(button["text"]),
+                                    switch_inline_query_current_chat=button["_switch_query"]
+                                    + " ",
+                                )
+                            ]
+
+                        case _ if "data" in button:
+                            line += [
+                                InlineKeyboardButton(
+                                    text=str(button["text"]),
+                                    callback_data=button["data"],
+                                )
+                            ]
+
+                        case _ if "web_app" in button:
+                            line += [
+                                InlineKeyboardButton(
+                                    text=str(button["text"]),
+                                    web_app=WebAppInfo(button["data"]),
+                                )
+                            ]
+
+                        case _ if "copy" in button:
+                            line += [
+                                InlineKeyboardButton(
+                                    text=str(button["text"]),
+                                    copy_text=CopyTextButton(
+                                        text=button["copy"]
+                                    )
+                                )
+                            ]
+
+                        case _ if "switch_inline_query_current_chat" in button:
+                            line += [
+                                InlineKeyboardButton(
+                                    text=str(button["text"]),
+                                    switch_inline_query_current_chat=button[
+                                        "switch_inline_query_current_chat"
+                                    ],
+                                )
+                            ]
+
+                        case _ if "switch_inline_query" in button:
+                            line += [
+                                InlineKeyboardButton(
+                                    text=str(button["text"]),
+                                    switch_inline_query_current_chat=button[
+                                        "switch_inline_query"
+                                    ],
+                                )
+                            ]
+
+                        case _:
+                            logger.warning(
+                                (
+                                   "Button have not been added to "
+                                    "form, because it is not structured "
+                                    "properly. %s"
+                                ),
+                                button,
                             )
-                        ]
-                        
-                    elif "switch_inline_query_current_chat" in button:
-                        line += [
-                            InlineKeyboardButton(
-                                text=str(button["text"]),
-                                switch_inline_query_current_chat=button[
-                                    "switch_inline_query_current_chat"
-                                ],
-                            )
-                        ]
-                    elif "switch_inline_query" in button:
-                        line += [
-                            InlineKeyboardButton(
-                                text=str(button["text"]),
-                                switch_inline_query_current_chat=button[
-                                    "switch_inline_query"
-                                ],
-                            )
-                        ]
-                    else:
-                        logger.warning(
-                            (
-                                "Button have not been added to "
-                                "form, because it is not structured "
-                                "properly. %s"
-                            ),
-                            button,
-                        )
                 except KeyError:
                     logger.exception(
                         "Error while forming markup! Probably, you "
@@ -447,30 +454,45 @@ class Utils(InlineUnit):
         if isinstance(media, io.BytesIO):
             media = InputFile(filename=media)
 
-        if file:
-            media = InputMediaDocument(media=media, caption=text, parse_mode="HTML")
-        elif photo:
-            media = InputMediaPhoto(media=media, caption=text, parse_mode="HTML")
-        elif audio:
-            if isinstance(audio, dict):
-                media = InputMediaAudio(
-                    media=audio["url"],
-                    title=audio.get("title"),
-                    performer=audio.get("performer"),
-                    duration=audio.get("duration"),
-                    caption=text,
-                    parse_mode="HTML",
-                )
-            else:
-                media = InputMediaAudio(
-                    media=audio,
-                    caption=text,
-                    parse_mode="HTML",
-                )
-        elif video:
-            media = InputMediaVideo(media=media, caption=text, parse_mode="HTML")
-        elif gif:
-            media = InputMediaAnimation(media=media, caption=text, parse_mode="HTML")
+        kind = (
+            "file"
+            if file
+            else "photo"
+            if photo
+            else "audio"
+            if audio
+            else "video"
+            if video
+            else "gif"
+            if gif
+            else None
+        )
+
+        match kind:
+            case "file":
+                media = InputMediaDocument(media=media, caption=text, parse_mode="HTML")
+            case "photo":
+                media = InputMediaPhoto(media=media, caption=text, parse_mode="HTML")
+            case "audio":
+                if isinstance(audio, dict):
+                    media = InputMediaAudio(
+                        media=audio["url"],
+                        title=audio.get("title"),
+                        performer=audio.get("performer"),
+                        duration=audio.get("duration"),
+                        caption=text,
+                        parse_mode="HTML",
+                    )
+                else:
+                    media = InputMediaAudio(
+                        media=audio,
+                        caption=text,
+                        parse_mode="HTML",
+                    )
+            case "video":
+                media = InputMediaVideo(media=media, caption=text, parse_mode="HTML")
+            case "gif":
+                media = InputMediaAnimation(media=media, caption=text, parse_mode="HTML")
 
         if media is None and text is None and reply_markup:
             try:
@@ -857,31 +879,32 @@ class Utils(InlineUnit):
 
         main_url = url.split("?")[0]
         try:
-            if action == 1:
-                return await self._assert_token(
-                    session,
-                    main_url,
-                    _hash,
-                    create_new_if_needed=create_new_if_needed,
-                    revoke_token=revoke_token
-                )
-            elif action == 2:
-                return await self._create_bot(session, main_url, _hash)
-            elif action == 3:
-                return await self._dp_revoke_token(
-                    session,
-                    main_url,
-                    _hash,
-                    already_initialised=already_initialised
-                )
-            elif action == 4:
-                return await self._reassert_token(session, main_url, _hash)
-            elif action == 5:
-                return await self._check_bot(
-                    session,
-                    main_url,
-                    _hash,
-                    username=username
-                )
+            match action:
+                case 1:
+                    return await self._assert_token(
+                        session,
+                        main_url,
+                        _hash,
+                        create_new_if_needed=create_new_if_needed,
+                        revoke_token=revoke_token,
+                    )
+                case 2:
+                    return await self._create_bot(session, main_url, _hash)
+                case 3:
+                    return await self._dp_revoke_token(
+                        session,
+                        main_url,
+                        _hash,
+                        already_initialised=already_initialised,
+                    )
+                case 4:
+                    return await self._reassert_token(session, main_url, _hash)
+                case 5:
+                    return await self._check_bot(
+                        session,
+                        main_url,
+                        _hash,
+                        username=username,
+                    )
         finally:
             await session.close()

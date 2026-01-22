@@ -1,4 +1,4 @@
-# ©️ Codrago, 2024-2025
+# ©️ Codrago, 2024-2030
 # This file is a part of Heroku Userbot
 # 🌐 https://github.com/coddrago/Heroku
 # You can redistribute it and/or modify it under the terms of the GNU AGPLv3
@@ -42,43 +42,31 @@ def get_named_platform() -> str:
     with contextlib.suppress(Exception):
         if os.path.isfile("/proc/device-tree/model"):
             with open("/proc/device-tree/model") as f:
-                model = f.read()
-                if "Orange" in model:
-                    return f"{model}"
+                model = f.read().strip()
+                if any(board in model for board in ("Orange", "Raspberry")):
+                    return model
 
-                if "Raspberry" in model:
-                    return f"{model}"
-                else:
-                    return f"{model}"
-
-    if IS_WSL:
-        return "WSL"
-
-    if IS_WINDOWS:
-        return "Windows"
-
-    if IS_MACOS:
-        return "MacOS"
-
-    if IS_JAMHOST:
-        return "JamHost"
-
-    if IS_USERLAND:
-        return "UserLand"
-
-    if IS_PTERODACTYL:
-        return "Pterodactyl"
-       
-    if IS_HIKKAHOST:
-        return "HikkaHost"
-
-    if IS_DOCKER:
-        return "Docker"
-
-    if IS_LAVHOST:
-        return f"lavHost {os.environ['LAVHOST']}"
-    else:
-        return "VDS"
+    match True:
+        case _ if IS_WSL:
+            return "WSL"
+        case _ if IS_WINDOWS:
+            return "Windows"
+        case _ if IS_MACOS:
+            return "MacOS"
+        case _ if IS_JAMHOST:
+            return "JamHost"
+        case _ if IS_USERLAND:
+            return "UserLand"
+        case _ if IS_PTERODACTYL:
+            return "Pterodactyl"
+        case _ if IS_HIKKAHOST:
+            return "HikkaHost"
+        case _ if IS_DOCKER:
+            return "Docker"
+        case _ if IS_LAVHOST:
+            return f"lavHost {os.environ['LAVHOST']}"
+        case _:
+            return "VDS"
 
 def get_named_platform_emoji() -> str:
     """
@@ -97,34 +85,27 @@ def get_named_platform_emoji() -> str:
                 else:
                     return "?"
 
-    if IS_WSL:
-        return "🍀 "
-
-    if IS_WINDOWS:
-        return "💻 "
-
-    if IS_MACOS:
-         return "🍏 "
-
-    if IS_JAMHOST:
-        return "🧃 "
-
-    if IS_USERLAND:
-        return "🐧 "
-
-    if IS_PTERODACTYL:
-        return "🦅 "
-       
-    if IS_HIKKAHOST:
-        return "🌼 "
-
-    if IS_DOCKER:
-        return "🐳 "
-
-    if IS_LAVHOST:
-        return f"✌️ "
-    else:
-        return "💎 "
+    match True:
+        case _ if IS_WSL:
+            return "🍀 "
+        case _ if IS_WINDOWS:
+            return "💻 "
+        case _ if IS_MACOS:
+            return "🍏 "
+        case _ if IS_JAMHOST:
+            return "🧃 "
+        case _ if IS_USERLAND:
+            return "🐧 "
+        case _ if IS_PTERODACTYL:
+            return "🦅 "
+        case _ if IS_HIKKAHOST:
+            return "🌼 "
+        case _ if IS_DOCKER:
+            return "🐳 "
+        case _ if IS_LAVHOST:
+            return f"✌️ "
+        case _:
+            return "💎 "
 
 def get_platform_emoji() -> str:
     """
@@ -141,25 +122,21 @@ def get_platform_emoji() -> str:
         )
     )
 
-    if IS_HIKKAHOST:
-        return BASE.format(5395745114494624362)
-    
-    if IS_JAMHOST:
-        return BASE.format(5242536621659678947)
-
-    if IS_USERLAND:
-        return BASE.format(5458877818031077824)
-
-    if IS_PTERODACTYL:
-        return BASE.format(5427286516797831670)
-        
-    if IS_LAVHOST:
-        return BASE.format(5352753797531721191)
-
-    if IS_DOCKER:
-        return BASE.format(5352678227582152630)
-
-    return BASE.format(5393588431026674882)
+    match True:
+        case _ if IS_HIKKAHOST:
+            return BASE.format(5395745114494624362)
+        case _ if IS_JAMHOST:
+            return BASE.format(5242536621659678947)
+        case _ if IS_USERLAND:
+            return BASE.format(5458877818031077824)
+        case _ if IS_PTERODACTYL:
+            return BASE.format(5427286516797831670)
+        case _ if IS_LAVHOST:
+            return BASE.format(5352753797531721191)
+        case _ if IS_DOCKER:
+            return BASE.format(5352678227582152630)
+        case _:
+            return BASE.format(5393588431026674882)
 
 def uptime() -> int:
     """
@@ -227,3 +204,32 @@ def get_cpu_usage():
 init_ts = time.perf_counter()
 
 get_platform_name = get_named_platform
+
+def get_ip_address() -> str:
+    """
+    Get the public IP address
+    :return: IP address string
+    """
+    try:
+        import requests
+        response = requests.get('https://api.ipify.org?format=json', timeout=5)
+        return response.json()['ip']
+    except Exception:
+        return "Unknown"
+
+def get_disk_usage() -> dict:
+    """
+    Get disk usage information
+    :return: Dictionary with total, used, free in GB
+    """
+    try:
+        import psutil
+        disk = psutil.disk_usage('/')
+        return {
+            'total': round(disk.total / (1024**3), 2),
+            'used': round(disk.used / (1024**3), 2),
+            'free': round(disk.free / (1024**3), 2),
+            'percent': disk.percent
+        }
+    except Exception:
+        return {'total': 0, 'used': 0, 'free': 0, 'percent': 0}

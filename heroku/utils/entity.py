@@ -1,5 +1,5 @@
 
-# ©️ Codrago, 2024-2025
+# ©️ Codrago, 2024-2030
 # This file is a part of Heroku Userbot
 # 🌐 https://github.com/coddrago/Heroku
 # You can redistribute it and/or modify it under the terms of the GNU AGPLv3
@@ -8,6 +8,7 @@
 import inspect
 import logging
 import random
+import asyncio
 import re
 import string
 import time
@@ -28,6 +29,9 @@ from pyrogram.raw.functions.messages import (
     GetDialogFilters,
     SetHistoryTTL,
     UpdateDialogFilter,
+    CreateForumTopic,
+    GetForumTopicsByID,
+    EditForumTopic,
 )
 from pyrogram.raw.types import (
     Channel,
@@ -54,7 +58,9 @@ from pyrogram.raw.types import (
     PeerChat,
     PeerUser,
     UpdateNewChannelMessage,
-    User
+    User,
+    ForumTopic,
+    ForumTopicDeleted,
 )
 from pyrogram.utils import get_raw_peer_id
 
@@ -209,6 +215,7 @@ async def asset_channel(
     avatar: typing.Optional[str] = None,
     ttl: typing.Optional[int] = None,
     forum: bool = False,
+    hide_general: bool = False,
     _folder: typing.Optional[str] = None,
 ) -> typing.Tuple[Channel, bool]:
     """
@@ -223,8 +230,13 @@ async def asset_channel(
     :param avatar: Url to an avatar to set as pfp of created peer
     :param ttl: Time to live for messages in channel
     :param forum: Whether to create a forum channel
+    :param hide_general: Hide '#General' topic
     :return: Peer and bool: is channel new or pre-existent
     """
+
+# thanks xdesai and Legacy
+
+
     if not hasattr(client, "_channels_cache"):
         client._channels_cache = {}
 
@@ -234,9 +246,10 @@ async def asset_channel(
     ):
         return client._channels_cache[title]["peer"], False
 
-    # legacy heroku / hikka chats conversion to heroku
     if title.startswith("hikka-"):
         title = title.replace("hikka-", "heroku-")
+    if title.startswith("legacy-"):
+        title = title.replace("legacy-", "heroku-")
 
     async for d in client.iter_dialogs():
         if d.title == title:
@@ -244,8 +257,8 @@ async def asset_channel(
             if invite_bot:
                 if all(
                     participant.id != client.loader.inline.bot_id
-                    for participant in (
-                        await client.get_participants(d.entity, limit=100)
+                    for participant in await client.get_participants(
+                        d.entity, limit=100
                     )
                 ):
                     await fw_protect()
@@ -281,6 +294,10 @@ async def asset_channel(
         await fw_protect()
         await set_avatar(client, peer, avatar)
 
+    if hide_general and forum:
+        await fw_protect()
+        await client(EditForumTopic(peer=peer, topic_id=1, hidden=True))
+
     if ttl:
         await fw_protect()
         await client.invoke(SetHistoryTTL(peer=peer, period=ttl))
@@ -289,18 +306,25 @@ async def asset_channel(
         if _folder != "Heroku":
             raise NotImplementedError
 
-        folders = await client.invoke(GetDialogFilters())
+        folders = (await client.invoke(GetDialogFilters())).filters
 
         try:
-            folder = next(folder for folder in folders if folder.title == "Heroku")
+            folder = next(
+                folder
+                for folder in folders
+                if not isinstance(folder, pyrogram.raw.types.DialogFilterDefault)
+                and folder.title.text.lower() == _folder.lower()
+            )
         except Exception:
             folder = None
 
-        if folder is not None and not any(
+        if folder and not any(
             peer.id == getattr(folder_peer, "channel_id", None)
             for folder_peer in folder.include_peers
         ):
-            folder.include_peers += [await client.get_input_entity(peer)]
+            print(len(folder.include_peers))
+            folder.include_peers.append(await client.get_input_entity(peer))
+            print(len(folder.include_peers))
 
             await client.invoke(
                 UpdateDialogFilter(
@@ -311,6 +335,85 @@ async def asset_channel(
 
     client._channels_cache[title] = {"peer": peer, "exp": int(time.time())}
     return peer, True
+
+if typing.TYPE_CHECKING:
+    from ..database import Database
+
+async def asset_forum_topic(
+    client: CustomClient,
+    db: 'Database',
+    peer: hints.Entity,
+    title: str,
+    description: typing.Optional[str] = None,
+    icon_emoji_id: typing.Optional[int] = None,
+    invite_bot: bool = False,
+) -> ForumTopic:
+    entity = await client.get_entity(peer)
+
+    if not isinstance(entity, Channel):
+        raise TypeError(f"Expected entity to be 'Channel', but got '{type(entity).__name__}'")
+
+    async def create_topic() -> ForumTopic:
+        result = await client.invoke(CreateForumTopic(
+            peer=entity,
+            title=title,
+            icon_emoji_id=(icon_emoji_id if client.heroku_me.is_premium else None)
+        ))
+
+        await fw_protect()
+
+        await client.send_message(entity=entity, message=(description if description else f"<emoji document_id=5258503720928288433>ℹ️</emoji> <b>Content related to <i>'{title}'</i> will be here</b>"), reply_to=result.updates[0].id)
+
+        await fw_protect()
+
+        result = await client.invoke(GetForumTopicsByID(peer=entity, topics=[result.updates[0].id]))
+
+        return result.topics[0]
+
+    forums_cache = db.get("heroku.forums", "forums_cache", {})
+
+    if (topic_id := forums_cache.get(entity.title, {}).get(title)):
+        await fw_protect()
+        topic = await client(GetForumTopicsByID(peer=entity, topics=[topic_id]))
+        topic = topic.topics[0]
+
+        if not isinstance(topic, ForumTopicDeleted):
+            return topic
+        else:
+            logger.warning(f"Topic: '{title}' was found in the database but does not exist in the channel and will be recreated")
+            await fw_protect()
+            new_topic = await create_topic()
+            forums_cache[entity.title][title] = new_topic.id
+
+    else:
+        await fw_protect()
+        new_topic = await create_topic()
+        forums_cache.setdefault(entity.title, {})[title] = new_topic.id
+
+    db.set("heroku.forums", "forums_cache", forums_cache)
+
+    if invite_bot:
+        await fw_protect()
+        if all(
+            p.id != client.loader.inline.bot_id
+            for p in await client.get_participants(
+                entity, limit=20
+            )
+        ):
+            await fw_protect()
+            await invite_inline_bot(client, entity)
+
+    return new_topic
+    
+async def wait_for_content_channel(db: 'Database', delay: float = 10) -> int:
+    cid = db.get("heroku.forums", "channel_id", None)
+
+    while not cid:
+        logger.warning("Heroku content channel not found in database. Sleeping 10 seconds...")
+        await asyncio.sleep(delay)
+        cid = db.get("heroku.forums", "channel_id", None)
+
+    return cid
 
 async def set_avatar(
     client: CustomClient,
