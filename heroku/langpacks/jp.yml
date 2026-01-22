@@ -543,6 +543,7 @@ loader:
   requirements_restart: "<emoji document_id=5875145601682771643>🚀</emoji> <b>要件はインストールされましたが、</b> <code>{}</code> <b>を適用するには再起動が必要です</b>"
   all_modules_deleted: "<emoji document_id=5784993237412351403>✅</emoji> <b>すべてのモジュールが削除されました</b>"
   undoc: "<emoji document_id=5427052514094619126>🤷‍♀️</emoji> ドキュメントなし"
+  custom_placeholders: "<emoji document_id=5372981976804366741>🤖</emoji>カスタムプレースホルダー: "
   ihandler: "\n<emoji document_id=5372981976804366741>🤖</emoji> <code>{}</code> {}"
   inline_init_failed: "<emoji document_id=5454225457916420314>😖</emoji> <b>このモジュールには Heroku インライン機能が必要ですが、InlineManager の初期化に失敗しました</b>\n<i>@BotFather から古いボットの1つを削除し、ユーザーボットを再起動してこのモジュールをロードしてください</i>"
   version_incompatible: "<emoji document_id=5454225457916420314>😖</emoji> <b>このモジュールには Heroku {}+ が必要です\n</b> <code>.update</code> <b>で更新してください</b>"

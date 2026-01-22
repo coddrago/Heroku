@@ -543,6 +543,7 @@ loader:
   requirements_restart: "<emoji document_id=5875145601682771643>🚀</emoji> <b>Requirements installed, but a restart is required for</b> <code>{}</code> <b>to apply</b>"
   all_modules_deleted: "<emoji document_id=5784993237412351403>✅</emoji> <b>All modules deleted</b>"
   undoc: "<emoji document_id=5427052514094619126>🤷‍♀️</emoji> No docs"
+  custom_placeholders: "<emoji document_id=5372981976804366741>🤖</emoji>Custom placeholders: "
   ihandler: "\n<emoji document_id=5372981976804366741>🤖</emoji> <code>{}</code> {}"
   inline_init_failed: "<emoji document_id=5454225457916420314>😖</emoji> <b>This module requires Heroku inline feature and initialization of InlineManager failed</b>\n<i>Please, remove one of your old bots from @BotFather and restart userbot to load this module</i>"
   version_incompatible: "<emoji document_id=5454225457916420314>😖</emoji> <b>This module requires Heroku {}+\nPlease, update with</b> <code>.update</code>"

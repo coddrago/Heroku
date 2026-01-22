@@ -543,6 +543,7 @@ loader:
   requirements_restart: "<emoji document_id=5875145601682771643>🚀</emoji> <b>Prérequis installés, mais un redémarrage est requis pour que</b> <code>{}</code> <b>s'applique</b>"
   all_modules_deleted: "<emoji document_id=5784993237412351403>✅</emoji> <b>Tous les modules supprimés</b>"
   undoc: "<emoji document_id=5427052514094619126>🤷‍♀️</emoji> Pas de docs"
+  custom_placeholders: "<emoji document_id=5372981976804366741>🤖</emoji>Espaces réservés personnalisés : "
   ihandler: "\n<emoji document_id=5372981976804366741>🤖</emoji> <code>{}</code> {}"
   inline_init_failed: "<emoji document_id=5454225457916420314>😖</emoji> <b>Ce module nécessite la fonctionnalité inline Heroku et l'initialisation de InlineManager a échoué</b>\n<i>Veuillez supprimer un de vos anciens bots de @BotFather et redémarrer le userbot pour charger ce module</i>"
   version_incompatible: "<emoji document_id=5454225457916420314>😖</emoji> <b>Ce module nécessite Heroku {}+\nVeuillez mettre à jour avec</b> <code>.update</code>"

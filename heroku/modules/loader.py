@@ -1093,6 +1093,11 @@ class LoaderMod(loader.Module):
                 subscribe, \
                 blob_link, \
                 depends_from
+            placeholders = utils.help_placeholders(modname.strip()).replace("No docs", self.strings('undoc'))
+            if placeholders != "":
+                placeholders_info = f"<blockquote expandable>{self.string('custom_placeholders')}\n{placeholders}</blockquote>"
+            else: 
+                placeholders_info = ""
             return self.strings("loaded").format(
                 modname.strip(),
                 version,
@@ -1101,6 +1106,7 @@ class LoaderMod(loader.Module):
                 "<blockquote expandable>{}</blockquote>".format(
                     '\n'.join(modhelp)
                 ),
+                placeholders_info,
                 developer if not subscribe or not use_subscribe else "",
                 depends_from,
                 (
