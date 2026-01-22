@@ -1095,7 +1095,7 @@ class LoaderMod(loader.Module):
                 depends_from
             placeholders = utils.help_placeholders(modname.strip()).replace("No docs", self.strings('undoc'))
             if placeholders != "":
-                placeholders_info = f"<blockquote expandable>{self.string('custom_placeholders')}\n{placeholders}</blockquote>"
+                placeholders_info = f"<blockquote expandable>{self.strings('custom_placeholders')}\n{placeholders}</blockquote>"
             else: 
                 placeholders_info = ""
             return self.strings("loaded").format(
