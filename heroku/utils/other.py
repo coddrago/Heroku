@@ -256,7 +256,7 @@ def config_placeholders():
     result = ""
     for placeholder_name, placeholder_data in custom_placeholders.items():
         module_name = placeholder_data.get("module_name")
-        result = result + f"{{{placeholder_name}}} - {module_name} "
+        result = result + f"{{{placeholder_name}}} - {placeholder_data.get('description') if placeholder_data.get('description') is not None else 'No docs'}"
     if result == "":
         return "None"
     else:
