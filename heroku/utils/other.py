@@ -259,7 +259,7 @@ def config_placeholders():
     if result == []:
         return "None"
     else:
-        return f'<blockquote expandable>{"\n".join(result)}</blockquote>'
+        return("\n".join(result))
 
 def help_placeholders(module_name):
     result = ""
