@@ -326,8 +326,6 @@ class UpdaterMod(loader.Module):
 
         self.set("restart_ts", time.time())
 
-        # await self._db.remote_force_save()
-
         with contextlib.suppress(Exception):
             await main.heroku.web.stop()
 

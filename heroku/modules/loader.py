@@ -377,29 +377,12 @@ class LoaderMod(loader.Module):
         path_: str,
         mode: str,
     ):
-        save = False
-        match mode:
-            case "all_yes":
-                self._db.set(main.__name__, "permanent_modules_fs", True)
-                self._db.set(main.__name__, "disable_modules_fs", False)
-                await call.answer(self.strings("will_save_fs"))
-                save = True
-            case "all_no":
-                self._db.set(main.__name__, "disable_modules_fs", True)
-                self._db.set(main.__name__, "permanent_modules_fs", False)
-            case "once":
-                save = True
 
-        await self.load_module(doc, call, origin=path_ or "<string>", save_fs=save)
+        await self.load_module(doc, call, origin=path_ or "<string>", save_fs=True)
 
     @loader.command(alias="lm")
-    async def loadmod(self, message: Message, force_pm: bool = False):
+    async def loadmod(self, message: Message):
         args = utils.get_args_raw(message)
-        if "-fs" in args:
-            force_save = True
-            args = args.replace("-fs", "").strip()
-        else:
-            force_save = False
 
         msg = message if message.file else (await message.get_reply_message())
 
@@ -420,73 +403,18 @@ class LoaderMod(loader.Module):
             await utils.answer(message, self.strings("bad_unicode"))
             return
 
-        if (
-            not self._db.get(
-                main.__name__,
-                "disable_modules_fs",
-                False,
-            )
-            and not self._db.get(main.__name__, "permanent_modules_fs", False)
-            and not force_save
-        ):
-            if message.file:
-                await message.edit("")
-                message = await message.respond("🪐", reply_to=utils.get_topic(message))
-
-            if await self.inline.form(
-                self.strings("module_fs"),
-                message=message,
-                reply_markup=[
-                    [
-                        {
-                            "text": self.strings("save"),
-                            "callback": self._inline__load,
-                            "args": (doc, path_, "once"),
-                        },
-                        {
-                            "text": self.strings("no_save"),
-                            "callback": self._inline__load,
-                            "args": (doc, path_, "no"),
-                        },
-                    ],
-                    [
-                        {
-                            "text": self.strings("save_for_all"),
-                            "callback": self._inline__load,
-                            "args": (doc, path_, "all_yes"),
-                        }
-                    ],
-                    [
-                        {
-                            "text": self.strings("never_save"),
-                            "callback": self._inline__load,
-                            "args": (doc, path_, "all_no"),
-                        }
-                    ],
-                ],
-            ):
-                return
-
         if path_ is not None:
             await self.load_module(
                 doc,
                 message,
                 origin=path_,
-                save_fs=(
-                    force_save
-                    or self._db.get(main.__name__, "permanent_modules_fs", False)
-                    and not self._db.get(main.__name__, "disable_modules_fs", False)
-                ),
+                save_fs=True
             )
         else:
             await self.load_module(
                 doc,
                 message,
-                save_fs=(
-                    force_save
-                    or self._db.get(main.__name__, "permanent_modules_fs", False)
-                    and not self._db.get(main.__name__, "disable_modules_fs", False)
-                ),
+                save_fs=True
             )
 
     async def approve_internal(
@@ -609,7 +537,7 @@ class LoaderMod(loader.Module):
         name: typing.Optional[str] = None,
         origin: str = "<string>",
         did_requirements: bool = False,
-        save_fs: bool = False,
+        save_fs: bool = True,
         blob_link: bool = False,
         did_requires: bool = False,
         did_packages: bool = False,
