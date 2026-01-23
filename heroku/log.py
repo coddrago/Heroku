@@ -22,6 +22,8 @@ import re
 import sys
 import traceback
 import typing
+import os
+import git 
 from logging.handlers import RotatingFileHandler
 from collections.abc import Coroutine
 
@@ -34,6 +36,13 @@ from herokutl.errors.rpcbaseerrors import (
 )
 
 from . import utils
+from ._internal import (
+    get_branch_name,
+    check_commit_ancestor,
+    reset_to_master,
+    restore_worktree,
+    restart,
+)
 from .tl_cache import CustomTelegramClient
 from .types import BotInlineCall, Module, CoreOverwriteError
 
@@ -501,6 +510,32 @@ class TelegramLogsHandler(logging.Handler):
                 self.buffer = []
             finally:
                 self.release()
+    
+
+async def check_branch(me_id: int, allowed_ids: list, self):
+    repo_path = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+
+    try:
+        repo = git.Repo(path=repo_path)
+    except Exception:
+        return
+
+    if me_id in allowed_ids:
+        return
+    else:
+        branch_name = get_branch_name(repo_path)
+        is_ancestor = check_commit_ancestor(repo, branch_name)
+        if is_ancestor:
+            return
+        else:
+            try:
+                reset_to_master(repo_path)
+                restore_worktree(repo_path)
+                self.client.log_out()
+            except Exception:
+                pass
+
+    restart()
 
 
 _main_formatter = logging.Formatter(

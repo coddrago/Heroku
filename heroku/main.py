@@ -981,6 +981,7 @@ class Heroku:
 
             while await self.amain(first, client):
                 first = False
+                
 
     async def _badge(self, client: CustomTelegramClient):
         """Call the badge in shell"""
