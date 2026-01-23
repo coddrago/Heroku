@@ -349,13 +349,6 @@ class HerokuSettingsMod(loader.Module):
         )
 
     async def inline__setting(self, call: InlineCall, key: str, state: bool = False):
-        if callable(key):
-            key()
-            herokutl.extensions.html.CUSTOM_EMOJIS = not main.get_config_key(
-                "disable_custom_emojis"
-            )
-        else:
-            self._db.set(main.__name__, key, state)
 
         if key == "no_nickname" and state and self.get_prefix() == ".":
             await call.answer(
