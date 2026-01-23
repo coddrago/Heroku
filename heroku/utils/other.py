@@ -253,13 +253,13 @@ def unregister_placeholders(module_name: str) -> int:
     return True
 
 def config_placeholders():
-    result = ""
+    result = []
     for placeholder_name, placeholder_data in custom_placeholders.items():
-        result = result + f"<blockquote expandable>\n{{{placeholder_name}}} - {placeholder_data.get('description') if placeholder_data.get('description') is not None else 'No docs'}</blockquote>"
-    if result == "":
+        result.append(f"{{{placeholder_name}}} - {placeholder_data.get('description') if placeholder_data.get('description') is not None else 'No docs'}")
+    if result == []:
         return "None"
     else:
-        return result
+        return f'<blockquote expandable>{"\n".join(result)}</blockquote>'
 
 def help_placeholders(module_name):
     result = ""
