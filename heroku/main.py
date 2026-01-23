@@ -27,11 +27,16 @@ import sqlite3
 import sys
 import typing
 import string
+import zlib
+import base64
+import binascii
+
 from getpass import getpass
 from pathlib import Path
 
 import aiohttp
 import herokutl
+
 from herokutl import events
 from herokutl.errors import (
     ApiIdInvalidError,
