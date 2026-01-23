@@ -255,8 +255,7 @@ def unregister_placeholders(module_name: str) -> int:
 def config_placeholders():
     result = ""
     for placeholder_name, placeholder_data in custom_placeholders.items():
-        module_name = placeholder_data.get("module_name")
-        result = result + f"{{{placeholder_name}}} - {placeholder_data.get('description') if placeholder_data.get('description') is not None else 'No docs'}"
+        result = result + f"\n{{{placeholder_name}}} - {placeholder_data.get('description') if placeholder_data.get('description') is not None else 'No docs'}\m"
     if result == "":
         return "None"
     else:
