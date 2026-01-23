@@ -255,7 +255,7 @@ def unregister_placeholders(module_name: str) -> int:
 def config_placeholders():
     result = ""
     for placeholder_name, placeholder_data in custom_placeholders.items():
-        result = result + f"\n{{{placeholder_name}}} - {placeholder_data.get('description') if placeholder_data.get('description') is not None else 'No docs'}"
+        result = result + f"<blockquote expandable>\n{{{placeholder_name}}} - {placeholder_data.get('description') if placeholder_data.get('description') is not None else 'No docs'}</blockquote>"
     if result == "":
         return "None"
     else:
