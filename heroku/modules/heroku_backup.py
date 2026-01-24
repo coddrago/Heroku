@@ -37,10 +37,7 @@ class HerokuBackupMod(loader.Module):
 
     strings = {"name": "HerokuBackup"}
 
-    async def client_ready(self, client, db):
-        self._client = client
-        self._db = db
-
+    async def client_ready(self):
         if not self.get("period"):
             await self.inline.bot.send_photo(
                 self.tg_id,
@@ -198,7 +195,7 @@ class HerokuBackupMod(loader.Module):
         try:
             file = await (
                 await self._client.get_messages(
-                    self._content_channel_id, call.message.message_id
+                    self._content_channel_id, ids=[call.message.message_id]
                 )
             )[0].download_media(bytes)
 
