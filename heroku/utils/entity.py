@@ -164,9 +164,9 @@ def remove_html(text: str, escape: bool = False, keep_emojis: bool = False) -> s
     return (escape_html if escape else str)(
         re.sub(
             (
-                r"(<\/?a.*?>|<\/?b>|<\/?i>|<\/?u>|<\/?strong>|<\/?em>|<\/?code>|<\/?strike>|<\/?del>|<\/?pre.*?>|<\/?blockquote.*?>)"
+                r"(<\/?a.*?>|<\/?b>|<\/?i>|<\/?u>|<\/?strong>|<\/?em>|<\/?code.*?>|<\/?strike>|<\/?del>|<\/?pre.*?>|<\/?blockquote.*?>)"
                 if keep_emojis
-                else r"(<\/?a.*?>|<\/?b>|<\/?i>|<\/?u>|<\/?strong>|<\/?em>|<\/?code>|<\/?strike>|<\/?del>|<\/?pre.*?>|<\/?emoji.*?>|<\/?blockquote.*?>)"
+                else r"(<\/?a.*?>|<\/?b>|<\/?i>|<\/?u>|<\/?strong>|<\/?em>|<\/?code.*?>|<\/?strike>|<\/?del>|<\/?pre.*?>|<\/?emoji.*?>|<\/?blockquote.*?>)"
             ),
             "",
             text,
