@@ -45,7 +45,7 @@ class HerokuInfoMod(loader.Module):
             loader.ConfigValue(
                 "custom_message",
                 doc=lambda: (
-                    "<blockquote expandable>" + self.strings("configping") + "\n" + self.strings("configpingph").format(
+                    "<blockquote expandable>" + self.strings("_cfg_cst_msg") + "\n" + self.strings("_cfg_cst_ph").format(
                         utils.config_placeholders()
                     ) + "</blockquote>"
                 )
