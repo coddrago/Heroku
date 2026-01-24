@@ -244,6 +244,8 @@ async def get_placeholders(data, custom_message):
     """
     Returns placeholders if it is in custom_message
     """
+    if custom_message is None:
+        return data
     for placeholder in custom_placeholders.values():
         if f"{{{placeholder['placeholder_name']}}}" in custom_message:
             data[placeholder["placeholder_name"]] = await get_placeholder(placeholder["placeholder_name"])
