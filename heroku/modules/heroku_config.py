@@ -1031,6 +1031,7 @@ class HerokuConfigMod(loader.Module):
     @loader.command(alias="fcfg")
     async def fconfig(self, message: Message):
         raw = utils.get_args_raw(message).strip()
+        reply = await message.get_reply_message()
 
         if not raw:
             await utils.answer(message, self.strings("args"))
@@ -1042,11 +1043,18 @@ class HerokuConfigMod(loader.Module):
             return
 
         first = parts[0].split(maxsplit=2)
-        if len(first) < 3:
+        
+        if len(first) == 3:
+            mod, option, value = first
+        elif len(first) == 2 and reply:
+            mod, option = first
+            value = reply.raw_text
+            if not value:
+                await utils.answer(message, self.strings("args"))
+                return
+        else:
             await utils.answer(message, self.strings("args"))
             return
-
-        mod, option, value = first
 
         if not (instance := self.lookup(mod)):
             await utils.answer(message, self.strings("no_mod"))
