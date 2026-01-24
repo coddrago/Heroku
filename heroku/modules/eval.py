@@ -59,9 +59,10 @@ class Evaluator(loader.Module):
     @loader.command(alias="eval")
     async def e(self, message: Message):
         args = utils.get_args_raw(message)
-        reply = utils.remove_html(await message.get_reply_message())
+        reply = await message.get_reply_message()
+
         if not args and reply and reply.text:
-            args = reply.text
+            args = utils.remove_html(reply.text)
         
         real_db = self.db
         self.db = self._SecureDB(real_db)
