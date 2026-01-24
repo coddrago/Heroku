@@ -226,7 +226,7 @@ heroku_backup:
   never_bot: "✅ Je ne ferai pas de sauvegardes automatiques. Peut être annulé en utilisant {prefix}set_backup_period"
   invalid_args: "🚫 <b>Veuillez spécifier la fréquence correcte en heures, ou `0` pour désactiver</b>"
   backup_caption: '<emoji document_id=5469718869536940860>👆</emoji> <b>Ceci est votre sauvegarde de base de données. Ne la partagez avec personne, elle contient des informations personnelles. Si vous devez la restaurer, utilisez</b> <pre><code class="language-heroku">{prefix}restoredb</code></pre> <b>en réponse à ce fichier.</b>'
-  backupall_info: '<emoji document_id=5469718869536940860>👆</emoji> <b>Ceci est votre sauvegarde de la base de données et des modules. Ne la donnez à personne, elle contient des informations personnelles. Si vous devez la restaurer, utilisez</b> <pre><code class="language-heroku">{prefix}restoreall</code></pre> <b>en réponse à ce fichier.</b>'
+  backupall_info: '👆 <b>Ceci est votre sauvegarde de la base de données et des modules. Ne la donnez à personne, elle contient des informations personnelles. Si vous devez la restaurer, utilisez</b> <pre><code class="language-heroku">{prefix}restoreall</code></pre> <b>en réponse à ce fichier.</b>'
   all_restored: "<emoji document_id=5774134533590880843>🔄</emoji> <b>Votre sauvegarde complète a été restaurée, redémarrage...</b>"
   reply_to_file: "<emoji document_id=5210952531676504517>🚫</emoji> <b>Répondez avec un fichier .json ou .zip</b>"
   db_restored: "<emoji document_id=5774134533590880843>🔄</emoji> <b>Base de données mise à jour, redémarrage...</b>"

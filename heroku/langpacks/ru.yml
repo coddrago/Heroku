@@ -212,7 +212,7 @@ heroku_backup:
   never_bot: "✅ Я не буду делать автоматические резервные копии. Можно отменить используя {prefix}set_backup_period"
   invalid_args: "🚫 <b>Укажи правильную периодичность в часах, или `0` для отключения</b>"
   backup_caption: '<emoji document_id=5469718869536940860>👆</emoji> <b>Это твоя резервная копия базы данных. Не передавай ее никому, она содержит личную информацию. Если тебе нужно ее восстановить, используй</b> <pre><code class="language-heroku">{prefix}restoredb</code></pre> <b>в ответ на этот файл.</b>'
-  backupall_info: '<emoji document_id=5469718869536940860>👆</emoji> <b>Это твоя резервная копия базы и модулей. Не передавай ее никому, она содержит личную информацию. Если тебе нужно ее восстановить, используй</b> <pre><code class="language-heroku">{prefix}restoreall</code></pre> <b>в ответ на этот файл.</b>'
+  backupall_info: '👆 <b>Это твоя резервная копия базы и модулей. Не передавай ее никому, она содержит личную информацию. Если тебе нужно ее восстановить, используй</b> <pre><code class="language-heroku">{prefix}restoreall</code></pre> <b>в ответ на этот файл.</b>'
   all_restored: "<emoji document_id=5774134533590880843>🔄</emoji> <b>Ваша полная резервная копия восстановлена, перезапуск....</b>"
   reply_to_file: "<emoji document_id=5210952531676504517>🚫</emoji> <b>Ответь на .json или .zip файл</b>"
   db_restored: "<emoji document_id=5774134533590880843>🔄</emoji> <b>База данных обновлена, перезапуск...</b>"

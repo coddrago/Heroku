@@ -226,7 +226,7 @@ heroku_backup:
   never_bot: "✅ 自動バックアップは行いません。{prefix}set_backup_period を使用してキャンセルできます"
   invalid_args: "🚫 <b>正しい頻度を時間単位で指定するか、無効にする場合は `0` を指定してください</b>"
   backup_caption: '<emoji document_id=5469718869536940860>👆</emoji> <b>これはデータベースのバックアップです。個人情報が含まれているため、誰とも共有しないでください。復元する必要がある場合は、このファイルへの返信として</b> <pre><code class="language-heroku">{prefix}restoredb</code></pre> <b>を使用してください。</b>'
-  backupall_info: '<emoji document_id=5469718869536940860>👆</emoji> <b>これはデータベースとモジュールのバックアップです。個人情報が含まれているため、誰にも渡さないでください。復元する必要がある場合は、このファイルへの返信として</b> <pre><code class="language-heroku">{prefix}restoreall</code></pre> <b>を使用してください。</b>'
+  backupall_info: '👆 <b>これはデータベースとモジュールのバックアップです。個人情報が含まれているため、誰にも渡さないでください。復元する必要がある場合は、このファイルへの返信として</b> <pre><code class="language-heroku">{prefix}restoreall</code></pre> <b>を使用してください。</b>'
   all_restored: "<emoji document_id=5774134533590880843>🔄</emoji> <b>完全バックアップが復元されました。再起動しています...</b>"
   reply_to_file: "<emoji document_id=5210952531676504517>🚫</emoji> <b>.json または .zip ファイルに返信してください</b>"
   db_restored: "<emoji document_id=5774134533590880843>🔄</emoji> <b>データベースが更新されました。再起動しています...</b>"
