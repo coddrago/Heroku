@@ -216,7 +216,7 @@ def safe_getattr(obj, attr, default=None):
 
 def register_placeholder(placeholder: str, callback: typing.Callable, description: typing.Optional[str] = None):
     """
-    Register placeholder for Ping or Info commands
+    Register placeholder
     """
     module_name = callback.__self__.__class__.__name__
     module_instance = callback.__self__
@@ -230,6 +230,9 @@ def register_placeholder(placeholder: str, callback: typing.Callable, descriptio
     return True
 
 async def get_placeholder(placeholder: str):
+    """
+    Returns placeholder data
+    """
     callback = custom_placeholders[placeholder]["callback"]
     try:
         callback_data = str(await callback())
@@ -237,13 +240,19 @@ async def get_placeholder(placeholder: str):
         callback_data = str(callback())
     return callback_data
 
-
-async def get_placeholders(data):
+async def get_placeholders(data, custom_message):
+    """
+    Returns placeholders if it is in custom_message
+    """
     for placeholder in custom_placeholders.values():
-        data[placeholder["placeholder_name"]] = await get_placeholder(placeholder["placeholder_name"])
+        if f"{{{placeholder['placeholder_name']}}}" in custom_message:
+            data[placeholder["placeholder_name"]] = await get_placeholder(placeholder["placeholder_name"])
     return data
 
 def unregister_placeholders(module_name: str) -> int:
+    """
+    Removes placeholders by module_name
+    """
     placeholders_to_remove = []
     for placeholder_name, placeholder_data in custom_placeholders.items():
         if placeholder_data.get("module_name") == module_name:
@@ -253,6 +262,9 @@ def unregister_placeholders(module_name: str) -> int:
     return True
 
 def config_placeholders():
+    """
+    Return placeholders list for config
+    """
     result = []
     for placeholder_name, placeholder_data in custom_placeholders.items():
         result.append(f"{{{placeholder_name}}} - {placeholder_data.get('description') if placeholder_data.get('description') is not None else 'No docs'}")
@@ -262,6 +274,9 @@ def config_placeholders():
         return("\n".join(result))
 
 def help_placeholders(module_name):
+    """
+    Return placeholders list for help
+    """
     result = ""
     for placeholder_name, placeholder_data in custom_placeholders.items():
         if placeholder_data.get("module_name") == module_name:
