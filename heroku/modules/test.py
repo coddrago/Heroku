@@ -368,7 +368,7 @@ class TestMod(loader.Module):
             "user": getpass.getuser(),
             "platform": utils.get_platform_name(),
         }
-        data = await utils.get_placeholders(data)
+        data = await utils.get_placeholders(data, self.config["custom_message"])
         await utils.answer(
             message,
             self.config["custom_message"].format(**data),

@@ -187,7 +187,7 @@ class HerokuInfoMod(loader.Module):
             'htl_ver': herokutl.__version__,
             'git_status': utils.get_git_status(),
         }
-        data = await utils.get_placeholders(data)
+        data = await utils.get_placeholders(data, self.config["custom_message"])
         return (
             (
                 "🪐 Heroku\n"
