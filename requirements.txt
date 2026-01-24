@@ -19,7 +19,7 @@ TgCrypto-pyrofork
 rsa==4.9
 ruamel.yaml==0.17.21
 bs4==0.0.2
-whoosh
+ujson
 Pillow
 
 # Python 3.9+
