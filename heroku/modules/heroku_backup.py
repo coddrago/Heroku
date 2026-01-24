@@ -20,6 +20,8 @@ import os
 import re 
 import time
 import zipfile
+import ujson
+
 from pathlib import Path
 
 from aiogram.types import BufferedInputFile
@@ -417,37 +419,47 @@ class HerokuBackupMod(loader.Module):
 
     @loader.command()
     async def backupall(self, message: Message):
-        db = io.BytesIO(json.dumps(self._db).encode())
-        db.name = "db.json"
+        db_dump = ujson.dumps(self._db).encode()
 
-        mods = io.BytesIO()
-        with zipfile.ZipFile(mods, "w", zipfile.ZIP_DEFLATED) as zipf:
+        result = io.BytesIO()
+
+        with zipfile.ZipFile(result, "w", zipfile.ZIP_DEFLATED) as zipf:
             for root, _, files in os.walk(loader.LOADED_MODULES_DIR):
                 for file in files:
                     if file.endswith(f"{self.tg_id}.py"):
                         with open(os.path.join(root, file), "rb") as f:
                             zipf.writestr(file, f.read())
-            zipf.writestr("db_mods.json", json.dumps(self.lookup("Loader").get("loaded_modules", {})))
 
-        mods.seek(0)
-        mods.name = "mods.zip"
+            zipf.writestr("db-backup.json", db_dump)
 
-        archive = io.BytesIO()
-        with zipfile.ZipFile(archive, "w", zipfile.ZIP_DEFLATED) as z:
-            z.writestr("db.json", db.getvalue())
-            z.writestr("mods.zip", mods.getvalue())
+        outfile = io.BytesIO(result.getvalue())
+        outfile.name = f"heroku-{datetime.datetime.now():%d-%m-%Y-%H-%M}.backup"
 
-        archive.name = f"backup-all-{datetime.datetime.now():%d-%m-%Y-%H-%M}.backup"
-        archive.seek(0)
+        backup_msg = await self.inline.bot.send_document(
+            int(f"-100{self._content_channel_id}"),
+            BufferedInputFile(outfile.getvalue(), outfile.name),
+            caption=self.strings["backupall_info"].format(
+                prefix=utils.escape_html(self.get_prefix()),
+            ),
+            reply_markup=self.inline.generate_markup(
+                [
+                    [
+                        {
+                            "text": self.strings["restore_this"],
+                            "data": "heroku/backup/restore/confirm",
+                        },
+                    ],
+                ],
+            ),
+            message_thread_id=self._backup_topic.id,
+        )
 
-        await self._client.send_file(
-            "me",
-            archive,
-            caption=self.strings("backupall_info").format(
-                prefix=utils.escape_html(self.get_prefix())
+        await utils.answer(
+            message,
+            self.strings["backupall_sent"].format(
+                f"https://t.me/c/{self._content_channel_id}/{self._backup_topic.id}/{backup_msg.message_id}"
             ),
         )
-        await utils.answer(message, self.strings("backupall_sent"))
 
     @loader.command()
     async def restoreall(self, message: Message):

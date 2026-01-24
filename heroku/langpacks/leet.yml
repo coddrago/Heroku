@@ -233,7 +233,7 @@ heroku_backup:
   modules_backup: "<emoji document_id=5431736674147114227>🗂</emoji> <b>M0dul35 b4ckup ({})</b>\n\n<b>U c4n r3570r3 17 u51ng:</b>\n<pre><code class=\"language-heroku\">{}restoremods</code></pre>"
   mods_restored: "<emoji document_id=5774134533590880843>🔄</emoji> <b>M0d5 r3570r3d, r3574r71ng</b>"
   backup_sent: "<emoji document_id=5431736674147114227>🗂</emoji> <b>B4ckup s3n7 2 s4v3d m5g5</b>"
-  backupall_sent: "<emoji document_id=5431736674147114227>🗂</emoji> <b>B4ckup 0f DB & m0d5 s3n7 2 s4v3d m5g5</b>"
+  backupall_sent: "<emoji document_id=5431736674147114227>🗂</emoji> <b>B4ckup 0f t3h d4t4b453 & m0dul35 53n7 2 <a href={}>'d4t4b453 ch47'</a></b>"
   db_warning: "❗️ Hikka b4ckup d373c73d. 1f u c0n71nu3, 7h3 u53rb07 w1ll <b>7ry</b> 2 c0nv3r7 17 2 4 f0rm47 su174bl3 4 H3r0ku.\n7h3r3 m4y b3 50m3 3rr0r5 1n 7h3 c0nv3r510n. C0n71nu3?"
   advice_converting: "U c4n m4nu4lly r3pl4c3 <a>'hikka.'</a> w17h <a>'heroku.'</a> 1n 7h3 b4ckup c0n73n7. 7h15 15 n3c3554ry 4 l04d1ng 17."
   converting_db: "🔄 C0nv3r71ng..."

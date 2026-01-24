@@ -233,7 +233,7 @@ heroku_backup:
   modules_backup: "<emoji document_id=5431736674147114227>🗂</emoji> <b>Moduwes backup ({})</b>\n\n<b>You can westowe it using:</b>\n<pre><code class=\"language-heroku\">{}restoremods</code></pre>"
   mods_restored: "<emoji document_id=5774134533590880843>🔄</emoji> <b>Moduwes westowed, westawting</b>"
   backup_sent: "<emoji document_id=5431736674147114227>🗂</emoji> <b>Backup sent to saved messages ~</b>"
-  backupall_sent: "<emoji document_id=5431736674147114227>🗂</emoji> <b>Backup of database and moduwes sent to saved messages ^w^</b>"
+  backupall_sent: "<emoji document_id=5431736674147114227>🗂</emoji> <b>Backup of databwase an moduwules sent twoo <a href={}>'databwase chat'</a> ( ˘ ³˘)</b>"
   db_warning: "❗️ Hikka backup detected. If you continyue, da usewbot wiww <b>twy</b> to convewt it to a fowmat suitabwe fow Hewoku.\nThewe may be some ewwows in da convewsion. Continyue?"
   advice_converting: "You can manyuawwy wepwace <a>'hikka.'</a> with <a>'heroku.'</a> in da backup content. Dis is nyecessawy fow woading it."
   converting_db: "🔄 Convewting..."

@@ -218,7 +218,7 @@ heroku_backup:
   db_restored: "<emoji document_id=5774134533590880843>🔄</emoji> <b>Datenbank aktualisiert, Neustart läuft…</b>"
   modules_backup: "<emoji document_id=5431736674147114227>🗂</emoji> <b>Modulsicherung ({})</b>\n\n<b>Sie können sie wiederherstellen mit:</b>\n<pre><code class=\"language-heroku\">{}restoremods</code></pre>"
   mods_restored: "<emoji document_id=5774134533590880843>🔄</emoji> <b>Module wiederhergestellt, Neustart</b>"
-  backup_sent: "<emoji document_id=5431736674147114227>🗂</emoji> <b>Backup an gespeicherte Nachrichten gesendet</b>"
+  backup_sent: "<emoji document_id=5431736674147114227>🗂</emoji> <b>Backup der Datenbank und Module wurde an den <a href={}>'Datenbank-Chat'</a> gesendet</b>"
   backupall_sent: "<emoji document_id=5431736674147114227>🗂</emoji> <b>Sicherung der Datenbank und der an gespeicherte Nachrichten gesendeten Module</b>"
   db_warning: "❗️ Hikka-Backup erkannt. Wenn Sie fortfahren, <b>versucht</b> der Userbot, es in ein für Heroku geeignetes Format zu konvertieren. Möglicherweise treten Fehler bei der Konvertierung auf. Fortfahren?"
   advice_converting: "Sie können <a>'hikka.'</a> im Backup-Inhalt manuell durch <a>'heroku.'</a> ersetzen. Dies ist zum Laden erforderlich."

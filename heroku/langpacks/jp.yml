@@ -233,7 +233,7 @@ heroku_backup:
   modules_backup: "<emoji document_id=5431736674147114227>🗂</emoji> <b>モジュールバックアップ ({})</b>\n\n<b>以下を使用して復元できます:</b>\n<pre><code class=\"language-heroku\">{}restoremods</code></pre>"
   mods_restored: "<emoji document_id=5774134533590880843>🔄</emoji> <b>モジュールが復元されました。再起動します</b>"
   backup_sent: "<emoji document_id=5431736674147114227>🗂</emoji> <b>バックアップを保存用メッセージに送信しました</b>"
-  backupall_sent: "<emoji document_id=5431736674147114227>🗂</emoji> <b>データベースとモジュールのバックアップを保存用メッセージに送信しました</b>"
+  backupall_sent: "<emoji document_id=5431736674147114227>🗂</emoji> <b>データベースとモジュールのバックアップが<a href={}>「データベースチャット」</a>に送信されました</b>"
   db_warning: "❗️ Hikka バックアップが検出されました。続行すると、ユーザーボットは Heroku に適した形式への変換を<b>試行</b>します。\n変換中にエラーが発生する可能性があります。続行しますか？"
   advice_converting: "バックアップコンテンツ内の <a>'hikka.'</a> を <a>'heroku.'</a> に手動で置換できます。これは読み込みに必要です。"
   converting_db: "🔄 変換中..."
