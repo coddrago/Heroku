@@ -430,7 +430,7 @@ class HerokuBackupMod(loader.Module):
                         with open(os.path.join(root, file), "rb") as f:
                             zipf.writestr(file, f.read())
 
-            zipf.writestr("db-backup.json", db_dump)
+            zipf.writestr("db.json", db_dump)
 
         outfile = io.BytesIO(result.getvalue())
         outfile.name = f"heroku-{datetime.datetime.now():%d-%m-%Y-%H-%M}.backup"
