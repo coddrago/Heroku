@@ -446,7 +446,7 @@ class HerokuBackupMod(loader.Module):
                     [
                         {
                             "text": "↪️ Restore this",
-                            "data": "heroku/backup/restore/confirm",
+                            "data": "heroku/backupall/restore/confirm",
                         },
                     ],
                 ],
