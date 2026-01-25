@@ -332,6 +332,7 @@ heroku_config:
   configure: "⚙️ <b>設定するモジュールを選択してください</b>"
   configure_lib: "📦 <b>設定するライブラリを選択してください</b>"
   configuring_mod: "⚙️ <b>モジュール</b> <code>{}</code> <b>の設定オプションを選択してください</b>\n\n<b>現在のオプション:</b>\n\n{}"
+  configuring_folder: "📁 <b>フォルダー</b> <code>{}</code> <b>モジュール</b> <code>{}</code> <b>の設定オプションを選択してください</b>\n\n<b>現在のオプション:</b>\n\n{}"
   configuring_lib: "📦 <b>ライブラリ</b> <code>{}</code> <b>の設定オプションを選択してください</b>\n\n<b>現在のオプション:</b>\n\n{}"
   configuring_option: "⚙️ <b>モジュール</b> <code>{}</code> <b>のオプション</b> <code>{}</code> <b>を設定中</b>\n<i>ℹ️ {}</i>\n\n<b>デフォルト: {}</b>\n\n<b>現在: {}</b>\n\n{}"
   configuring_option_lib: "📦 <b>ライブラリ</b> <code>{}</code> <b>のオプション</b> <code>{}</code> <b>を設定中</b>\n<i>ℹ️ {}</i>\n\n<b>デフォルト: {}</b>\n\n<b>現在: {}</b>\n\n{}"
