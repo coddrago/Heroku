@@ -123,19 +123,52 @@ def _is_external_stack() -> bool:
 
 
 def _session_audit_hook(event, args):
-    if event != "open" or not args:
+    if not args:
         return
-    try:
-        path = os.fspath(args[0])
-    except Exception:
-        return
-    if isinstance(path, bytes):
+
+    def _is_session_path(value) -> bool:
         try:
-            path = path.decode(errors="ignore")
+            path = os.fspath(value)
         except Exception:
+            return False
+        if isinstance(path, bytes):
+            try:
+                path = path.decode(errors="ignore")
+            except Exception:
+                return False
+        return isinstance(path, str) and (
+            path.endswith(".session")
+            or path.endswith(".session-journal")
+        )
+
+    def _has_session_path(values) -> bool:
+        for value in values:
+            if isinstance(value, (list, tuple, set)):
+                if _has_session_path(value):
+                    return True
+                continue
+            if _is_session_path(value):
+                return True
+        return False
+
+    def _has_session_hint(values) -> bool:
+        for value in values:
+            if isinstance(value, (list, tuple, set)):
+                if _has_session_hint(value):
+                    return True
+                continue
+            if isinstance(value, str) and any(
+                ext in value for ext in (".session", ".session-journal")
+            ):
+                return True
+        return False
+
+    if not _has_session_path(args):
+        if event.startswith("subprocess.") and _has_session_hint(args):
+            pass
+        else:
             return
-    if not isinstance(path, str) or not path.endswith(".session"):
-        return
+
     if _external_context.get() or _is_external_stack():
         logger.warning("Blocked .session file access from external module")
         raise PermissionError("Access to .session files is blocked for external modules")
