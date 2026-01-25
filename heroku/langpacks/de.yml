@@ -571,13 +571,13 @@ translations:
   _cmd_doc_setlang: "[Sprachen] - Ändere die Standardsprache"
 
 eval:
-  eval: "<tg-emoji emoji-id="{}">💻</emoji><b> Code:</b>\n<pre><code class=\"language-{}\">{}</code></pre>\n\n<tg-emoji emoji-id="5197688912457245639">✅</tg-emoji><b> Ergebnis:</b>\n<pre><code class=\"language-{}\">{}</code></pre>"
-  eval_py: "<tg-emoji emoji-id="{}">💻</emoji><b> Code:</b>\n<pre><code class=\"language-{}\">{}</code></pre>"
-  err: "<tg-emoji emoji-id="{}">💻</emoji><b> Code:</b>\n<pre><code class=\"language-{}\">{}</code></pre>\n\n<tg-emoji emoji-id="5210952531676504517">🚫</tg-emoji> <b>Fehler:</b>\n<pre><code class=\"language-{}\">{}</code></pre>"
+  eval: "<tg-emoji emoji-id="{}">💻</tg-emoji><b> Code:</b>\n<pre><code class=\"language-{}\">{}</code></pre>\n\n<tg-emoji emoji-id="5197688912457245639">✅</tg-emoji><b> Ergebnis:</b>\n<pre><code class=\"language-{}\">{}</code></pre>"
+  eval_py: "<tg-emoji emoji-id="{}">💻</tg-emoji><b> Code:</b>\n<pre><code class=\"language-{}\">{}</code></pre>"
+  err: "<tg-emoji emoji-id="{}">💻</tg-emoji><b> Code:</b>\n<pre><code class=\"language-{}\">{}</code></pre>\n\n<tg-emoji emoji-id="5210952531676504517">🚫</tg-emoji> <b>Fehler:</b>\n<pre><code class=\"language-{}\">{}</code></pre>"
   _cls_doc: "Führt Code in verschiedenen Programmiersprachen aus"
   compiling: "<tg-emoji emoji-id="5325787248363314644">🫥</tg-emoji> <b>Code wird kompiliert...</b>"
   time_exec: "\n<tg-emoji emoji-id="5134202243486057363">💫</tg-emoji> <b>Ausführungszeit: {}s</b>"
-  no_compiler: "<tg-emoji emoji-id="{}">💻</emoji> <b>Compiler {} ist auf dem System nicht installiert.</b>"
+  no_compiler: "<tg-emoji emoji-id="{}">💻</tg-emoji> <b>Compiler {} ist auf dem System nicht installiert.</b>"
   eval_result: "\n\n<tg-emoji emoji-id="5197688912457245639">✅</tg-emoji><b> Ergebnis:</b>\n<pre><code class=\"language-{}\">{}</code></pre>"
   print_outp: "\n\n<tg-emoji emoji-id="5118861066981344121">✅</tg-emoji><b> Ergebnis drucken:</b>\n<pre><code class=\"language-{}\">{}</code></pre>"
   _cmd_doc_e: "Führt Python-Code aus"

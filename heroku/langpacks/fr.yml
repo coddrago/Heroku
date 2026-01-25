@@ -609,11 +609,11 @@ translations:
 
 eval:
   name: "Evaluator"
-  eval: "<tg-emoji emoji-id="{}">💻</emoji><b> Code :</b>\n<pre><code class=\"language-{}\">{}</code></pre>\n\n<tg-emoji emoji-id="5197688912457245639">✅</tg-emoji><b> Résultat :</b>\n<pre><code class=\"language-{}\">{}</code></pre>"
-  eval_py: "<tg-emoji emoji-id="{}">💻</emoji><b> Code :</b>\n<pre><code class=\"language-{}\">{}</code></pre>"
-  err: "<tg-emoji emoji-id="{}">💻</emoji><b> Code :</b>\n<pre><code class=\"language-{}\">{}</code></pre>\n\n<tg-emoji emoji-id="5210952531676504517">🚫</tg-emoji> <b>Erreur :</b>\n<pre><code class=\"language-{}\">{}</code></pre>"
+  eval: "<tg-emoji emoji-id="{}">💻</tg-emoji><b> Code :</b>\n<pre><code class=\"language-{}\">{}</code></pre>\n\n<tg-emoji emoji-id="5197688912457245639">✅</tg-emoji><b> Résultat :</b>\n<pre><code class=\"language-{}\">{}</code></pre>"
+  eval_py: "<tg-emoji emoji-id="{}">💻</tg-emoji><b> Code :</b>\n<pre><code class=\"language-{}\">{}</code></pre>"
+  err: "<tg-emoji emoji-id="{}">💻</tg-emoji><b> Code :</b>\n<pre><code class=\"language-{}\">{}</code></pre>\n\n<tg-emoji emoji-id="5210952531676504517">🚫</tg-emoji> <b>Erreur :</b>\n<pre><code class=\"language-{}\">{}</code></pre>"
   compiling: "<tg-emoji emoji-id="5325787248363314644">🫥</tg-emoji> <b>Compilation du code...</b>"
-  no_compiler: "<tg-emoji emoji-id="{}">💻</emoji> <b>Le compilateur {} n'est pas installé sur le système.</b>"
+  no_compiler: "<tg-emoji emoji-id="{}">💻</tg-emoji> <b>Le compilateur {} n'est pas installé sur le système.</b>"
   time_exec: "\n<tg-emoji emoji-id="5134202243486057363">💫</tg-emoji> <b>Temps d'exécution : {}s</b>"
   eval_result: "\n\n<tg-emoji emoji-id="5197688912457245639">✅</tg-emoji><b> Résultat :</b>\n<pre><code class=\"language-{}\">{}</code></pre>"
   print_outp: "\n\n<tg-emoji emoji-id="5118861066981344121">✅</tg-emoji><b> Résultat Print :</b>\n<pre><code class=\"language-{}\">{}</code></pre>"

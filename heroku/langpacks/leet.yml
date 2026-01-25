@@ -609,11 +609,11 @@ translations:
 
 eval:
   name: "3v4lu470r"
-  eval: "<tg-emoji emoji-id="{}">💻</emoji><b> C0d3:</b>\n<pre><code class=\"language-{}\">{}</code></pre>\n\n<tg-emoji emoji-id="5197688912457245639">✅</tg-emoji><b> R35ul7:</b>\n<pre><code class=\"language-{}\">{}</code></pre>"
-  eval_py: "<tg-emoji emoji-id="{}">💻</emoji><b> C0d3:</b>\n<pre><code class=\"language-{}\">{}</code></pre>"
-  err: "<tg-emoji emoji-id="{}">💻</emoji><b> C0d3:</b>\n<pre><code class=\"language-{}\">{}</code></pre>\n\n<tg-emoji emoji-id="5210952531676504517">🚫</tg-emoji> <b>3rr0r:</b>\n<pre><code class=\"language-{}\">{}</code></pre>"
+  eval: "<tg-emoji emoji-id="{}">💻</tg-emoji><b> C0d3:</b>\n<pre><code class=\"language-{}\">{}</code></pre>\n\n<tg-emoji emoji-id="5197688912457245639">✅</tg-emoji><b> R35ul7:</b>\n<pre><code class=\"language-{}\">{}</code></pre>"
+  eval_py: "<tg-emoji emoji-id="{}">💻</tg-emoji><b> C0d3:</b>\n<pre><code class=\"language-{}\">{}</code></pre>"
+  err: "<tg-emoji emoji-id="{}">💻</tg-emoji><b> C0d3:</b>\n<pre><code class=\"language-{}\">{}</code></pre>\n\n<tg-emoji emoji-id="5210952531676504517">🚫</tg-emoji> <b>3rr0r:</b>\n<pre><code class=\"language-{}\">{}</code></pre>"
   compiling: "<tg-emoji emoji-id="5325787248363314644">🫥</tg-emoji> <b>C0mp1l1ng c0d3...</b>"
-  no_compiler: "<tg-emoji emoji-id="{}">💻</emoji> <b>{} c0mp1l3r 15 n07 1n574ll3d 0n 7h3 sy573m.</b>"
+  no_compiler: "<tg-emoji emoji-id="{}">💻</tg-emoji> <b>{} c0mp1l3r 15 n07 1n574ll3d 0n 7h3 sy573m.</b>"
   time_exec: "\n<tg-emoji emoji-id="5134202243486057363">💫</tg-emoji> <b>Ex3cu710n 71m3: {}s</b>"
   eval_result: "\n\n<tg-emoji emoji-id="5197688912457245639">✅</tg-emoji><b> R35ul7:</b>\n<pre><code class=\"language-{}\">{}</code></pre>"
   print_outp: "\n\n<tg-emoji emoji-id="5118861066981344121">✅</tg-emoji><b> Pr1n7 R35ul7:</b>\n<pre><code class=\"language-{}\">{}</code></pre>"
