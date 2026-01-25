@@ -332,7 +332,7 @@ heroku_config:
   configure: "⚙️ <b>Choose a moduwe to configuwe</b>"
   configure_lib: "📦 <b>Choose a wibwawy to configuwe</b>"
   configuring_mod: "⚙️ <b>Choose config option fow mod</b> <code>{}</code>\n\n<b>Cuwwent options:</b>\n\n{}"
-  configuring_folder: "📁 <b>Choose config option fow fowdew</b> <code>{}</code> <b>of mod</b> <code>{}</code>\n\n<b>Cuwwent options:</b>\n\n{}"
+  configuring_folder: "📁 <b>Choose config option fow fowdew</b> <code>{}</code>\n\n<b>Cuwwent options:</b>\n\n{}"
   configuring_lib: "📦 <b>Choose config option fow wibwawy</b> <code>{}</code>\n\n<b>Cuwwent options:</b>\n\n{}"
   configuring_option: "⚙️ <b>Configuwing option</b> <code>{}</code> <b>of mod</b> <code>{}</code>\n<i>ℹ️ {}</i>\n\n<b>Defauwt: {}</b>\n\n<b>Cuwwent: {}</b>\n\n{}"
   configuring_option_lib: "📦 <b>Configuwing option</b> <code>{}</code> <b>of wibwawy</b> <code>{}</code>\n<i>ℹ️ {}</i>\n\n<b>Defauwt: {}</b>\n\n<b>Cuwwent: {}</b>\n\n{}"

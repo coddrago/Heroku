@@ -332,7 +332,7 @@ heroku_config:
   configure: "⚙️ <b>Choisissez un module à configurer</b>"
   configure_lib: "📦 <b>Choisissez une bibliothèque à configurer</b>"
   configuring_mod: "⚙️ <b>Choisissez l'option de configuration pour le mod</b> <code>{}</code>\n\n<b>Options actuelles :</b>\n\n{}"
-  configuring_folder: "📁 <b>Choisissez l'option de configuration pour le dossier</b> <code>{}</code> <b>du mod</b> <code>{}</code>\n\n<b>Options actuelles :</b>\n\n{}"
+  configuring_folder: "📁 <b>Choisissez l'option de configuration pour le dossier</b> <code>{}</code>\n\n<b>Options actuelles :</b>\n\n{}"
   configuring_lib: "📦 <b>Choisissez l'option de configuration pour la bibliothèque</b> <code>{}</code>\n\n<b>Options actuelles :</b>\n\n{}"
   configuring_option: "⚙️ <b>Configuration de l'option</b> <code>{}</code> <b>du mod</b> <code>{}</code>\n<i>ℹ️ {}</i>\n\n<b>Défaut : {}</b>\n\n<b>Actuel : {}</b>\n\n{}"
   configuring_option_lib: "📦 <b>Configuration de l'option</b> <code>{}</code> <b>de la bibliothèque</b> <code>{}</code>\n<i>ℹ️ {}</i>\n\n<b>Défaut : {}</b>\n\n<b>Actuel : {}</b>\n\n{}"

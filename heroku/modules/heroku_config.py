@@ -986,20 +986,23 @@ class HerokuConfigMod(loader.Module):
         text_parts = []
         for mod_name, param in folder_options:
             try:
-                value = self._get_value(mod_name, param)
-                if len(value) > 150:
-                    try:
-                        value = list(utils.smart_split(*html.parse(value), 150))[0] + "..."
-                    except Exception:
-                        value = utils.escape_html(str(self.lookup(mod_name).config[param]))[:150] + "..."
-                text_parts.append(f"<b>{utils.escape_html(mod_name)}</b> → <code>{utils.escape_html(param)}</code>: {value}")
+                raw_value = str(self.lookup(mod_name).config[param])
+                if len(raw_value) > 100:
+                    raw_value = raw_value[:100] + "..."
+                text_parts.append(
+                    f"▫️ <b>{utils.escape_html(mod_name)}</b> → "
+                    f"<code>{utils.escape_html(param)}</code>: "
+                    f"<code>{utils.escape_html(raw_value)}</code>"
+                )
             except Exception:
-                text_parts.append(f"<b>{utils.escape_html(mod_name)}</b> → <code>{utils.escape_html(param)}</code>")
+                text_parts.append(
+                    f"▫️ <b>{utils.escape_html(mod_name)}</b> → "
+                    f"<code>{utils.escape_html(param)}</code>"
+                )
         
         await call.edit(
             self.strings("configuring_folder").format(
                 utils.escape_html(folder),
-                "global",
                 "\n".join(text_parts) if text_parts else "No options",
             ),
             reply_markup=list(utils.chunks(btns, 1))

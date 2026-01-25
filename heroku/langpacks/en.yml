@@ -333,7 +333,7 @@ heroku_config:
   configure_lib: "📦 <b>Choose a library to configure</b>"
   configuring_mod: "⚙️ <b>Choose config option for mod</b> <code>{}</code>\n\n<b>Current options:</b>\n\n{}"
   configuring_lib: "📦 <b>Choose config option for library</b> <code>{}</code>\n\n<b>Current options:</b>\n\n{}"
-  configuring_folder: "📁 <b>Choose config option for folder</b> <code>{}</code> <b>of mod</b> <code>{}</code>\n\n<b>Current options:</b>\n\n{}"
+  configuring_folder: "📁 <b>Choose config option for folder</b> <code>{}</code>\n\n<b>Current options:</b>\n\n{}"
   configuring_option: "⚙️ <b>Configuring option</b> <code>{}</code> <b>of mod</b> <code>{}</code>\n<i>ℹ️ {}</i>\n\n<b>Default: {}</b>\n\n<b>Current: {}</b>\n\n{}"
   configuring_option_lib: "📦 <b>Configuring option</b> <code>{}</code> <b>of library</b> <code>{}</code>\n<i>ℹ️ {}</i>\n\n<b>Default: {}</b>\n\n<b>Current: {}</b>\n\n{}"
   option_saved: "<emoji document_id=5318933532825888187>⚙️</emoji> <b>Option</b> <code>{}</code> <b>of module</b> <code>{}</code><b> saved!</b>\n<b>Current: {}</b>"
