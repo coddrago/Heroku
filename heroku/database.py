@@ -135,7 +135,7 @@ class Database(dict):
 
         except Exception:
             self._assets_topic = None
-            logger.error(
+            logger.exception(
                 "Can't find and/or create assets topic\n"
                 "This may cause several consequences, such as:\n"
                 "- Non working assets feature (e.g. notes)\n"
