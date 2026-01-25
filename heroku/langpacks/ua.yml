@@ -307,7 +307,7 @@ heroku_config:
   configure: "⚙️ <b>Обери модуль для налаштування</b>"
   configure_lib: "📦 <b>Обери бібліотеку для налаштування</b>"
   configuring_mod: "⚙️ <b>Обери параметр для модуля</b> <code>{}</code>\n\n<b>Поточні налаштування:</b>\n\n{}"
-  configuring_folder: "📁 <b>Обери параметр для папки</b> <code>{}</code> <b>модуля</b> <code>{}</code>\n\n<b>Поточні налаштування:</b>\n\n{}"
+  configuring_folder: "📁 <b>Обери параметр для папки</b> <code>{}</code>\n\n<b>Поточні налаштування:</b>\n\n{}"
   configuring_lib: "📦 <b>Обери параметр для бібліотеки</b> <code>{}</code>\n\n<b>Поточні налаштування:</b>\n\n{}"
   configuring_option: "⚙️ <b>Керування параметром</b> <code>{}</code> <b>модуля</b> <code>{}</code>\n<i>ℹ️ {}</i>\n\n<b>Стандартне: {}</b>\n\n<b>Поточне: {}</b>\n\n{}"
   configuring_option_lib: "📦 <b>Керування параметром</b> <code>{}</code> <b>бібліотеки</b> <code>{}</code>\n<i>ℹ️ {}</i>\n\n<b>Стандартне: {}</b>\n\n<b>Поточне: {}</b>\n\n{}"

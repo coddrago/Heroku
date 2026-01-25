@@ -332,7 +332,7 @@ heroku_config:
   configure: "⚙️ <b>Ch0053 4 m0d 2 c0nf1g</b>"
   configure_lib: "📦 <b>Ch0053 4 l1b 2 c0nf1g</b>"
   configuring_mod: "⚙️ <b>Ch0053 c0nf1g 0p710n 4 m0d</b> <code>{}</code>\n\n<b>Curr3n7 0p75:</b>\n\n{}"
-  configuring_folder: "📁 <b>Ch0053 c0nf1g 0p710n 4 f0ld3r</b> <code>{}</code> <b>0f m0d</b> <code>{}</code>\n\n<b>Curr3n7 0p75:</b>\n\n{}"
+  configuring_folder: "📁 <b>Ch0053 c0nf1g 0p710n 4 f0ld3r</b> <code>{}</code>\n\n<b>Curr3n7 0p75:</b>\n\n{}"
   configuring_lib: "📦 <b>Ch0053 c0nf1g 0p710n 4 l1b</b> <code>{}</code>\n\n<b>Curr3n7 0p75:</b>\n\n{}"
   configuring_option: "⚙️ <b>C0nf1gur1ng 0p710n</b> <code>{}</code> <b>0f m0d</b> <code>{}</code>\n<i>ℹ️ {}</i>\n\n<b>D3f4ul7: {}</b>\n\n<b>Curr3n7: {}</b>\n\n{}"
   configuring_option_lib: "📦 <b>C0nf1gur1ng 0p710n</b> <code>{}</code> <b>0f l1b</b> <code>{}</code>\n<i>ℹ️ {}</i>\n\n<b>D3f4ul7: {}</b>\n\n<b>Curr3n7: {}</b>\n\n{}"
