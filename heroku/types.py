@@ -230,6 +230,7 @@ class Module:
 
     def internal_init(self):
         """Called after the class is initialized in order to pass the client and db. Do not call it yourself"""
+        self.allmodules: "Modules"
 
         origin = getattr(self, "__origin__", "")
         is_external = _is_external_origin(origin)
