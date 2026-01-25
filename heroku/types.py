@@ -32,13 +32,27 @@ import requests
 from herokutl.hints import EntityLike
 from herokutl.tl.functions.account import UpdateNotifySettingsRequest
 
-from herokutl.tl.types import (Channel, ChannelForbidden, ChannelFull,
-                               InputPeerNotifySettings, Message, UserFull)
+from herokutl.tl.types import (
+    Channel,
+    ChannelForbidden,
+    ChannelFull,
+    InputPeerNotifySettings,
+    Message,
+    UserFull,
+)
 
 from . import version
 from ._reference_finder import replace_all_refs
-from .inline.types import (BotInlineCall, BotInlineMessage, BotMessage,
-                           InlineCall, InlineMessage, InlineQuery, InlineUnit)
+from .inline.types import (
+    BotInlineCall,
+    BotInlineMessage,
+    BotMessage,
+    HerokuReplyMarkup,
+    InlineCall,
+    InlineMessage,
+    InlineQuery,
+    InlineUnit,
+)
 from .pointers import PointerDict, PointerList
 
 if typing.TYPE_CHECKING:
