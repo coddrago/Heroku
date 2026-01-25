@@ -45,9 +45,9 @@ class HerokuInfoMod(loader.Module):
             loader.ConfigValue(
                 "custom_message",
                 doc=lambda: (
-                    self.strings("_cfg_cst_msg") + "\n" + self.strings("_cfg_cst_ph").format(
+                    "<blockquote expandable>" + self.strings("_cfg_cst_msg") + "\n" + self.strings("_cfg_cst_ph").format(
                         utils.config_placeholders()
-                    )
+                    ) + "</blockquote>"
                 )
             ),
 
@@ -187,7 +187,7 @@ class HerokuInfoMod(loader.Module):
             'htl_ver': herokutl.__version__,
             'git_status': utils.get_git_status(),
         }
-        data = await utils.get_placeholders(data)
+        data = await utils.get_placeholders(data, self.config["custom_message"])
         return (
             (
                 "🪐 Heroku\n"
@@ -359,3 +359,4 @@ class HerokuInfoMod(loader.Module):
             await utils.answer(message, self.strings["switchinfo_on"])
         else:
             await utils.answer(message, self.strings["switchinfo_off"])
+

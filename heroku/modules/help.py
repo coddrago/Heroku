@@ -238,16 +238,29 @@ class Help(loader.Module):
             )
         cmds = "\n".join(lines)
 
-        await utils.answer(
-            message,
-            f'{reply}<blockquote expandable>{cmds}{inline_cmd}</blockquote>'
-            + (f"\n\n{self.strings('not_exact')}" if not exact else "")
-            + (
-                f"\n\n{self.strings('core_notice')}"
-                if module.__origin__.startswith("<core")
-                else ""
-            ),
-        )
+        placeholders = utils.help_placeholders(module.__class__.__name__).replace("No docs", self.strings('undoc'))
+        if placeholders != "":
+            await utils.answer(
+                message,
+                f"{reply}<blockquote expandable>{cmds}{inline_cmd}</blockquote>\n<blockquote expandable>{self.strings('custom_placeholders')}\n{placeholders}</blockquote>"
+                + (f"\n\n{self.strings('not_exact')}" if not exact else "")
+                + (
+                    f"\n\n{self.strings('core_notice')}"
+                    if module.__origin__.startswith("<core")
+                    else ""
+                ),
+            )
+        else:
+            await utils.answer(
+                message,
+                f'{reply}<blockquote expandable>{cmds}{inline_cmd}</blockquote>'
+                + (f"\n\n{self.strings('not_exact')}" if not exact else "")
+                + (
+                    f"\n\n{self.strings('core_notice')}"
+                    if module.__origin__.startswith("<core")
+                    else ""
+                ),
+            )
 
     @loader.command(ru_doc="[args] | Помощь с вашими модулями!", ua_doc="[args] | допоможіть з вашими модулями!", de_doc="[args] | Hilfe mit deinen Modulen!")
     async def help(self, message: Message):

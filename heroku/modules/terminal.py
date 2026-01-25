@@ -120,8 +120,6 @@ class MessageEditor:
 
 
 class SudoMessageEditor(MessageEditor):
-    # Let's just hope these are safe to parse
-    # Who wrote this?
     PASS_REQ = ["[sudo] password for", "[sudo] пароль для"]
     WRONG_PASS = [r"\[sudo\] password for (.*): Sorry, try again\.", r"\[sudo\] пароль для (.*): Попробуйте еще раз.\."]
     TOO_MANY_TRIES = [r"\[sudo\] password for (.*): sudo: [0-9]+ incorrect password attempts", r"\[sudo\] пароль для (.*): sudo: [0-9]+ неверные попытки ввода пароля"]  # fmt: skip
@@ -152,6 +150,7 @@ class SudoMessageEditor(MessageEditor):
         ):
             logger.debug("switching state to 0")
             await utils.answer(self.message, self.strings("auth_fail"))
+
             self.state = 0
             handled = True
             await asyncio.sleep(2)

@@ -681,7 +681,7 @@ class HerokuConfigMod(loader.Module):
         args = [
             utils.escape_html(config_opt),
             utils.escape_html(mod),
-            utils.escape_html(module.config.getdoc(config_opt)),
+            module.config.getdoc(config_opt),
             self.prep_value(module.config.getdef(config_opt)),
             (
                 self.prep_value(module.config[config_opt])
@@ -850,13 +850,19 @@ class HerokuConfigMod(loader.Module):
         mod: str,
         obj_type: typing.Union[bool, str] = False,
     ):
+        direct = []
+        for param in self.lookup(mod).config:
+            config_value = self.lookup(mod).config._config.get(param)
+            if not config_value or not hasattr(config_value, 'folder') or not config_value.folder:
+                direct.append(param)
+        
         btns = [
             {
                 "text": param,
                 "callback": self.inline__configure_option,
                 "kwargs": {"obj_type": obj_type, "mod": mod, "config_opt": param},
             }
-            for param in self.lookup(mod).config
+            for param in direct
         ]
 
         await call.edit(
@@ -867,14 +873,14 @@ class HerokuConfigMod(loader.Module):
                 "\n".join(
                     [
                         "▫️ <code>{}</code>: <b>{}</b>".format(
-                            utils.escape_html(key),
+                            utils.escape_html(param),
                             (
-                                self._get_value(mod, key)
-                                if len(self._get_value(mod, key)) < 200
+                                self._get_value(mod, param)
+                                if len(self._get_value(mod, param)) < 200
                                 else (
                                     list(
                                         utils.smart_split(
-                                            *html.parse(self._get_value(mod, key)),
+                                            *html.parse(self._get_value(mod, param)),
                                             200
                                             )
                                         )[0] +
@@ -882,9 +888,9 @@ class HerokuConfigMod(loader.Module):
                                     )
                             ),
                         )
-                        for key in self.lookup(mod).config
+                        for param in direct
                     ]
-                ),
+                ) if direct else "No options",
             ),
             reply_markup=list(utils.chunks(btns, 2))
             + [
@@ -899,7 +905,33 @@ class HerokuConfigMod(loader.Module):
             ],
         )
 
+    def _get_all_folders(self) -> dict:
+        folders = {}
+        for mod in self.allmodules.modules:
+            if not hasattr(mod, "config") or not mod.config:
+                continue
+            mod_name = mod.strings("name") if callable(mod.strings) else mod.__class__.__name__
+            for param in mod.config:
+                config_value = mod.config._config.get(param)
+                if config_value and hasattr(config_value, 'folder') and config_value.folder:
+                    folder_name = config_value.folder
+                    if folder_name not in folders:
+                        folders[folder_name] = []
+                    folders[folder_name].append((mod_name, param))
+        return folders
+
     async def inline__choose_category(self, call: typing.Union[Message, InlineCall]):
+        all_folders = self._get_all_folders()
+        
+        folder_btns = [
+            {
+                "text": f"📁 {folder_name}",
+                "callback": self.inline__global_folder,
+                "kwargs": {"folder": folder_name},
+            }
+            for folder_name in sorted(all_folders.keys())
+        ]
+        
         await utils.answer(
             call,
             self.strings("choose_core"),
@@ -929,7 +961,59 @@ class HerokuConfigMod(loader.Module):
                     and any(hasattr(lib, "config") for lib in self.allmodules.libraries)
                     else []
                 ),
+                *list(utils.chunks(folder_btns, 2)),
                 [{"text": self.strings("close_btn"), "action": "close"}],
+            ],
+        )
+
+    async def inline__global_folder(
+        self,
+        call: InlineCall,
+        folder: str,
+    ):
+        all_folders = self._get_all_folders()
+        folder_options = all_folders.get(folder, [])
+        
+        btns = [
+            {
+                "text": f"{mod_name}: {param}",
+                "callback": self.inline__configure_option,
+                "kwargs": {"obj_type": False, "mod": mod_name, "config_opt": param},
+            }
+            for mod_name, param in folder_options
+        ]
+        
+        text_parts = []
+        for mod_name, param in folder_options:
+            try:
+                raw_value = str(self.lookup(mod_name).config[param])
+                if len(raw_value) > 100:
+                    raw_value = raw_value[:100] + "..."
+                text_parts.append(
+                    f"▫️ <b>{utils.escape_html(mod_name)}</b> → "
+                    f"<code>{utils.escape_html(param)}</code>: "
+                    f"<code>{utils.escape_html(raw_value)}</code>"
+                )
+            except Exception:
+                text_parts.append(
+                    f"▫️ <b>{utils.escape_html(mod_name)}</b> → "
+                    f"<code>{utils.escape_html(param)}</code>"
+                )
+        
+        await call.edit(
+            self.strings("configuring_folder").format(
+                utils.escape_html(folder),
+                "\n".join(text_parts) if text_parts else "No options",
+            ),
+            reply_markup=list(utils.chunks(btns, 1))
+            + [
+                [
+                    {
+                        "text": self.strings("back_btn"),
+                        "callback": self.inline__choose_category,
+                    },
+                    {"text": self.strings("close_btn"), "action": "close"},
+                ]
             ],
         )
 
@@ -1031,6 +1115,7 @@ class HerokuConfigMod(loader.Module):
     @loader.command(alias="fcfg")
     async def fconfig(self, message: Message):
         raw = utils.get_args_raw(message).strip()
+        reply = await message.get_reply_message()
 
         if not raw:
             await utils.answer(message, self.strings("args"))
@@ -1042,11 +1127,18 @@ class HerokuConfigMod(loader.Module):
             return
 
         first = parts[0].split(maxsplit=2)
-        if len(first) < 3:
+        
+        if len(first) == 3:
+            mod, option, value = first
+        elif len(first) == 2 and reply:
+            mod, option = first
+            value = reply.raw_text
+            if not value:
+                await utils.answer(message, self.strings("args"))
+                return
+        else:
             await utils.answer(message, self.strings("args"))
             return
-
-        mod, option, value = first
 
         if not (instance := self.lookup(mod)):
             await utils.answer(message, self.strings("no_mod"))

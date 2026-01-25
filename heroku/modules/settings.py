@@ -231,7 +231,6 @@ class CoreMod(loader.Module):
                     ),
                 )
 
-
         oldprefix = utils.escape_html(self.get_prefix())
 
         self._db.set(
@@ -265,6 +264,7 @@ class CoreMod(loader.Module):
 
     @loader.command()
     async def addalias(self, message: Message):
+
         if len(args := utils.get_args_raw(message).split()) < 2:
             await utils.answer(message, self.strings("alias_args"))
             return

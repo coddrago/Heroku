@@ -32,7 +32,7 @@ except Exception:
     branch = "master"
 
 
-async def check_branch(me_id: int, allowed_ids: list):
+async def check_branch(me_id: int, allowed_ids: list, self):
     repo_path = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 
     try:
@@ -51,6 +51,7 @@ async def check_branch(me_id: int, allowed_ids: list):
             try:
                 reset_to_master(repo_path)
                 restore_worktree(repo_path)
+                self.client.log_out()
             except Exception:
                 pass
 

@@ -28,14 +28,14 @@ from herokutl import events
 from herokutl.errors import FloodWaitError, RPCError
 from herokutl.tl.types import Message
 
-from . import main, security, utils
+from . import loader, main, security, utils
 from .database import Database
 from .loader import Modules
 from .tl_cache import CustomTelegramClient
 
 logger = logging.getLogger(__name__)
 
-# Keyboard layout translation table (created once at module load)
+# Keys for layout switch
 _LAYOUT_TRANSLATION = str.maketrans(
     'ёйцукенгшщзхъфывапролджэячсмитьбю.Ё"№;%:?ЙЦУКЕНГШЩЗХЪФЫВАПРОЛДЖЭ/ЯЧСМИТЬБЮ,'
     + "`qwertyuiop[]asdfghjkl;'zxcvbnm,./~@#$%^&QWERTYUIOP{}ASDFGHJKL:\"|ZXCVBNM<>?",
@@ -118,19 +118,18 @@ class CommandDispatcher:
 
         self.check_security = self.security.check
         self._me = self._client.heroku_me.id
-        self._cached_usernames = [
-            (
-                self._client.heroku_me.username.lower()
-                if self._client.heroku_me.username
-                else str(self._client.heroku_me.id)
-            )
-        ]
+        self._cached_usernames = set()
 
-        self._cached_usernames.extend(
-            u.username.lower()
-            for u in getattr(self._client.heroku_me, "usernames", [])
-            or []
-        )
+        if self._client.heroku_me.username:
+            self._cached_usernames.add(self._client.heroku_me.username.lower())
+
+        if self._client.heroku_me.usernames:
+            self._cached_usernames.update(
+                u.username.lower()
+                for u in getattr(self._client.heroku_me, "usernames", [])
+            )
+
+        self._cached_usernames.add(str(self._client.heroku_me.id))
 
         self.raw_handlers = []
         self._external_bl: typing.List[int] = []
@@ -369,7 +368,7 @@ class CommandDispatcher:
             and event.message is not None
             and event.message.message is not None
             and not any(
-                f"@{username}" not in command.lower()
+                f"@{username}" in command.lower()
                 for username in self._cached_usernames
             )
         ):
@@ -435,7 +434,7 @@ class CommandDispatcher:
         for handler in self.raw_handlers:
             if isinstance(event, tuple(handler.updates)):
                 try:
-                    await handler(event)
+                    await loader._call_with_external_context(handler, event)
                 except Exception as e:
                     logger.exception("Error in raw handler %s: %s", handler.id, e)
 
@@ -709,7 +708,7 @@ class CommandDispatcher:
         # parsed via inspect.stack()
         _heroku_client_id_logging_tag = copy.copy(self.client.tg_id)  # noqa: F841
         try:
-            await func(message)
+            await loader._call_with_external_context(func, message)
         except Exception as e:
             await exception_handler(e, message, *args)
 

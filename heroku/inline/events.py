@@ -28,7 +28,7 @@ from aiogram.types import (
 )
 from aiogram.types import Message as AiogramMessage
 
-from .. import utils
+from .. import loader, utils
 from .types import BotInlineCall, InlineCall, InlineQuery, InlineUnit
 
 if typing.TYPE_CHECKING:
@@ -53,7 +53,7 @@ class Events(InlineUnit):
                 continue
 
             try:
-                await mod.aiogram_watcher(message)
+                await loader._call_with_external_context(mod.aiogram_watcher, message)
             except Exception:
                 logger.exception("Error on running aiogram watcher!")
 
@@ -72,7 +72,10 @@ class Events(InlineUnit):
 
             try:
                 if not (
-                    result := await self._allmodules.inline_handlers[cmd](instance)
+                    result := await loader._call_with_external_context(
+                        self._allmodules.inline_handlers[cmd],
+                        instance,
+                    )
                 ):
                     return
             except Exception:
@@ -232,12 +235,13 @@ class Events(InlineUnit):
         for func in self._allmodules.callback_handlers.values():
             if await self.check_inline_security(func=func, user=call.from_user.id):
                 try:
-                    await func(
+                    await loader._call_with_external_context(
+                        func,
                         (
                             BotInlineCall
                             if getattr(getattr(call, "message", None), "chat", None)
                             else InlineCall
-                        )(call, self, None)
+                        )(call, self, None),
                     )
                 except Exception:
                     logger.exception("Error on running callback watcher!")

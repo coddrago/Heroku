@@ -70,6 +70,14 @@
 - improve platform model detection
 - add blockquote to dlm and lm cmds
 - improve boolean validation
+- add requirements installation when launching the userbot
+- add mini protection in eval
+- fix database path
+- fconfig value from reply
+- migrate from json to orjson
+- backupall send backup in backupchat
+- fully remove save to fs
+- optimize username handling & fix logic
 
 ## 🪐 Heroku 1.7.2
 - added autoupdate
