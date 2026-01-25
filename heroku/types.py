@@ -31,26 +31,13 @@ from importlib.abc import SourceLoader
 import requests
 from herokutl.hints import EntityLike
 from herokutl.tl.functions.account import UpdateNotifySettingsRequest
-from herokutl.tl.types import (
-    Channel,
-    ChannelForbidden,
-    ChannelFull,
-    InputPeerNotifySettings,
-    Message,
-    UserFull,
-)
+from herokutl.tl.types import (Channel, ChannelForbidden, ChannelFull,
+                               InputPeerNotifySettings, Message, UserFull)
 
 from . import version
 from ._reference_finder import replace_all_refs
-from .inline.types import (
-    BotInlineCall,
-    BotInlineMessage,
-    BotMessage,
-    InlineCall,
-    InlineMessage,
-    InlineQuery,
-    InlineUnit,
-)
+from .inline.types import (BotInlineCall, BotInlineMessage, BotMessage,
+                           InlineCall, InlineMessage, InlineQuery, InlineUnit)
 from .pointers import PointerDict, PointerList
 
 __all__ = [
@@ -75,6 +62,106 @@ __all__ = [
 ]
 
 logger = logging.getLogger(__name__)
+
+def _is_external_origin(origin: str) -> bool:
+    if not origin:
+        return False
+    return not origin.startswith("<core")
+
+
+def _make_safe_client_proxy():
+    # Store client mapping in a closure to make direct extraction harder.
+    import weakref
+
+    _client_map = weakref.WeakKeyDictionary()
+    _origin_map = weakref.WeakKeyDictionary()
+
+    class SafeClientProxy:
+        __slots__ = ("__weakref__",)
+
+        _BLOCKED_ATTRS = {
+            "session",
+            "_sender",
+            "_connection",
+            "_transport",
+            "_auth_key",
+            "_log",
+            "_mtproto",
+            "_updates_handle",
+            "_keepalive_handle",
+        }
+
+        _BLOCKED_MAGIC = {
+            "__class__",
+            "__dict__",
+            "__getattribute__",
+            "__setattr__",
+            "__weakref__",
+            "__reduce__",
+            "__reduce_ex__",
+            "__getstate__",
+            "__setstate__",
+        }
+
+        def __init__(self, client, origin: str):
+            _client_map[self] = client
+            _origin_map[self] = origin
+
+        def __getattribute__(self, name: str):
+            if name in SafeClientProxy._BLOCKED_MAGIC:
+                raise AttributeError("Access denied")
+            if name in SafeClientProxy._BLOCKED_ATTRS:
+                logger.warning(
+                    "Blocked access to client.%s from %s",
+                    name,
+                    _origin_map.get(self, "<unknown>"),
+                )
+                raise AttributeError("Access to client attribute is blocked")
+            return getattr(_client_map[self], name)
+
+        def __setattr__(self, name: str, value):
+            if name in SafeClientProxy._BLOCKED_MAGIC or name in SafeClientProxy._BLOCKED_ATTRS:
+                logger.warning(
+                    "Blocked write to client.%s from %s",
+                    name,
+                    _origin_map.get(self, "<unknown>"),
+                )
+                raise AttributeError("Write to client attribute is blocked")
+            setattr(_client_map[self], name, value)
+
+        def __call__(self, *args, **kwargs):
+            return _client_map[self](*args, **kwargs)
+
+        def __repr__(self) -> str:
+            return "<SafeClientProxy>"
+
+    return SafeClientProxy
+
+
+SafeClientProxy = _make_safe_client_proxy()
+
+
+class SafeAllModulesProxy:
+    __slots__ = ("__allmodules", "__safe_client", "__safe_allclients")
+
+    def __init__(self, allmodules, safe_client, safe_allclients):
+        object.__setattr__(self, "_SafeAllModulesProxy__allmodules", allmodules)
+        object.__setattr__(self, "_SafeAllModulesProxy__safe_client", safe_client)
+        object.__setattr__(self, "_SafeAllModulesProxy__safe_allclients", safe_allclients)
+
+    @property
+    def client(self):
+        return object.__getattribute__(self, "_SafeAllModulesProxy__safe_client")
+
+    @property
+    def allclients(self):
+        return object.__getattribute__(self, "_SafeAllModulesProxy__safe_allclients")
+
+    def __getattr__(self, name: str):
+        return getattr(object.__getattribute__(self, "_SafeAllModulesProxy__allmodules"), name)
+
+    def __repr__(self) -> str:
+        return "<SafeAllModulesProxy>"
 
 
 JSONSerializable = typing.Union[str, int, float, bool, list, dict, None]
@@ -120,15 +207,29 @@ class Module:
 
     def internal_init(self):
         """Called after the class is initialized in order to pass the client and db. Do not call it yourself"""
+        origin = getattr(self, "__origin__", "")
+        is_external = _is_external_origin(origin)
+
         self.db = self.allmodules.db
         self._db = self.allmodules.db
-        self.client = self.allmodules.client
-        self._client = self.allmodules.client
+        self.is_external = is_external
+
+        if is_external:
+            safe_client = SafeClientProxy(self.allmodules.client, origin)
+            safe_allclients = [SafeClientProxy(c, origin) for c in self.allmodules.allclients]
+            self.allmodules = SafeAllModulesProxy(self.allmodules, safe_client, safe_allclients)
+            self.client = safe_client
+            self._client = safe_client
+            self.allclients = safe_allclients
+        else:
+            self.client = self.allmodules.client
+            self._client = self.allmodules.client
+            self.allclients = self.allmodules.allclients
+
         self.lookup = self.allmodules.lookup
         self.get_prefix = self.allmodules.get_prefix
         self.get_prefixes = self.allmodules.get_prefixes
         self.inline = self.allmodules.inline
-        self.allclients = self.allmodules.allclients
         self.tg_id = self._client.tg_id
         self._tg_id = self._client.tg_id
 
@@ -388,7 +489,7 @@ class Module:
 
         if not getattr(channel, "left", True):
             return True
-        
+
         event = asyncio.Event()
         await self.client(
             UpdateNotifySettingsRequest(

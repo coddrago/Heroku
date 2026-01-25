@@ -44,7 +44,7 @@ from herokutl import events
 from herokutl.errors import FloodWaitError, RPCError
 from herokutl.tl.types import Message
 
-from . import main, security, utils
+from . import loader, main, security, utils
 from .database import Database
 from .loader import Modules
 from .tl_cache import CustomTelegramClient
@@ -443,7 +443,7 @@ class CommandDispatcher:
         for handler in self.raw_handlers:
             if isinstance(event, tuple(handler.updates)):
                 try:
-                    await handler(event)
+                    await loader._call_with_external_context(handler, event)
                 except Exception as e:
                     logger.exception("Error in raw handler %s: %s", handler.id, e)
 
@@ -717,7 +717,7 @@ class CommandDispatcher:
         # parsed via inspect.stack()
         _heroku_client_id_logging_tag = copy.copy(self.client.tg_id)  # noqa: F841
         try:
-            await func(message)
+            await loader._call_with_external_context(func, message)
         except Exception as e:
             await exception_handler(e, message, *args)
 
