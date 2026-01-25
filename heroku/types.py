@@ -37,7 +37,7 @@ from herokutl.tl.types import (Channel, ChannelForbidden, ChannelFull,
 
 from . import version
 from ._reference_finder import replace_all_refs
-from .inline.types import (BotInlineCall, BotInlineMessage, BotMessage,
+from .inline.types import (BotInlineCall, BotInlineMessage, BotMessage, HerokuReplyMarkup,
                            InlineCall, InlineMessage, InlineQuery, InlineUnit)
 from .pointers import PointerDict, PointerList
 
