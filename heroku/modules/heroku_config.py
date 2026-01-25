@@ -850,14 +850,29 @@ class HerokuConfigMod(loader.Module):
         mod: str,
         obj_type: typing.Union[bool, str] = False,
     ):
-        btns = [
-            {
+        folders = {}
+        direct = []
+        for param in self.lookup(mod).config:
+            if hasattr(self.lookup(mod).config._config[param], 'folder') and self.lookup(mod).config._config[param].folder:
+                folder_name = self.lookup(mod).config._config[param].folder
+                if folder_name not in folders:
+                    folders[folder_name] = []
+                folders[folder_name].append(param)
+            else:
+                direct.append(param)
+        btns = []
+        for folder_name in sorted(folders.keys()):
+            btns.append({
+                "text": folder_name,
+                "callback": self.inline__configure_folder,
+                "kwargs": {"obj_type": obj_type, "mod": mod, "folder": folder_name},
+            })
+        for param in direct:
+            btns.append({
                 "text": param,
                 "callback": self.inline__configure_option,
                 "kwargs": {"obj_type": obj_type, "mod": mod, "config_opt": param},
-            }
-            for param in self.lookup(mod).config
-        ]
+            })
 
         await call.edit(
             self.strings(
@@ -865,25 +880,51 @@ class HerokuConfigMod(loader.Module):
             ).format(
                 utils.escape_html(mod),
                 "\n".join(
-                    [
-                        "▫️ <code>{}</code>: <b>{}</b>".format(
-                            utils.escape_html(key),
-                            (
-                                self._get_value(mod, key)
-                                if len(self._get_value(mod, key)) < 200
-                                else (
-                                    list(
-                                        utils.smart_split(
-                                            *html.parse(self._get_value(mod, key)),
-                                            200
-                                            )
-                                        )[0] +
-                                    "..."
-                                    )
-                            ),
-                        )
-                        for key in self.lookup(mod).config
-                    ]
+                    (
+                        [
+                            utils.escape_html(folder_name)
+                            for folder_name in sorted(folders.keys())
+                        ]
+                        + [
+                            "▫️ <code>{}</code>: <b>{}</b>".format(
+                                utils.escape_html(param),
+                                (
+                                    self._get_value(mod, param)
+                                    if len(self._get_value(mod, param)) < 200
+                                    else (
+                                        list(
+                                            utils.smart_split(
+                                                *html.parse(self._get_value(mod, param)),
+                                                200
+                                                )
+                                            )[0] +
+                                        "..."
+                                        )
+                                ),
+                            )
+                            for folder_name in sorted(folders.keys())
+                            for param in folders[folder_name]
+                        ]
+                        + [
+                            "▫️ <code>{}</code>: <b>{}</b>".format(
+                                utils.escape_html(param),
+                                (
+                                    self._get_value(mod, param)
+                                    if len(self._get_value(mod, param)) < 200
+                                    else (
+                                        list(
+                                            utils.smart_split(
+                                                *html.parse(self._get_value(mod, param)),
+                                                200
+                                                )
+                                            )[0] +
+                                        "..."
+                                        )
+                                ),
+                            )
+                            for param in direct
+                        ]
+                    )
                 ),
             ),
             reply_markup=list(utils.chunks(btns, 2))
@@ -893,6 +934,67 @@ class HerokuConfigMod(loader.Module):
                         "text": self.strings("back_btn"),
                         "callback": self.inline__global_config,
                         "kwargs": {"obj_type": obj_type},
+                    },
+                    {"text": self.strings("close_btn"), "action": "close"},
+                ]
+            ],
+        )
+
+    async def inline__configure_folder(
+        self,
+        call: InlineCall,
+        mod: str,
+        folder: str,
+        obj_type: typing.Union[bool, str] = False,
+    ):
+        folder_options = []
+        for param in self.lookup(mod).config:
+            if hasattr(self.lookup(mod).config._config[param], 'folder') and self.lookup(mod).config._config[param].folder == folder:
+                folder_options.append(param)
+        
+        btns = [
+            {
+                "text": param,
+                "callback": self.inline__configure_option,
+                "kwargs": {"obj_type": obj_type, "mod": mod, "config_opt": param},
+            }
+            for param in folder_options
+        ]
+        
+        await call.edit(
+            self.strings(
+                "configuring_mod" if isinstance(obj_type, bool) else "configuring_lib"
+            ).format(
+                utils.escape_html(folder),
+                "\n".join(
+                    [
+                        "▫️ <code>{}</code>: <b>{}</b>".format(
+                            utils.escape_html(param),
+                            (
+                                self._get_value(mod, param)
+                                if len(self._get_value(mod, param)) < 200
+                                else (
+                                    list(
+                                        utils.smart_split(
+                                            *html.parse(self._get_value(mod, param)),
+                                            200
+                                            )
+                                        )[0] +
+                                    "..."
+                                    )
+                            ),
+                        )
+                        for param in folder_options
+                    ]
+                ),
+            ),
+            reply_markup=list(utils.chunks(btns, 2))
+            + [
+                [
+                    {
+                        "text": self.strings("back_btn"),
+                        "callback": self.inline__configure,
+                        "kwargs": {"obj_type": obj_type, "mod": mod},
                     },
                     {"text": self.strings("close_btn"), "action": "close"},
                 ]
