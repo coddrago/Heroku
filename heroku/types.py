@@ -161,6 +161,26 @@ class SafeAllModulesProxy:
     def allclients(self):
         return object.__getattribute__(self, "_SafeAllModulesProxy__safe_allclients")
 
+    def __setattr__(self, name: str, value):
+        if name in (
+            "_SafeAllModulesProxy__allmodules",
+            "_SafeAllModulesProxy__safe_client",
+            "_SafeAllModulesProxy__safe_allclients",
+        ):
+            object.__setattr__(self, name, value)
+        else:
+            setattr(object.__getattribute__(self, "_SafeAllModulesProxy__allmodules"), name, value)
+
+    def __delattr__(self, name: str):
+        if name in (
+            "_SafeAllModulesProxy__allmodules",
+            "_SafeAllModulesProxy__safe_client",
+            "_SafeAllModulesProxy__safe_allclients",
+        ):
+            object.__delattr__(self, name)
+        else:
+            delattr(object.__getattribute__(self, "_SafeAllModulesProxy__allmodules"), name)
+
     def __getattr__(self, name: str):
         return getattr(object.__getattribute__(self, "_SafeAllModulesProxy__allmodules"), name)
 
