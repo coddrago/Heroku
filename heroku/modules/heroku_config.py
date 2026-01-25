@@ -880,51 +880,29 @@ class HerokuConfigMod(loader.Module):
             ).format(
                 utils.escape_html(mod),
                 "\n".join(
-                    (
-                        [
-                            utils.escape_html(folder_name)
-                            for folder_name in sorted(folders.keys())
-                        ]
-                        + [
-                            "▫️ <code>{}</code>: <b>{}</b>".format(
-                                utils.escape_html(param),
-                                (
-                                    self._get_value(mod, param)
-                                    if len(self._get_value(mod, param)) < 200
-                                    else (
-                                        list(
-                                            utils.smart_split(
-                                                *html.parse(self._get_value(mod, param)),
-                                                200
-                                                )
-                                            )[0] +
-                                        "..."
-                                        )
-                                ),
-                            )
-                            for folder_name in sorted(folders.keys())
-                            for param in folders[folder_name]
-                        ]
-                        + [
-                            "▫️ <code>{}</code>: <b>{}</b>".format(
-                                utils.escape_html(param),
-                                (
-                                    self._get_value(mod, param)
-                                    if len(self._get_value(mod, param)) < 200
-                                    else (
-                                        list(
-                                            utils.smart_split(
-                                                *html.parse(self._get_value(mod, param)),
-                                                200
-                                                )
-                                            )[0] +
-                                        "..."
-                                        )
-                                ),
-                            )
-                            for param in direct
-                        ]
-                    )
+                    [
+                        "📁 <code>{}</code>".format(utils.escape_html(folder_name))
+                        for folder_name in sorted(folders.keys())
+                    ]
+                    + [
+                        "▫️ <code>{}</code>: <b>{}</b>".format(
+                            utils.escape_html(param),
+                            (
+                                self._get_value(mod, param)
+                                if len(self._get_value(mod, param)) < 200
+                                else (
+                                    list(
+                                        utils.smart_split(
+                                            *html.parse(self._get_value(mod, param)),
+                                            200
+                                            )
+                                        )[0] +
+                                    "..."
+                                    )
+                            ),
+                        )
+                        for param in direct
+                    ]
                 ),
             ),
             reply_markup=list(utils.chunks(btns, 2))
