@@ -35,7 +35,7 @@ class CoreMod(loader.Module):
             ),
             loader.ConfigValue(
                 "alias_emoji",
-                "<emoji document_id=4974259868996207180>▪️</emoji>",
+                "<tg-emoji emoji-id="4974259868996207180">▪️</tg-emoji>",
                 "just emoji in .aliases",
             ),
         )
@@ -223,7 +223,7 @@ class CoreMod(loader.Module):
                 return await utils.answer(
                     message,
                     self.strings("entity_prefix_set").format(
-                        "<emoji document_id=5197474765387864959>👍</emoji>",
+                        "<tg-emoji emoji-id="5197474765387864959">👍</tg-emoji>",
                         entity_name=utils.escape_html(entity.first_name),
                         newprefix=utils.escape_html(args[0]),
                         oldprefix=utils.escape_html(oldprefix),
@@ -241,7 +241,7 @@ class CoreMod(loader.Module):
         await utils.answer(
             message,
             self.strings("prefix_set").format(
-                "<emoji document_id=5197474765387864959>👍</emoji>",
+                "<tg-emoji emoji-id="5197474765387864959">👍</tg-emoji>",
                 newprefix=utils.escape_html(args[0]),
                 oldprefix=utils.escape_html(oldprefix),
             ),
