@@ -541,6 +541,7 @@ class LoaderMod(loader.Module):
         save_fs: bool = True,
         blob_link: bool = False,
         did_requires: bool = False,
+        did_packages: bool = False,
     ):
         if any(
             line.replace(" ", "") == "#scope:ffmpeg" for line in doc.splitlines()
