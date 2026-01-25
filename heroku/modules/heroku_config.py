@@ -962,10 +962,9 @@ class HerokuConfigMod(loader.Module):
         ]
         
         await call.edit(
-            self.strings(
-                "configuring_mod" if isinstance(obj_type, bool) else "configuring_lib"
-            ).format(
+            self.strings("configuring_folder").format(
                 utils.escape_html(folder),
+                utils.escape_html(mod),
                 "\n".join(
                     [
                         "▫️ <code>{}</code>: <b>{}</b>".format(

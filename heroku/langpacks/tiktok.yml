@@ -307,6 +307,7 @@ heroku_config:
   configure: "⚙️ <b>Тыкай модуль</b>"
   configure_lib: "📦 <b>Тыкай либу</b>"
   configuring_mod: "⚙️ <b>Настройка модуля</b> <code>{}</code>\n\n<b>Че щас стоит:</b>\n\n{}"
+  configuring_folder: "📁 <b>Настройка папки</b> <code>{}</code> <b>модуля</b> <code>{}</code>\n\n<b>Че щас стоит:</b>\n\n{}"
   configuring_lib: "📦 <b>Настройка либы</b> <code>{}</code>\n\n<b>Че щас стоит:</b>\n\n{}"
   configuring_option: "⚙️ <b>Крутим настройку</b> <code>{}</code> <b>модуля</b> <code>{}</code>\n<i>ℹ️ {}</i>\n\n<b>По дефолту: {}</b>\n\n<b>Щас: {}</b>\n\n{}"
   configuring_option_lib: "📦 <b>Крутим настройку</b> <code>{}</code> <b>либы</b> <code>{}</code>\n<i>ℹ️ {}</i>\n\n<b>По дефолту: {}</b>\n\n<b>Щас: {}</b>\n\n{}"
