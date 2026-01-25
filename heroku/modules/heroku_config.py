@@ -988,10 +988,13 @@ class HerokuConfigMod(loader.Module):
             try:
                 value = self._get_value(mod_name, param)
                 if len(value) > 150:
-                    value = list(utils.smart_split(*html.parse(value), 150))[0] + "..."
+                    try:
+                        value = list(utils.smart_split(*html.parse(value), 150))[0] + "..."
+                    except Exception:
+                        value = utils.escape_html(str(self.lookup(mod_name).config[param]))[:150] + "..."
                 text_parts.append(f"<b>{utils.escape_html(mod_name)}</b> → <code>{utils.escape_html(param)}</code>: {value}")
             except Exception:
-                pass
+                text_parts.append(f"<b>{utils.escape_html(mod_name)}</b> → <code>{utils.escape_html(param)}</code>")
         
         await call.edit(
             self.strings("configuring_folder").format(
