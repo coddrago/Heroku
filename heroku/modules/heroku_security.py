@@ -959,6 +959,7 @@ class HerokuSecurityMod(loader.Module):
         await self._confirm(message, "sgroup", target, possible_rules[0], duration)
 
     async def _tsec_user(self, message: Message, args: list):
+
         match args:
             case [single]:
                 if not message.is_private and not message.is_reply:

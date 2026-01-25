@@ -40,6 +40,7 @@
   
 </div>
 
+### Manual Installation (VPS/VDS Server)
 
 ---
 

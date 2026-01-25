@@ -185,6 +185,7 @@ class LoaderMod(loader.Module):
 
     @loader.command(alias = "dlm")
     async def dlmod(self, message: Message, force_pm: bool = False):
+
         if args := utils.get_args(message):
             match args:
                 case [single]:
@@ -540,7 +541,6 @@ class LoaderMod(loader.Module):
         save_fs: bool = True,
         blob_link: bool = False,
         did_requires: bool = False,
-        did_packages: bool = False,
     ):
         if any(
             line.replace(" ", "") == "#scope:ffmpeg" for line in doc.splitlines()
@@ -1221,6 +1221,7 @@ class LoaderMod(loader.Module):
         for mod_name in worked:
             utils.unregister_placeholders(mod_name)
         return msg
+
 
     @loader.command()
     async def clearmodules(self, message: Message):

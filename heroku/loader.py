@@ -25,6 +25,7 @@ import os
 import re
 import sys
 import typing
+import contextvars
 from functools import wraps
 from pathlib import Path
 from types import FunctionType
@@ -37,26 +38,12 @@ from . import security, utils, validators
 from .database import Database
 from .inline.core import InlineManager
 from .translations import Strings, Translator
-from .types import (
-    Command,
-    ConfigValue,
-    CoreOverwriteError,
-    CoreUnloadError,
-    InlineMessage,
-    JSONSerializable,
-    Library,
-    LibraryConfig,
-    LoadError,
-    Module,
-    ModuleConfig,
-    SelfSuspend,
-    SelfUnload,
-    StopLoop,
-    StringLoader,
-    get_callback_handlers,
-    get_commands,
-    get_inline_handlers,
-)
+from .types import (Command, ConfigValue, CoreOverwriteError, CoreUnloadError,
+                    InlineMessage, JSONSerializable, Library, LibraryConfig,
+                    LoadError, Module, ModuleConfig, SafeAllModulesProxy,
+                    SafeClientProxy, SelfSuspend, SelfUnload, StopLoop,
+                    StringLoader, get_callback_handlers, get_commands,
+                    get_inline_handlers)
 
 if typing.TYPE_CHECKING:
     from .tl_cache import CustomTelegramClient
@@ -104,6 +91,74 @@ __all__ = [
 ]
 
 logger = logging.getLogger(__name__)
+
+_EXTERNAL_ORIGIN_PREFIXES = ("<external", "<file", "<string")
+_external_context = contextvars.ContextVar("heroku_external_module_origin", default=None)
+_SESSION_AUDIT_INSTALLED = False
+
+
+def _is_external_origin(origin: str) -> bool:
+    if not origin:
+        return False
+    if origin.startswith("<core"):
+        return False
+    return True
+
+
+def _is_external_frame(frame) -> bool:
+    spec = frame.f_globals.get("__spec__", None)
+    if spec and getattr(spec, "origin", None):
+        return _is_external_origin(spec.origin)
+    filename = frame.f_globals.get("__file__", "")
+    if not filename:
+        return False
+    return _is_external_origin(filename) or "loaded_modules" in filename
+
+
+def _is_external_stack() -> bool:
+    for frame_info in inspect.stack():
+        if _is_external_frame(frame_info.frame):
+            return True
+    return False
+
+
+def _session_audit_hook(event, args):
+    if event != "open" or not args:
+        return
+    try:
+        path = os.fspath(args[0])
+    except Exception:
+        return
+    if isinstance(path, bytes):
+        try:
+            path = path.decode(errors="ignore")
+        except Exception:
+            return
+    if not isinstance(path, str) or not path.endswith(".session"):
+        return
+    if _external_context.get() or _is_external_stack():
+        logger.warning("Blocked .session file access from external module")
+        raise PermissionError("Access to .session files is blocked for external modules")
+
+
+async def _call_with_external_context(func: callable, *args, **kwargs):
+    origin = getattr(getattr(func, "__self__", None), "__origin__", "")
+    token = None
+    if origin and _is_external_origin(origin):
+        token = _external_context.set(origin)
+    try:
+        return await func(*args, **kwargs)
+    finally:
+        if token is not None:
+            _external_context.reset(token)
+
+
+def _install_session_audit_hook():
+    global _SESSION_AUDIT_INSTALLED
+    if _SESSION_AUDIT_INSTALLED:
+        return
+    sys.addaudithook(_session_audit_hook)
+    _SESSION_AUDIT_INSTALLED = True
 
 owner = security.owner
 
@@ -514,6 +569,7 @@ class Modules:
         allclients: list,
         translator: Translator,
     ):
+        _install_session_audit_hook()
         self._initial_registration = True
         self.commands = {}
         self.inline_handlers = {}
@@ -728,8 +784,8 @@ class Modules:
             if not isinstance(ret, Module):
                 raise TypeError(f"Instance is not a Module, it is {type(ret)}")
 
-        await self.complete_registration(ret)
         ret.__origin__ = origin
+        await self.complete_registration(ret)
 
         cls_name = ret.__class__.__name__
 
@@ -921,7 +977,7 @@ class Modules:
         else:
             result = self._db.get(key, "command_prefix", default)
         return result
-    
+
     def get_prefixes(self) -> set[str]:
         """Get all command prefixes"""
         from . import main
@@ -942,6 +998,16 @@ class Modules:
 
         instance.allmodules = self
         instance.internal_init()
+        origin = getattr(instance, "__origin__", "")
+        if _is_external_origin(origin) and not isinstance(
+            getattr(instance, "_client", None), SafeClientProxy
+        ):
+            safe_client = SafeClientProxy(self.client, origin)
+            safe_allclients = [SafeClientProxy(c, origin) for c in self.allclients]
+            instance.allmodules = SafeAllModulesProxy(self, safe_client, safe_allclients)
+            instance.client = safe_client
+            instance._client = safe_client
+            instance.allclients = safe_allclients
 
         for module in self.modules:
             if module.__class__.__name__ == instance.__class__.__name__:
@@ -1119,11 +1185,18 @@ class Modules:
     ):
         with contextlib.suppress(AttributeError):
             _heroku_client_id_logging_tag = copy.copy(self.client.tg_id)  # noqa: F841
+        origin = getattr(mod, "__origin__", "")
+        safe_client = (
+            mod.client
+            if _is_external_origin(origin)
+            and isinstance(getattr(mod, "client", None), SafeClientProxy)
+            else (SafeClientProxy(self.client, origin) if _is_external_origin(origin) else self.client)
+        )
 
         if from_dlmod:
             try:
                 if len(inspect.signature(mod.on_dlmod).parameters) == 2:
-                    await mod.on_dlmod(self.client, self._db)
+                    await mod.on_dlmod(safe_client, self._db)
                 else:
                     await mod.on_dlmod()
             except Exception:
@@ -1131,7 +1204,7 @@ class Modules:
 
         try:
             if len(inspect.signature(mod.client_ready).parameters) == 2:
-                await mod.client_ready(self.client, self._db)
+                await mod.client_ready(safe_client, self._db)
             else:
                 await mod.client_ready()
         except SelfUnload as e:

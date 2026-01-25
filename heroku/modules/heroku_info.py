@@ -359,3 +359,4 @@ class HerokuInfoMod(loader.Module):
             await utils.answer(message, self.strings["switchinfo_on"])
         else:
             await utils.answer(message, self.strings["switchinfo_off"])
+

@@ -45,6 +45,7 @@ from herokutl.errors import (
     PasswordHashInvalidError,
     PhoneNumberInvalidError,
     SessionPasswordNeededError,
+    YouBlockedUserError,
 )
 from herokutl.network.connection import (
     ConnectionTcpFull,

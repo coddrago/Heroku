@@ -294,7 +294,9 @@ class HerokuBackupMod(loader.Module):
 
         file = await reply.download_media(bytes)
         try:
+
             decoded_text = orjson.loads(file.decode())
+
         except UnicodeDecodeError as e:
             await utils.answer(message,
                                self.strings("probably_zip").format(self.get_prefix()))

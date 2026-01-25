@@ -45,8 +45,6 @@ def die():
         case _:
             os.killpg(os.getpgid(os.getpid()), signal.SIGTERM)
 
-
-
 def restart():
     if "--sandbox" in " ".join(sys.argv):
         exit(0)
@@ -76,9 +74,7 @@ def restart():
                 atexit.register(get_startup_callback())
             else:
                 signal.signal(signal.SIGTERM, get_startup_callback())
-
             die()
-
 
 def print_banner(banner: str):
     print("\033[2J\033[3;1f")

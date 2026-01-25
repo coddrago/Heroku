@@ -389,6 +389,7 @@ class HerokuSettingsMod(loader.Module):
     @loader.command()
     async def remove_core_protection(self, message: Message):
         """| Removes core protection"""
+
         if self._db.get(main.__name__, "remove_core_protection") == True:
             await utils.answer(message, self.strings("core_protection_already_removed"))
             return
@@ -415,6 +416,7 @@ class HerokuSettingsMod(loader.Module):
     @loader.command()
     async def enable_core_protection(self, message: Message):
         """| Enables core protection"""
+
         if self._db.get(main.__name__, "remove_core_protection") == False:
             await utils.answer(message, self.strings("core_protection_already_enabled"))
             return

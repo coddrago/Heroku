@@ -385,6 +385,7 @@ class TelegramLogsHandler(logging.Handler):
                 for exceptions in self._exc_queue.values())
             )
 
+
             self.tg_buff = []
 
             for client_id in self._mods:
@@ -420,6 +421,12 @@ class TelegramLogsHandler(logging.Handler):
                                 message_thread_id=self._mods[client_id]._logs_topic.id,
                             )
                         )
+    async def avoid_floodwait(self, exc):
+        try:
+            await exc
+        except TelegramRetryAfter as e:
+            await asyncio.sleep(e.retry_after)
+            await self.avoid_floodwait(exc)
 
     async def _exc_sender(self, *coros: Coroutine):
         for coro in coros:
@@ -566,6 +573,7 @@ def init():
         def filter(self, record: logging.LogRecord) -> bool:
             msg = record.getMessage()
             return "Failed to fetch updates" not in msg and "Sleep" not in msg
+
     
     logging.getLogger("aiogram.dispatcher").addFilter(NoFetchUpdatesFilter())
     handler = logging.StreamHandler()
