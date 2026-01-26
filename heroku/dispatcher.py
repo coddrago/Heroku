@@ -352,6 +352,7 @@ class CommandDispatcher:
 
 
         command = message.message[len(prefix):].strip().split(maxsplit=1)[0]
+        tag = command.split("@", maxsplit=1)
         #logger.info(f"Received command: {command}")
         tag = command.split("@", maxsplit=1)
         #logger.info(f"Command tag: {tag}")

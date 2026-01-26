@@ -1040,8 +1040,8 @@ class Heroku:
                 logging.getLogger().handlers[0].get_logid_by_client(client.tg_id),
                 "https://raw.githubusercontent.com/coddrago/assets/refs/heads/main/heroku/heroku_started.png",
                 caption=(
-                    "🪐 <b>Heroku {} started!</b>\n\n⚙ <b>GitHub commit SHA: <a"
-                    ' href="https://github.com/coddrago/Heroku/commit/{}">{}</a></b>\n🔎'
+                    "🪐 <b>Heroku {} started!</b>\n\n <tg-emoji emoji-id=5303382121967001310>💻</tg-emoji> <b>GitHub commit SHA: <a"
+                    ' href="https://github.com/coddrago/Heroku/commit/{}">{}</a></b>\n<tg-emoji emoji-id=5188311512791393083>🔎</tg-emoji>'
                     " <b>Update status: {}</b>\n<b>{}</b>\n🕶 <b>Prefix:</b> <code>{}</code>"
                 ).format(
                     ".".join(list(map(str, list(__version__)))),
