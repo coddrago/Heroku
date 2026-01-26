@@ -353,7 +353,10 @@ class CommandDispatcher:
 
         command = message.message[len(prefix):].strip().split(maxsplit=1)[0]
         tag = command.split("@", maxsplit=1)
-        
+        #logger.info(f"Received command: {command}")
+        tag = command.split("@", maxsplit=1)
+        #logger.info(f"Command tag: {tag}")
+
         if len(tag) == 2:
             if tag[1] == "me":
                 if not message.out:
