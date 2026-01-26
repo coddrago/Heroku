@@ -35,34 +35,34 @@ class Help(loader.Module):
         self.config = loader.ModuleConfig(
             loader.ConfigValue(
                 "core_emoji",
-                "<emoji document_id=4974681956907221809>▪️</emoji>",
+                "<tg-emoji emoji-id=4974681956907221809>▪️</tg-emoji>",
                 lambda: "Core module bullet",
             ),
             loader.ConfigValue(
                 "plain_emoji",
-                "<emoji document_id=4974508259839836856>▪️</emoji>",
+                "<tg-emoji emoji-id=4974508259839836856>▪️</tg-emoji>",
                 lambda: "Plain module bullet",
             ),
             loader.ConfigValue(
                 "empty_emoji",
-                "<emoji document_id=5100652175172830068>🟠</emoji>",
+                "<tg-emoji emoji-id=5100652175172830068>🟠</tg-emoji>",
                 lambda: "Empty modules bullet",
             ),
             loader.ConfigValue(
                 "desc_icon",
-                "<emoji document_id=5188377234380954537>🪐</emoji>",
+                "<tg-emoji emoji-id=5188377234380954537>🪐</tg-emoji>",
                 lambda: "Desc emoji",
             ),
             loader.ConfigValue(
                 "command_emoji",
-                "<emoji document_id=5197195523794157505>▫️</emoji>",
+                "<tg-emoji emoji-id=5197195523794157505>▫️</tg-emoji>",
                 lambda: "Emoji for command",
             ),
             loader.ConfigValue(
                 "banner_url",
                 None,
                 lambda: "Banner for .help",
-                validator=loader.validators.RandomLink(),
+                validator=loader.validators.Link(),
             ),
             loader.ConfigValue(
                 "media_quote",
@@ -168,7 +168,7 @@ class Help(loader.Module):
         )
 
         reply = "{} <b>{}</b>:".format(
-            "<emoji document_id=5134452506935427991>🪐</emoji>",
+            "<tg-emoji emoji-id=5134452506935427991>🪐</tg-emoji>",
             _name,
             ""
         )
@@ -176,7 +176,7 @@ class Help(loader.Module):
         cmds = ""
         if module.__doc__:
             reply += (
-                "\n<i><emoji document_id=5879813604068298387>ℹ️</emoji> "
+                "\n<i><tg-emoji emoji-id=5879813604068298387>ℹ️</tg-emoji> "
                 + utils.escape_html(inspect.getdoc(module))
                 + "\n</i>"
             )
@@ -198,7 +198,7 @@ class Help(loader.Module):
         if hasattr(module, "inline_handlers"):
             for name, fun in module.inline_handlers.items():
                 inline_cmd += (
-                    "\n<emoji document_id=5372981976804366741>🤖</emoji>"
+                    "\n<tg-emoji emoji-id=5372981976804366741>🤖</tg-emoji>"
                     " <code>{}</code> {}".format(
                         f"@{self.inline.bot_username} {name}",
                         (
@@ -268,13 +268,10 @@ class Help(loader.Module):
 
         args = utils.get_args_raw(message)
 
-        banner = str(self.config["banner_url"])
+        banner = self.config["banner_url"]
 
         if self.config["banner_url"] and self.config["media_quote"] is True:
-            banner = InputMediaWebPage(str(self.config["banner_url"]))
-            
-        elif not self.config["banner_url"]:
-            banner = None
+            banner = InputMediaWebPage(self.config["banner_url"])
 
         force = False
         if "-f" in args:
@@ -404,52 +401,53 @@ class Help(loader.Module):
         core_.sort(key=str.lower)
         no_commands_.sort(key=str.lower)
 
-        if only_core:
-            await utils.answer(
-                message,
-                (self.config["desc_icon"] + " {}\n <blockquote expandable>{}</blockquote><blockquote expandable>{}</blockquote>").format(
-                    reply,
-                    "".join(core_),
-                    (
-                        ""
-                        if self.lookup("Loader").fully_loaded
-                        else f"\n\n{self.strings('partial_load')}"
+        match True:
+            case _ if only_core:
+                await utils.answer(
+                    message,
+                    (self.config["desc_icon"] + " {}\n <blockquote expandable>{}</blockquote><blockquote expandable>{}</blockquote>").format(
+                        reply,
+                        "".join(core_),
+                        (
+                            ""
+                            if self.lookup("Loader").fully_loaded
+                            else f"\n\n{self.strings('partial_load')}"
+                        ),
                     ),
-                ),
-                file=banner,
-                invert_media=self.config["invert_media"],
-            )
-        elif only_loaded:
-            await utils.answer(
-                message,
-                (self.config["desc_icon"] + " {}\n <blockquote expandable>{}</blockquote><blockquote expandable>{}</blockquote>").format(
-                    reply,
-                    "".join(plain_ + (no_commands_ if force else [])),
-                    (
-                        ""
-                        if self.lookup("Loader").fully_loaded
-                        else f"\n\n{self.strings('partial_load')}"
+                    file = banner,
+                    invert_media = self.config["invert_media"],
+                )
+            case _ if only_loaded:
+                await utils.answer(
+                    message,
+                    (self.config["desc_icon"] + " {}\n <blockquote expandable>{}</blockquote><blockquote expandable>{}</blockquote>").format(
+                        reply,
+                        "".join(plain_ + (no_commands_ if force else [])),
+                        (
+                            ""
+                            if self.lookup("Loader").fully_loaded
+                            else f"\n\n{self.strings('partial_load')}"
+                        ),
                     ),
-                ),
-                file=banner,
-                invert_media=self.config["invert_media"],
-            )
-        else:
-            await utils.answer(
-                message,
-                (self.config["desc_icon"] + " {}\n <blockquote expandable>{}</blockquote><blockquote expandable>{}</blockquote><blockquote expandable>{}</blockquote>").format(
-                    reply,
-                    "".join(core_),
-                    "".join(plain_ + (no_commands_ if force else [])),
-                    (
-                        ""
-                        if self.lookup("Loader").fully_loaded
-                        else f"\n\n{self.strings('partial_load')}"
+                    file = banner,
+                    invert_media = self.config["invert_media"],
+                )
+            case _:
+                await utils.answer(
+                    message,
+                    (self.config["desc_icon"] + " {}\n <blockquote expandable>{}</blockquote><blockquote expandable>{}</blockquote><blockquote expandable>{}</blockquote>").format(
+                        reply,
+                        "".join(core_),
+                        "".join(plain_ + (no_commands_ if force else [])),
+                        (
+                            ""
+                            if self.lookup("Loader").fully_loaded
+                            else f"\n\n{self.strings('partial_load')}"
+                        ),
                     ),
-                ),
-                file=banner,
-                invert_media=self.config["invert_media"],
-            )
+                    file = banner,
+                    invert_media = self.config["invert_media"],
+                )
 
     @loader.command(ru_doc="| Ссылка на чат помощи", ua_doc="| посилання для чату служби підтримки", de_doc="| Link zum Support-Chat")
     async def support(self, message):

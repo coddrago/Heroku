@@ -64,19 +64,19 @@ class Translations(loader.Module):
 
     def _get_flag(self, lang: str) -> str:
         emoji_flags = {
-            "🇬🇧": "<emoji document_id=6323589145717376403>🇬🇧</emoji>",
-            "🇺🇿": "<emoji document_id=6323430017179059570>🇺🇿</emoji>",
-            "🇷🇺": "<emoji document_id=6323139226418284334>🇷🇺</emoji>",
-            "🇺🇦": "<emoji document_id=5276140694891666474>🇺🇦</emoji>",
-            "🇮🇹": "<emoji document_id=6323471399188957082>🇮🇹</emoji>",
-            "🇩🇪": "<emoji document_id=6320817337033295141>🇩🇪</emoji>",
-            "🇪🇸": "<emoji document_id=6323315062379382237>🇪🇸</emoji>",
-            "🇹🇷": "<emoji document_id=6321003171678259486>🇹🇷</emoji>",
-            "🇰🇿": "<emoji document_id=6323135275048371614>🇰🇿</emoji>",
-            "🥟": "<emoji document_id=5382337996123020810>🥟</emoji>",
-            "🇯🇵": "<emoji document_id=5456261908069885892>🇯🇵</emoji>",
-            "🇫🇷": "<emoji document_id=5202132623060640759>🇫🇷</emoji>",
-            "🏴‍☠️": "<emoji document_id=5386372293263892965>🏴‍☠️</emoji>",
+            "🇬🇧": "<tg-emoji emoji-id=6323589145717376403>🇬🇧</tg-emoji>",
+            "🇺🇿": "<tg-emoji emoji-id=6323430017179059570>🇺🇿</tg-emoji>",
+            "🇷🇺": "<tg-emoji emoji-id=6323139226418284334>🇷🇺</tg-emoji>",
+            "🇺🇦": "<tg-emoji emoji-id=5276140694891666474>🇺🇦</tg-emoji>",
+            "🇮🇹": "<tg-emoji emoji-id=6323471399188957082>🇮🇹</tg-emoji>",
+            "🇩🇪": "<tg-emoji emoji-id=6320817337033295141>🇩🇪</tg-emoji>",
+            "🇪🇸": "<tg-emoji emoji-id=6323315062379382237>🇪🇸</tg-emoji>",
+            "🇹🇷": "<tg-emoji emoji-id=6321003171678259486>🇹🇷</tg-emoji>",
+            "🇰🇿": "<tg-emoji emoji-id=6323135275048371614>🇰🇿</tg-emoji>",
+            "🥟": "<tg-emoji emoji-id=5382337996123020810>🥟</tg-emoji>",
+            "🇯🇵": "<tg-emoji emoji-id=5456261908069885892>🇯🇵</tg-emoji>",
+            "🇫🇷": "<tg-emoji emoji-id=5202132623060640759>🇫🇷</tg-emoji>",
+            "🏴‍☠️": "<tg-emoji emoji-id=5386372293263892965>🏴‍☠️</tg-emoji>",
         }
 
         lang2country = {"en": "🇬🇧", "tt": "🥟", "kk": "🇰🇿", "ua": "🇺🇦", "de": "🇩🇪", "jp": "🇯🇵", "fr": "🇫🇷"}
@@ -113,7 +113,7 @@ class Translations(loader.Module):
                         (
                             self._get_flag(lang)
                             if not utils.check_url(lang)
-                            else "<emoji document_id=5433653135799228968>📁</emoji>"
+                            else "<tg-emoji emoji-id=5433653135799228968>📁</tg-emoji>"
                         )
                         for lang in args.split()
                     ]
