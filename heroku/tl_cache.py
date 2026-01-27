@@ -86,8 +86,6 @@ def get_running_loop():
 
 
 class CustomClient(TelegramClient): # TODO: rewrite the cache specifically for Kurigram
-    PARENT_DIR = Path(sys.argv[0]).parent.parent
-    WORKDIR = PARENT_DIR
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -135,6 +133,7 @@ class CustomClient(TelegramClient): # TODO: rewrite the cache specifically for K
             "app_version": self.app_version,
             "device_model": self.device_model,
             "system_version": self.system_version,
+            "workdir": self.workdir,
             "lang_code": self.lang_code,
             "system_lang_code": self.system_lang_code,
             "proxy": self.proxy,
