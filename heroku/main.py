@@ -1000,7 +1000,8 @@ class Heroku:
             while await self.amain(first, client):
                 first = False
         finally:
-            await client.stop()
+            if client.is_connected:
+                await client.disconnect()
 
     async def _badge(self, client: CustomClient):
         """Call the badge in shell"""
@@ -1103,7 +1104,8 @@ class Heroku:
     async def amain(self, first: bool, client: CustomClient):
         """Entrypoint for async init, run once for each user"""
         client.parse_mode = ParseMode.HTML
-        await client.start()
+        if not client.is_connected:
+            await client.start()
 
         db = database.Database(client)
         client.heroku_db = db
