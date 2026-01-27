@@ -469,7 +469,7 @@ class SuperList(list):
 
 
 class InteractiveAuthRequired(Exception):
-    """Is being rased by Telethon, if phone is required"""
+    """Is being rased by Pyrogram, if phone is required"""
 
 
 def raise_auth():
@@ -495,7 +495,7 @@ class Heroku:
             self.loop = asyncio.new_event_loop()
             asyncio.set_event_loop(self.loop)
 
-        self.clients = SuperList()
+        self.clients: list[CustomClient] = SuperList()
         self.ready = asyncio.Event()
         self._read_sessions()
         self._get_api_token()
@@ -536,11 +536,11 @@ class Heroku:
         self.sessions += [
             session.rsplit(".session", maxsplit=1)[0]
             for session in filter(
-                lambda f: f.startswith("heroku-") or f.startswith("hikka-") and f.endswith(".session"),
+                lambda f: (f.startswith("heroku-") or f.startswith("hikka-")) and f.endswith(".session"),
                 os.listdir(BASE_DIR),
             )
         ]
-        print(self.sessions)
+        print(self.sessions, os.listdir(BASE_DIR))
 
     def _get_api_token(self):
         """Get API Token from disk or environment"""
@@ -923,8 +923,11 @@ class Heroku:
                 # if session.server_address == "0.0.0.0":
                 #     patcher.patch(client, session)
 
-                await client.connect()
-                client.phone_number = "None"
+                rslt = await client.connect()
+                if not rslt:
+                    raise InteractiveAuthRequired()
+
+                client.phone_number = None
 
                 self.clients += [client]
             except sqlite3.OperationalError:
@@ -958,7 +961,7 @@ class Heroku:
 
     async def amain_wrapper(self, client: CustomClient):
         """Wrapper around amain"""
-        async with client:
+        try:
             first = True
             me = await client.get_me()
             client._tg_id = me.id
@@ -966,19 +969,10 @@ class Heroku:
             client.hikka_me = me
             client.heroku_me = me
 
-            async with aiohttp.ClientSession() as session:
-                async with session.get("https://raw.githubusercontent.com/coddrago/modules-web/main/mods/ids/allowed_ids.txt") as response:
-                    if response.status == 200:
-                        content = await response.text()
-                        allowed_ids = [int(line.strip()) for line in content.split('\n') if line.strip()]
-                    else:
-                        logging.error(f"Exception on loading allowed beta testers ids: {response.status}")
-                        return []
-
-            await asyncio.gather(*[version.check_branch((await client.get_me()).id, allowed_ids) for client in self.clients])
-
             while await self.amain(first, client):
                 first = False
+        finally:
+            await client.stop()
 
     async def _badge(self, client: CustomClient):
         """Call the badge in shell"""
@@ -1143,9 +1137,24 @@ class Heroku:
 
         await asyncio.gather(*[self.amain_wrapper(client) for client in self.clients])
 
+        async with aiohttp.ClientSession() as session:
+                async with session.get("https://raw.githubusercontent.com/coddrago/modules-web/main/mods/ids/allowed_ids.txt") as response:
+                    if response.status == 200:
+                        content = await response.text()
+                        allowed_ids = [int(line.strip()) for line in content.split('\n') if line.strip()]
+                    else:
+                        logging.error(f"Exception on loading allowed beta testers ids: {response.status}")
+                        return []
+
+        await asyncio.gather(*[version.check_branch((await client.get_me()).id, allowed_ids) for client in self.clients])
+
     async def _shutdown_handler(self):
         for client in self.clients:
-            inline = getattr(client.loader, "inline", None)
+            inline = getattr(
+                getattr(client, "loader", None),
+                "inline",
+                None
+            )
             if inline:
                 for t in (inline._task, inline._cleaner_task):
                     if t:
