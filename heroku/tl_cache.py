@@ -18,6 +18,8 @@ import sys
 import time
 import typing
 
+from pathlib import Path
+
 import pyrogram
 from pyrogram.client import Client as TelegramClient
 # from herokutl.client import TelegramClient
@@ -84,6 +86,8 @@ def get_running_loop():
 
 
 class CustomClient(TelegramClient): # TODO: rewrite the cache specifically for Kurigram
+    PARENT_DIR = Path(sys.argv[0]).parent.parent
+    WORKDIR = PARENT_DIR
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 

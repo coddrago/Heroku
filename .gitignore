@@ -139,6 +139,7 @@ heroku/loaded_modules
 loaded_modules
 heroku/debug_modules
 heroku*.session*
+*session
 database-*.json
 *.swp
 .setup_complete

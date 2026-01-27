@@ -69,6 +69,7 @@ class Database(dict):
         self._me: User = None
         self._redis: redis.Redis = None
         self._saving_task: asyncio.Future = None
+        self._content_channel_id: int = 0
 
     def __repr__(self):
         return object.__repr__(self)
@@ -118,27 +119,31 @@ class Database(dict):
         self._db_file = main.BASE_PATH / f"config-{self._client.tg_id}.json"
         self.read()
 
-        try:
-            self._content_channel_id = await utils.wait_for_content_channel(self)
+        async def _create_topic():
+            nonlocal self
+            try:
+                self._content_channel_id = await utils.wait_for_content_channel(self)
 
-            self._assets_topic = await utils.asset_forum_topic(
-                client=self._client,
-                db=self,
-                peer=self._content_channel_id,
-                title="Assets",
-                description="🌆 Your Heroku assets will be stored here",
-                icon_emoji_id=5877307202888273539,
-            )
+                self._assets_topic = await utils.asset_forum_topic(
+                    client=self._client,
+                    db=self,
+                    peer=self._content_channel_id,
+                    title="Assets",
+                    description="🌆 Your Heroku assets will be stored here",
+                    icon_emoji_id=5877307202888273539,
+                )
 
-        except Exception as e:
-            self._assets_topic = None
-            logger.exception(
-                "Can't find and/or create assets topic\n"
-                "This may cause several consequences, such as:\n"
-                "- Non working assets feature (e.g. notes)\n"
-                "- This error will occur every restart\n\n"
-                "You can solve this by leaving some channels/groups"
-            )
+            except Exception:
+                self._assets_topic = None
+                logger.exception(
+                    "Can't find and/or create assets topic\n"
+                    "This may cause several consequences, such as:\n"
+                    "- Non working assets feature (e.g. notes)\n"
+                    "- This error will occur every restart\n\n"
+                    "You can solve this by leaving some channels/groups"
+                )
+        
+        asyncio.create_task(_create_topic())
 
     def read(self):
         """Read database and stores it in self"""

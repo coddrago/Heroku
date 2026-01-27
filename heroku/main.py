@@ -640,7 +640,7 @@ class Heroku:
             **init_kwargs
         )
 
-        await client.stop()
+        await client.disconnect()
 
         storage = SQLiteStringStorage(cli)
         await storage.import_session_string(session_str)
@@ -649,6 +649,7 @@ class Heroku:
         await cli.connect()
 
         if not delay_restart:
+            logging.info("restart")
             restart()
 
         # Set db attribute to this client in order to save
