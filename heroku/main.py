@@ -1044,7 +1044,7 @@ class Heroku:
                     ' href="https://github.com/coddrago/Heroku/commit/{}">{}</a></b>\n🔎'
                     " <b>Update status: {}</b>\n<b>{}</b>\n🕶 <b>Prefix:</b> <code>{}</code>"
                 ).format(
-                    utils.get_platform_emoji() if self.client.heroku_me is premium else "🪐 <b>Heroku"
+                    utils.get_platform_emoji() if client.heroku_me is premium else "🪐 <b>Heroku"
                     ".".join(list(map(str, list(__version__)))),
                     build,
                     build[:7],
