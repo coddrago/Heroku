@@ -14,12 +14,13 @@ import asyncio
 import contextlib
 import datetime
 import io
-import json
 import logging
 import os
 import re 
 import time
 import zipfile
+import orjson
+
 from pathlib import Path
 
 from aiogram.types import BufferedInputFile
@@ -36,10 +37,7 @@ class HerokuBackupMod(loader.Module):
 
     strings = {"name": "HerokuBackup"}
 
-    async def client_ready(self, client, db):
-        self._client = client
-        self._db = db
-
+    async def client_ready(self):
         if not self.get("period"):
             await self.inline.bot.send_photo(
                 self.tg_id,
@@ -133,7 +131,7 @@ class HerokuBackupMod(loader.Module):
                 self.get("last_backup") + self.get("period") - time.time()
             )
 
-            db = io.BytesIO(json.dumps(self._db).encode())
+            db = io.BytesIO(orjson.dumps(self._db))
             db.name = "db.json"
 
             mods = io.BytesIO()
@@ -143,7 +141,7 @@ class HerokuBackupMod(loader.Module):
                         if file.endswith(f"{self.tg_id}.py"):
                             with open(os.path.join(root, file), "rb") as f:
                                 zipf.writestr(file, f.read())
-                zipf.writestr("db_mods.json", json.dumps(self.lookup("Loader").get("loaded_modules", {})))
+                zipf.writestr("db_mods.json", orjson.dumps(self.lookup("Loader").get("loaded_modules", {})))
 
             mods.seek(0)
             mods.name = "mods.zip"
@@ -154,7 +152,6 @@ class HerokuBackupMod(loader.Module):
                 z.writestr("mods.zip", mods.getvalue())
 
             archive.name = f"backup-{datetime.datetime.now():%d-%m-%Y-%H-%M}.backup"
-            archive.seek(0)
 
             await self.inline.bot.send_document(
                 int(f"-100{self._content_channel_id}"),
@@ -198,14 +195,14 @@ class HerokuBackupMod(loader.Module):
         try:
             file = await (
                 await self._client.get_messages(
-                    self._content_channel_id, call.message.message_id
+                    self._content_channel_id, message_ids=[call.message.message_id]
                 )
-            )[0].download_media(bytes)
+            )[0].download(in_memory=True)
 
             zipfile_bytes = io.BytesIO(file)
             with zipfile.ZipFile(zipfile_bytes) as zf:
                 with zf.open("db.json") as f:
-                    db_data = json.loads(f.read().decode())
+                    db_data = orjson.loads(f.read().decode())
 
                 with contextlib.suppress(KeyError):
                     db_data["heroku.inline"].pop("bot_token")
@@ -220,7 +217,7 @@ class HerokuBackupMod(loader.Module):
                 with zf.open("mods.zip") as modzip_bytes:
                     with zipfile.ZipFile(io.BytesIO(modzip_bytes.read())) as modzip:
                         with modzip.open("db_mods.json", "r") as modules:
-                            db_mods = json.loads(modules.read().decode())
+                            db_mods = orjson.loads(modules.read().decode())
                             if isinstance(db_mods, dict):
                                 self.lookup("Loader").set("loaded_modules", db_mods)
 
@@ -275,9 +272,9 @@ class HerokuBackupMod(loader.Module):
 
     @loader.command()
     async def backupdb(self, message: Message):
-        txt = io.BytesIO(json.dumps(self._db).encode())
+        txt = io.BytesIO(orjson.dumps(self._db))
         txt.name = f"db-backup-{datetime.datetime.now():%d-%m-%Y-%H-%M}.json"
-        await self._client.send_file(
+        await self._client.send_document(
             "me",
             txt,
             caption=self.strings("backup_caption").format(
@@ -288,16 +285,18 @@ class HerokuBackupMod(loader.Module):
 
     @loader.command()
     async def restoredb(self, message: Message):
-        if not (reply := await message.get_reply_message()) or not reply.media:
+        if not (reply := message.reply_to_message) or not reply.media:
             await utils.answer(
                 message,
                 self.strings("reply_to_file"),
             )
             return
 
-        file = await reply.download_media(bytes)
+        file = await reply.download(in_memory=True)
         try:
-            decoded_text = json.loads(file.decode())
+
+            decoded_text = orjson.loads(file.decode())
+
         except UnicodeDecodeError as e:
             await utils.answer(message,
                                self.strings("probably_zip").format(self.get_prefix()))
@@ -341,7 +340,7 @@ class HerokuBackupMod(loader.Module):
         result = io.BytesIO()
         result.name = "mods.zip"
 
-        db_mods = json.dumps(self.lookup("Loader").get("loaded_modules", {})).encode()
+        db_mods = orjson.dumps(self.lookup("Loader").get("loaded_modules", {}))
 
         with zipfile.ZipFile(result, "w", zipfile.ZIP_DEFLATED) as zipf:
             for root, _, files in os.walk(loader.LOADED_MODULES_DIR):
@@ -367,13 +366,13 @@ class HerokuBackupMod(loader.Module):
 
     @loader.command()
     async def restoremods(self, message: Message):
-        if not (reply := await message.get_reply_message()) or not reply.media:
+        if not (reply := message.reply_to_message) or not reply.media:
             await utils.answer(message, self.strings("reply_to_file"))
             return
 
         file = await reply.download_media(bytes)
         try:
-            decoded_text = json.loads(file.decode())
+            decoded_text = orjson.loads(file.decode())
         except Exception:
             try:
                 file = io.BytesIO(file)
@@ -381,7 +380,7 @@ class HerokuBackupMod(loader.Module):
 
                 with zipfile.ZipFile(file) as zf:
                     with zf.open("db_mods.json", "r") as modules:
-                        db_mods = json.loads(modules.read().decode())
+                        db_mods = orjson.loads(modules.read().decode())
                         if isinstance(db_mods, dict) and all(
                             (
                                 isinstance(key, str)
@@ -417,7 +416,7 @@ class HerokuBackupMod(loader.Module):
 
     @loader.command()
     async def backupall(self, message: Message):
-        db = io.BytesIO(json.dumps(self._db).encode())
+        db = io.BytesIO(orjson.dumps(self._db))
         db.name = "db.json"
 
         mods = io.BytesIO()
@@ -427,7 +426,7 @@ class HerokuBackupMod(loader.Module):
                     if file.endswith(f"{self.tg_id}.py"):
                         with open(os.path.join(root, file), "rb") as f:
                             zipf.writestr(file, f.read())
-            zipf.writestr("db_mods.json", json.dumps(self.lookup("Loader").get("loaded_modules", {})))
+            zipf.writestr("db_mods.json", orjson.dumps(self.lookup("Loader").get("loaded_modules", {})))
 
         mods.seek(0)
         mods.name = "mods.zip"
@@ -437,30 +436,46 @@ class HerokuBackupMod(loader.Module):
             z.writestr("db.json", db.getvalue())
             z.writestr("mods.zip", mods.getvalue())
 
-        archive.name = f"backup-all-{datetime.datetime.now():%d-%m-%Y-%H-%M}.backup"
-        archive.seek(0)
+        archive.name = f"heroku-{datetime.datetime.now():%d-%m-%Y-%H-%M}.backup"
 
-        await self._client.send_file(
-            "me",
-            archive,
-            caption=self.strings("backupall_info").format(
-                prefix=utils.escape_html(self.get_prefix())
+        backup_msg = await self.inline.bot.send_document(
+            int(f"-100{self._content_channel_id}"),
+            BufferedInputFile(archive.getvalue(), archive.name),
+            caption=self.strings["backupall_info"].format(
+                prefix=utils.escape_html(self.get_prefix()),
+            ),
+            reply_markup=self.inline.generate_markup(
+                [
+                    [
+                        {
+                            "text": "↪️ Restore this",
+                            "data": "heroku/backupall/restore/confirm",
+                        },
+                    ],
+                ],
+            ),
+            message_thread_id=self._backup_topic.id,
+        )
+
+        await utils.answer(
+            message,
+            self.strings["backupall_sent"].format(
+                f"https://t.me/c/{self._content_channel_id}/{self._backup_topic.id}/{backup_msg.message_id}"
             ),
         )
-        await utils.answer(message, self.strings("backupall_sent"))
 
     @loader.command()
     async def restoreall(self, message: Message):
-        if not (reply := await message.get_reply_message()) or not reply.media:
+        if not (reply := message.reply_to_message) or not reply.media:
             await utils.answer(message, self.strings("reply_to_file"))
             return
 
-        file = await reply.download_media(bytes)
+        file = await reply.download(in_memory=True)
         try:
             zipfile_bytes = io.BytesIO(file)
             with zipfile.ZipFile(zipfile_bytes) as zf:
                 with zf.open("db.json") as f:
-                    db_data = json.loads(f.read().decode())
+                    db_data = orjson.loads(f.read().decode())
 
                 with contextlib.suppress(KeyError):
                     db_data["heroku.inline"].pop("bot_token")
@@ -475,7 +490,7 @@ class HerokuBackupMod(loader.Module):
                 with zf.open("mods.zip") as modzip_bytes:
                     with zipfile.ZipFile(io.BytesIO(modzip_bytes.read())) as modzip:
                         with modzip.open("db_mods.json", "r") as modules:
-                            db_mods = json.loads(modules.read().decode())
+                            db_mods = orjson.loads(modules.read().decode())
                             if isinstance(db_mods, dict):
                                 self.lookup("Loader").set("loaded_modules", db_mods)
 

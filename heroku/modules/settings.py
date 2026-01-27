@@ -35,7 +35,7 @@ class CoreMod(loader.Module):
             ),
             loader.ConfigValue(
                 "alias_emoji",
-                "<emoji document_id=4974259868996207180>▪️</emoji>",
+                "<tg-emoji emoji-id=4974259868996207180>▪️</tg-emoji>",
                 "just emoji in .aliases",
             ),
         )
@@ -131,7 +131,7 @@ class CoreMod(loader.Module):
         try:
             return int(utils.get_args(message)[0])
         except (ValueError, IndexError):
-            if reply := await message.get_reply_message():
+            if reply := message.reply_to_message:
                 return reply.sender_id
 
             return message.to_id.user_id if message.is_private else False
@@ -223,14 +223,13 @@ class CoreMod(loader.Module):
                 return await utils.answer(
                     message,
                     self.strings("entity_prefix_set").format(
-                        "<emoji document_id=5197474765387864959>👍</emoji>",
+                        "<tg-emoji emoji-id=5197474765387864959>👍</tg-emoji>",
                         entity_name=utils.escape_html(entity.first_name),
                         newprefix=utils.escape_html(args[0]),
                         oldprefix=utils.escape_html(oldprefix),
                         entity_id=args[1],
                     ),
                 )
-
 
         oldprefix = utils.escape_html(self.get_prefix())
 
@@ -242,7 +241,7 @@ class CoreMod(loader.Module):
         await utils.answer(
             message,
             self.strings("prefix_set").format(
-                "<emoji document_id=5197474765387864959>👍</emoji>",
+                "<tg-emoji emoji-id=5197474765387864959>👍</tg-emoji>",
                 newprefix=utils.escape_html(args[0]),
                 oldprefix=utils.escape_html(oldprefix),
             ),
@@ -265,6 +264,7 @@ class CoreMod(loader.Module):
 
     @loader.command()
     async def addalias(self, message: Message):
+
         if len(args := utils.get_args_raw(message).split()) < 2:
             await utils.answer(message, self.strings("alias_args"))
             return

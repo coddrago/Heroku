@@ -59,9 +59,10 @@ class Evaluator(loader.Module):
     @loader.command(alias="eval")
     async def e(self, message: Message):
         args = utils.get_args_raw(message)
-        reply = await message.get_reply_message()
+        reply = message.reply_to_message
+
         if not args and reply and reply.text:
-            args = reply.text
+            args = utils.remove_html(reply.text)
         
         real_db = self.db
         self.db = self._SecureDB(real_db)
@@ -262,7 +263,7 @@ class Evaluator(loader.Module):
         return ret
 
     async def getattrs(self, message: Message) -> dict:
-        reply = await message.get_reply_message()
+        reply = message.reply_to_message
         return {
             "message": message,
             "client": self._client,
@@ -309,3 +310,4 @@ class Evaluator(loader.Module):
                 )
             ),
         }
+        

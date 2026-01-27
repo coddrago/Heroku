@@ -153,6 +153,7 @@ class SudoMessageEditor(MessageEditor):
         ):
             logger.debug("switching state to 0")
             await utils.answer(self.message, self.strings("auth_fail"))
+
             self.state = 0
             handled = True
             await asyncio.sleep(2)
@@ -407,9 +408,9 @@ class TerminalMod(loader.Module):
             await utils.answer(message, self.strings("what_to_kill"))
             return
 
-        if hash_msg(await message.get_reply_message()) in self.activecmds:
+        if hash_msg(message.reply_to_message) in self.activecmds:
             try:
-                kill_pids = self.activecmds[hash_msg(await message.get_reply_message())] 
+                kill_pids = self.activecmds[hash_msg(message.reply_to_message)] 
                 if "-f" not in utils.get_args_raw(message):
                      os.killpg(kill_pids.pid, signal.SIGTERM)
                 else:

@@ -176,7 +176,7 @@ class HerokuSettingsMod(loader.Module):
 
     @loader.command()
     async def nonickuser(self, message: Message):
-        if not (reply := await message.get_reply_message()):
+        if not (reply := message.reply_to_message):
             await utils.answer(message, self.strings("reply_required"))
             return
 
@@ -349,13 +349,6 @@ class HerokuSettingsMod(loader.Module):
         )
 
     async def inline__setting(self, call: InlineCall, key: str, state: bool = False):
-        if callable(key):
-            key()
-            pyrogram.extensions.html.CUSTOM_EMOJIS = not main.get_config_key(
-                "disable_custom_emojis"
-            )
-        else:
-            self._db.set(main.__name__, key, state)
 
         if key == "no_nickname" and state and self.get_prefix() == ".":
             await call.answer(
@@ -396,6 +389,7 @@ class HerokuSettingsMod(loader.Module):
     @loader.command()
     async def remove_core_protection(self, message: Message):
         """| Removes core protection"""
+
         if self._db.get(main.__name__, "remove_core_protection") == True:
             await utils.answer(message, self.strings("core_protection_already_removed"))
             return
@@ -422,6 +416,7 @@ class HerokuSettingsMod(loader.Module):
     @loader.command()
     async def enable_core_protection(self, message: Message):
         """| Enables core protection"""
+
         if self._db.get(main.__name__, "remove_core_protection") == False:
             await utils.answer(message, self.strings("core_protection_already_enabled"))
             return
@@ -524,48 +519,6 @@ class HerokuSettingsMod(loader.Module):
             [
                 (
                     {
-                        "text": self.strings("do_not_suggest_fs"),
-                        "callback": self.inline__setting,
-                        "args": (
-                            "disable_modules_fs",
-                            False,
-                        ),
-                    }
-                    if self._db.get(main.__name__, "disable_modules_fs", False)
-                    else {
-                        "text": self.strings("suggest_fs"),
-                        "callback": self.inline__setting,
-                        "args": (
-                            "disable_modules_fs",
-                            True,
-                        ),
-                    }
-                )
-            ],
-            [
-                (
-                    {
-                        "text": self.strings("use_fs"),
-                        "callback": self.inline__setting,
-                        "args": (
-                            "permanent_modules_fs",
-                            False,
-                        ),
-                    }
-                    if self._db.get(main.__name__, "permanent_modules_fs", False)
-                    else {
-                        "text": self.strings("do_not_use_fs"),
-                        "callback": self.inline__setting,
-                        "args": (
-                            "permanent_modules_fs",
-                            True,
-                        ),
-                    }
-                ),
-            ],
-            [
-                (
-                    {
                         "text": self.strings("suggest_subscribe"),
                         "callback": self.inline__setting,
                         "args": (
@@ -580,27 +533,6 @@ class HerokuSettingsMod(loader.Module):
                         "args": (
                             "suggest_subscribe",
                             True,
-                        ),
-                    }
-                ),
-            ],
-            [
-                (
-                    {
-                        "text": self.strings("no_custom_emojis"),
-                        "callback": self.inline__setting,
-                        "args": (
-                            lambda: main.save_config_key(
-                                "disable_custom_emojis", False
-                            ),
-                        ),
-                    }
-                    if main.get_config_key("disable_custom_emojis")
-                    else {
-                        "text": self.strings("custom_emojis"),
-                        "callback": self.inline__setting,
-                        "args": (
-                            lambda: main.save_config_key("disable_custom_emojis", True),
                         ),
                     }
                 ),

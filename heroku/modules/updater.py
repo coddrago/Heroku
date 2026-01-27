@@ -246,7 +246,7 @@ class UpdaterMod(loader.Module):
         with open('CHANGELOG.md', mode='r', encoding='utf-8') as f:
             changelog = f.read().split('##')[1].strip()
         if (await self._client.get_me()).premium:
-            changelog.replace('🌑 Heroku', '<emoji document_id=5192765204898783881>🌘</emoji><emoji document_id=5195311729663286630>🌘</emoji><emoji document_id=5195045669324201904>🌘</emoji>')
+            changelog.replace('🌑 Heroku', '<tg-emoji emoji-id=5192765204898783881>🌘</tg-emoji><tg-emoji emoji-id=5195311729663286630>🌘</tg-emoji><tg-emoji emoji-id=5195045669324201904>🌘</tg-emoji>')
 
         await utils.answer(message, self.strings('changelog').format(changelog))
 
@@ -325,8 +325,6 @@ class UpdaterMod(loader.Module):
         self.db.set("Updater", "modules_count", len(self.allmodules.modules))
 
         self.set("restart_ts", time.time())
-
-        # await self._db.remote_force_save()
 
         with contextlib.suppress(Exception):
             await main.heroku.web.stop()
@@ -665,12 +663,18 @@ class UpdaterMod(loader.Module):
         self.set("restart_ts", None)
         ms = self.get("selfupdatemsg")
 
-        if self.db.get("Updater", "modules_count") <= len(self.allmodules.modules):
+        modules_count = self.db.get("Updater", "modules_count")
+        try:
+            modules_count = int(modules_count)
+        except Exception:
+            modules_count = len(self.allmodules.modules)
+
+        if modules_count <= len(self.allmodules.modules):
             msg = self.strings(
                 "secure_boot_complete" if secure_boot else "full_success"
             ).format(utils.ascii_face(), took)
         else:
-            fails = self.db.get("Updater", "modules_count") - len(self.allmodules.modules)
+            fails = modules_count - len(self.allmodules.modules)
             msg = self.strings(
                 "secure_boot_fail" if secure_boot else "full_fail"
             ).format(utils.ascii_face(), took, fails)

@@ -73,6 +73,12 @@
 - add requirements installation when launching the userbot
 - add mini protection in eval
 - fix database path
+- fconfig value from reply
+- migrate from json to orjson
+- backupall send backup in backupchat
+- fully remove save to fs
+- optimize username handling & fix logic
+- protection for session files
 
 ## 🪐 Heroku 1.7.2
 - added autoupdate
@@ -561,7 +567,7 @@
 
 - Completely drop fast_uploader support
 - Add :method:`utils.import_lib`
-- Add protection for :obj:`CheckChatInviteRequest` in forbid_joins
+- Add protection for :obj:`CheckChatInvite` in forbid_joins
 - Add ability to search modules by classname in :method:`self.lookup`
 - Add anonymous stats of modules loading (YOU CAN DISABLE THEM IN `.settings`)
 - Add telethon objects formatting in `.e`

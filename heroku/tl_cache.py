@@ -479,7 +479,7 @@ class CustomClient(TelegramClient): # TODO: rewrite the cache specifically for K
     #     force: bool = False,
     # ) -> ChannelFull:
     #     """
-    #     Gets the FullChannelRequest and cache it
+    #     Gets the FullChannel and cache it
 
     #     :param entity: Channel to fetch ChannelFull of
     #     :param exp: Expiration time of the cache record and maximum time of already cached record
@@ -501,7 +501,7 @@ class CustomClient(TelegramClient): # TODO: rewrite the cache specifically for K
     #                 ),
     #                 entity,
     #             )
-    #             return await self(GetFullChannelRequest(channel=entity))
+    #             return await self(GetFullChannel(channel=entity))
     #     else:
     #         hashable_entity = entity
 
@@ -516,7 +516,7 @@ class CustomClient(TelegramClient): # TODO: rewrite the cache specifically for K
     #     ):
     #         return self._heroku_fullchannel_cache[hashable_entity].full_channel
 
-    #     result = await self(GetFullChannelRequest(channel=entity))
+    #     result = await self(GetFullChannel(channel=entity))
     #     self._heroku_fullchannel_cache[hashable_entity] = CacheRecordFullChannel(
     #         hashable_entity,
     #         result,
@@ -531,7 +531,7 @@ class CustomClient(TelegramClient): # TODO: rewrite the cache specifically for K
     #     force: bool = False,
     # ) -> UserFull:
     #     """
-    #     Gets the FullUserRequest and cache it
+    #     Gets the FullUser and cache it
 
     #     :param entity: User to fetch UserFull of
     #     :param exp: Expiration time of the cache record and maximum time of already cached record
@@ -553,7 +553,7 @@ class CustomClient(TelegramClient): # TODO: rewrite the cache specifically for K
     #                 ),
     #                 entity,
     #             )
-    #             return await self(GetFullUserRequest(entity))
+    #             return await self(GetFullUser(entity))
     #     else:
     #         hashable_entity = entity
 
@@ -568,7 +568,7 @@ class CustomClient(TelegramClient): # TODO: rewrite the cache specifically for K
     #     ):
     #         return self._heroku_fulluser_cache[hashable_entity].full_user
 
-    #     result = await self(GetFullUserRequest(entity))
+    #     result = await self(GetFullUser(entity))
     #     self._heroku_fulluser_cache[hashable_entity] = CacheRecordFullUser(
     #         hashable_entity,
     #         result,

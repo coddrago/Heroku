@@ -90,11 +90,11 @@ class TestMod(loader.Module):
             ),
             loader.ConfigValue(
                 "custom_message",
-                "<emoji document_id=5920515922505765329>⚡️</emoji> <b>𝙿𝚒𝚗𝚐: </b><code>{ping}</code><b> 𝚖𝚜 </b>\n<emoji document_id=5900104897885376843>🕓</emoji><b> 𝚄𝚙𝚝𝚒𝚖𝚎: </b><code>{uptime}</code>",
+                "<tg-emoji emoji-id=5920515922505765329>⚡️</tg-emoji> <b>𝙿𝚒𝚗𝚐: </b><code>{ping}</code><b> 𝚖𝚜 </b>\n<tg-emoji emoji-id=5900104897885376843>🕓</tg-emoji><b> 𝚄𝚙𝚝𝚒𝚖𝚎: </b><code>{uptime}</code>",
                 lambda: (
-                    self.strings("configping") + "\n" + self.strings("configpingph").format(
+                    "<blockquote expandable>" + self.strings("configping") + "\n" + self.strings("configpingph").format(
                         utils.config_placeholders()
-                    )
+                    ) + "</blockquote>"
                 ),
                 validator=loader.validators.String(),
             ),
@@ -368,7 +368,7 @@ class TestMod(loader.Module):
             "user": getpass.getuser(),
             "platform": utils.get_platform_name(),
         }
-        data = await utils.get_placeholders(data)
+        data = await utils.get_placeholders(data, self.config["custom_message"])
         await utils.answer(
             message,
             self.config["custom_message"].format(**data),

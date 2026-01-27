@@ -27,7 +27,7 @@ from pathlib import Path
 from PIL import Image, ImageDraw, ImageFont
 from io import BytesIO
 from pyrogram.errors import WebpageMediaEmpty
-from pyrogram.types import InputMediaWebPage
+from pyrogram.raw.types import InputMediaWebPage
 from pyrogram.types import Message
 from ..utils import get_display_name
 from .. import loader, utils, version
@@ -45,9 +45,9 @@ class HerokuInfoMod(loader.Module):
             loader.ConfigValue(
                 "custom_message",
                 doc=lambda: (
-                    self.strings("_cfg_cst_msg") + "\n" + self.strings("_cfg_cst_ph").format(
+                    "<blockquote expandable>" + self.strings("_cfg_cst_msg") + "\n" + self.strings("_cfg_cst_ph").format(
                         utils.config_placeholders()
-                    )
+                    ) + "</blockquote>"
                 )
             ),
 
@@ -143,26 +143,26 @@ class HerokuInfoMod(loader.Module):
         platform_emoji = utils.get_named_platform_emoji()
 
         for emoji, icon in [
-            ("🍊", "<emoji document_id=5449599833973203438>🧡</emoji>"),
-            ("🍇", "<emoji document_id=5449468596952507859>💜</emoji>"),
-            ("😶‍🌫️", "<emoji document_id=5370547013815376328>😶‍🌫️</emoji>"),
-            ("❓", "<emoji document_id=5407025283456835913>📱</emoji>"),
-            ("🍀", "<emoji document_id=5395325195542078574>🍀</emoji>"),
-            ("🦾", "<emoji document_id=5386766919154016047>🦾</emoji>"),
-            ("🚂", "<emoji document_id=5359595190807962128>🚂</emoji>"),
-            ("🐳", "<emoji document_id=5431815452437257407>🐳</emoji>"),
-            ("🕶", "<emoji document_id=5407025283456835913>📱</emoji>"),
-            ("🐈‍⬛", "<emoji document_id=6334750507294262724>🐈‍⬛</emoji>"),
-            ("✌️", "<emoji document_id=5469986291380657759>✌️</emoji>"),
-            ("💎", "<emoji document_id=5471952986970267163>💎</emoji>"),
-            ("🛡", "<emoji document_id=5282731554135615450>🌩</emoji>"),
-            ("🌼", "<emoji document_id=5224219153077914783>❤️</emoji>"),
-            ("🎡", "<emoji document_id=5226711870492126219>🎡</emoji>"),
-            ("🐧", "<emoji document_id=5361541227604878624>🐧</emoji>"),
-            ("🧃", "<emoji document_id=5422884965593397853>🧃</emoji>"),
-            ("🦅", "<emoji document_id=5427286516797831670>🦅</emoji>"),
-            ("💻", "<emoji document_id=5469825590884310445>💻</emoji>"),
-            ("🍏", "<emoji document_id=5372908412604525258>🍏</emoji>")
+            ("🍊", "<tg-emoji emoji-id=\"5449599833973203438\">🧡</tg-emoji>"),
+            ("🍇", "<tg-emoji emoji-id=\"5449468596952507859\">💜</tg-emoji>"),
+            ("😶‍🌫️", "<tg-emoji emoji-id=\"5370547013815376328\">😶‍🌫️</tg-emoji>"),
+            ("❓", "<tg-emoji emoji-id=\"5407025283456835913\">📱</tg-emoji>"),
+            ("🍀", "<tg-emoji emoji-id=\"5395325195542078574\">🍀</tg-emoji>"),
+            ("🦾", "<tg-emoji emoji-id=\"5386766919154016047\">🦾</tg-emoji>"),
+            ("🚂", "<tg-emoji emoji-id=\"5359595190807962128\">🚂</tg-emoji>"),
+            ("🐳", "<tg-emoji emoji-id=\"5431815452437257407\">🐳</tg-emoji>"),
+            ("🕶", "<tg-emoji emoji-id=\"5407025283456835913\">📱</tg-emoji>"),
+            ("🐈‍⬛", "<tg-emoji emoji-id=\"6334750507294262724\">🐈‍⬛</tg-emoji>"),
+            ("✌️", "<tg-emoji emoji-id=\"5469986291380657759\">✌️</tg-emoji>"),
+            ("💎", "<tg-emoji emoji-id=\"5471952986970267163\">💎</tg-emoji>"),
+            ("🛡", "<tg-emoji emoji-id=\"5282731554135615450\">🌩</tg-emoji>"),
+            ("🌼", "<tg-emoji emoji-id=\"5224219153077914783\">❤️</tg-emoji>"),
+            ("🎡", "<tg-emoji emoji-id=\"5226711870492126219\">🎡</tg-emoji>"),
+            ("🐧", "<tg-emoji emoji-id=\"5361541227604878624\">🐧</tg-emoji>"),
+            ("🧃", "<tg-emoji emoji-id=\"5422884965593397853\">🧃</tg-emoji>"),
+            ("🦅", "<tg-emoji emoji-id=\"5427286516797831670\">🦅</tg-emoji>"),
+            ("💻", "<tg-emoji emoji-id=\"5469825590884310445\">💻</tg-emoji>"),
+            ("🍏", "<tg-emoji emoji-id=\"5372908412604525258\">🍏</tg-emoji>")
         ]:
             platform_emoji = platform_emoji.replace(emoji, icon)
         data = {
@@ -187,7 +187,7 @@ class HerokuInfoMod(loader.Module):
             'htl_ver': herokutl.__version__,
             'git_status': utils.get_git_status(),
         }
-        data = await utils.get_placeholders(data)
+        data = await utils.get_placeholders(data, self.config["custom_message"])
         return (
             (
                 "🪐 Heroku\n"
@@ -250,7 +250,7 @@ class HerokuInfoMod(loader.Module):
         "<Url|Reply to font> - Install font"
         match True:
             case _ if message.is_reply:
-                reply = await message.get_reply_message()
+                reply = message.reply_to_message
                 fontform = reply.document.mime_type.split("/")[1]
                 if not fontform in ['ttf', 'otf']:
                     await utils.answer(
@@ -305,14 +305,13 @@ class HerokuInfoMod(loader.Module):
             media = None
 
         try:
-            match True:
-                case _ if self.config['switchInfo']:
-                    if await self._get_info_photo(start) is None:
-                        await utils.answer(
-                            message, 
-                            self.strings["incorrect_img_format"]
-                        )
-                        return
+            if self.config['switchInfo']:
+                if await self._get_info_photo(start) is None:
+                    await utils.answer(
+                        message, 
+                        self.strings["incorrect_img_format"]
+                    )
+                    return
 
                 await utils.answer(
                     message,
@@ -338,7 +337,7 @@ class HerokuInfoMod(loader.Module):
                     reply_to=getattr(message, "reply_to_msg_id", None),
                     invert_media = self.config["invert_media"],
                 )
-        except WebpageMediaEmptyError:
+        except WebpageMediaEmpty:
             await utils.answer(
                 message,
                 self.strings["no_banner"].format(

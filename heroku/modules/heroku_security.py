@@ -15,7 +15,8 @@ import datetime
 import time
 import typing
 
-from pyrogram.raw.types import Message, PeerUser, User
+from pyrogram.types import Message
+from pyrogram.raw.types import PeerUser, User
 from ..utils import get_display_name
 
 from .. import loader, main, security, utils
@@ -314,7 +315,7 @@ class HerokuSecurityMod(loader.Module):
                 (
                     self.strings("permissions_list").format(
                         "\n".join(
-                            "<emoji document_id=4974307891025543730>▫️</emoji>"
+                            "<tg-emoji emoji-id=4974307891025543730>▫️</tg-emoji>"
                             " <b>{}</b> <code>{}</code> <b>{}</b>".format(
                                 self.strings(rule["rule_type"]),
                                 rule["rule"],
@@ -374,7 +375,7 @@ class HerokuSecurityMod(loader.Module):
                 await utils.answer(message, self.strings("no_args"))
                 return
 
-            group, user = args, await (await message.get_reply_message()).get_sender()
+            group, user = args, (await message.reply_to_message).get_sender()
 
         if not (group := self._sgroups.get(group)):
             await utils.answer(message, self.strings("sgroup_not_found").format(group))
@@ -424,7 +425,7 @@ class HerokuSecurityMod(loader.Module):
                 await utils.answer(message, self.strings("no_args"))
                 return
 
-            group, user = args, await (await message.get_reply_message()).get_sender()
+            group, user = args, (await message.reply_to_message).get_sender()
 
         if not (group := self._sgroups.get(group)):
             await utils.answer(message, self.strings("sgroup_not_found").format(group))
@@ -503,7 +504,7 @@ class HerokuSecurityMod(loader.Module):
 
     async def _resolve_user(self, message: Message):
         if not (args := utils.get_args_raw(message).replace("@", "")) and not (
-            reply := await message.get_reply_message()
+            reply := message.reply_to_message
         ):
             await utils.answer(message, self.strings("no_user"))
             return
@@ -961,6 +962,7 @@ class HerokuSecurityMod(loader.Module):
         await self._confirm(message, "sgroup", target, possible_rules[0], duration)
 
     async def _tsec_user(self, message: Message, args: list):
+
         match args:
             case [single]:
                 if not message.is_private and not message.is_reply:
@@ -982,7 +984,7 @@ class HerokuSecurityMod(loader.Module):
                         target = await self._client.get_entity(message.peer_id, exp=0)
                     elif message.is_reply:
                         target = await self._client.get_entity(
-                            (await message.get_reply_message()).sender_id,
+                            (message.reply_to_message).sender_id,
                             exp=0,
                         )
                     else:
@@ -1052,7 +1054,7 @@ class HerokuSecurityMod(loader.Module):
                 target = await self._client.get_entity(message.peer_id, exp=0)
             elif message.is_reply:
                 target = await self._client.get_entity(
-                    (await message.get_reply_message()).sender_id,
+                    (message.reply_to_message).sender_id,
                     exp=0,
                 )
 
@@ -1142,7 +1144,7 @@ class HerokuSecurityMod(loader.Module):
                 target = await self._client.get_entity(message.peer_id, exp=0)
             elif message.is_reply:
                 target = await self._client.get_entity(
-                    (await message.get_reply_message()).sender_id,
+                    (message.reply_to_message).sender_id,
                     exp=0,
                 )
 
@@ -1205,7 +1207,7 @@ class HerokuSecurityMod(loader.Module):
                 self.strings("rules").format(
                     "\n".join(
                         [
-                            "<emoji document_id=6037355667365300960>👥</emoji> <b><a"
+                            "<tg-emoji emoji-id=6037355667365300960>👥</tg-emoji> <b><a"
                             " href='{}'>{}</a> {} {} {}</b> <code>{}</code>".format(
                                 rule["entity_url"],
                                 utils.escape_html(rule["entity_name"]),
@@ -1217,7 +1219,7 @@ class HerokuSecurityMod(loader.Module):
                             for rule in self._client.dispatcher.security.tsec_chat
                         ]
                         + [
-                            "<emoji document_id=6037122016849432064>👤</emoji> <b><a"
+                            "<tg-emoji emoji-id=6037122016849432064>👤</tg-emoji> <b><a"
                             " href='{}'>{}</a> {} {} {}</b> <code>{}</code>".format(
                                 rule["entity_url"],
                                 utils.escape_html(rule["entity_name"]),
@@ -1231,7 +1233,7 @@ class HerokuSecurityMod(loader.Module):
                         + [
                             "\n".join(
                                 [
-                                    "<emoji document_id=5870704313440932932>🔒</emoji>"
+                                    "<tg-emoji emoji-id=5870704313440932932>🔒</tg-emoji>"
                                     " <code>{}</code> <b>{} {} {}</b> <code>{}</code>".format(
                                         utils.escape_html(group.name),
                                         self._convert_time(

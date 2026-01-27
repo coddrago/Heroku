@@ -51,7 +51,7 @@ class Translator(loader.Module):
                     text = None
 
         if not text:
-            if not (reply := await message.get_reply_message()):
+            if not (reply := message.reply_to_message):
                 await utils.answer(message, self.strings("no_args"))
                 return
 

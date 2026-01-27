@@ -20,7 +20,7 @@ import pyrogram
 import requests
 from aiogram.types import Message as AiogramMessage
 from pyrogram import types
-from herokutl.tl.custom.message import Message
+from pyrogram.types import Message
 from pyrogram.raw.functions.channels import (
     CreateChannel,
     EditPhoto,
@@ -166,9 +166,9 @@ def remove_html(text: str, escape: bool = False, keep_emojis: bool = False) -> s
     return (escape_html if escape else str)(
         re.sub(
             (
-                r"(<\/?a.*?>|<\/?b>|<\/?i>|<\/?u>|<\/?strong>|<\/?em>|<\/?code>|<\/?strike>|<\/?del>|<\/?pre.*?>|<\/?blockquote.*?>)"
+                r"(<\/?a.*?>|<\/?b>|<\/?i>|<\/?u>|<\/?strong>|<\/?em>|<\/?code.*?>|<\/?strike>|<\/?del>|<\/?pre.*?>|<\/?blockquote.*?>)"
                 if keep_emojis
-                else r"(<\/?a.*?>|<\/?b>|<\/?i>|<\/?u>|<\/?strong>|<\/?em>|<\/?code>|<\/?strike>|<\/?del>|<\/?pre.*?>|<\/?emoji.*?>|<\/?blockquote.*?>)"
+                else r"(<\/?a.*?>|<\/?b>|<\/?i>|<\/?u>|<\/?strong>|<\/?em>|<\/?code.*?>|<\/?strike>|<\/?del>|<\/?pre.*?>|<\/?emoji.*?>|<\/?blockquote.*?>)"
             ),
             "",
             text,
@@ -362,7 +362,7 @@ async def asset_forum_topic(
 
         await fw_protect()
 
-        await client.send_message(entity=entity, message=(description if description else f"<emoji document_id=5258503720928288433>ℹ️</emoji> <b>Content related to <i>'{title}'</i> will be here</b>"), reply_to=result.updates[0].id)
+        await client.send_message(entity=entity, message=(description if description else f"<tg-emoji emoji-id=\"5258503720928288433\">ℹ️</tg-emoji> <b>Content related to <i>'{title}'</i> will be here</b>"), reply_to=result.updates[0].id)
 
         await fw_protect()
 
@@ -443,7 +443,7 @@ async def set_avatar(
     res = await client.invoke(
         EditPhoto(
             channel=peer,
-            photo=await client.upload_file(f, file_name="photo.png"),
+            photo=await client.save_file(f, file_name="photo.png"),
         )
     )
 
@@ -487,7 +487,7 @@ async def get_target(message: Message, arg_no: int = 0) -> typing.Optional[int]:
     if len(get_args(message)) > arg_no:
         user = get_args(message)[arg_no]
     elif message.is_reply:
-        return (await message.get_reply_message()).sender_id
+        return (message.reply_to_message).sender_id
     elif hasattr(message.peer_id, "user_id"):
         user = message.peer_id.user_id
     else:

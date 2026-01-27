@@ -99,7 +99,7 @@ class LoaderMod(loader.Module):
             ),
             loader.ConfigValue(
                 "command_emoji",
-                "<emoji document_id=5197195523794157505>▫️</emoji>",
+                "<tg-emoji emoji-id=5197195523794157505>▫️</tg-emoji>",
                 lambda: "Emoji for command",
             ),
         )
@@ -185,6 +185,7 @@ class LoaderMod(loader.Module):
 
     @loader.command(alias = "dlm")
     async def dlmod(self, message: Message, force_pm: bool = False):
+
         if args := utils.get_args(message):
             match args:
                 case [single]:
@@ -377,31 +378,14 @@ class LoaderMod(loader.Module):
         path_: str,
         mode: str,
     ):
-        save = False
-        match mode:
-            case "all_yes":
-                self._db.set(main.__name__, "permanent_modules_fs", True)
-                self._db.set(main.__name__, "disable_modules_fs", False)
-                await call.answer(self.strings("will_save_fs"))
-                save = True
-            case "all_no":
-                self._db.set(main.__name__, "disable_modules_fs", True)
-                self._db.set(main.__name__, "permanent_modules_fs", False)
-            case "once":
-                save = True
 
-        await self.load_module(doc, call, origin=path_ or "<string>", save_fs=save)
+        await self.load_module(doc, call, origin=path_ or "<string>", save_fs=True)
 
     @loader.command(alias="lm")
-    async def loadmod(self, message: Message, force_pm: bool = False):
+    async def loadmod(self, message: Message):
         args = utils.get_args_raw(message)
-        if "-fs" in args:
-            force_save = True
-            args = args.replace("-fs", "").strip()
-        else:
-            force_save = False
 
-        msg = message if message.file else (await message.get_reply_message())
+        msg = message if message.file else (message.reply_to_message)
 
         if msg is None or msg.media is None:
             await utils.answer(message, self.strings("provide_module"))
@@ -420,73 +404,18 @@ class LoaderMod(loader.Module):
             await utils.answer(message, self.strings("bad_unicode"))
             return
 
-        if (
-            not self._db.get(
-                main.__name__,
-                "disable_modules_fs",
-                False,
-            )
-            and not self._db.get(main.__name__, "permanent_modules_fs", False)
-            and not force_save
-        ):
-            if message.file:
-                await message.edit("")
-                message = await message.respond("🪐", reply_to=utils.get_topic(message))
-
-            if await self.inline.form(
-                self.strings("module_fs"),
-                message=message,
-                reply_markup=[
-                    [
-                        {
-                            "text": self.strings("save"),
-                            "callback": self._inline__load,
-                            "args": (doc, path_, "once"),
-                        },
-                        {
-                            "text": self.strings("no_save"),
-                            "callback": self._inline__load,
-                            "args": (doc, path_, "no"),
-                        },
-                    ],
-                    [
-                        {
-                            "text": self.strings("save_for_all"),
-                            "callback": self._inline__load,
-                            "args": (doc, path_, "all_yes"),
-                        }
-                    ],
-                    [
-                        {
-                            "text": self.strings("never_save"),
-                            "callback": self._inline__load,
-                            "args": (doc, path_, "all_no"),
-                        }
-                    ],
-                ],
-            ):
-                return
-
         if path_ is not None:
             await self.load_module(
                 doc,
                 message,
                 origin=path_,
-                save_fs=(
-                    force_save
-                    or self._db.get(main.__name__, "permanent_modules_fs", False)
-                    and not self._db.get(main.__name__, "disable_modules_fs", False)
-                ),
+                save_fs=True
             )
         else:
             await self.load_module(
                 doc,
                 message,
-                save_fs=(
-                    force_save
-                    or self._db.get(main.__name__, "permanent_modules_fs", False)
-                    and not self._db.get(main.__name__, "disable_modules_fs", False)
-                ),
+                save_fs=True
             )
 
     async def approve_internal(
@@ -609,7 +538,7 @@ class LoaderMod(loader.Module):
         name: typing.Optional[str] = None,
         origin: str = "<string>",
         did_requirements: bool = False,
-        save_fs: bool = False,
+        save_fs: bool = True,
         blob_link: bool = False,
         did_requires: bool = False,
         did_packages: bool = False,
@@ -858,7 +787,7 @@ class LoaderMod(loader.Module):
                         await utils.answer(
                             message,
                             (
-                                "<emoji document_id=5454225457916420314>😖</emoji>"
+                                "<tg-emoji emoji-id=5454225457916420314>😖</tg-emoji>"
                                 f" <b>{utils.escape_html(str(e))}</b>"
                             ),
                         )
@@ -939,7 +868,7 @@ class LoaderMod(loader.Module):
                         await utils.answer(
                             message,
                             (
-                                "<emoji document_id=5454225457916420314>😖</emoji>"
+                                "<tg-emoji emoji-id=5454225457916420314>😖</tg-emoji>"
                                 f" <b>{utils.escape_html(str(e))}</b>"
                             ),
                         )
@@ -966,7 +895,7 @@ class LoaderMod(loader.Module):
                     await utils.answer(
                         message,
                         (
-                            "<emoji document_id=5454225457916420314>😖</emoji>"
+                            "<tg-emoji emoji-id=5454225457916420314>😖</tg-emoji>"
                             f" <b>{utils.escape_html(str(e))}</b>"
                         ),
                     )
@@ -1052,7 +981,7 @@ class LoaderMod(loader.Module):
 
         if instance.__doc__:
             mod_doc += (
-                "<i>\n<emoji document_id=5879813604068298387>ℹ️</emoji>"
+                "<i>\n<tg-emoji emoji-id=5879813604068298387>ℹ️</tg-emoji>"
                 f" {utils.escape_html(inspect.getdoc(instance))}</i>\n\n"
             )
 
@@ -1064,7 +993,7 @@ class LoaderMod(loader.Module):
             value = getattr(instance, key)
             if isinstance(value, loader.Library):
                 depends_from.append(
-                    "<emoji document_id=5197195523794157505>▫️</emoji>"
+                    "<tg-emoji emoji-id=5197195523794157505>▫️</tg-emoji>"
                     " <code>{}</code> <b>{}</b> <code>{}</code>".format(
                         value.__class__.__name__,
                         self.strings("by"),
@@ -1093,6 +1022,11 @@ class LoaderMod(loader.Module):
                 subscribe, \
                 blob_link, \
                 depends_from
+            placeholders = utils.help_placeholders(modname.strip()).replace("No docs", self.strings('undoc'))
+            if placeholders != "":
+                placeholders_info = f"<blockquote expandable>{self.strings('custom_placeholders')}\n{placeholders}</blockquote>"
+            else: 
+                placeholders_info = ""
             return self.strings("loaded").format(
                 modname.strip(),
                 version,
@@ -1101,6 +1035,7 @@ class LoaderMod(loader.Module):
                 "<blockquote expandable>{}</blockquote>".format(
                     '\n'.join(modhelp)
                 ),
+                placeholders_info,
                 developer if not subscribe or not use_subscribe else "",
                 depends_from,
                 (
@@ -1276,7 +1211,7 @@ class LoaderMod(loader.Module):
 
         msg = (
             self.strings("unloaded").format(
-                "<emoji document_id=5784993237412351403>✅</emoji>",
+                "<tg-emoji emoji-id=5784993237412351403>✅</tg-emoji>",
                 ", ".join(
                     [(mod[:-3] if mod.endswith("Mod") else mod) for mod in worked]
                 ),
@@ -1287,6 +1222,7 @@ class LoaderMod(loader.Module):
         for mod_name in worked:
             utils.unregister_placeholders(mod_name)
         return msg
+
 
     @loader.command()
     async def clearmodules(self, message: Message):
