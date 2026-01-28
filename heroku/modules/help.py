@@ -322,8 +322,8 @@ class Help(loader.Module):
                 continue
 
             tmp = ""
-            
-            developer = mod.developer if hasattr(mod, "developer") else None
+
+            developer = getattr(mod, "developer", None)
 
             try:
                 name = mod.strings["name"]
