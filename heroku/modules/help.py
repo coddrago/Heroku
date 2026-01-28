@@ -155,7 +155,10 @@ class Help(loader.Module):
             name = module.strings("name")
         except (KeyError, AttributeError):
             name = getattr(module, "name", "ERROR")
-
+            if hasattr(module, "developer"):
+                dev_text = f"({getattr(module, 'developer', None)})"
+            else:
+                dev_text = None
         _name = (
             "{} (v{}.{}.{})".format(
                 utils.escape_html(name),
@@ -239,28 +242,22 @@ class Help(loader.Module):
         cmds = "\n".join(lines)
 
         placeholders = utils.help_placeholders(module.__class__.__name__).replace("No docs", self.strings('undoc'))
-        if placeholders != "":
-            await utils.answer(
-                message,
-                f"{reply}<blockquote expandable>{cmds}{inline_cmd}</blockquote>\n<blockquote expandable>{self.strings('custom_placeholders')}\n{placeholders}</blockquote>"
-                + (f"\n\n{self.strings('not_exact')}" if not exact else "")
-                + (
-                    f"\n\n{self.strings('core_notice')}"
-                    if module.__origin__.startswith("<core")
-                    else ""
-                ),
-            )
-        else:
-            await utils.answer(
-                message,
-                f'{reply}<blockquote expandable>{cmds}{inline_cmd}</blockquote>'
-                + (f"\n\n{self.strings('not_exact')}" if not exact else "")
-                + (
-                    f"\n\n{self.strings('core_notice')}"
-                    if module.__origin__.startswith("<core")
-                    else ""
-                ),
-            )
+        await utils.answer(
+            message,
+            f"{reply}<blockquote expandable>{cmds}{inline_cmd}</blockquote>\n<blockquote expandable>" 
+            + (f"{self.strings('custom_placeholders')}\n{placeholders}</blockquote>" if placeholders else "")
+            + (f"\n\n{self.strings('not_exact')}" if not exact else "")
+            + (
+                f"\n\n{self.strings('core_notice')}"
+                if module.__origin__.startswith("<core")
+                else ""
+            ) 
+            + (
+                f"\n\n<tg-emoji emoji-id=5287454910059654880>🫶</tg-emoji> Developer: {dev_text}" # без стрингсов потому что я без кодспейсов хз на сколько, как будут - поменяю
+               if dev_text 
+               else ""
+            ),
+        )
 
     @loader.command(ru_doc="[args] | Помощь с вашими модулями!", ua_doc="[args] | допоможіть з вашими модулями!", de_doc="[args] | Hilfe mit deinen Modulen!")
     async def help(self, message: Message):
@@ -323,8 +320,6 @@ class Help(loader.Module):
 
             tmp = ""
 
-            developer = getattr(mod, "developer", None)
-
             try:
                 name = mod.strings["name"]
             except KeyError:
@@ -335,26 +330,17 @@ class Help(loader.Module):
                 and not getattr(mod, "inline_handlers", None)
                 and not getattr(mod, "callback_handlers", None)
             ):
-                if developer:
-                    no_commands_ += [
-                        "\n{} <code>{}({})</code>".format(self.config["empty_emoji"], name, developer)
-                    ]
-                else:
-                    no_commands_ += [
-                        "\n{} <code>{}</code>".format(self.config["empty_emoji"], name)
-                    ]
+                no_commands_ += [
+                    "\n{} <code>{}</code>".format(self.config["empty_emoji"], name)
+                ]
                 continue
 
             core = mod.__origin__.startswith("<core")
-            if developer:
-                tmp += "\n{} <code>{}({})</code>".format(
-                    self.config["core_emoji"] if core else self.config["plain_emoji"], name, developer
-                )
-            else:
-                tmp += "\n{} <code>{}</code>".format(
-                    self.config["core_emoji"] if core else self.config["plain_emoji"], name
-                )
-                first = True
+
+            tmp += "\n{} <code>{}</code>".format(
+                self.config["core_emoji"] if core else self.config["plain_emoji"], name
+            )
+            first = True
 
             commands = [
                 name
