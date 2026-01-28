@@ -323,10 +323,8 @@ class Help(loader.Module):
 
             tmp = ""
 
-            try:
-                developer = getattr(mod, "developer", None)
-            except KeyError:
-                developer = None
+            developer = getattr(mod, "developer", None)
+
             try:
                 name = mod.strings["name"]
             except KeyError:
