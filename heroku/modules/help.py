@@ -158,10 +158,11 @@ class Help(loader.Module):
             if hasattr(module, "developer"):
                 dev_text = f"({getattr(module, 'developer', None)})"
             else:
-                dev_text = None
+                dev_text = ""
         _name = (
             "{} (v{}.{}.{})".format(
                 utils.escape_html(name),
+                dev_text,
                 module.__version__[0],
                 module.__version__[1],
                 module.__version__[2],
