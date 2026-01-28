@@ -86,7 +86,7 @@ class Evaluator(loader.Module):
                 self.strings("err").format(
                     "4985626654563894116",
                     "python",
-                    utils.escape_html(args),
+                    args,
                     "error",
                     self.censor(
                         (
