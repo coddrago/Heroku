@@ -155,12 +155,12 @@ class Help(loader.Module):
             name = module.strings("name")
         except (KeyError, AttributeError):
             name = getattr(module, "name", "ERROR")
-            if hasattr(module, "developer"):
-                dev_text = f"({getattr(module, 'developer', None)})"
-            else:
-                dev_text = ""
+        if hasattr(module, "developer"):
+            dev_text = f"({getattr(module, 'developer', None)})"
+        else:
+            dev_text = ""
         _name = (
-            "{} (v{}.{}.{})".format(
+            "{}({}) (v{}.{}.{})".format(
                 utils.escape_html(name),
                 dev_text,
                 module.__version__[0],
