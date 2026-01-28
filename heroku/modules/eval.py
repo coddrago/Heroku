@@ -72,7 +72,7 @@ class Evaluator(loader.Module):
             output_print = StringIO()
             with contextlib.redirect_stdout(output_print):
                 result = await meval(
-                        args.replace('\xa0', ' '),
+                        args,
                     globals(),
                     **await self.getattrs(message),
                 )

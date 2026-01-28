@@ -76,12 +76,6 @@ class Help(loader.Module):
                 lambda: "invert banner",
                 validator=loader.validators.Boolean(),
             ),
-            loader.ConfigValue(
-                "show_developer",
-                "False",
-                lambda: "Show developer in help",
-                validator=loader.validators.Boolean(),
-            ),
         )
 
     @loader.command(ru_doc="[args] | Спрячет ваши модули", ua_doc="[args] | Сховає ваші модулі", de_doc="[args] | Versteckt Ihre Module")
@@ -328,11 +322,11 @@ class Help(loader.Module):
                 continue
 
             tmp = ""
-            if self.config["show_developer"]:
-                try:
-                    developer = getattr(mod, "developer", None)
-                except KeyError:
-                    developer = None
+
+            try:
+                developer = getattr(mod, "developer", None)
+            except KeyError:
+                developer = None
             try:
                 name = mod.strings["name"]
             except KeyError:
@@ -343,7 +337,7 @@ class Help(loader.Module):
                 and not getattr(mod, "inline_handlers", None)
                 and not getattr(mod, "callback_handlers", None)
             ):
-                if self.config["show_developer"] and developer:
+                if developer:
                     no_commands_ += [
                         "\n{} <code>{}({})</code>".format(self.config["empty_emoji"], name, developer)
                     ]
@@ -354,7 +348,7 @@ class Help(loader.Module):
                 continue
 
             core = mod.__origin__.startswith("<core")
-            if self.config["show_developer"] and developer:
+            if developer:
                 tmp += "\n{} <code>{}({})</code>".format(
                     self.config["core_emoji"] if core else self.config["plain_emoji"], name, developer
                 )
@@ -403,12 +397,6 @@ class Help(loader.Module):
                     first = False
                 else:
                     tmp += f" | 🤖 {cmd}"
-            #МАССИВ - это группа переменных одного типа, расположенных в памяти рядом(в соседних ячейках) и имеющих  имя. Каждая ячейка в массиве имеет уникальный номер.
-
-            #МАССИВ - ТАБЛИЦА!
-            # A = [1, 3, 4, 23, 5]
-            # A - название массива
-            # 1 - 0 3 - 1 4 - 2 23 - 3 5 - 4
 
             if commands or icommands:
                 tmp += " )"
