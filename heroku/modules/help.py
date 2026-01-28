@@ -322,11 +322,9 @@ class Help(loader.Module):
                 continue
 
             tmp = ""
+            
+            developer = mod.developer if hasattr(mod, "developer") else None
 
-            try:
-                developer = mod.developer if hasattr(mod, "developer") else None
-            except (KeyError, AttributeError):
-                developer = None
             try:
                 name = mod.strings["name"]
             except KeyError:
