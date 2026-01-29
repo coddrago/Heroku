@@ -245,14 +245,14 @@ class Help(loader.Module):
             message,
             f"{reply}<blockquote expandable>{cmds}{inline_cmd}</blockquote>\n<blockquote expandable>" 
             + (f"{self.strings('custom_placeholders')}\n{placeholders}</blockquote>" if placeholders else "")
-            + (f"\n\n{self.strings('not_exact')}" if not exact else "")
+            + (f"\n{self.strings('not_exact')}" if not exact else "")
             + (
-                f"\n\n{self.strings('core_notice')}"
+                f"\n{self.strings('core_notice')}"
                 if module.__origin__.startswith("<core")
                 else ""
             )
             + (
-                f"\n\n<tg-emoji emoji-id=5287454910059654880>🫶</tg-emoji> Developer: {dev_text}" # без стрингсов потому что я без кодспейсов хз на сколько, как будут - поменяю
+                f"\n<tg-emoji emoji-id=5287454910059654880>🫶</tg-emoji> Developer: {dev_text}" # без стрингсов потому что я без кодспейсов хз на сколько, как будут - поменяю
                 if dev_text
                 else ""
             ),
