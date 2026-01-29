@@ -250,11 +250,11 @@ class Help(loader.Module):
                 f"\n\n{self.strings('core_notice')}"
                 if module.__origin__.startswith("<core")
                 else ""
-            ),
+            )
             + (
                 f"\n\n<tg-emoji emoji-id=5287454910059654880>🫶</tg-emoji> Developer: {dev_text}" # без стрингсов потому что я без кодспейсов хз на сколько, как будут - поменяю
-               if dev_text 
-               else ""
+                if dev_text
+                else ""
             ),
         )
 
