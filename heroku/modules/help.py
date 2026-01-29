@@ -246,7 +246,7 @@ class Help(loader.Module):
             f"{reply}<blockquote expandable>{cmds}{inline_cmd}</blockquote><blockquote expandable>" 
             + (f"{self.strings('custom_placeholders')}\n{placeholders}</blockquote>" if placeholders else "")
             + (
-                f"\n\n{self.strings('developer')}".format(dev_text) # Погиб поэт! — невольник чести — Пал, оклеветанный молвой!
+                f"\n\n{self.strings('developer')}".format(dev_text)
                 if dev_text
                 else ""
             )
