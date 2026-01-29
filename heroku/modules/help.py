@@ -252,7 +252,7 @@ class Help(loader.Module):
                 else ""
             )
             + (
-                f"\n<tg-emoji emoji-id=5287454910059654880>🫶</tg-emoji> Developer: {dev_text}" # без стрингсов потому что я без кодспейсов хз на сколько, как будут - поменяю
+                f"\n{self.strings('developer')}".format(dev_text) # Погиб поэт! — невольник чести — Пал, оклеветанный молвой!
                 if dev_text
                 else ""
             ),

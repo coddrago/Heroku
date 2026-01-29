@@ -479,6 +479,7 @@ help:
   no_mod: "🚫 <b>Specify module to hide</b>"
   custom_placeholders: "<tg-emoji emoji-id=5372981976804366741>🤖</tg-emoji>Custom placeholders: "
   help_lib: "<tg-emoji emoji-id=5404553572727660202>❌</tg-emoji> <b>Package</b> <code>{}</code> <b>is a library.</b>\n<tg-emoji emoji-id=5404553572727660202>❌</tg-emoji> <b>Libraries do not have descriptions...</b>"
+  developer: "<tg-emoji emoji-id=5287454910059654880>🫶</tg-emoji> Developer: {}"
   hidden_shown: "<b>{} modules hidden, {} modules shown:</b>\n{}\n{}"
   offchats: "<tg-emoji emoji-id=6019130940012370273>❔</tg-emoji> <a href=\"https://t.me/heroku_talks\"><b>Support chat</b></a>\n\n<tg-emoji emoji-id=6019151079114021083>💬</tg-emoji> <a href=\"https://t.me/heroku_offtop\"><b>Offtop chat</b></a>\n\n<tg-emoji emoji-id=6019094432790354513>📢</tg-emoji> <a href=\"https://t.me/heroku_ub\"><b>Official channel</b></a>"
   partial_load: "<tg-emoji emoji-id=5355133243773435190>☝️</tg-emoji> <b>Userbot is not fully loaded, so not all modules are shown</b>"
