@@ -14,6 +14,7 @@ import asyncio
 import difflib
 import inspect
 import logging
+import re
 
 from herokutl.extensions.html import CUSTOM_EMOJIS
 from herokutl.tl.types import Message
@@ -155,10 +156,7 @@ class Help(loader.Module):
             name = module.strings("name")
         except (KeyError, AttributeError):
             name = getattr(module, "name", "ERROR")
-            if hasattr(module, "developer"):
-                dev_text = f"({getattr(module, 'developer', None)})"
-            else:
-                dev_text = None
+
         _name = (
             "{} (v{}.{}.{})".format(
                 utils.escape_html(name),
@@ -240,23 +238,24 @@ class Help(loader.Module):
                 )
             )
         cmds = "\n".join(lines)
-
+        developer = re.search(r"# ?meta developer: ?(.+)", getattr(module, "__source__", None))
+        dev_text = developer.group(1) if developer else None
         placeholders = utils.help_placeholders(module.__class__.__name__).replace("No docs", self.strings('undoc'))
         await utils.answer(
             message,
-            f"{reply}<blockquote expandable>{cmds}{inline_cmd}</blockquote>\n<blockquote expandable>" 
+            f"{reply}<blockquote expandable>{cmds}{inline_cmd}</blockquote><blockquote expandable>" 
             + (f"{self.strings('custom_placeholders')}\n{placeholders}</blockquote>" if placeholders else "")
+            + (
+                f"\n\n{self.strings('developer')}".format(dev_text)
+                if dev_text
+                else ""
+            )
             + (f"\n\n{self.strings('not_exact')}" if not exact else "")
             + (
                 f"\n\n{self.strings('core_notice')}"
                 if module.__origin__.startswith("<core")
                 else ""
             ),
-            #+ (
-                #f"\n\n<tg-emoji emoji-id=5287454910059654880>🫶</tg-emoji> Developer: {dev_text}" # без стрингсов потому что я без кодспейсов хз на сколько, как будут - поменяю
-               #if dev_text 
-               #else ""
-           # ),
         )
 
     @loader.command(ru_doc="[args] | Помощь с вашими модулями!", ua_doc="[args] | допоможіть з вашими модулями!", de_doc="[args] | Hilfe mit deinen Modulen!")

@@ -479,6 +479,7 @@ help:
   no_mod: "🚫 <b>Sp3c1fy m0dul3 2 h1d3</b>"
   custom_placeholders: "<tg-emoji emoji-id=5372981976804366741>🤖</tg-emoji>Cu570m pl4c3h0ld3r5: "
   help_lib: "<tg-emoji emoji-id=5404553572727660202>❌</tg-emoji> <b>P4ck4g3</b> <code>{}</code> <b>15 4 l1b.</b>\n<tg-emoji emoji-id=5404553572727660202>❌</tg-emoji> <b>L1b5 d0 n07 h4v3 d35cr1p710n5...</b>"
+  developer: "<tg-emoji emoji-id=5287454910059654880>🫶</tg-emoji> D3v3l0p3r: {}"
   hidden_shown: "<b>{} m0dul35 h1dd3n, {} m0dul35 sh0wn:</b>\n{}\n{}"
   offchats: "<tg-emoji emoji-id=6019130940012370273>❔</tg-emoji> <a href=\"https://t.me/heroku_talks\"><b>Supp0r7 ch47</b></a>\n\n<tg-emoji emoji-id=6019151079114021083>💬</tg-emoji> <a href=\"https://t.me/heroku_offtop\"><b>0ff70p ch47</b></a>\n\n<tg-emoji emoji-id=6019094432790354513>📢</tg-emoji> <a href=\"https://t.me/heroku_ub\"><b>0ff1c14l ch4nn3l</b></a>"
   partial_load: "<tg-emoji emoji-id=5355133243773435190>☝️</tg-emoji> <b>Us3rb07 15 n07 fully l04d3d, 50 n07 4ll m0dul35 r sh0wn</b>"

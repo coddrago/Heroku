@@ -444,6 +444,7 @@ help:
   no_mod: "🚫 <b>Укажи модуль(-и), которые нужно скрыть</b>"
   custom_placeholders: "<tg-emoji emoji-id=5372981976804366741>🤖</tg-emoji>Кастомные плейсхолдеры: "
   help_lib: "<tg-emoji emoji-id=5404553572727660202>❌</tg-emoji> <b>Пакет</b> <code>{}</code> <b>является библиотекой.</b>\n<tg-emoji emoji-id=5404553572727660202>❌</tg-emoji> <b>У библиотек нет описания...</b>"
+  developer: "<tg-emoji emoji-id=5287454910059654880>🫶</tg-emoji> Разработчик : {}"
   hidden_shown: "<b>{} модулей скрыто, {} модулей показано:</b>\n{}\n{}"
   offchats: "<tg-emoji emoji-id=6019130940012370273>❔</tg-emoji> <a href=\"https://t.me/heroku_talks\"><b>Чат поддержки</b></a>\n\n<tg-emoji emoji-id=6019151079114021083>💬</tg-emoji> <a href=\"https://t.me/heroku_offtop\"><b>Оффтоп чат</b></a>\n\n<tg-emoji emoji-id=6019094432790354513>📢</tg-emoji> <a href=\"https://t.me/heroku_ub\"><b>Официальный канал</b></a>"
   _cls_doc: "Показывает помощь по модулям"
