@@ -238,7 +238,7 @@ class Help(loader.Module):
                 )
             )
         cmds = "\n".join(lines)
-        developer = re.search(r"# ?meta developer: ?(.+)", getattr(module, __source__, None))
+        developer = re.search(r"# ?meta developer: ?(.+)", getattr(module, "__source__", None))
         dev_text = developer.group(1) if developer else None
         placeholders = utils.help_placeholders(module.__class__.__name__).replace("No docs", self.strings('undoc'))
         await utils.answer(
