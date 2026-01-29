@@ -14,6 +14,7 @@ import asyncio
 import difflib
 import inspect
 import logging
+import re
 
 from herokutl.extensions.html import CUSTOM_EMOJIS
 from herokutl.tl.types import Message
