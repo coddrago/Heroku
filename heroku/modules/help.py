@@ -243,10 +243,10 @@ class Help(loader.Module):
         placeholders = utils.help_placeholders(module.__class__.__name__).replace("No docs", self.strings('undoc'))
         await utils.answer(
             message,
-            f"{reply}<blockquote expandable>{cmds}{inline_cmd}</blockquote><blockquote expandable>" 
+            f"{reply}<blockquote expandable>{cmds}{inline_cmd}</blockquote>\n<blockquote expandable>" 
             + (f"{self.strings('custom_placeholders')}\n{placeholders}</blockquote>" if placeholders else "")
             + (
-                f"\n\n{self.strings('developer')}".format(dev_text)
+                f"\n{self.strings('developer')}".format(dev_text)
                 if dev_text
                 else ""
             )
