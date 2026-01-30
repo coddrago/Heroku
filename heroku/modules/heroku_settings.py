@@ -350,6 +350,8 @@ class HerokuSettingsMod(loader.Module):
 
     async def inline__setting(self, call: InlineCall, key: str, state: bool = False):
 
+        self.db.set(main.__name__, key, state)
+
         if key == "no_nickname" and state and self.get_prefix() == ".":
             await call.answer(
                 self.strings("nonick_warning"),
