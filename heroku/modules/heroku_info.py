@@ -188,13 +188,19 @@ class HerokuInfoMod(loader.Module):
             'git_status': utils.get_git_status(),
         }
         data = await utils.get_placeholders(data, self.config["custom_message"])
+        if self.config["custom_message"]:
+            try:
+                placeholders_msg = self.config["custom_message"].format(**data)
+            except KeyError as e:
+                logger.warning(f"Missing placeholder in custom_message: {e}")
+                placeholders_msg = "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji>"
         return (
             (
                 "🪐 Heroku\n"
                 if self.config["show_heroku"]
                 else ""
             )
-            + self.config["custom_message"].format(**data)
+            + placeholders_msg
             if self.config["custom_message"]
             else self.strings["info_message"].format(
                 (
