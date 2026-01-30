@@ -380,7 +380,7 @@ test:
 
 updater:
   source: "<tg-emoji emoji-id=5208634061085492935>📖</tg-emoji> <b>Исходный код можно прочитать</b> <a href='{}'>здесь</a>"
-  restarting_caption: "<tg-emoji emoji-id=5208622108191506906>🕗</tg-emoji> <b>Твоя { } перезагружается...</b>"
+  restarting_caption: "<tg-emoji emoji-id=5208622108191506906>🕗</tg-emoji> <b>Твоя {} перезагружается...</b>"
   downloading: "<tg-emoji emoji-id=5208622108191506906>🕗</tg-emoji> <b>Скачивание обновлений...</b>"
   installing: "<tg-emoji emoji-id=5208622108191506906>🕗</tg-emoji> <b>Установка обновлений...</b>"
   success: "<tg-emoji emoji-id=5208661316947955396>⏱</tg-emoji> <b>Перезагрузка успешна! {}</b>\n<i>Но модули еще загружаются...</i>\n<i>Перезагрузка заняла {} сек</i>"
