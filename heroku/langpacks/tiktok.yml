@@ -395,7 +395,7 @@ updater:
   restart_confirm: "❓ <b>Ребутаемся?</b>"
   secure_boot_confirm: "❓ <b>В сейф моде ребутаемся?</b>"
   update_confirm: "❓ <b>Обновляемся?\n\n<a href=\"https://github.com/coddrago/Heroku/commit/{}\">{}</a> ⤑ <a href=\"https://github.com/coddrago/Heroku/commit/{}\">{}</a></b>"
-  no_update: "🚸 <b>У тебя ласт версия. Все равно обновить?</b>"
+  no_update: "<tg-emoji emoji-id=5465496001856950230>🌟</tg-emoji> <b>У тебя ласт версия. Все равно обновить?</b>"
   cancel: "🚫 Не надо"
   _cls_doc: "Обновлялка"
   invalid_args: "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>Сколько коммитов откатить то?</b>"

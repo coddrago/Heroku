@@ -395,7 +395,7 @@ updater:
   restart_confirm: "❓ <b>Ти впевнений, що хочеш перезавантажитися?</b>"
   secure_boot_confirm: "❓ <b>Ти впевнений, що хочеш перезавантажитися в режимі безпечного завантаження?</b>"
   update_confirm: "❓ <b>Ти впевнений, що хочеш оновитися?\n\n<a href=\"https://github.com/coddrago/Heroku/commit/{}\">{}</a> ⤑ <a href=\"https://github.com/coddrago/Heroku/commit/{}\">{}</a></b>"
-  no_update: "🚸 <b>У тебе остання версія. Оновитися примусово?</b>"
+  no_update: "<tg-emoji emoji-id=5465496001856950230>🌟</tg-emoji> <b>У тебе остання версія. Оновитися примусово?</b>"
   cancel: "🚫 Скасувати"
   _cls_doc: "Оновлює юзербот"
   invalid_args: "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>Ви повинні вказати кількість комітів для відкату!</b>"
