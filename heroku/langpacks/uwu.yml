@@ -433,7 +433,7 @@ updater:
   rollback_confirm: "❓ <b>Awe you suwe you want to wowwback {num} commit(-s)?</b>"
   rollback_process: "🕗 <b>Wowwing {num} commits back...</b>"
   autoupdate_notifier: "<tg-emoji emoji-id=5361979468887893611>🆕</tg-emoji> Nyew Hewoku update!\n\n🔮 Nyew Hewoku vewsion #{} is avaiwabwe\n\n<i>Update changewog</i>:\n<blockquote expandable>{}</blockquote>\n{}\n\n<b>Updating...</b>"
-  autoupdate: "🛡 Unit Awpha awso awwows you to ignyowe updates and <b>do it automaticawwy</b>!\n\n💫 Howevew, majow updates such as changing da gwobaw vewsion (1.x.x -> 2.x.x) wiww be ignyowed fow automatic updates and you wiww have to update manyuawwy"
+  autoupdate: "🛡 <b>Da unit «AWPHA»</b> awso awwows you to ignyowe updates and <b>do it automaticawwy</b>!\n\n💫 Howevew, majow updates such as changing da gwobaw vewsion (1.x.x -> 2.x.x) wiww be ignyowed fow automatic updates and you wiww have to update manyuawwy"
   autoupdate_on: "🎆 Automatic updates <b>have been enyabwed!\nEnjoy using it!</b>"
   autoupdate_off: "❌ Automatic updates <b>have been disabwed!</b>\nTo enyabwe dem, use da command <code>{prefix}autoupdate</code>"
   announcement: "<b>📢 Announcemwnt:</b>\n\n<blockquote>{}</blockquote>"

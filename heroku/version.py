@@ -24,35 +24,30 @@ from ._internal import (
     restart,
 )
 
+repo_path = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+
 try:
-    branch = git.Repo(
-        path=os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-    ).active_branch.name
+    with git.Repo(path=repo_path) as repo:
+        branch = repo.active_branch.name
 except Exception:
     branch = "master"
 
 
 async def check_branch(me_id: int, allowed_ids: list, self):
-    repo_path = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-
-    try:
-        repo = git.Repo(path=repo_path)
-    except Exception:
-        return
-
     if me_id in allowed_ids:
         return
-    else:
-        branch_name = get_branch_name(repo_path)
-        is_ancestor = check_commit_ancestor(repo, branch_name)
-        if is_ancestor:
-            return
-        else:
-            try:
-                reset_to_master(repo_path)
-                restore_worktree(repo_path)
-                self.client.log_out()
-            except Exception:
-                pass
+    try:
+        with git.Repo(path=repo_path) as repo:
+            branch_name = get_branch_name(repo_path)
+            if check_commit_ancestor(repo, branch_name):
+                return
+    except Exception:
+        return
+    try:
+        reset_to_master(repo_path)
+        restore_worktree(repo_path)
+        self.client.log_out()
+    except Exception:
+        pass
 
     restart()

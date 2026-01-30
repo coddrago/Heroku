@@ -433,7 +433,7 @@ updater:
   rollback_confirm: "❓ <b>Are you sure you want to rollback {num} commit(-s)?</b>"
   rollback_process: "🕗 <b>Rolling {num} commits back...</b>"
   autoupdate_notifier: "<tg-emoji emoji-id=5361979468887893611>🆕</tg-emoji> New Heroku update!\n\n🔮 New Heroku version #{} is available\n\n<i>Update changelog</i>:\n<blockquote expandable>{}</blockquote>\n{}\n\n<b>Updating...</b>"
-  autoupdate: "🛡 Unit Alpha also allows you to ignore updates and <b>do it automatically</b>!\n\n💫 However, major updates such as changing the global version (1.x.x -> 2.x.x) will be ignored for automatic updates and you will have to update manually"
+  autoupdate: "🛡 <b>The unit «ALPHA»</b> also allows you to ignore updates and <b>do it automatically</b>!\n\n💫 However, major updates such as changing the global version (1.x.x -> 2.x.x) will be ignored for automatic updates and you will have to update manually"
   autoupdate_on: "🎆 Automatic updates <b>have been enabled!\nEnjoy using it!</b>"
   autoupdate_off: "❌ Automatic updates <b>have been disabled!</b>\nTo enable them, use the command <code>{prefix}autoupdate</code>"
   announcement: "<b>📢 Announcement:</b>\n\n<blockquote>{}</blockquote>"

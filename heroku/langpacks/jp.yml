@@ -433,7 +433,7 @@ updater:
   rollback_confirm: "❓ <b>本当に {num} コミット分ロールバックしますか？</b>"
   rollback_process: "🕗 <b>{num} コミット分ロールバックしています...</b>"
   autoupdate_notifier: "<tg-emoji emoji-id=5361979468887893611>🆕</tg-emoji> 新しい Heroku アップデート！\n\n🔮 新しい Heroku バージョン #{} が利用可能です\n\n<i>アップデート変更履歴</i>:\n<blockquote expandable>{}</blockquote>\n{}\n\n<b>アップデート中...</b>"
-  autoupdate: "🛡 Unit Alpha では、アップデートを無視して<b>自動的に行う</b>こともできます！\n\n💫 ただし、グローバルバージョンの変更（1.x.x -> 2.x.x）などのメジャーアップデートは自動アップデートでは無視されるため、手動でアップデートする必要があります"
+  autoupdate: "🛡 <b>ユニット «ALPHA»</b> では、アップデートを無視して<b>自動的に行う</b>こともできます！\n\n💫 ただし、グローバルバージョンの変更（1.x.x -> 2.x.x）などのメジャーアップデートは自動アップデートでは無視されるため、手動でアップデートする必要があります"
   autoupdate_on: "🎆 自動アップデートが<b>有効になりました！\nご利用をお楽しみください！</b>"
   autoupdate_off: "❌ 自動アップデートが<b>無効になりました！</b>\n有効にするには、コマンド <code>{prefix}autoupdate</code> を使用してください"
   announcement: "<b>📢 アナウンス:</b>\n\n<blockquote>{}</blockquote>"
