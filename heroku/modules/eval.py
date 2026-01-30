@@ -72,7 +72,7 @@ class Evaluator(loader.Module):
             output_print = StringIO()
             with contextlib.redirect_stdout(output_print):
                 result = await meval(
-                    args,
+                        args,
                     globals(),
                     **await self.getattrs(message),
                 )
@@ -86,7 +86,7 @@ class Evaluator(loader.Module):
                 self.strings("err").format(
                     "4985626654563894116",
                     "python",
-                    utils.escape_html(args),
+                    args,
                     "error",
                     self.censor(
                         (

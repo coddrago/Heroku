@@ -78,6 +78,7 @@
 - backupall send backup in backupchat
 - fully remove save to fs
 - optimize username handling & fix logic
+- protection for session files
 
 ## 🪐 Heroku 1.7.2
 - added autoupdate

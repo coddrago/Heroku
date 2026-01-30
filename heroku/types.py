@@ -1003,6 +1003,7 @@ class ConfigValue:
     on_change: typing.Optional[
         typing.Union[typing.Callable[[], typing.Awaitable], typing.Callable]
     ] = None
+    folder: typing.Optional[str] = None
 
     def __post_init__(self):
         if isinstance(self.value, _Placeholder):
