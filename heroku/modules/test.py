@@ -369,9 +369,14 @@ class TestMod(loader.Module):
             "platform": utils.get_platform_name(),
         }
         data = await utils.get_placeholders(data, self.config["custom_message"])
+        try:
+            placeholders_msg = self.config["custom_message"].format(**data)
+        except KeyError as e:
+            logger.warning(f"Missing placeholder in custom_message: {e}")
+            placeholders_msg = "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji>"
         await utils.answer(
             message,
-            self.config["custom_message"].format(**data),
+            placeholders_msg,
             file = banner,
             invert_media = self.config["invert_media"]
         )
