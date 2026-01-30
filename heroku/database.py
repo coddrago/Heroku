@@ -27,7 +27,6 @@ except ImportError as e:
 
 import typing
 
-from herokutl.errors.rpcerrorlist import ChannelsTooMuchError
 from herokutl.tl.types import Message, User
 
 from . import main, utils

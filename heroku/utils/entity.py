@@ -376,6 +376,7 @@ async def asset_forum_topic(
             offset_topic=0,
             limit=100,
         ))
+        await fw_protect()
         for found_topic in result.topics:
             if found_topic.title == topic_title:
                 forums_cache.setdefault(entity.title, {})[topic_title] = found_topic.id
