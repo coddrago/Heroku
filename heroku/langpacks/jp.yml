@@ -421,7 +421,7 @@ updater:
   restart_confirm: "❓ <b>本当に再起動しますか？</b>"
   secure_boot_confirm: "❓ <b>本当にセキュアブートモードで再起動しますか？</b>"
   update_confirm: "❓ <b>本当にアップデートしますか？\n\n<a href=\"https://github.com/coddrago/Heroku/commit/{}\">{}</a> ⤑ <a href=\"https://github.com/coddrago/Heroku/commit/{}\">{}</a></b>"
-  no_update "<tg-emoji emoji-id=5465496001856950230>🌟</tg-emoji> <b>最新バージョンですが、とにかくアップデートを取得しますか？</b>"
+  no_update: "<tg-emoji emoji-id=5465496001856950230>🌟</tg-emoji> <b>最新バージョンですが、とにかくアップデートを取得しますか？</b>"
   cancel: "🚫 キャンセル"
   full_success: "<tg-emoji emoji-id=6028215594707324419>👍</tg-emoji> <b>ユーザーボットが完全に読み込まれました！ {}</b>\n<i>完全な再起動に {}秒かかりました</i>"
   ub_stop: "{emoji} は停止されました"
