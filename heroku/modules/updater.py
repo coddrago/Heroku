@@ -314,8 +314,6 @@ class UpdaterMod(loader.Module):
             self.strings("restarting_caption").format(
                 utils.get_platform_emoji()
                 if self._client.heroku_me.premium
-                and CUSTOM_EMOJIS
-                and isinstance(msg_obj, Message)
                 else "Heroku"
             ),
         )
@@ -449,8 +447,6 @@ class UpdaterMod(loader.Module):
                     self.strings("restarting_caption").format(
                         utils.get_platform_emoji()
                         if self._client.heroku_me.premium
-                        and CUSTOM_EMOJIS
-                        and isinstance(msg_obj, Message)
                         else "Heroku"
                     ),
                 )

@@ -421,7 +421,7 @@ updater:
   restart_confirm: "❓ <b>Awe you suwe you want to westawt?</b>"
   secure_boot_confirm: "❓ <b>Awe you suwe you want to westawt in secuwe boot mode?</b>"
   update_confirm: "❓ <b>Awe you suwe you want to update?\n\n<a href=\"https://github.com/coddrago/Heroku/commit/{}\">{}</a> ⤑ <a href=\"https://github.com/coddrago/Heroku/commit/{}\">{}</a></b>"
-  no_update: "🚸 <b>You awe on da watest vewsion, puww updates anyway?</b>"
+  no_update: "<tg-emoji emoji-id=5465496001856950230>🌟</tg-emoji> <b>You awe on da watest vewsion, puww updates anyway?</b>"
   cancel: "🚫 Cancew"
   full_success: "<tg-emoji emoji-id=6028215594707324419>👍</tg-emoji> <b>Usewbot is fuwwy woaded! {}</b>\n<i>Fuww westawt took {}s</i>"
   ub_stop: "Youw {emoji} has been stopped"
