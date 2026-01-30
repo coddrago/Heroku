@@ -27,8 +27,7 @@ except ImportError as e:
 
 import typing
 
-from herokutl.errors.rpcerrorlist import ChannelsTooMuchError
-from herokutl.tl.types import Message, User, ForumTopic
+from herokutl.tl.types import Message, User
 
 from . import main, utils
 from .pointers import (
@@ -65,7 +64,6 @@ class Database(dict):
         self._client: CustomTelegramClient = client
         self._next_revision_call: int = 0
         self._revisions: typing.List[dict] = []
-        self._assets_topic: typing.Optional[ForumTopic] = None
         self._me: User = None
         self._redis: redis.Redis = None
         self._saving_task: asyncio.Future = None
@@ -117,31 +115,6 @@ class Database(dict):
 
         self._db_file = main.BASE_PATH / f"config-{self._client.tg_id}.json"
         self.read()
-
-        try:
-            self._content_channel_id = self.get("heroku.forums", "channel_id", None)
-
-            if not self._content_channel_id:
-                raise KeyError("Heroku content channel not found in database")
-
-            self._assets_topic = await utils.asset_forum_topic(
-                client=self._client,
-                db=self,
-                peer=self._content_channel_id,
-                title="Assets",
-                description="🌆 Your Heroku assets will be stored here",
-                icon_emoji_id=5877307202888273539,
-            )
-
-        except Exception:
-            self._assets_topic = None
-            logger.exception(
-                "Can't find and/or create assets topic\n"
-                "This may cause several consequences, such as:\n"
-                "- Non working assets feature (e.g. notes)\n"
-                "- This error will occur every restart\n\n"
-                "You can solve this by leaving some channels/groups"
-            )
 
     def read(self):
         """Read database and stores it in self"""

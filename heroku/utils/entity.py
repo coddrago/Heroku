@@ -32,7 +32,8 @@ from herokutl.tl.functions.messages import (
     UpdateDialogFilterRequest,
     CreateForumTopicRequest,
     GetForumTopicsByIDRequest,
-    EditForumTopicRequest
+    EditForumTopicRequest,
+    GetForumTopicsRequest
 )
 from herokutl.tl.types import (
     Channel,
@@ -367,7 +368,22 @@ async def asset_forum_topic(
 
     forums_cache = db.get("heroku.forums", "forums_cache", {})
 
-    if (topic_id := forums_cache.get(entity.title, {}).get(title)):
+    async def _search_topic(topic_title: str) -> int | None:
+        result = await client(GetForumTopicsRequest(
+            peer=entity,
+            offset_date=None,
+            offset_id=0,
+            offset_topic=0,
+            limit=100,
+        ))
+        await fw_protect()
+        for found_topic in result.topics:
+            if found_topic.title == topic_title:
+                forums_cache.setdefault(entity.title, {})[topic_title] = found_topic.id
+                return found_topic.id
+        return None
+
+    if topic_id := forums_cache.get(entity.title, {}).get(title) or await _search_topic(title):
         await fw_protect()
         topic = await client(GetForumTopicsByIDRequest(peer=entity, topics=[topic_id]))
         topic = topic.topics[0]
