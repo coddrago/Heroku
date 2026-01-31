@@ -1022,7 +1022,7 @@ class LoaderMod(loader.Module):
                 subscribe, \
                 blob_link, \
                 depends_from
-            placeholders = utils.help_placeholders(modname.strip()).replace("No docs", self.strings('undoc'))
+            placeholders = "\n".join(utils.help_placeholders(modname, self))
             if placeholders != "":
                 placeholders_info = f"<blockquote expandable>{self.strings('custom_placeholders')}\n{placeholders}</blockquote>"
             else: 
