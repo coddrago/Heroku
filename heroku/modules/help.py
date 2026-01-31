@@ -240,7 +240,7 @@ class Help(loader.Module):
         cmds = "\n".join(lines)
         developer = re.search(r"# ?meta developer: ?(.+)", getattr(module, "__source__", None))
         dev_text = developer.group(1) if developer else None
-        placeholders = "\n".join(utils.help_placeholders(module.__class__.__name__, self).replace("No docs", self.strings('undoc')))
+        placeholders = "\n".join(utils.help_placeholders(module.__class__.__name__, self))
         await utils.answer(
             message,
             f"{reply}<blockquote expandable>{cmds}{inline_cmd}</blockquote>\n<blockquote expandable>" 
