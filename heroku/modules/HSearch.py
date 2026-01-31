@@ -30,6 +30,8 @@ from .. import loader, utils
 class HSearch(loader.Module):
     '''Module for searching modules! Watch all HSearch news in @FHeta_Updates!'''
 
+    strings = {"name": "HSearch"}
+
     THEMES = {
         "default": {
             "search": "🔎", "error": "❌", "warn": "❌", "result": "🔎", 
