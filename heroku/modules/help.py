@@ -244,7 +244,7 @@ class Help(loader.Module):
         await utils.answer(
             message,
             f"{reply}<blockquote expandable>{cmds}{inline_cmd}</blockquote>\n<blockquote expandable>" 
-            + (f"\n{placeholders}</blockquote>" if placeholders else "")
+            + (f"{placeholders}</blockquote>" if placeholders else "")
             + (
                 f"\n{self.strings('developer')}".format(dev_text)
                 if dev_text
