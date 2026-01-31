@@ -63,10 +63,10 @@ class Translator(loader.Module):
         if self.config["only_text"]:
             try:
                 tr_text = await self._client.translate(message.peer_id, message, lang, raw_text=text, entities=entities)
-                    await utils.answer(
-                        message,
-                        tr_text,
-                    )
+                await utils.answer(
+                    message,
+                    tr_text,
+                )
             except Exception:
                 logger.exception("Unable to translate text")
                 await utils.answer(message, self.strings("error"))
