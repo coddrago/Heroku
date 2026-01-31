@@ -180,7 +180,7 @@ class HerokuSettingsMod(loader.Module):
             await utils.answer(message, self.strings("reply_required"))
             return
 
-        u = reply.sender_id
+        u = reply.from_user.id
         if not isinstance(u, int):
             u = u.user_id
 

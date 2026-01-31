@@ -132,7 +132,7 @@ class CoreMod(loader.Module):
             return int(utils.get_args(message)[0])
         except (ValueError, IndexError):
             if reply := message.reply_to_message:
-                return reply.sender_id
+                return reply.from_user.id
 
             return message.to_id.user_id if message.is_private else False
 

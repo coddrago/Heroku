@@ -142,24 +142,24 @@ class CommandDispatcher:
 
         func = getattr(func, "__func__", func)
         ret = True
-        chat = self._ratelimit_storage_chat[message.chat_id]
+        chat = self._ratelimit_storage_chat[message.chat.id]
 
-        if message.sender_id:
-            user = self._ratelimit_storage_user[message.sender_id]
+        if message.from_user.id:
+            user = self._ratelimit_storage_user[message.chat.id]
             severity = (5 if getattr(func, "ratelimit", False) else 2) * (
                 (user + chat) // 30 + 1
             )
             user += severity
-            self._ratelimit_storage_user[message.sender_id] = user
+            self._ratelimit_storage_user[message.chat.id] = user
             if user > self._ratelimit_max_user:
                 ret = False
             else:
-                self._ratelimit_storage_chat[message.chat_id] = chat
+                self._ratelimit_storage_chat[message.chat.id] = chat
 
             _decrement_ratelimit(
                 self._ratelimit_max_user * severity,
                 self._ratelimit_storage_user,
-                message.sender_id,
+                message.chat.id,
                 severity,
             )
         else:
@@ -175,7 +175,7 @@ class CommandDispatcher:
         _decrement_ratelimit(
             self._ratelimit_max_chat * severity,
             self._ratelimit_storage_chat,
-            message.chat_id,
+            message.chat.id,
             severity,
         )
 
@@ -185,7 +185,7 @@ class CommandDispatcher:
         # Allow escaping grep with double stick
         if "||grep" in message.text.html or "|| grep" in message.text.html:
             message.raw_text = re.sub(r"\|\| ?grep", "| grep", message.raw_text)
-            message.text.html = re.sub(r"\|\| ?grep", "| grep", message.text.html)
+            message.text = re.sub(r"\|\| ?grep", "| grep", message.text)
             message.message = re.sub(r"\|\| ?grep", "| grep", message.message)
             return message
 
@@ -274,7 +274,7 @@ class CommandDispatcher:
         if not hasattr(event, "message") or not hasattr(event.message, "message"):
             return False
 
-        initiator = getattr(event, "sender_id", 0)
+        initiator = getattr(event, "from_user.id", 0)
 
         main_prefix = self._db.get(main.__name__, "command_prefix", ".")
         if initiator == self._client.tg_id:
@@ -593,12 +593,12 @@ class CommandDispatcher:
             ),
             "contains": lambda: isinstance(m, Message) and func.contains in m.raw_text,
             "filter": lambda: callable(func.filter) and func.filter(m),
-            "from_id": lambda: getattr(m, "sender_id", None) == func.from_id,
+            "from_id": lambda: getattr(m, "from_user.id", None) == func.from_id,
             "chat_id": lambda: utils.get_chat_id(m)
             == (
-                func.chat_id
-                if not str(func.chat_id).startswith("-100")
-                else int(str(func.chat_id)[4:])
+                func.chat.id
+                if not str(func.chat.id).startswith("-100")
+                else int(str(func.chat.id)[4:])
             ),
             "regex": lambda: (
                 isinstance(m, Message) and re.search(func.regex, m.raw_text)

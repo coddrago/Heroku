@@ -622,6 +622,7 @@ class Modules:
         asyncio.ensure_future(self._junk_collector())
         self.inline = InlineManager(self.client, self._db, self)
         self.client.heroku_inline = self.inline
+        self.check_security: typing.Callable
 
     async def _junk_collector(self):
         """

@@ -146,7 +146,7 @@ class HerokuWebMod(loader.Module):
             id = utils.get_args(message)
             if not id:
                 reply = message.reply_to_message
-                id = reply.sender_id if reply else None
+                id = reply.from_user.id if reply else None
             else:
                 id = id[0]
         

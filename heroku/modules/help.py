@@ -366,7 +366,7 @@ class Help(loader.Module):
                     *(
                         self.inline.check_inline_security(
                             func=func,
-                            user=message.sender_id if not message.out else self._client.tg_id,
+                            user=message.from_user.id if not message.outgoing else self._client.tg_id,
                         ) for func in mod.inline_handlers.values()
                     )
                 )

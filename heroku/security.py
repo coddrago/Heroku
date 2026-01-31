@@ -16,8 +16,9 @@ import logging
 import time
 import typing
 
+from pyrogram.types import Message
 from pyrogram.raw.functions.messages import GetFullChat
-from pyrogram.raw.types import ChatParticipantAdmin, ChatParticipantCreator, Message
+from pyrogram.raw.types import ChatParticipantAdmin, ChatParticipantCreator
 from .utils import get_display_name
 
 from . import main, utils
@@ -400,7 +401,7 @@ class SecurityManager:
             return False
 
         if not user_id:
-            user_id = message.sender_id
+            user_id = message.chat.id
 
         if not user_id:
             user_id = message.peer_id
@@ -409,8 +410,7 @@ class SecurityManager:
 
         if (
             message
-            and message.is_channel
-            and not message.is_group
+            and message.chat.type.name == 'CHANNEL'
             and message.edit_date
         ):
             async for event in self._client.iter_admin_log(
@@ -621,13 +621,13 @@ class SecurityManager:
             ):
                 participant = self._cache[cache_obj]["user"]
             else:
-                full_chat = await message.client.invoke(GetFullChat(message.chat_id))
+                full_chat = await message._client.invoke(GetFullChat(message.chat.id))
                 participants = full_chat.full_chat.participants.participants
                 participant = next(
                     (
                         possible_participant
                         for possible_participant in participants
-                        if possible_participant.user_id == message.sender_id
+                        if possible_participant.user_id == message.chat.id
                     ),
                     None,
                 )

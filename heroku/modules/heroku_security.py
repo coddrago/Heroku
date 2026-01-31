@@ -520,7 +520,7 @@ class HerokuSecurityMod(loader.Module):
 
         if user is None:
             try:
-                user = await self._client.get_entity(reply.sender_id, exp=0)
+                user = await self._client.get_entity(reply.from_user.id, exp=0)
             except ValueError:
                 user = await reply.get_sender()
 
@@ -984,7 +984,7 @@ class HerokuSecurityMod(loader.Module):
                         target = await self._client.get_entity(message.peer_id, exp=0)
                     elif message.is_reply:
                         target = await self._client.get_entity(
-                            (message.reply_to_message).sender_id,
+                            (message.reply_to_message).from_user.id,
                             exp=0,
                         )
                     else:
@@ -1054,7 +1054,7 @@ class HerokuSecurityMod(loader.Module):
                 target = await self._client.get_entity(message.peer_id, exp=0)
             elif message.is_reply:
                 target = await self._client.get_entity(
-                    (message.reply_to_message).sender_id,
+                    (message.reply_to_message).from_user.id,
                     exp=0,
                 )
 
@@ -1144,7 +1144,7 @@ class HerokuSecurityMod(loader.Module):
                 target = await self._client.get_entity(message.peer_id, exp=0)
             elif message.is_reply:
                 target = await self._client.get_entity(
-                    (message.reply_to_message).sender_id,
+                    (message.reply_to_message).from_user.id,
                     exp=0,
                 )
 

@@ -487,7 +487,7 @@ async def get_target(message: Message, arg_no: int = 0) -> typing.Optional[int]:
     if len(get_args(message)) > arg_no:
         user = get_args(message)[arg_no]
     elif message.is_reply:
-        return (message.reply_to_message).sender_id
+        return (message.reply_to_message).from_user.id
     elif hasattr(message.peer_id, "user_id"):
         user = message.peer_id.user_id
     else:
@@ -521,7 +521,7 @@ async def get_user(message: Message) -> typing.Optional[User]:
             message.peer_id,
             aggressive=True,
         ):
-            if user.id == message.sender_id:
+            if user.id == message.from_user.id:
                 return user
 
         logger.error("User isn't in the group where they sent the message")
