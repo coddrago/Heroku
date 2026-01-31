@@ -431,7 +431,7 @@ updater:
   invalid_args: "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>U mu57 pr0v1d3 numb3r 0f c0mm175 2 r0llb4ck!</b>"
   rollback_too_far: "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>U'r3 r0ll1ng b4ck 2 f4r!</b>"
   rollback_confirm: "<tg-emoji emoji-id=5382187118216879236>❓</tg-emoji> <b>R u 5ur3 u w4n7 2 r0llb4ck {num} c0mm17(-5)?</b>"
-  rollback_proccess: "<tg-emoji emoji-id=5873204392429096339>🕗</tg-emoji> <b>R0ll1ng {num} c0mm175 b4ck...</b>"
+  rollback_process: "<tg-emoji emoji-id=5873204392429096339>🕗</tg-emoji> <b>R0ll1ng {num} c0mm175 b4ck...</b>"
   autoupdate_notifier: "<tg-emoji emoji-id=5361979468887893611>🆕</tg-emoji> N3w H3r0ku upd473!\n\n🔮 N3w H3r0ku v3r #{} 15 4v41l4bl3\n\n<i>Upd473 ch4ng3l0g</i>:\n<blockquote expandable>{}</blockquote>\n{}\n\n<b>Upd471ng...</b>"
   autoupdate: "🛡 Un17 4lph4 4l50 4ll0w5 u 2 1gn0r3 upd4735 & <b>d0 17 4u70m471c4lly</b>!\n\n💫 H0w3v3r, m4j0r upd4735 5uch 45 ch4ng1ng 7h3 gl0b4l v3r (1.x.x -> 2.x.x) w1ll b3 1gn0r3d 4 4u70 upd4735 & u w1ll h4v3 2 upd473 m4nu4lly"
   autoupdate_on: "🎆 4u70 upd4735 <b>h4v3 b33n 3n4bl3d!\n3nj0y u51ng 17!</b>"

@@ -401,7 +401,7 @@ updater:
   invalid_args: "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>Сколько коммитов откатить то?</b>"
   rollback_too_far: "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>Куда так далеко откатываешь!</b>"
   rollback_confirm: "<tg-emoji emoji-id=5382187118216879236>❓</tg-emoji> <b>Точно откатываем {num} коммит(-а,-ов)?</b>"
-  rollback_proccess: "<tg-emoji emoji-id=5873204392429096339>🕗</tg-emoji> <b>Откатываю {num} коммитов...</b>"
+  rollback_process: "<tg-emoji emoji-id=5873204392429096339>🕗</tg-emoji> <b>Откатываю {num} коммитов...</b>"
   autoupdate_notifier: "<tg-emoji emoji-id=5361979468887893611>🆕</tg-emoji> Обнова Heroku!\n\n🔮 Версия #{} подлетела\n\n<i>Че нового</i>:\n<blockquote expandable>{}</blockquote>\n{}\n\n<b>Обновляю...</b>"
   autoupdate: "🛡 Unit Alpha умеет сам обновляться!\n\n💫 Но жирные обновы (1.х.х -> 2.х.х) скипаются, сам ручками делай"
   autoupdate_on: "🎆 Авто-апдейт <b>ВКЛЮЧЕН!\nКайфуй!</b>"

@@ -401,7 +401,7 @@ updater:
   invalid_args: "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>Ви повинні вказати кількість комітів для відкату!</b>"
   rollback_too_far: "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>Ви відкочуєтесь занадто далеко!</b>"
   rollback_confirm: "<tg-emoji emoji-id=5382187118216879236>❓</tg-emoji> <b>Ви впевнені, що хочете відкотити {num} коміт (-а, -ів)?</b>"
-  rollback_proccess: "<tg-emoji emoji-id=5873204392429096339>🕗</tg-emoji> <b>Відкот {num} коміт(-a,-ів)...</b>"
+  rollback_process: "<tg-emoji emoji-id=5873204392429096339>🕗</tg-emoji> <b>Відкот {num} коміт(-a,-ів)...</b>"
   autoupdate_notifier: "<tg-emoji emoji-id=5361979468887893611>🆕</tg-emoji> Нова версія Heroku!\n\n🔮 Нова версія Heroku #{} доступна\n\n<i>Список змін оновлення</i>:\n<blockquote expandable>{}</blockquote>\n{}\n\n<b>Оновлюю...</b>"
   autoupdate: "🛡 Unit Alpha також дозволяє ігнорувати оновлення та <b>робити це автоматично</b>!\n\n💫 Однак великі оновлення, такі як зміна глобальної версії (1.x.x -> 2.x.x), будуть ігноруватися для автоматичних оновлень, і вам доведеться оновлюватися вручну"
   autoupdate_on: "🎆 Автоматичні оновлення <b>були увімкнені!\nПриємного користування!</b>"
