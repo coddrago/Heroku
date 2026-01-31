@@ -499,7 +499,6 @@ help:
   undoc: "🦥 No Man Page"
   all_header: "<b>{} mods installed, {} hidden:</b>"
   no_mod: "🚫 <b>Specify module</b>"
-  custom_placeholders: "<tg-emoji emoji-id=5372981976804366741>🤖</tg-emoji>Vars: "
   help_lib: "<tg-emoji emoji-id=5404553572727660202>❌</tg-emoji> <b>{} is a Library.</b>\n<tg-emoji emoji-id=5404553572727660202>❌</tg-emoji> <b>Libraries have no docs.</b>"
   developer: "<tg-emoji emoji-id=5287454910059654880>🫶</tg-emoji> Dev: <code>{}</code>"
   hidden_shown: "<b>{} hidden, {} shown:</b>\n{}\n{}"

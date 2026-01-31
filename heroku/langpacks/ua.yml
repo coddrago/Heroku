@@ -466,7 +466,6 @@ help:
   undoc: "🦥 Немає опису"
   all_header: "<b>{} модулів доступно, {} приховано:</b>"
   no_mod: "🚫 <b>Вкажи модуль(-і), які потрібно приховати</b>"
-  custom_placeholders: "<tg-emoji emoji-id=5372981976804366741>🤖</tg-emoji>Кастомні плейсхолдери: "
   help_lib: "<tg-emoji emoji-id=5404553572727660202>❌</tg-emoji> <b>Пакет</b> <code>{}</code> <b>є бібліотекою.</b>\n<tg-emoji emoji-id=5404553572727660202>❌</tg-emoji> <b>У бібліотек немає опису...</b>"
   developer: "<tg-emoji emoji-id=5287454910059654880>🫶</tg-emoji> Розробник: <code>{}</code>"
   hidden_shown: "<b>{} модулів приховано, {} модулів показано:</b>\n{}\n{}"

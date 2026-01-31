@@ -500,7 +500,6 @@ help:
   undoc: "🦥 Nyo docs"
   all_header: "<b>{} mods avaiwabwe, {} hidden:</b>"
   no_mod: "🚫 <b>Specify moduwe to hide</b>"
-  custom_placeholders: "<tg-emoji emoji-id=5372981976804366741>🤖</tg-emoji>Cu5t0m pw4c3h0ld3r5: "
   help_lib: "<tg-emoji emoji-id=5404553572727660202>❌</tg-emoji> <b>Package</b> <code>{}</code> <b>is a wibwawy.</b>\n<tg-emoji emoji-id=5404553572727660202>❌</tg-emoji> <b>Wibwawies do nyot have descwiptions...</b>"
   developer: "<tg-emoji emoji-id=5287454910059654880>🫶</tg-emoji> Devewopew: <code>{}</code>"
   hidden_shown: "<b>{} moduwes hidden, {} moduwes shown:</b>\n{}\n{}"

@@ -500,7 +500,6 @@ help:
   undoc: "🦥 ドキュメントなし"
   all_header: "<b>{} 個のモジュールが利用可能、{} 個が非表示:</b>"
   no_mod: "🚫 <b>非表示にするモジュールを指定してください</b>"
-  custom_placeholders: "<tg-emoji emoji-id=5372981976804366741>🤖</tg-emoji>カスタムプレースホルダー: "
   help_lib: "<tg-emoji emoji-id=5404553572727660202>❌</tg-emoji> <b>パッケージ</b> <code>{}</code> <b>はライブラリです。</b>\n<tg-emoji emoji-id=5404553572727660202>❌</tg-emoji> <b>ライブラリには説明がありません...</b>"
   developer: "<tg-emoji emoji-id=5287454910059654880>🫶</tg-emoji> 開発者: <code>{}</code>"
   hidden_shown: "<b>{} 個のモジュールが非表示、{} 個のモジュールが表示中:</b>\n{}\n{}"

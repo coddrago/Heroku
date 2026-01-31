@@ -465,7 +465,6 @@ help:
   undoc: "🦥 Keine Beschreibung"
   all_header: "<b>{} Module verfügbar, {} verborgen:</b>"
   no_mod: "🚫 <b>Gib das Modul(-e) an, das(-e) versteckt werden soll(en)</b>"
-  custom_placeholders: "<tg-emoji emoji-id=5372981976804366741>🤖</tg-emoji>Benutzerdefinierte Platzhalter: "
   help_lib: "<tg-emoji emoji-id=5404553572727660202>❌</tg-emoji> <b>Das Paket</b> <code>{}</code> <b>ist eine Bibliothek.</b>\n<tg-emoji emoji-id=5404553572727660202>❌</tg-emoji> <b>Bibliotheken haben keine Beschreibung...</b>"
   developer: "<tg-emoji emoji-id=5287454910059654880>🫶</tg-emoji> Entwickler: <code>{}</code>"
   hidden_shown: "<b>{} Module verborgen, {} Module angezeigt:</b>\n{}\n{}"

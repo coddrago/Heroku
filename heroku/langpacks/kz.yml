@@ -500,7 +500,6 @@ help:
   undoc: "🦥 Құжаттама жоқ"
   all_header: "<b>{} модуль қолжетімді, {} жасырын:</b>"
   no_mod: "🚫 <b>Жасыру үшін модульді көрсетіңіз</b>"
-  custom_placeholders: "<tg-emoji emoji-id=5372981976804366741>🤖</tg-emoji>Арнайы толтырғыштар: "
   help_lib: "<tg-emoji emoji-id=5404553572727660202>❌</tg-emoji> <b>Пакет</b> <code>{}</code> <b>бұл кітапхана.</b>\n<tg-emoji emoji-id=5404553572727660202>❌</tg-emoji> <b>Кітапханаларда сипаттама жоқ...</b>"
   developer: "<tg-emoji emoji-id=5287454910059654880>🫶</tg-emoji> Әзірлеуші: <code>{}</code>"
   hidden_shown: "<b>{} модуль жасырылған, {} модуль көрсетілген:</b>\n{}\n{}"

@@ -465,7 +465,6 @@ help:
   undoc: "🦥 Хз че это"
   all_header: "<b>{} модов тут, {} в стелсе:</b>"
   no_mod: "🚫 <b>Какой модуль прячем?</b>"
-  custom_placeholders: "<tg-emoji emoji-id=5372981976804366741>🤖</tg-emoji>Кастомные плейсхолдеры: "
   help_lib: "<tg-emoji emoji-id=5404553572727660202>❌</tg-emoji> <b>Пакет</b> <code>{}</code> <b>это либа.</b>\n<tg-emoji emoji-id=5404553572727660202>❌</tg-emoji> <b>У либ нет описания, лол...</b>"
   developer: "<tg-emoji emoji-id=5287454910059654880>🫶</tg-emoji> Разработчик: <code>{}</code>"
   hidden_shown: "<b>{} модов скрыто, {} показано:</b>\n{}\n{}"

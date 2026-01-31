@@ -500,7 +500,6 @@ help:
   undoc: "🦥 No docs"
   all_header: "<b>{} mods available, {} hidden:</b>"
   no_mod: "🚫 <b>Specify module to hide</b>"
-  custom_placeholders: "<tg-emoji emoji-id=5372981976804366741>🤖</tg-emoji>Custom placeholders: "
   help_lib: "<tg-emoji emoji-id=5404553572727660202>❌</tg-emoji> <b>Package</b> <code>{}</code> <b>is a library.</b>\n<tg-emoji emoji-id=5404553572727660202>❌</tg-emoji> <b>Libraries do not have descriptions...</b>"
   developer: "<tg-emoji emoji-id=5287454910059654880>🫶</tg-emoji> Developer: <code>{}</code>"
   hidden_shown: "<b>{} modules hidden, {} modules shown:</b>\n{}\n{}"

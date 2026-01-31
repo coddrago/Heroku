@@ -500,7 +500,6 @@ help:
   undoc: "🦥 Hujjatlar yo‘q"
   all_header: "<b>{} ta modullar bor, {} ta yashirilgan:</b>"
   no_mod: "🚫 <b>Yashirish uchun modulni belgilang</b>"
-  custom_placeholders: "<tg-emoji emoji-id=5372981976804366741>🤖</tg-emoji>Maxsus to‘ldiruvchilar: "
   help_lib: "<tg-emoji emoji-id=5404553572727660202>❌</tg-emoji> <b>Paket</b> <code>{}</code> <b>bu kutubxona.</b>\n<tg-emoji emoji-id=5404553572727660202>❌</tg-emoji> <b>Kutubxonalarda tavsiflar yo‘q...</b>"
   developer: "<tg-emoji emoji-id=5287454910059654880>🫶</tg-emoji> Dasturchi: <code>{}</code>"
   hidden_shown: "<b>{} modullar yashirilgan, {} modullar ko‘rsatilgan:</b>\n{}\n{}"
