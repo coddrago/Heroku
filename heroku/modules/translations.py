@@ -72,14 +72,15 @@ class Translations(loader.Module):
             "🇩🇪": "<tg-emoji emoji-id=6320817337033295141>🇩🇪</tg-emoji>",
             "🇪🇸": "<tg-emoji emoji-id=6323315062379382237>🇪🇸</tg-emoji>",
             "🇹🇷": "<tg-emoji emoji-id=6321003171678259486>🇹🇷</tg-emoji>",
-            "🇰🇿": "<tg-emoji emoji-id=6323135275048371614>🇰🇿</tg-emoji>",
+            "🇰🇿": "<tg-emoji emoji-id=5228718354658769982>🇰🇿</tg-emoji>",
             "🥟": "<tg-emoji emoji-id=5382337996123020810>🥟</tg-emoji>",
             "🇯🇵": "<tg-emoji emoji-id=5456261908069885892>🇯🇵</tg-emoji>",
             "🇫🇷": "<tg-emoji emoji-id=5202132623060640759>🇫🇷</tg-emoji>",
             "🏴‍☠️": "<tg-emoji emoji-id=5386372293263892965>🏴‍☠️</tg-emoji>",
+            "🇺🇿": "<tg-emoji emoji-id=5449829434334912605>🇺🇿</tg-emoji>",
         }
 
-        lang2country = {"en": "🇬🇧", "tt": "🥟", "kk": "🇰🇿", "ua": "🇺🇦", "de": "🇩🇪", "jp": "🇯🇵", "fr": "🇫🇷"}
+        lang2country = {"en": "🇬🇧", "tt": "🥟", "kz": "🇰🇿", "ua": "🇺🇦", "de": "🇩🇪", "jp": "🇯🇵", "fr": "🇫🇷", "uz": "🇺🇿"}
 
         for meme in translations.MEME_LANGUAGES.keys():
             lang2country[meme] = "🏴‍☠️"
