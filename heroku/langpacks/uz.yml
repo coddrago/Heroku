@@ -224,9 +224,9 @@ heroku_backup:
   saved_bot: "✅ Davriylik saqlandi! Uni {prefix}set_backup_period bilan o‘zgartirish mumkin"
   never: "✅ Men avtomatik zahira nusxalarini yaratmayman. <code>{prefix}set_backup_period</code> yordamida bekor qilish mumkin"
   never_bot: "✅ Men avtomatik zahira nusxalarini yaratmayman. {prefix}set_backup_period yordamida bekor qilish mumkin"
-  invalid_args: "🚫 <b>Iltimos, to‘g‘ri chastotani soatlarda belgilang yoki o‘chirish uchun `0` ni kiriting</b>"
-  backup_caption: '<tg-emoji emoji-id=5469718869536940860>👆</tg-emoji> <b>Bu sizning ma\'lumotlar bazangiz zahira nusxasi. Uni hech kimga bermang, u shaxsiy ma\'lumotlarni o‘z ichiga oladi. Agar uni tiklashingiz kerak bo‘lsa, ushbu faylga javoban</b> <pre><code class="language-heroku">{prefix}restoredb</code></pre> <b>ishlating.</b>'
-  backupall_info: '👆 <b>Bu ma\'lumotlar bazasi va modullarning zahira nusxasi. Uni hech kimga bermang, u shaxsiy ma\'lumotlarni o‘z ichiga oladi. Agar uni tiklashingiz kerak bo‘lsa, ushbu faylga javoban</b> <pre><code class="language-heroku">{prefix}restoreall</code></pre> <b>ishlating.</b>'
+  invalid_args: "🚫 <b>Iltimos, to‘g‘ri chastotani soatlarda belgilang yoki o‘chirish uchun 0 ni kiriting</b>"
+  backup_caption: "<tg-emoji emoji-id=5469718869536940860>👆</tg-emoji> <b>Bu sizning malumotlar bazangiz zahira nusxasi. Uni hech kimga bermang, u shaxsiy malumotlarni o‘z ichiga oladi. Agar uni tiklashingiz kerak bo‘lsa, ushbu faylga javoban</b> <pre><code class=\"language-heroku\">{prefix}restoredb</code></pre> <b>ishlating.</b>"
+  backupall_info: "👆 <b>Bu ma'lumotlar bazasi va modullarning zahira nusxasi. Uni hech kimga bermang, u shaxsiy ma'lumotlarni o‘z ichiga oladi. Agar uni tiklashingiz kerak bo‘lsa, ushbu faylga javoban</b> <pre><code class=\"language-heroku\">{prefix}restoreall</code></pre> <b>ishlating.</b>"
   all_restored: "<tg-emoji emoji-id=5774134533590880843>🔄</tg-emoji> <b>To‘liq zahira nusxangiz tiklandi, qayta ishga tushmoqda...</b>"
   reply_to_file: "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>.json yoki .zip fayliga javob (reply) qiling</b>"
   db_restored: "<tg-emoji emoji-id=5774134533590880843>🔄</tg-emoji> <b>Ma'lumotlar bazasi yangilandi, qayta ishga tushmoqda...</b>"
