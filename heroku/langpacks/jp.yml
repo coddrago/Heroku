@@ -479,7 +479,7 @@ help:
   no_mod: "🚫 <b>非表示にするモジュールを指定してください</b>"
   custom_placeholders: "<tg-emoji emoji-id=5372981976804366741>🤖</tg-emoji>カスタムプレースホルダー: "
   help_lib: "<tg-emoji emoji-id=5404553572727660202>❌</tg-emoji> <b>パッケージ</b> <code>{}</code> <b>はライブラリです。</b>\n<tg-emoji emoji-id=5404553572727660202>❌</tg-emoji> <b>ライブラリには説明がありません...</b>"
-  developer: "<tg-emoji emoji-id=5287454910059654880>🫶</tg-emoji> 開発者: {}"
+  developer: "<tg-emoji emoji-id=5287454910059654880>🫶</tg-emoji> 開発者: <code>{}</code>"
   hidden_shown: "<b>{} 個のモジュールが非表示、{} 個のモジュールが表示中:</b>\n{}\n{}"
   offchats: "<tg-emoji emoji-id=6019130940012370273>❔</tg-emoji> <a href=\"https://t.me/heroku_talks\"><b>サポートチャット</b></a>\n\n<tg-emoji emoji-id=6019151079114021083>💬</tg-emoji> <a href=\"https://t.me/heroku_offtop\"><b>オフトピックチャット</b></a>\n\n<tg-emoji emoji-id=6019094432790354513>📢</tg-emoji> <a href=\"https://t.me/heroku_ub\"><b>公式チャンネル</b></a>"
   partial_load: "<tg-emoji emoji-id=5355133243773435190>☝️</tg-emoji> <b>ユーザーボットが完全に読み込まれていないため、一部のモジュールは表示されません</b>"
