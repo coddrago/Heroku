@@ -69,17 +69,17 @@ def config_placeholders():
     else:
         return("\n".join(result))
 
-def help_placeholders(module_name):
+def help_placeholders(module_name, self):
     """
     Return placeholders list for help
     """
-    result = ""
+    result = []
     for placeholder_name, placeholder_data in custom_placeholders.items():
         if placeholder_data.get("module_name") == module_name:
             if placeholder_data.get("description") is not None:
-                result = result + f"{{{placeholder_name}}} - {placeholder_data.get('description')}\n"
+                result.append(self.db.get("Help", "__config__", None).get("command_emoji") +f" {{{placeholder_name}}} - {placeholder_data.get('description')}")
             else:
-                result = result + f"{{{placeholder_name}}} - No docs\n"
+                result.append(self.db.get("Help", "__config__", None).get("command_emoji") + f" {{{placeholder_name}}} - No docs")
     return result
 
 def debug_placeholders():
