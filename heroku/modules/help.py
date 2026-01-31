@@ -246,11 +246,11 @@ class Help(loader.Module):
             f"{reply}<blockquote expandable>{cmds}{inline_cmd}</blockquote>\n<blockquote expandable>" 
             + (f"{placeholders}</blockquote>" if placeholders else "")
             + (
-                f"\n{self.strings('developer')}".format(dev_text)
+                f"\n\n{self.strings('developer')}".format(dev_text)
                 if dev_text
                 else ""
             )
-            + (f"\n{self.strings('not_exact')}" if not exact else "")
+            + (f"\n\n{self.strings('not_exact')}" if not exact else "")
             + (
                 f"\n{self.strings('core_notice')}"
                 if module.__origin__.startswith("<core")
