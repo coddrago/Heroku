@@ -240,19 +240,19 @@ class Help(loader.Module):
         cmds = "\n".join(lines)
         developer = re.search(r"# ?meta developer: ?(.+)", getattr(module, "__source__", None))
         dev_text = developer.group(1) if developer else None
-        placeholders = utils.help_placeholders(module.__class__.__name__).replace("No docs", self.strings('undoc'))
+        placeholders = "\n".join(utils.help_placeholders(module.__class__.__name__, self))
         await utils.answer(
             message,
             f"{reply}<blockquote expandable>{cmds}{inline_cmd}</blockquote>\n<blockquote expandable>" 
-            + (f"{self.strings('custom_placeholders')}\n{placeholders}</blockquote>" if placeholders else "")
+            + (f"{placeholders}</blockquote>" if placeholders else "")
             + (
-                f"\n{self.strings('developer')}".format(dev_text)
+                f"\n\n{self.strings('developer')}".format(dev_text)
                 if dev_text
                 else ""
             )
             + (f"\n\n{self.strings('not_exact')}" if not exact else "")
             + (
-                f"\n\n{self.strings('core_notice')}"
+                f"\n{self.strings('core_notice')}"
                 if module.__origin__.startswith("<core")
                 else ""
             ),

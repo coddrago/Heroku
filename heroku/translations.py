@@ -34,11 +34,14 @@ SUPPORTED_LANGUAGES = {
     "de": "🇩🇪 Deutsch",
     "jp": "🇯🇵 日本語",
     "fr": "🇫🇷 Français",
+    "uz": "🇺🇿 O'zbek",
+    "kz": "🇰🇿 Қазақша"
 }
 MEME_LANGUAGES = {
     "leet": "🏴‍☠️ 1337",
     "uwu": "🏴‍☠️ UwU",
     "tiktok": "🏴‍☠️ TikTokKid",
+    "neofit": "🏴‍☠️ Neofit"
 }
 
 

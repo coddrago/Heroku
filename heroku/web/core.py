@@ -96,6 +96,8 @@ class Web(root.Web):
                 .strip()
             )
 
+            ip = os.environ.get("HEROKU_IP", ip)
+
             url = f"http://{ip}:{self.port}"
 
         self.url = url

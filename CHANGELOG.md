@@ -79,6 +79,10 @@
 - fully remove save to fs
 - optimize username handling & fix logic
 - protection for session files
+- add premium emoji in some cases with inline
+- add developer in help
+- add folder for config
+- remove pyproject.toml
 
 ## 🪐 Heroku 1.7.2
 - added autoupdate

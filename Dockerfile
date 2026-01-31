@@ -1,4 +1,4 @@
-FROM python:3.10 AS python-base
+FROM python:3.14 AS python-base
 FROM python-base AS builder-base
 
 ENV PYTHONUNBUFFERED=1 \
