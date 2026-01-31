@@ -472,6 +472,29 @@ api_protection:
   _cmd_doc_suspend_api_protect: "<time in seconds> - Suspend API Ratelimiter for n seconds"
   _cls_doc: "Helps userbot avoid spamming Telegram API"
 
+HSearch:
+  name: "HSearch",
+  searching: "{emoji} <b>Searching...</b>",
+  no_query: "{emoji} <b>Enter a query to search.</b>",
+  no_results: "{emoji} <b>No modules found.</b>",
+  query_too_big: "{emoji} <b>Your query is too big, please try reducing it to 168 characters.</b>",
+  result_query: "{emoji} <b>Result {idx}/{total} by query:</b> <code>{query}</code>\n",
+  result_single: "{emoji} <b>Result by query:</b> <code>{query}</code>\n",
+  module_info: "<code>{name}</code> <b>by</b> <code>{author}</code> <b>(</b><code>v{version}</code><b>)</b>\n{emoji} <b>Command for installation:</b> <code>{install}</code>",
+  desc: "\n{emoji} <b>Description:</b> {desc}",
+  cmds: "\n{emoji} <b>Commands:</b>\n{cmds}",
+  inline_cmds: "\n{emoji} <b>Inline commands:</b>\n{cmds}",
+  lang: "en",
+  rating_added: "{emoji} Rating submitted!",
+  rating_changed: "{emoji} Rating has been changed!",
+  rating_removed: "{emoji} Rating deleted!",
+  inline_no_query: "Enter a query to search.",
+  inline_desc: "Name, command, description, author.",
+  inline_no_results: "Try another query.",
+  inline_query_too_big: "Your query is too big, please try reducing it to 168 characters.",
+  _cfg_doc_tracking: "Enable tracking of your data (user ID, language) for synchronization with the HSearch bot?",
+  _cfg_doc_theme: "Theme for emojis."
+
 help:
   name: "Help"
   undoc: "🦥 No docs"

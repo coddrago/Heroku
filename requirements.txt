@@ -11,6 +11,7 @@ aiohttp_jinja2==1.5
 aiohttp==3.11.18
 Jinja2==3.0.3
 requests==2.27.1
+certifi==2024.8.30
 grapheme==0.6.0
 emoji==2.1.0
 werkzeug==2.2.2
