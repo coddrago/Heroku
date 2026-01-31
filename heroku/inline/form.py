@@ -406,7 +406,7 @@ class Form(InlineUnit):
                     and button["_switch_query"] == query
                     and inline_query.from_user.id
                     in [self._me]
-                    + self._client.dispatcher.security._owner
+                    + self._client._heroku_dispatcher.security._owner
                     + unit.get("always_allow", [])
                 ):
                     await inline_query.answer(

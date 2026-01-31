@@ -290,7 +290,7 @@ class Utils(InlineUnit):
 
     async def check_inline_security(self: "InlineManager", *, func: typing.Callable, user: int) -> bool:
         """Checks if user with id `user` is allowed to run function `func`"""
-        return await self._client.dispatcher.security.check(
+        return await self._client._heroku_dispatcher.security.check(
             message=None,
             func=func,
             user_id=user,
@@ -305,7 +305,7 @@ class Utils(InlineUnit):
 
             logger.debug("Found caller: %s", caller)
 
-            return lambda: self._client.dispatcher.security.get_flags(
+            return lambda: self._client._heroku_dispatcher.security.get_flags(
                 getattr(caller, "__self__", caller),
             )
         except Exception:

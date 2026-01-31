@@ -1074,7 +1074,7 @@ class Heroku:
     ):
         """Inits and adds dispatcher instance to client"""
         dispatcher = CommandDispatcher(modules, client, db)
-        client.dispatcher = dispatcher
+        client._heroku_dispatcher = dispatcher
         modules.check_security = dispatcher.check_security
 
         client.add_handler(

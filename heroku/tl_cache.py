@@ -117,7 +117,7 @@ class CustomClient(TelegramClient): # TODO: rewrite the cache specifically for K
                 typing.Any,
             ]
         ] = None
-        self.dispatcher: "CommandDispatcher"
+        self._heroku_dispatcher: "CommandDispatcher"
         self.tg_id: int
         self._tg_id: int
         self.heroku_me: "User"

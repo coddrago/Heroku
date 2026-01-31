@@ -194,12 +194,12 @@ class CoreMod(loader.Module):
             
             if entity.id != self.tg_id:
                 sgroup_users = []
-                for g in self._client.dispatcher.security._sgroups.values():
+                for g in self._client._heroku_dispatcher.security._sgroups.values():
                     for u in g.users:
                         sgroup_users.append(u)
 
-                tsec_users = [rule['target'] for rule in self._client.dispatcher.security._tsec_user]
-                ub_owners = self._client.dispatcher.security.owner.copy()
+                tsec_users = [rule['target'] for rule in self._client._heroku_dispatcher.security._tsec_user]
+                ub_owners = self._client._heroku_dispatcher.security.owner.copy()
 
                 all_users = sgroup_users + tsec_users + ub_owners
 

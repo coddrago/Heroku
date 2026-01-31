@@ -847,7 +847,7 @@ class Modules:
         """Register event handlers for a module"""
         for name, handler in utils.iter_attrs(instance):
             if getattr(handler, "is_raw_handler", False):
-                self.client.dispatcher.raw_handlers.append(handler)
+                self.client._heroku_dispatcher.raw_handlers.append(handler)
                 logger.debug(
                     "Registered raw handler %s for %s. ID: %s",
                     name,
@@ -1389,9 +1389,9 @@ class Modules:
 
     def unregister_raw_handlers(self, instance: Module, purpose: str):
         """Unregister event handlers for a module"""
-        for handler in self.client.dispatcher.raw_handlers:
+        for handler in self.client._heroku_dispatcher.raw_handlers:
             if handler.__self__.__class__.__name__ == instance.__class__.__name__:
-                self.client.dispatcher.raw_handlers.remove(handler)
+                self.client._heroku_dispatcher.raw_handlers.remove(handler)
                 logger.debug(
                     "Unregistered raw handler of module %s for %s. ID: %s",
                     instance.__class__.__name__,
