@@ -475,7 +475,7 @@ api_protection:
 help:
   name: "Help"
   undoc: "🦥 Hujjatlar yo‘q"
-  all_header: "<b>{} ta modullar mavjud, {} ta yashirilgan:</b>"
+  all_header: "<b>{} ta modullar bor, {} ta yashirilgan:</b>"
   no_mod: "🚫 <b>Yashirish uchun modulni belgilang</b>"
   custom_placeholders: "<tg-emoji emoji-id=5372981976804366741>🤖</tg-emoji>Maxsus to‘ldiruvchilar: "
   help_lib: "<tg-emoji emoji-id=5404553572727660202>❌</tg-emoji> <b>Paket</b> <code>{}</code> <b>bu kutubxona.</b>\n<tg-emoji emoji-id=5404553572727660202>❌</tg-emoji> <b>Kutubxonalarda tavsiflar yo‘q...</b>"
@@ -485,7 +485,7 @@ help:
   partial_load: "<tg-emoji emoji-id=5355133243773435190>☝️</tg-emoji> <b>Yuzerbot to‘liq yuklanmagan, shuning uchun barcha modullar ko‘rsatilmagan</b>"
   not_exact: "<tg-emoji emoji-id=5355133243773435190>☝️</tg-emoji> <b>Aniq moslik topilmadi, shuning uchun eng yaqin natija ko‘rsatiladi</b>"
   request_join: "Siz Heroku qo‘llab-quvvatlash guruhi uchun havolani so‘radingiz"
-  core_notice: "<tg-emoji emoji-id=5355133243773435190>☝️</tg-emoji> <b>Bu yadro (core) moduli. Siz uni yuklashdan olib tashlay olmaysiz va o‘zgartira olmaysiz</b>"
+  core_notice: "<tg-emoji emoji-id=5355133243773435190>☝️</tg-emoji> <b>Bu yadro (core) moduli. Siz uni ochirlidi olib tashlay olmaysiz va o‘zgartira olmaysiz</b>"
 
 heroku_info:
   info_message: "{}\n<blockquote>┌\n├  【<tg-emoji emoji-id=5883964170268840032>👤</tg-emoji>】 <b>𝙴𝚐𝚊𝚜𝚒</b>: {me}\n├  【<tg-emoji emoji-id=5931415565955503486>🤖</tg-emoji>】 <b>𝚅𝚎𝚛𝚜𝚒𝚢𝚊</b>: {version}\n└</blockquote>\n<blockquote>┌\n├  【<tg-emoji emoji-id=5778335621491723621>📷</tg-emoji>】 <b>𝙿𝚛𝚎𝚏𝚒𝚔𝚜</b>: {prefix}⠀ ⠀ \n├  【<tg-emoji emoji-id=5843799474362652262>🔄</tg-emoji>】 <b>𝚄𝚙𝚝𝚒𝚖𝚎</b>: {uptime}\n├  【<tg-emoji emoji-id=5879770735999717115>👤</tg-emoji>】 <b>𝙵𝚒𝚕𝚒𝚊𝚕</b>: {branch}\n└</blockquote>\n<blockquote>┌\n├  【<tg-emoji emoji-id=5775887550262546277>❗️</tg-emoji>】 <b>𝙲𝙿𝚄</b>: {cpu_usage}\n├  【<tg-emoji emoji-id=5931409969613116639>🛡</tg-emoji>】 <b>𝚁𝙰𝙼</b>: {ram_usage}\n├  【<tg-emoji emoji-id=5931472654660800739>📊</tg-emoji>】 <b>𝙿𝚒𝚗𝚐</b>: {ping}\n└</blockquote>\n<blockquote>┌\n├  【<tg-emoji emoji-id=5926783847453692661>🛡</tg-emoji>】 <b>𝚈𝚊𝚗𝚐𝚒𝚕𝚊𝚗𝚒𝚜𝚑</b>: {upd}\n├  【<tg-emoji emoji-id=5931415565955503486>🤖</tg-emoji>】 <b>𝚇𝚘𝚜𝚝</b>: {platform}\n├  【<tg-emoji emoji-id=5819078828017849357>🤖</tg-emoji>】 <b>𝙾𝚃</b>: {os}\n├  【<tg-emoji emoji-id=5819078828017849357>🤖</tg-emoji>】 <b>𝙿𝚢𝚝𝚑𝚘𝚗 𝚅𝚎𝚛𝚜𝚒𝚢𝚊</b>: {python_ver}\n└</blockquote>"
@@ -530,11 +530,11 @@ loader:
   bad_unicode: "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>Modulda noto‘g‘ri Unicode formatlash</b>"
   load_failed: "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>Yuklash muvaffaqiyatsiz tugadi. Tafsilotlar uchun loglarni ko‘ring</b>"
   loaded: "<tg-emoji emoji-id=5134452506935427991>🪐</tg-emoji> <b>Modul</b> <code>{}</code>{} <b>yuklandi {}</b>{}{}{}{}{}{}{}"
-  no_class: "<b>Qaysi sinfni (class) yuklashdan olib tashlash kerak?</b>"
-  unloaded: "{} <b>Modul {} yuklashdan olib tashlandi.</b>"
-  modules_unloaded: "<tg-emoji emoji-id=5784993237412351403>✅</tg-emoji> <b>{unloaded_num} ta modul yuklashdan olib tashlandi:</b>\n<blockquote expandable>{unloaded}</blockquote>"
-  not_unloaded: "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>Modul yuklashdan olib tashlanmadi.</b>"
-  modules_not_unloaded: "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>{not_unloaded} ta modulni yuklashdan olib tashlab bo‘lmadi.</b>\n<blockquote expandable>{errors}</blockquote>"
+  no_class: "<b>Qaysi sinfni (class) ochirlidi olib tashlash kerak?</b>"
+  unloaded: "{} <b>Modul {} ochirlidi olib tashlandi.</b>"
+  modules_unloaded: "<tg-emoji emoji-id=5784993237412351403>✅</tg-emoji> <b>{unloaded_num} ta modul ochirlidi olib tashlandi:</b>\n<blockquote expandable>{unloaded}</blockquote>"
+  not_unloaded: "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>Modul ochirlidi olib tashlanmadi.</b>"
+  modules_not_unloaded: "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>{not_unloaded} ta modulni ochirlidi olib tashlab bo‘lmadi.</b>\n<blockquote expandable>{errors}</blockquote>"
   requirements_failed: "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>Talablarni (kutubxonalarni) o‘rnatish muvaffaqiyatsiz tugadi</b>"
   requirements_restarted: "🚀 <b>Yuzerbotingiz qayta ishga tushirildi, qayta ishga tushgandan so‘ng, modulni qayta o‘rnating.</b>"
   requirements_installing: "<tg-emoji emoji-id=5328311576736833844>🚀</tg-emoji> <b>Talablar o‘rnatilmoqda:\n\n{}</b>"
@@ -570,8 +570,8 @@ loader:
   overwrite_module: "<tg-emoji emoji-id=5454225457916420314>😖</tg-emoji> <b>Ushbu modul yadro modulini (</b><code>{}</code><b>) bekor qilishga (overwrite) urindi</b>\n\n<tg-emoji emoji-id=5472146462362048818>💡</tg-emoji><i> Buni xato deb xabar qilmang. Bu yadro modullarini ba'zi keraksiz narsalar bilan almashtirishni oldini olish uchun xavfsizlik chorasidir</i>"
   scam_module: "<tg-emoji emoji-id=5454225457916420314>😖</tg-emoji> <b>Modul</b> <code>{name}</code> <b>firibgar (scam), iltimos, uni qo‘llab-quvvatlash guruhiga xabar bering (</b><code>{prefix}support</code><b>)</b>\n\n<tg-spoiler><i>Himoya uning yuklanishini to‘xtatdi.</i></tg-spoiler>"
   overwrite_command: "<tg-emoji emoji-id=5454225457916420314>😖</tg-emoji> <b>Ushbu modul yadro buyrug‘ini (</b><code>{}{}</code><b>) bekor qilishga (overwrite) urindi</b>\n\n<tg-emoji emoji-id=5472146462362048818>💡</tg-emoji><i> Buni xato deb xabar qilmang. Bu yadro modullari buyruqlarini ba'zi keraksiz narsalar bilan almashtirishni oldini olish uchun xavfsizlik chorasidir</i>"
-  unload_core: "<tg-emoji emoji-id=5454225457916420314>😖</tg-emoji> <b>Siz yadro modulini</b> <code>{}</code><b></b> yuklashdan olib tashlay olmaysiz\n\n<tg-emoji emoji-id=5472146462362048818>💡</tg-emoji><i> Buni xato deb xabar qilmang. Bu yadro modullarini ba'zi keraksiz narsalar bilan almashtirishni oldini olish uchun xavfsizlik chorasidir</i>"
-  cannot_unload_lib: "<tg-emoji emoji-id=5454225457916420314>😖</tg-emoji> <b>Siz kutubxonani yuklashdan olib tashlay olmaysiz</b>"
+  unload_core: "<tg-emoji emoji-id=5454225457916420314>😖</tg-emoji> <b>Siz yadro modulini</b> <code>{}</code><b></b> ochirlidi olib tashlay olmaysiz\n\n<tg-emoji emoji-id=5472146462362048818>💡</tg-emoji><i> Buni xato deb xabar qilmang. Bu yadro modullarini ba'zi keraksiz narsalar bilan almashtirishni oldini olish uchun xavfsizlik chorasidir</i>"
+  cannot_unload_lib: "<tg-emoji emoji-id=5454225457916420314>😖</tg-emoji> <b>Siz kutubxonani ochirlidi olib tashlay olmaysiz</b>"
   wait_channel_approve: "<tg-emoji emoji-id=5469741319330996757>💫</tg-emoji> <b>Modul</b> <code>{}</code> <b><a href=\"https://t.me/{}\">{}</a> kanaliga qo‘shilishga ruxsat so‘rayapti.\n\n<b><tg-emoji emoji-id=5467666648263564704>❓</tg-emoji> Sabab: {}</b>\n\n<i><a href=\"https://t.me/{}\">Tasdiqlash</a> kutilmoqda...</i>"
   installing: "<tg-emoji emoji-id=5325792861885570739>🕔</tg-emoji> <b>Modul o‘rnatilmoqda</b> <code>{}</code><b>...</b>"
   repo_exists: "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>Repo</b> <code>{}</code> <b>allaqachon qo‘shilgan</b>"
@@ -584,7 +584,7 @@ loader:
   _cmd_doc_delrepo: "Repozitoriylar ro‘yxatidan repozitoriyni olib tashlash"
   _cmd_doc_dlmod: "Rasmiy modul reposidan modul o‘rnatish"
   _cmd_doc_loadmod: "Modul faylini yuklaydi"
-  _cmd_doc_unloadmod: "Modulni sinf (class) nomi bo‘yicha yuklashdan olib tashlash"
+  _cmd_doc_unloadmod: "Modulni sinf (class) nomi bo‘yicha ochirlidi olib tashlash"
   _cls_doc: "Modullarni yuklaydi"
   basic_auth_doc: "Modul reposi uchun asosiy autentifikatsiya"
 
@@ -638,7 +638,7 @@ translate:
 
 quickstart:
   name: "Quickstart"
-  base: "🪐 <b>Salom.</b> Sizning <b>Heroku</b> yuzerbotingiz endi o‘rnatildi.\n\n❓ <b>Yordam kerakmi?</b> <a href=\"https://t.me/heroku_talks\">Qo‘llab-quvvatlash guruhimizga</a> qo‘shiling. Biz <b>hammaga</b> yordam beramiz.\n\n💁‍♀️ <b>Tezkor qo‘llanma:</b>\n\n1️⃣ Modullar ro‘yxatini ko‘rish uchun <code>.help</code> <b>deb yozing</b>\n2️⃣ Modul tavsifini ko‘rish uchun <code>.help &lt;Modul nomi/buyruq&gt;</code> <b>deb yozing</b>\n3️⃣ Havoladan modul yuklash uchun <code>.dlmod &lt;havola&gt;</code> <b>deb yozing</b>\n4️⃣ Fayldan modul yuklash uchun faylga javoban <code>.loadmod</code> <b>deb yozing</b>\n5️⃣ Modulni yuklashdan olib tashlash uchun <code>.unloadmod &lt;Modul nomi&gt;</code> <b>deb yozing</b>\n\n💡 <b>Heroku Hikka, Friendly-Telegram va GeekTG modullarini, shuningdek o‘z modullarini qo‘llab-quvvatlaydi.</b>\n"
+  base: "🪐 <b>Salom.</b> Sizning <b>Heroku</b> yuzerbotingiz endi o‘rnatildi.\n\n❓ <b>Yordam kerakmi?</b> <a href=\"https://t.me/heroku_talks\">Qo‘llab-quvvatlash guruhimizga</a> qo‘shiling. Biz <b>hammaga</b> yordam beramiz.\n\n💁‍♀️ <b>Tezkor qo‘llanma:</b>\n\n1️⃣ Modullar ro‘yxatini ko‘rish uchun <code>.help</code> <b>deb yozing</b>\n2️⃣ Modul tavsifini ko‘rish uchun <code>.help &lt;Modul nomi/buyruq&gt;</code> <b>deb yozing</b>\n3️⃣ Havoladan modul yuklash uchun <code>.dlmod &lt;havola&gt;</code> <b>deb yozing</b>\n4️⃣ Fayldan modul yuklash uchun faylga javoban <code>.loadmod</code> <b>deb yozing</b>\n5️⃣ Modulni ochirlidi olib tashlash uchun <code>.unloadmod &lt;Modul nomi&gt;</code> <b>deb yozing</b>\n\n💡 <b>Heroku Hikka, Friendly-Telegram va GeekTG modullarini, shuningdek o‘z modullarini qo‘llab-quvvatlaydi.</b>\n"
   lavhost: "✌️ <b>Yuzerbotingiz lavHost-da o‘rnatilgan</b>. Muhim bildirishnomalar va yangilanishlar uchun @lavhost ga qo‘shilganingizga ishonch hosil qiling. Platforma bo‘yicha barcha savollarni @lavhostchat da berish kerak."
   language_saved: "🇺🇿 Til saqlandi!"
   language: "🇺🇿 O‘zbekcha"
