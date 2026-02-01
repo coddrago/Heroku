@@ -146,7 +146,7 @@ class Web:
         for _ in range(5):
             await asyncio.sleep(1.5)
             try:
-                result = await inutils._get_webapp_session(None, url)
+                result = await inutils._get_webapp_session(url)
             except:
                 continue
             break
