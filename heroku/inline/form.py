@@ -359,7 +359,7 @@ class Form(InlineUnit):
             if "No query results" in str(e):
                 await answer(
                     self.translator.getkey("inline.no_query_results").format(
-                        prefix=client.heroku_db.get("heroku.main", "command_prefix", "ss"),
+                        prefix=utils.escape_html(self.get_prefix()),
                         ),
                     )
             if unit_id in self._units:
