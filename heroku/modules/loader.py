@@ -1004,7 +1004,13 @@ class LoaderMod(loader.Module):
                         ),
                     )
                 )
-
+        placeholders = "\n".join(
+            utils.help_placeholders(
+                modname, 
+                self
+            )
+        )
+        
         depends_from = (
             self.strings("depends_from").format("\n".join(depends_from))
             if depends_from
@@ -1017,13 +1023,12 @@ class LoaderMod(loader.Module):
                 version, \
                 mod_doc, \
                 modhelp, \
+                placeholders, \
                 developer, \
                 origin, \
                 subscribe, \
                 blob_link, \
                 depends_from
-            placeholders = "\n".join(utils.help_placeholders(modname, self))
-            placeholders_info = f"<blockquote expandable>\n{placeholders}</blockquote>"
             return self.strings("loaded").format(
                 modname.strip(),
                 version,
@@ -1032,7 +1037,9 @@ class LoaderMod(loader.Module):
                 "<blockquote expandable>{}</blockquote>".format(
                     '\n'.join(modhelp)
                 ),
-                placeholders_info,
+                "<blockquote expandable>{}</blockquote>".format(
+                    '\n'.join(placeholders)
+                ),
                 developer if not subscribe or not use_subscribe else "",
                 depends_from,
                 (
