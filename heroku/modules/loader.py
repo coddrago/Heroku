@@ -1004,11 +1004,9 @@ class LoaderMod(loader.Module):
                         ),
                     )
                 )
-        placeholders = "\n".join(
-            utils.help_placeholders(
-                modname, 
-                self
-            )
+        placeholders = utils.help_placeholders(
+            modname, 
+            self
         )
         
         depends_from = (
