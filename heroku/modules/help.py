@@ -63,7 +63,7 @@ class Help(loader.Module):
                 "banner_url",
                 None,
                 lambda: "Banner for .help",
-                validator=loader.validators.Link(),
+                validator=loader.validators.RandomLink(),
             ),
             loader.ConfigValue(
                 "media_quote",
