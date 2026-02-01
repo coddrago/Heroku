@@ -359,7 +359,7 @@ class Form(InlineUnit):
             if "No query results" in str(e):
                 await answer(
                     self.translator.getkey("inline.no_query_results").format(
-                        prefix=utils.escape_html(self.get_prefix()),
+                        prefix=getattr(self._client, "command_prefix", "."),
                         ),
                     )
             if unit_id in self._units:
