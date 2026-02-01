@@ -518,7 +518,7 @@ loader:
   provide_module: "<tg-emoji emoji-id=5312383351217201533>⚠️</tg-emoji> <b>Geben Sie ein Modul zum Download an</b>"
   bad_unicode: "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>Ungültige Modulkodierung</b>"
   load_failed: "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>Der Download war nicht erfolgreich. Siehe Logs.</b>"
-  loaded: "<tg-emoji emoji-id=5134452506935427991>🪐</tg-emoji> <b>Modul</b> <code>{}</code>{} <b>wurde geladen {}</b>{}{}{}{}{}{}{}"
+  loaded: "<tg-emoji emoji-id=5134452506935427991>🪐</tg-emoji> <b>Modul</b> <code>{}</code>{} <b>wurde geladen {}</b>{}{}{}{}{}{}{}{}"
   no_class: "<b>Was soll entladen werden?</b>"
   unloaded: "{} <b>Modul {} wurde entladen.</b>"
   not_unloaded: "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>Modul wurde nicht entladen.</b>"

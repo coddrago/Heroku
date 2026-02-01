@@ -1005,7 +1005,7 @@ class LoaderMod(loader.Module):
                     )
                 )
         placeholders = utils.help_placeholders(
-            modname, 
+            getattr(getattr(instance, "__class__"), "__name__"), 
             self
         )
         
@@ -1031,13 +1031,13 @@ class LoaderMod(loader.Module):
                 modname.strip(),
                 version,
                 utils.ascii_face(),
-                mod_doc, 
+                mod_doc if mod_doc else "",
                 "<blockquote expandable>{}</blockquote>".format(
                     '\n'.join(modhelp)
-                ),
+                ) if modhelp else "",
                 "<blockquote expandable>{}</blockquote>".format(
                     '\n'.join(placeholders)
-                ),
+                ) if placeholders else "",
                 developer if not subscribe or not use_subscribe else "",
                 depends_from,
                 (
@@ -1045,7 +1045,7 @@ class LoaderMod(loader.Module):
                     if origin != "<string>" and self.config["share_link"]
                     else ""
                 ),
-                blob_link,
+                blob_link if blob_link else "",
                 subscribe if use_subscribe else "",
             )
 

@@ -551,7 +551,7 @@ loader:
   provide_module: "<tg-emoji emoji-id=5312383351217201533>⚠️</tg-emoji> <b>Yuklash uchun modulni taqdim eting</b>"
   bad_unicode: "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>Modulda noto‘g‘ri Unicode formatlash</b>"
   load_failed: "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>Yuklash muvaffaqiyatsiz tugadi. Tafsilotlar uchun loglarni ko‘ring</b>"
-  loaded: "<tg-emoji emoji-id=5134452506935427991>🪐</tg-emoji> <b>Modul</b> <code>{}</code>{} <b>yuklandi {}</b>{}{}{}{}{}{}{}"
+  loaded: "<tg-emoji emoji-id=5134452506935427991>🪐</tg-emoji> <b>Modul</b> <code>{}</code>{} <b>yuklandi {}</b>{}{}{}{}{}{}{}{}"
   no_class: "<b>Qaysi sinfni (class) ochirlidi olib tashlash kerak?</b>"
   unloaded: "{} <b>Modul {} ochirlidi olib tashlandi.</b>"
   modules_unloaded: "<tg-emoji emoji-id=5784993237412351403>✅</tg-emoji> <b>{unloaded_num} ta modul ochirlidi olib tashlandi:</b>\n<blockquote expandable>{unloaded}</blockquote>"

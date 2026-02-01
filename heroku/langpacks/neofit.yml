@@ -550,7 +550,7 @@ loader:
   provide_module: "<tg-emoji emoji-id=5312383351217201533>⚠️</tg-emoji> <b>Argument 'module' required</b>"
   bad_unicode: "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>UnicodeDecodeError</b>"
   load_failed: "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>ImportError. Check logs</b>"
-  loaded: "<tg-emoji emoji-id=5134452506935427991>🪐</tg-emoji> <b>Module</b> <code>{}</code>{} <b>imported {}</b>{}{}{}{}{}{}{}"
+  loaded: "<tg-emoji emoji-id=5134452506935427991>🪐</tg-emoji> <b>Module</b> <code>{}</code>{} <b>imported {}</b>{}{}{}{}{}{}{}{}"
   no_class: "<b>Class name required for unload</b>"
   unloaded: "{} <b>Module {} removed.</b>"
   modules_unloaded: "<tg-emoji emoji-id=5784993237412351403>✅</tg-emoji> <b>Unloaded {unloaded_num} mods:</b>\n<blockquote expandable>{unloaded}</blockquote>"
