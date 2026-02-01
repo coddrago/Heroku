@@ -13,12 +13,13 @@
 # 🔑 https://www.gnu.org/licenses/agpl-3.0.html
 
 import getpass
+import hashlib
 import os
 import subprocess
 import sys
-import hashlib
 
 from ._internal import restart
+
 
 def get_file_hash(filename):
     hasher = hashlib.sha256()

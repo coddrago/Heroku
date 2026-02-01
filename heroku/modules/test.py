@@ -11,10 +11,10 @@
 # 🔑 https://www.gnu.org/licenses/agpl-3.0.html
 
 import getpass
-import platform as lib_platform
 import inspect
 import logging
 import os
+import platform as lib_platform
 import random
 import time
 import typing

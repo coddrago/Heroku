@@ -30,14 +30,9 @@ import typing
 from herokutl.tl.types import Message, User
 
 from . import main, utils
-from .pointers import (
-    BaseSerializingMiddlewareDict,
-    BaseSerializingMiddlewareList,
-    NamedTupleMiddlewareDict,
-    NamedTupleMiddlewareList,
-    PointerDict,
-    PointerList,
-)
+from .pointers import (BaseSerializingMiddlewareDict,
+                       BaseSerializingMiddlewareList, NamedTupleMiddlewareDict,
+                       NamedTupleMiddlewareList, PointerDict, PointerList)
 from .tl_cache import CustomTelegramClient
 from .types import JSONSerializable
 

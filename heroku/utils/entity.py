@@ -5,72 +5,50 @@
 # You can redistribute it and/or modify it under the terms of the GNU AGPLv3
 # 🔑 https://www.gnu.org/licenses/agpl-3.0.html
 
+import asyncio
 import inspect
 import logging
 import random
-import asyncio
 import re
 import string
 import time
 import typing
 from urllib.parse import urlparse
-import emoji
 
+import emoji
 import herokutl
 import requests
 from aiogram.types import Message as AiogramMessage
 from herokutl import hints
 from herokutl.tl.custom.message import Message
 from herokutl.tl.functions.account import UpdateNotifySettingsRequest
-from herokutl.tl.functions.channels import (
-    CreateChannelRequest,
-    EditPhotoRequest,
-)
-from herokutl.tl.functions.messages import (
-    GetDialogFiltersRequest,
-    SetHistoryTTLRequest,
-    UpdateDialogFilterRequest,
-    CreateForumTopicRequest,
-    GetForumTopicsByIDRequest,
-    EditForumTopicRequest,
-    GetForumTopicsRequest
-)
-from herokutl.tl.types import (
-    Channel,
-    InputPeerNotifySettings,
-    MessageEntityBankCard,
-    MessageEntityBlockquote,
-    MessageEntityBold,
-    MessageEntityBotCommand,
-    MessageEntityCashtag,
-    MessageEntityCode,
-    MessageEntityEmail,
-    MessageEntityHashtag,
-    MessageEntityItalic,
-    MessageEntityMention,
-    MessageEntityMentionName,
-    MessageEntityPhone,
-    MessageEntityPre,
-    MessageEntitySpoiler,
-    MessageEntityStrike,
-    MessageEntityTextUrl,
-    MessageEntityUnderline,
-    MessageEntityUnknown,
-    MessageEntityUrl,
-    PeerChannel,
-    PeerChat,
-    PeerUser,
-    UpdateNewChannelMessage,
-    User,
-    ForumTopic,
-    ForumTopicDeleted,
-)
-
-from .other import invite_inline_bot, run_sync
+from herokutl.tl.functions.channels import (CreateChannelRequest,
+                                            EditPhotoRequest)
+from herokutl.tl.functions.messages import (CreateForumTopicRequest,
+                                            EditForumTopicRequest,
+                                            GetDialogFiltersRequest,
+                                            GetForumTopicsByIDRequest,
+                                            GetForumTopicsRequest,
+                                            SetHistoryTTLRequest,
+                                            UpdateDialogFilterRequest)
+from herokutl.tl.types import (Channel, ForumTopic, ForumTopicDeleted,
+                               InputPeerNotifySettings, MessageEntityBankCard,
+                               MessageEntityBlockquote, MessageEntityBold,
+                               MessageEntityBotCommand, MessageEntityCashtag,
+                               MessageEntityCode, MessageEntityEmail,
+                               MessageEntityHashtag, MessageEntityItalic,
+                               MessageEntityMention, MessageEntityMentionName,
+                               MessageEntityPhone, MessageEntityPre,
+                               MessageEntitySpoiler, MessageEntityStrike,
+                               MessageEntityTextUrl, MessageEntityUnderline,
+                               MessageEntityUnknown, MessageEntityUrl,
+                               PeerChannel, PeerChat, PeerUser,
+                               UpdateNewChannelMessage, User)
 
 from .._internal import fw_protect
 from ..tl_cache import CustomTelegramClient
 from ..types import Module
+from .other import invite_inline_bot, run_sync
 
 FormattingEntity = typing.Union[
     MessageEntityUnknown,

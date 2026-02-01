@@ -14,10 +14,8 @@ import logging
 import random
 
 import herokutl
-from herokutl.tl.functions.messages import (
-    GetDialogFiltersRequest,
-    UpdateDialogFilterRequest,
-)
+from herokutl.tl.functions.messages import (GetDialogFiltersRequest,
+                                            UpdateDialogFilterRequest)
 from herokutl.tl.types import Message
 from herokutl.utils import get_display_name
 

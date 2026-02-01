@@ -16,13 +16,9 @@ __version__ = (2, 0, 0)
 import os
 
 import git
-from ._internal import (
-    get_branch_name,
-    check_commit_ancestor,
-    reset_to_master,
-    restore_worktree,
-    restart,
-)
+
+from ._internal import (check_commit_ancestor, get_branch_name,
+                        reset_to_master, restart, restore_worktree)
 
 try:
     branch = git.Repo(
