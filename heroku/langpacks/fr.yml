@@ -719,3 +719,4 @@ $inline:
   command: "🪐 Commande «{}»"
   button403: "Vous n'êtes pas autorisé à appuyer sur ce bouton !"
   keep_id: "⚠️ Ne retirez pas l'ID ! {}"
+  no_query_results: "<tg-emoji emoji-id=5440660757194744323>‼️</tg-emoji> <b>Échec de la création du formulaire</b>\n\nSolutions possibles pour corriger l'erreur:\n\n1. Redémarrez Heroku: <code>{prefix}restart</code>\n\n2. Activez le mode en ligne pour le bot: allez sur @BotFather, envoyez /mybots, cliquez sur Bot Settings -> Inline Mode -> On\n\n3. Créez un nouveau bot: envoyez la commande <code>{prefix}ch_heroku_bot</code> <@nombot>"

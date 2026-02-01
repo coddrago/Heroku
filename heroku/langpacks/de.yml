@@ -679,3 +679,4 @@ $inline:
   command: "🪐 Befehl „{}“"
   button403: "Sie können diesen Button nicht drücken!"
   keep_id: "⚠️ Löschen Sie die ID nicht! {}"
+  no_query_results: "<tg-emoji emoji-id=5440660757194744323>‼️</tg-emoji> <b>Formular konnte nicht erstellt werden</b>\n\nMögliche Lösungen für den Fehler:\n\n1. Starten Sie Heroku neu: <code>{prefix}restart</code>\n\n2. Aktivieren Sie den Inline-Modus für den Bot: gehen Sie zu @BotFather, senden Sie /mybots, klicken Sie auf Bot Settings -> Inline Mode -> On\n\n3. Erstellen Sie einen neuen Bot: senden Sie den Befehl <code>{prefix}ch_heroku_bot</code> <@botname>"

@@ -719,3 +719,4 @@ $inline:
   command: "🪐 Пәрмен «{}»"
   button403: "Сізге бұл батырманы басуға рұқсат жоқ!"
   keep_id: "⚠️ ID-ді алып тастамаңыз! {}"
+  no_query_results: "<tg-emoji emoji-id=5440660757194744323>‼️</tg-emoji> <b>Форма жасалмады</b>\n\nҚатені түзету әдістері:\n\n1. Heroku-ды қайта қосыңыз: <code>{prefix}restart</code>\n\n2. Боттың ішкі режимін қосыңыз: @BotFather-ге барыңыз, /mybots жіберіңіз, Bot Settings -> Inline Mode -> On басыңыз\n\n3. Жаңа бот жасаңыз: <code>{prefix}ch_heroku_bot</code> <@бот_аты> бұйрығын жіберіңіз"

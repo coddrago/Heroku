@@ -355,7 +355,17 @@ class Form(InlineUnit):
             m = await self._invoke_unit(unit_id, message)
         except ChatSendInlineForbiddenError:
             await answer(self.translator.getkey("inline.inline403"))
-        except Exception:
+        except Exception as e:
+            if "No query results" in str(e):
+                await answer(
+                    self.translator.getkey("inline.no_query_results").format(
+                        prefix=client.heroku_db.get("heroku.main", "command_prefix", "ss"),
+                        ),
+                    )
+                )
+            if unit_id in self._units:
+                del self._units[unit_id]
+                return False
             logger.exception("Can't send form")
 
             del self._units[unit_id]
