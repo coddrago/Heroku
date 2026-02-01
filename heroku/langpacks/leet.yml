@@ -719,3 +719,4 @@ $inline:
   command: "🪐 Cmd «{}»"
   button403: "U r n07 4ll0w3d 2 pr355 7h15 bu770n!"
   keep_id: "⚠️ D0 n07 r3m0v3 ID! {}"
+  no_query_results: "<tg-emoji emoji-id=5440660757194744323>‼️</tg-emoji> <b>F41L3D 70 CR34T3 F0RM</b>\n\nP0551BL3 W4Y5 70 F1X 7H3 3RR0R:\n\n1. R3574RT H3R0KU: <code>{prefix}restart</code>\n\n2. 3N4BL3 1NL1N3 M0D3 F0R 7H3 B07: G0 70 @B07F47H3R, 53ND /MYB075, CL1CK B07 53771N65 -> 1NL1N3 M0D3 -> 0N\n\n3. CR34T3 4 N3W B07: 53ND 7H3 C0MM4ND <code>{prefix}ch_heroku_bot</code> <@B07N4M3>"

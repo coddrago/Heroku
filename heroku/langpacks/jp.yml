@@ -719,3 +719,4 @@ $inline:
   command: "🪐 コマンド «{}»"
   button403: "このボタンを押すことは許可されていません！"
   keep_id: "⚠️ ID を削除しないでください！ {}"
+  no_query_results: "<tg-emoji emoji-id=5440660757194744323>‼️</tg-emoji> <b>フォームの作成に失敗しました</b>\n\nエラー修正の可能な方法:\n\n1. Herokuを再起動: <code>{prefix}restart</code>\n\n2. ボットのインラインモードを有効化: @BotFatherに移動、/mybotsを送信、Bot Settings -> Inline Mode -> Onをクリック\n\n3. 新しいボットを作成: コマンド <code>{prefix}ch_heroku_bot</code> <@ボット名> を送信"

@@ -719,3 +719,4 @@ $inline:
   command: "🪐 Buyruq «{}»"
   button403: "Sizga ushbu tugmani bosishga ruxsat berilmagan!"
   keep_id: "⚠️ ID-ni olib tashlamang! {}"
+  no_query_results: "<tg-emoji emoji-id=5440660757194744323>‼️</tg-emoji> <b>Shakl yaratib bo'lmadi</b>\n\nXatoni tuzatish usullari:\n\n1. Heroku-ni qayta ishga tushiring: <code>{prefix}restart</code>\n\n2. Bot uchun inline rejimini yoqing: @BotFather-ga boring, /mybots yuboring, Bot Settings -> Inline Mode -> On bosing\n\n3. Yangi bot yarating: <code>{prefix}ch_heroku_bot</code> <@bot_nomi> buyrug'ini yuboring"

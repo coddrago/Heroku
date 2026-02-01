@@ -682,3 +682,4 @@ $inline:
   command: "🪐 Команда «{}»"
   button403: "Ви не можете натиснути на цю кнопку!"
   keep_id: "⚠️ Не видаляйте ID! {}"
+  no_query_results: "<tg-emoji emoji-id=5440660757194744323>‼️</tg-emoji> <b>Не вдалося створити форму</b>\n\nМожливі способи виправлення помилки:\n\n1. Перезавантажте Heroku: <code>{prefix}restart</code>\n\n2. Увімкніть inline-режим для бота: перейдіть до @BotFather, відправте /mybots, натисніть Bot Settings -> Inline Mode -> On\n\n3. Створіть нового бота: відправте команду <code>{prefix}ch_heroku_bot</code> <@ім'я_бота>"
