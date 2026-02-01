@@ -264,10 +264,13 @@ class Help(loader.Module):
 
         args = utils.get_args_raw(message)
 
-        banner = self.config["banner_url"]
+        banner = str(self.config["banner_url"])
 
         if self.config["banner_url"] and self.config["media_quote"] is True:
-            banner = InputMediaWebPage(self.config["banner_url"])
+            banner = InputMediaWebPage(str(self.config["banner_url"]))
+
+        if not self.config["banner_url"]:
+            banner = None
 
         force = False
         if "-f" in args:
