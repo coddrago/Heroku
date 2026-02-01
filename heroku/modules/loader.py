@@ -1034,10 +1034,10 @@ class LoaderMod(loader.Module):
                 mod_doc if mod_doc else "",
                 "<blockquote expandable>{}</blockquote>".format(
                     '\n'.join(modhelp)
-                ) if modhelp else "",
+                ),
                 "<blockquote expandable>{}</blockquote>".format(
                     '\n'.join(placeholders)
-                ) if placeholders else "",
+                ),
                 developer if not subscribe or not use_subscribe else "",
                 depends_from,
                 (
@@ -1045,7 +1045,7 @@ class LoaderMod(loader.Module):
                     if origin != "<string>" and self.config["share_link"]
                     else ""
                 ),
-                blob_link if blob_link else "",
+                blob_link,
                 subscribe if use_subscribe else "",
             )
 
