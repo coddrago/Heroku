@@ -65,7 +65,7 @@ def config_placeholders():
     for placeholder_name, placeholder_data in custom_placeholders.items():
         result.append(f"{{{placeholder_name}}} - {placeholder_data.get('description') if placeholder_data.get('description') is not None else 'No docs'}")
     if result == []:
-        return "None"
+        return None
     else:
         return("\n".join(result))
 

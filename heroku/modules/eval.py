@@ -18,6 +18,7 @@ import sys
 import tempfile
 import time
 import typing
+from io import StringIO
 from types import ModuleType
 
 import herokutl
@@ -25,7 +26,6 @@ from herokutl.errors.rpcerrorlist import MessageIdInvalidError
 from herokutl.sessions import StringSession
 from herokutl.tl.types import Message
 from meval import meval
-from io import StringIO
 
 from .. import loader, main, utils
 from ..log import HerokuException
@@ -72,7 +72,7 @@ class Evaluator(loader.Module):
             output_print = StringIO()
             with contextlib.redirect_stdout(output_print):
                 result = await meval(
-                        args,
+                    args,
                     globals(),
                     **await self.getattrs(message),
                 )

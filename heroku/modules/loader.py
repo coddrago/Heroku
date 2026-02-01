@@ -1023,10 +1023,7 @@ class LoaderMod(loader.Module):
                 blob_link, \
                 depends_from
             placeholders = "\n".join(utils.help_placeholders(modname, self))
-            if placeholders != "":
-                placeholders_info = f"<blockquote expandable>{self.strings('custom_placeholders')}\n{placeholders}</blockquote>"
-            else: 
-                placeholders_info = ""
+            placeholders_info = f"<blockquote expandable>\n{placeholders}</blockquote>"
             return self.strings("loaded").format(
                 modname.strip(),
                 version,
