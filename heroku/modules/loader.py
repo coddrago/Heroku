@@ -1005,7 +1005,7 @@ class LoaderMod(loader.Module):
                     )
                 )
         placeholders = utils.help_placeholders(
-            modname, 
+            getattr(getattr(instance, "__class__"), "__name__"), 
             self
         )
         
