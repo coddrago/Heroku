@@ -362,7 +362,6 @@ class Form(InlineUnit):
                         prefix=client.heroku_db.get("heroku.main", "command_prefix", "ss"),
                         ),
                     )
-                )
             if unit_id in self._units:
                 del self._units[unit_id]
                 return False
