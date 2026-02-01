@@ -519,7 +519,7 @@ loader:
   provide_module: "<tg-emoji emoji-id=5312383351217201533>⚠️</tg-emoji> <b>Укажи модуль для загрузки</b>"
   bad_unicode: "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>Неверная кодировка модуля</b>"
   load_failed: "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>Загрузка не увенчалась успехом. Смотри логи.</b>"
-  loaded: "<tg-emoji emoji-id=5134452506935427991>🪐</tg-emoji> <b>Модуль</b> <code>{}</code>{} <b>загружен {}</b>{}{}{}{}{}{}{}"
+  loaded: "<tg-emoji emoji-id=5134452506935427991>🪐</tg-emoji> <b>Модуль</b> <code>{}</code>{} <b>загружен {}</b>{}{}{}{}{}{}{}{}"
   no_class: "<b>А что выгружать то?</b>"
   unloaded: "{} <b>Модуль {} выгружен.</b>"
   modules_unloaded: "<tg-emoji emoji-id=5784993237412351403>✅</tg-emoji> <b>Выгружено {unloaded_num} модулей:</b>\n<blockquote expandable>{unloaded}</blockquote>"

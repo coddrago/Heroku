@@ -551,7 +551,7 @@ loader:
   provide_module: "<tg-emoji emoji-id=5312383351217201533>⚠️</tg-emoji> <b>Fournissez un module à charger</b>"
   bad_unicode: "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>Formatage Unicode invalide dans le module</b>"
   load_failed: "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>Le chargement a échoué. Voir les logs pour les détails</b>"
-  loaded: "<tg-emoji emoji-id=5134452506935427991>🪐</tg-emoji> <b>Module</b> <code>{}</code>{} <b>chargé {}</b>{}{}{}{}{}{}{}"
+  loaded: "<tg-emoji emoji-id=5134452506935427991>🪐</tg-emoji> <b>Module</b> <code>{}</code>{} <b>chargé {}</b>{}{}{}{}{}{}{}{}"
   no_class: "<b>Quelle classe doit être déchargée ?</b>"
   unloaded: "{} <b>Module {} déchargé.</b>"
   modules_unloaded: "<tg-emoji emoji-id=5784993237412351403>✅</tg-emoji> <b>Déchargé {unloaded_num} modules :</b>\n<blockquote expandable>{unloaded}</blockquote>"

@@ -551,7 +551,7 @@ loader:
   provide_module: "<tg-emoji emoji-id=5312383351217201533>⚠️</tg-emoji> <b>Жүктеу үшін модульді ұсыныңыз</b>"
   bad_unicode: "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>Модульдегі жарамсыз Unicode пішімдеуі</b>"
   load_failed: "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>Жүктеу сәтсіз аяқталды. Толығырақ логтардан қараңыз</b>"
-  loaded: "<tg-emoji emoji-id=5134452506935427991>🪐</tg-emoji> <b>Модуль</b> <code>{}</code>{} <b>жүктелді {}</b>{}{}{}{}{}{}{}"
+  loaded: "<tg-emoji emoji-id=5134452506935427991>🪐</tg-emoji> <b>Модуль</b> <code>{}</code>{} <b>жүктелді {}</b>{}{}{}{}{}{}{}{}"
   no_class: "<b>Қай классты жүктеуден алу керек?</b>"
   unloaded: "{} <b>Модуль {} жүктеуден алынды.</b>"
   modules_unloaded: "<tg-emoji emoji-id=5784993237412351403>✅</tg-emoji> <b>{unloaded_num} модуль жүктеуден алынды:</b>\n<blockquote expandable>{unloaded}</blockquote>"

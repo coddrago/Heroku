@@ -551,7 +551,7 @@ loader:
   provide_module: "<tg-emoji emoji-id=5312383351217201533>⚠️</tg-emoji> <b>読み込むモジュールを提供してください</b>"
   bad_unicode: "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>モジュール内のUnicode形式が無効です</b>"
   load_failed: "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>読み込みに失敗しました。詳細はログを確認してください</b>"
-  loaded: "<tg-emoji emoji-id=5134452506935427991>🪐</tg-emoji> <b>モジュール</b> <code>{}</code>{} <b>が読み込まれました {}</b>{}{}{}{}{}{}{}"
+  loaded: "<tg-emoji emoji-id=5134452506935427991>🪐</tg-emoji> <b>モジュール</b> <code>{}</code>{} <b>が読み込まれました {}</b>{}{}{}{}{}{}{}{}"
   no_class: "<b>どのクラスをアンロードする必要がありますか？</b>"
   unloaded: "{} <b>モジュール {} がアンロードされました。</b>"
   modules_unloaded: "<tg-emoji emoji-id=5784993237412351403>✅</tg-emoji> <b>{unloaded_num} 個のモジュールをアンロードしました:</b>\n<blockquote expandable>{unloaded}</blockquote>"
