@@ -265,8 +265,8 @@ class CustomClient(TelegramClient): # TODO: rewrite the cache specifically for K
                 of the target channel/supergroup (in the format @username).
 
             force_full (``bool``, *optional*):
-                Pass False, if you don't need to fetch full chat information.
-                Defaults to True.
+                Pass True, if you need to fetch full chat information.
+                Defaults to False.
 
         Returns:
             :obj:`~pyrogram.types.Chat`: On success, if you've already joined the chat, a chat object is returned,

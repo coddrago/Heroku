@@ -24,7 +24,6 @@ from copy import deepcopy
 from urllib.parse import urlparse, unquote
 
 from aiogram.types import (
-    CallbackQuery,
     InlineKeyboardButton,
     InlineKeyboardMarkup,
     InputFile,
@@ -344,7 +343,7 @@ class Utils(InlineUnit):
         disable_security: typing.Optional[bool] = None,
         always_allow: typing.Optional[typing.List[int]] = None,
         disable_web_page_preview: bool = True,
-        query: typing.Optional[CallbackQuery] = None,
+        query: typing.Optional[InlineCall] = None,
         unit_id: typing.Optional[str] = None,
         inline_message_id: typing.Optional[str] = None,
         chat_id: typing.Optional[int] = None,
@@ -603,7 +602,7 @@ class Utils(InlineUnit):
 
     async def _delete_unit_message(
         self: "InlineManager",
-        call: typing.Optional[CallbackQuery] = None,
+        call: typing.Optional[InlineCall] = None,
         unit_id: typing.Optional[str] = None,
         chat_id: typing.Optional[int] = None,
         message_id: typing.Optional[int] = None,
@@ -857,7 +856,7 @@ class Utils(InlineUnit):
         username: str = ""
     ) -> bool | None:
         url: str = (
-            await self._client(RequestWebView(
+            await self._client.invoke(RequestWebView(
                 peer="@botfather",
                 bot="@botfather",
                 platform="android",

@@ -38,7 +38,7 @@ from pyrogram.errors import (
 from pyrogram.raw.functions.account import GetPassword
 from pyrogram.raw.functions.auth import CheckPassword
 from pyrogram.raw.functions.contacts import Unblock
-from pyrogram.raw.functions.messages.request_app_web_view import RequestAppWebView
+from pyrogram.raw.functions.messages import RequestWebView
 # from pyrogram.utils import parse_phone
 
 from .. import database, main, utils
@@ -67,6 +67,8 @@ class Web:
         self._sessions = []
         self._ratelimit = {}
         self.api_token = kwargs.pop("api_token")
+        self.app: "web.Application"
+        self.client_data: dict
         self.data_root = kwargs.pop("data_root")
         self.proxy = kwargs.pop("proxy")
 
@@ -135,7 +137,7 @@ class Web:
         username: str,
     ) -> bool:
         url: str = (
-            await client(RequestWebView(
+            await client.invoke(RequestWebView(
                 peer="@botfather",
                 bot="@botfather",
                 platform="android",

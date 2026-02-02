@@ -296,7 +296,7 @@ async def asset_channel(
 
     if hide_general and forum:
         await fw_protect()
-        await client(EditForumTopic(peer=peer, topic_id=1, hidden=True))
+        await client.invoke(EditForumTopic(peer=peer, topic_id=1, hidden=True))
 
     if ttl:
         await fw_protect()
@@ -374,7 +374,7 @@ async def asset_forum_topic(
 
     if (topic_id := forums_cache.get(entity.title, {}).get(title)):
         await fw_protect()
-        topic = await client(GetForumTopicsByID(peer=entity, topics=[topic_id]))
+        topic = await client.invoke(GetForumTopicsByID(peer=entity, topics=[topic_id]))
         topic = topic.topics[0]
 
         if not isinstance(topic, ForumTopicDeleted):
