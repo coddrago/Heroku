@@ -84,7 +84,7 @@ class UpdaterMod(loader.Module):
                     remote.fetch()
 
                 if not (
-                    diff := repo.iter_commits(f"HEAD..origin/{version.branch}")
+                    diff := [*repo.iter_commits(f"HEAD..origin/{version.branch}")]
                 ):
                     return False
         except Exception:
@@ -93,11 +93,11 @@ class UpdaterMod(loader.Module):
         res = "\n".join(
             f"<b>{commit.split()[0]}</b>:"
             f" <i>{utils.escape_html(' '.join(commit.split()[1:]))}</i>"
-            for commit in diff.splitlines()[:10]
+            for commit in diff[:10]
         )
 
         if diff.count("\n") >= 10:
-            res += self.strings("more").format(len(diff.splitlines()) - 10)
+            res += self.strings("more").format(len(diff) - 10)
 
         return res
 
