@@ -147,7 +147,7 @@ class Web:
         for _ in range(5):
             await asyncio.sleep(1.5)
             try:
-                result = await inutils._get_webapp_session(None, url)
+                result = await inutils._get_webapp_session(url)
             except:
                 continue
             break
@@ -158,7 +158,7 @@ class Web:
         session, _hash = result
         main_url = url.split("?")[0]
 
-        if await TokenObtainment._check_bot(None, session, main_url, _hash, username):
+        if await TokenObtainment._check_bot(session, main_url, _hash, username):
             return True
 
     async def custom_bot(self, request: web.Request) -> web.Response:
