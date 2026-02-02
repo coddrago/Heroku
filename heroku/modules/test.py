@@ -371,8 +371,8 @@ class TestMod(loader.Module):
         data = await utils.get_placeholders(data, self.config["custom_message"])
         try:
             placeholders_msg = self.config["custom_message"].format(**data)
-        except KeyError as e:
-            logger.warning(f"Missing placeholder in custom_message: {e}")
+        except KeyError:
+            logger.exception("Missing placeholder in custom_message")
             placeholders_msg = "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji>"
         await utils.answer(
             message,

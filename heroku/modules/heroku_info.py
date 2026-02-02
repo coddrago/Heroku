@@ -18,6 +18,7 @@ import os
 import glob
 import requests
 import re
+import logging
 import emoji
 import herokutl
 
@@ -33,6 +34,8 @@ from herokutl.utils import get_display_name
 from .. import loader, utils, version
 import platform as lib_platform
 import getpass
+
+logger = logging.getLogger(__name__)
 
 @loader.tds
 class HerokuInfoMod(loader.Module):
@@ -190,8 +193,8 @@ class HerokuInfoMod(loader.Module):
         if self.config["custom_message"]:
             try:
                 placeholders_msg = self.config["custom_message"].format(**data)
-            except KeyError as e:
-                logger.warning(f"Missing placeholder in custom_message: {e}")
+            except KeyError:
+                logger.exception("Missing placeholder in custom_message")
                 placeholders_msg = "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji>"
         return (
             (
