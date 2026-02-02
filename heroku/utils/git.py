@@ -12,6 +12,8 @@ import typing
 import git
 import herokutl
 
+from .. import version
+
 parser = herokutl.utils.sanitize_parse_mode("html")
 logger = logging.getLogger(__name__)
 
@@ -99,3 +101,10 @@ def get_commit_count() -> int:
         return len(list(repo.iter_commits()))
     except Exception:
         return 0
+
+def is_up_to_date():
+    repo = git.Repo(search_parent_directories=True)
+    diff = any(
+        repo.iter_commits(f"HEAD..origin/{version.branch}", max_count=1)
+    )
+    return not diff

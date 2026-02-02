@@ -1001,13 +1001,8 @@ class Heroku:
     async def _badge(self, client: CustomTelegramClient):
         """Call the badge in shell"""
         try:
-            import git
-
-            repo = git.Repo()
-
             build = utils.get_git_hash()
-            diff = repo.git.log([f"HEAD..origin/{version.branch}", "--oneline"])
-            upd = "Update required" if diff else "Up-to-date"
+            upd = "Up-to-date" if utils.is_up_to_date() else "Update required"
             pref = client.heroku_db.get("heroku.main", "command_prefix", None)
 
             logo = (

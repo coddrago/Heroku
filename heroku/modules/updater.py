@@ -84,7 +84,7 @@ class UpdaterMod(loader.Module):
                     remote.fetch()
 
                 if not (
-                    diff := repo.git.log([f"HEAD..origin/{version.branch}", "--oneline"])
+                    diff := repo.iter_commits(f"HEAD..origin/{version.branch}")
                 ):
                     return False
         except Exception:

@@ -122,12 +122,11 @@ class HerokuInfoMod(loader.Module):
 
     async def _render_info(self, start: float) -> str:
         try:
-            repo = git.Repo(search_parent_directories=True)
-            diff = repo.git.log([f"HEAD..origin/{version.branch}", "--oneline"])
-            if diff:
-                upd = (self.strings("update_required").format(prefix=self.get_prefix()))
-            else:
+            up_to_date = utils.is_up_to_date()
+            if up_to_date:
                 upd = self.strings["up-to-date"]
+            else:
+                upd = self.strings["update_required"].format(prefix=self.get_prefix())
         except Exception:
             upd = ""
 
