@@ -91,8 +91,8 @@ class UpdaterMod(loader.Module):
             return False
 
         res = "\n".join(
-            f"<b>{commit.split()[0]}</b>:"
-            f" <i>{utils.escape_html(' '.join(commit.split()[1:]))}</i>"
+            f"<b>{commit.hexsha[:7]}</b>:"
+            f" <i>{utils.escape_html(commit.message.splitlines()[0])}</i>"
             for commit in diff[:10]
         )
 
