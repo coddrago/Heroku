@@ -229,7 +229,7 @@ class HerokuInfoMod(loader.Module):
         imgform = str(self.config['banner_url']).split('.')[-1]
         imgset = self.config['imgSettings']
         if imgform in ['jpg', 'jpeg', 'png', 'bmp', 'webp']:
-            response = requests.get(self.config['banner_url'] if not self.config['banner_url'].startswith('https://imgur') else self.imgur(self.config['banner_url']), stream=True, headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"})
+            response = requests.get(str(self.config['banner_url']) if not str(self.config['banner_url']).startswith('https://imgur') else self.imgur(str(self.config['banner_url'])), stream=True, headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"})
             img = Image.open(BytesIO(response.content))
             font = ImageFont.truetype(
                 glob.glob(f'{os.getcwd()}/assets/font.*')[0], 
