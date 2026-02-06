@@ -199,6 +199,8 @@ def _external_stack_info() -> typing.Tuple[bool, typing.Optional[str], typing.Op
 def _session_audit_hook(event, args):
     if not args:
         return
+    if event.startswith("import") or event.startswith("importlib."):
+        return
 
     def _is_session_path(value) -> bool:
         try:
