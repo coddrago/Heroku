@@ -31,14 +31,14 @@ from importlib.abc import SourceLoader
 import requests
 from herokutl.hints import EntityLike
 from herokutl.tl.functions.account import UpdateNotifySettingsRequest
-
 from herokutl.tl.types import (Channel, ChannelForbidden, ChannelFull,
                                InputPeerNotifySettings, Message, UserFull)
 
 from . import version
 from ._reference_finder import replace_all_refs
-from .inline.types import (BotInlineCall, BotInlineMessage, BotMessage, HerokuReplyMarkup,
-                           InlineCall, InlineMessage, InlineQuery, InlineUnit)
+from .inline.types import (BotInlineCall, BotInlineMessage, BotMessage,
+                           HerokuReplyMarkup, InlineCall, InlineMessage,
+                           InlineQuery, InlineUnit)
 from .pointers import PointerDict, PointerList
 
 if typing.TYPE_CHECKING:
@@ -211,6 +211,18 @@ def _make_safe_db_proxy():
                 )
                 raise AttributeError("Write to db attribute is blocked")
             setattr(_db_map[self], name, value)
+
+        def __getitem__(self, key):
+            return _db_map[self][key]
+
+        def __setitem__(self, key, value):
+            _db_map[self][key] = value
+
+        def __delitem__(self, key):
+            del _db_map[self][key]
+
+        def __contains__(self, key):
+            return key in _db_map[self]
 
         def __repr__(self) -> str:
             return "<SafeDatabaseProxy>"
@@ -703,7 +715,7 @@ class Module:
         from . import utils
 
         channel = await self.client.get_entity(peer)
-        
+
         match channel:
             case ChannelForbidden():
                 if assure_joined:
@@ -722,7 +734,7 @@ class Module:
 
             case Channel():
                 pass
-            
+
             case _:
                 raise TypeError("`peer` field must be a channel")
 
@@ -731,7 +743,7 @@ class Module:
 
         if not getattr(channel, "left", True):
             return True
-        
+
         event = asyncio.Event()
         await self.client(
             UpdateNotifySettingsRequest(
