@@ -442,12 +442,6 @@ def patched_import(name: str, *args, **kwargs):
         return native_import(name, *args, **kwargs)
     token = _IMPORT_DEPTH.set(depth + 1)
     try:
-        if _is_external_context_active() and name in {
-        "gc",
-        "ctypes",
-        "pickle",
-        }:
-            raise ImportError(f"Import of {name!r} is blocked for external modules")
         match name:
             case s if s.startswith("telethon"):
                 return native_import("herokutl" + name[8:], *args, **kwargs)
