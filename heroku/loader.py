@@ -167,6 +167,8 @@ def _format_audit_args(args: typing.Any, limit: int = 400) -> str:
 def _is_external_origin(origin: str) -> bool:
     if not origin:
         return False
+    if not isinstance(origin, str):
+        return False
     if origin.startswith("<core"):
         return False
     if origin.startswith(_EXTERNAL_ORIGIN_PREFIXES):
@@ -175,25 +177,43 @@ def _is_external_origin(origin: str) -> bool:
 
 
 def _is_external_frame(frame) -> bool:
+    if frame is None:
+        return False
     spec = frame.f_globals.get("__spec__", None)
     if spec and getattr(spec, "origin", None):
-        return _is_external_origin(spec.origin)
+        origin = spec.origin
+        if origin and isinstance(origin, str):
+            return _is_external_origin(origin)
     filename = frame.f_globals.get("__file__", "")
     if not filename:
         return False
-    return _is_external_origin(filename) or "loaded_modules" in filename
+    if isinstance(filename, str):
+        return _is_external_origin(filename) or "loaded_modules" in filename
+    return False
 
 
 def _external_stack_info() -> typing.Tuple[bool, typing.Optional[str], typing.Optional[str]]:
-    for frame_info in inspect.stack():
-        if _is_external_frame(frame_info.frame):
-            spec = frame_info.frame.f_globals.get("__spec__", None)
+    frame = sys._getframe()
+    if frame:
+        frame = frame.f_back
+    max_frames = 50
+    frame_count = 0
+    while frame and frame_count < max_frames:
+        if _is_external_frame(frame):
+            spec = frame.f_globals.get("__spec__", None)
             origin = getattr(spec, "origin", None) if spec else None
             if not origin:
-                origin = frame_info.frame.f_globals.get("__file__", "")
-            mod_name = frame_info.frame.f_globals.get("__name__", None)
+                origin = frame.f_globals.get("__file__", "")
+            
+            if origin and not isinstance(origin, str):
+                origin = str(origin)
+            
+            mod_name = frame.f_globals.get("__name__", None)
             return True, origin or None, mod_name
+        frame = frame.f_back
+        frame_count += 1
     return False, None, None
+
 
 
 def _session_audit_hook(event, args):
@@ -305,7 +325,6 @@ def _is_external_context_active() -> bool:
         return True
     has_external_stack, _, _ = _external_stack_info()
     return has_external_stack
-
 
 def _deny_external(reason: str):
     if _is_external_context_active():
@@ -433,23 +452,31 @@ native_import = builtins.__import__
 
 
 def patched_import(name: str, *args, **kwargs):
-    if _is_external_context_active() and name in {
-        "gc",
-        "ctypes",
-        "pickle",
-    }:
-        raise ImportError(f"Import of {name!r} is blocked for external modules")
-    match name:
-        case s if s.startswith("telethon"):
-            return native_import("herokutl" + name[8:], *args, **kwargs)
-        case s if s.startswith("hikkatl"):
-            return native_import("herokutl" + name[7:], *args, **kwargs)
-        case s if s.startswith("hikkalls"):
-            return native_import(name, *args, **kwargs)
-        case s if s.startswith("hikka"):
-            return native_import("heroku" + name[5:], *args, **kwargs)
-
-    return native_import(name, *args, **kwargs)
+    _import_recursion_depth = getattr(sys, '_import_recursion_depth', 0)
+    sys._import_recursion_depth = _import_recursion_depth + 1
+    try:
+        if _import_recursion_depth > 10:
+            sys._import_recursion_depth = 0
+            raise ImportError(f"Import recursion depth exceeded for {name!r}")
+        
+        if _is_external_context_active() and name in {"gc", "ctypes", "pickle"}:
+            sys._import_recursion_depth -= 1
+            raise ImportError(f"Import of {name!r} is blocked for external modules")
+        
+        match name:
+            case s if s.startswith("telethon"):
+                result = native_import("herokutl" + name[8:], *args, **kwargs)
+            case s if s.startswith("hikkatl"):
+                result = native_import("herokutl" + name[7:], *args, **kwargs)
+            case s if s.startswith("hikkalls"):
+                result = native_import(name, *args, **kwargs)
+            case s if s.startswith("hikka"):
+                result = native_import("heroku" + name[5:], *args, **kwargs)
+            case _:
+                result = native_import(name, *args, **kwargs)
+    finally:
+        sys._import_recursion_depth = max(0, getattr(sys, '_import_recursion_depth', 0) - 1)
+    return result
 
 
 builtins.__import__ = patched_import
