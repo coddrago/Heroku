@@ -219,6 +219,8 @@ def _external_stack_info() -> typing.Tuple[bool, typing.Optional[str], typing.Op
 def _session_audit_hook(event, args):
     if not args:
         return
+    if event.startswith("import") or event.startswith("importlib."):
+        return
 
     def _is_session_path(value) -> bool:
         try:
@@ -449,34 +451,35 @@ VALID_APT_PACKAGES = re.compile(
 USER_INSTALL = "PIP_TARGET" not in os.environ and "VIRTUAL_ENV" not in os.environ
 
 native_import = builtins.__import__
+_IMPORT_DEPTH = contextvars.ContextVar("_IMPORT_DEPTH", default=0)
+_MAX_IMPORT_DEPTH = 80
 
 
 def patched_import(name: str, *args, **kwargs):
-    _import_recursion_depth = getattr(sys, '_import_recursion_depth', 0)
-    sys._import_recursion_depth = _import_recursion_depth + 1
+    depth = _IMPORT_DEPTH.get()
+    if depth > _MAX_IMPORT_DEPTH:
+        return native_import(name, *args, **kwargs)
+    token = _IMPORT_DEPTH.set(depth + 1)
     try:
-        if _import_recursion_depth > 10:
-            sys._import_recursion_depth = 0
-            raise ImportError(f"Import recursion depth exceeded for {name!r}")
-        
-        if _is_external_context_active() and name in {"gc", "ctypes", "pickle"}:
-            sys._import_recursion_depth -= 1
+        if _is_external_context_active() and name in {
+        "gc",
+        "ctypes",
+        "pickle",
+        }:
             raise ImportError(f"Import of {name!r} is blocked for external modules")
-        
         match name:
             case s if s.startswith("telethon"):
-                result = native_import("herokutl" + name[8:], *args, **kwargs)
+                return native_import("herokutl" + name[8:], *args, **kwargs)
             case s if s.startswith("hikkatl"):
-                result = native_import("herokutl" + name[7:], *args, **kwargs)
+                return native_import("herokutl" + name[7:], *args, **kwargs)
             case s if s.startswith("hikkalls"):
-                result = native_import(name, *args, **kwargs)
+                return native_import(name, *args, **kwargs)
             case s if s.startswith("hikka"):
-                result = native_import("heroku" + name[5:], *args, **kwargs)
-            case _:
-                result = native_import(name, *args, **kwargs)
+                return native_import("heroku" + name[5:], *args, **kwargs)
+
+        return native_import(name, *args, **kwargs)
     finally:
-        sys._import_recursion_depth = max(0, getattr(sys, '_import_recursion_depth', 0) - 1)
-    return result
+        _IMPORT_DEPTH.reset(token)
 
 
 builtins.__import__ = patched_import
