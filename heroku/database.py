@@ -12,6 +12,7 @@
 
 import asyncio
 import collections
+import inspect
 import json
 import logging
 import os
@@ -28,17 +29,12 @@ except ImportError as e:
 import typing
 
 from herokutl.errors.rpcerrorlist import ChannelsTooMuchError
-from herokutl.tl.types import Message, User, ForumTopic
+from herokutl.tl.types import ForumTopic, Message, User
 
 from . import main, utils
-from .pointers import (
-    BaseSerializingMiddlewareDict,
-    BaseSerializingMiddlewareList,
-    NamedTupleMiddlewareDict,
-    NamedTupleMiddlewareList,
-    PointerDict,
-    PointerList,
-)
+from .pointers import (BaseSerializingMiddlewareDict,
+                       BaseSerializingMiddlewareList, NamedTupleMiddlewareDict,
+                       NamedTupleMiddlewareList, PointerDict, PointerList)
 from .tl_cache import CustomTelegramClient
 from .types import JSONSerializable
 
@@ -53,6 +49,8 @@ __all__ = [
 ]
 
 logger = logging.getLogger(__name__)
+_DB_PROTECTED_OWNERS = {"HerokuPluginSecurity"}
+_DB_ALLOWED_WRITERS = {f"{__package__}.modules.heroku_plugin_security"}
 
 
 class NoAssetsChannel(Exception):
@@ -147,12 +145,12 @@ class Database(dict):
         """Read database and stores it in self"""
         if self._redis:
             try:
-                self.update(
-                    **json.loads(
+                self._update_from_read(
+                    json.loads(
                         self._redis.get(
                             str(self._client.tg_id),
                         ).decode(),
-                    )
+                    ),
                 )
             except Exception:
                 logger.exception("Error reading redis database")
@@ -166,11 +164,15 @@ class Database(dict):
             if re.search(r'"(legacy\.)(\S+\":)', db):
                 logging.warning("Converting db after update")
                 db = re.sub(r'(legacy\.)(\S+\":)', lambda m: 'heroku.' + m.group(2), db)
-            self.update(**json.loads(db))
+            self._update_from_read(json.loads(db))
         except json.decoder.JSONDecodeError:
             logger.warning("Database read failed! Creating new one...")
         except FileNotFoundError:
             logger.debug("Database file not found, creating new one...")
+
+    def _update_from_read(self, items: dict) -> None:
+        """Update DB from persisted storage without write-protection checks."""
+        super().update(items)
 
     def process_db_autofix(self, db: dict) -> bool:
         if not utils.is_serializable(db):
@@ -297,6 +299,11 @@ class Database(dict):
 
     def set(self, owner: str, key: str, value: JSONSerializable) -> bool:
         """Set database key"""
+        if owner in _DB_PROTECTED_OWNERS:
+            caller = self._get_write_caller()
+            if caller not in _DB_ALLOWED_WRITERS:
+                self._reject_write(owner, key, caller)
+
         if not utils.is_serializable(owner):
             raise RuntimeError(
                 "Attempted to write object to "
@@ -320,6 +327,56 @@ class Database(dict):
 
         super().setdefault(owner, {})[key] = value
         return self.save()
+
+    def __setitem__(self, owner: str, value: JSONSerializable) -> None:
+        if owner in _DB_PROTECTED_OWNERS:
+            caller = self._get_write_caller()
+            if caller not in _DB_ALLOWED_WRITERS:
+                self._reject_write(owner, "<dict>", caller)
+
+        if not utils.is_serializable(owner):
+            raise RuntimeError(
+                "Attempted to write object to "
+                f"{owner=} ({type(owner)=}) of database. It is not "
+                "JSON-serializable key which will cause errors"
+            )
+
+        if not utils.is_serializable(value):
+            raise RuntimeError(
+                "Attempted to write object of "
+                f"{owner=} ({type(value)=}) to database. It is not "
+                "JSON-serializable value which will cause errors"
+            )
+
+        super().__setitem__(owner, value)
+
+    def update(self, *args, **kwargs) -> None:
+        items = dict(*args, **kwargs)
+        for owner in items.keys():
+            if owner in _DB_PROTECTED_OWNERS:
+                caller = self._get_write_caller()
+                if caller not in _DB_ALLOWED_WRITERS:
+                    self._reject_write(owner, "<dict>", caller)
+        return super().update(items)
+
+    @staticmethod
+    def _get_write_caller() -> typing.Optional[str]:
+        for frame_info in inspect.stack():
+            mod = frame_info.frame.f_globals.get("__name__", None)
+            if not mod or mod == __name__ or mod == f"{__package__}.pointers":
+                continue
+            return mod
+        return None
+
+    @staticmethod
+    def _reject_write(owner: str, key: str, caller: typing.Optional[str]):
+        logger.warning(
+            "Blocked db write to protected owner=%s key=%s from %s",
+            owner,
+            key,
+            caller or "<unknown>",
+        )
+        raise PermissionError("Database write to protected owner is restricted")
 
     def pointer(
         self,
