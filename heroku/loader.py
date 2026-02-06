@@ -432,26 +432,35 @@ VALID_APT_PACKAGES = re.compile(
 USER_INSTALL = "PIP_TARGET" not in os.environ and "VIRTUAL_ENV" not in os.environ
 
 native_import = builtins.__import__
+_IMPORT_DEPTH = contextvars.ContextVar("_IMPORT_DEPTH", default=0)
+_MAX_IMPORT_DEPTH = 80
 
 
 def patched_import(name: str, *args, **kwargs):
-    if _is_external_context_active() and name in {
+    depth = _IMPORT_DEPTH.get()
+    if depth > _MAX_IMPORT_DEPTH:
+        return native_import(name, *args, **kwargs)
+    token = _IMPORT_DEPTH.set(depth + 1)
+    try:
+        if _is_external_context_active() and name in {
         "gc",
         "ctypes",
         "pickle",
-    }:
-        raise ImportError(f"Import of {name!r} is blocked for external modules")
-    match name:
-        case s if s.startswith("telethon"):
-            return native_import("herokutl" + name[8:], *args, **kwargs)
-        case s if s.startswith("hikkatl"):
-            return native_import("herokutl" + name[7:], *args, **kwargs)
-        case s if s.startswith("hikkalls"):
-            return native_import(name, *args, **kwargs)
-        case s if s.startswith("hikka"):
-            return native_import("heroku" + name[5:], *args, **kwargs)
+        }:
+            raise ImportError(f"Import of {name!r} is blocked for external modules")
+        match name:
+            case s if s.startswith("telethon"):
+                return native_import("herokutl" + name[8:], *args, **kwargs)
+            case s if s.startswith("hikkatl"):
+                return native_import("herokutl" + name[7:], *args, **kwargs)
+            case s if s.startswith("hikkalls"):
+                return native_import(name, *args, **kwargs)
+            case s if s.startswith("hikka"):
+                return native_import("heroku" + name[5:], *args, **kwargs)
 
-    return native_import(name, *args, **kwargs)
+        return native_import(name, *args, **kwargs)
+    finally:
+        _IMPORT_DEPTH.reset(token)
 
 
 builtins.__import__ = patched_import
