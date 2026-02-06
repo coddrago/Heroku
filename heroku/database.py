@@ -28,8 +28,7 @@ except ImportError as e:
 
 import typing
 
-from herokutl.errors.rpcerrorlist import ChannelsTooMuchError
-from herokutl.tl.types import ForumTopic, Message, User
+from herokutl.tl.types import Message, User
 
 from . import main, utils
 from .pointers import (BaseSerializingMiddlewareDict,
@@ -56,6 +55,9 @@ _DB_ALLOWED_WRITERS = {f"{__package__}.modules.heroku_plugin_security"}
 class NoAssetsChannel(Exception):
     """Raised when trying to read/store asset with no asset channel present"""
 
+class NoContentChannel(Exception):
+    """Raised when trying to read/store asset with no content channel present"""
+
 
 class Database(dict):
     def __init__(self, client: CustomTelegramClient):
@@ -63,7 +65,6 @@ class Database(dict):
         self._client: CustomTelegramClient = client
         self._next_revision_call: int = 0
         self._revisions: typing.List[dict] = []
-        self._assets_topic: typing.Optional[ForumTopic] = None
         self._me: User = None
         self._redis: redis.Redis = None
         self._saving_task: asyncio.Future = None
@@ -115,31 +116,6 @@ class Database(dict):
 
         self._db_file = main.BASE_PATH / f"config-{self._client.tg_id}.json"
         self.read()
-
-        try:
-            self._content_channel_id = self.get("heroku.forums", "channel_id", None)
-
-            if not self._content_channel_id:
-                raise KeyError("Heroku content channel not found in database")
-
-            self._assets_topic = await utils.asset_forum_topic(
-                client=self._client,
-                db=self,
-                peer=self._content_channel_id,
-                title="Assets",
-                description="🌆 Your Heroku assets will be stored here",
-                icon_emoji_id=5877307202888273539,
-            )
-
-        except Exception:
-            self._assets_topic = None
-            logger.error(
-                "Can't find and/or create assets topic\n"
-                "This may cause several consequences, such as:\n"
-                "- Non working assets feature (e.g. notes)\n"
-                "- This error will occur every restart\n\n"
-                "You can solve this by leaving some channels/groups"
-            )
 
     def read(self):
         """Read database and stores it in self"""
@@ -258,30 +234,40 @@ class Database(dict):
         Save assets
         returns asset_id as integer
         """
-        if not self._assets_topic:
-            raise NoAssetsChannel("Tried to save asset to non-existing asset topic")
+
+        try:
+            _assets_topic_id = self.get("heroku.forums", "forums_cache", {})["heroku-userbot"]["Assets"]
+        except (TypeError, KeyError):
+            raise NoAssetsChannel("Tried to save asset to non-existing asset topic.")
+
+        if not (_content_channel_id := self.get("heroku.forums", "channel_id", None)):
+            raise NoContentChannel("Tried to save asset with non-existing content channel.")
 
         return (
-            (await self._client.send_message(self._content_channel_id, message, reply_to=self._assets_topic.id)).id
+            (await self._client.send_message(_content_channel_id, message, reply_to=_assets_topic_id)).id
             if isinstance(message, Message)
             else (
                 await self._client.send_message(
-                    self._content_channel_id,
+                    _content_channel_id,
                     file=message,
                     force_document=True,
-                    message_thread_id=self._assets_topic.id
+                    message_thread_id=_assets_topic_id
                 )
             ).id
         )
 
     async def fetch_asset(self, asset_id: int) -> typing.Optional[Message]:
         """Fetch previously saved asset by its asset_id"""
-        if not self._assets_topic:
-            raise NoAssetsChannel(
-                "Tried to fetch asset from non-existing asset topic"
-            )
 
-        asset = await self._client.get_messages(self._content_channel_id, ids=[asset_id])
+        if not (_content_channel_id := self.get("heroku.forums", "channel_id", None)):
+            raise NoContentChannel("Tried to save asset with non-existing content channel.")
+
+        try:
+            _assets_topic_id = self.get("heroku.forums", "forums_cache", {})["heroku-userbot"]["Assets"]
+        except (TypeError, KeyError):
+            raise NoAssetsChannel("Tried to save asset to non-existing asset topic.")
+
+        asset = await self._client.get_messages(_content_channel_id, reply_to=_assets_topic_id, ids=[asset_id])
 
         return asset[0] if asset else None
 

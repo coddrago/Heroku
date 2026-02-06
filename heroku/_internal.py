@@ -154,8 +154,8 @@ def reset_to_master(repo_path):
         import git
 
         repo = git.Repo(path=repo_path)
-        repo.git.reset("--hard", "HEAD")
-        repo.git.checkout("master", force=True)
+        repo.head.reset(index=True, working_tree=True)
+        repo.heads.master.checkout(force=True)
     except Exception:
         try:
             subprocess.run(["git", "reset", "--hard", "HEAD"], cwd=repo_path)

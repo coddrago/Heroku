@@ -80,26 +80,25 @@ class UpdaterMod(loader.Module):
         if NO_GIT:
             return False
         try:
-            repo = git.Repo()
+            with git.Repo() as repo:
+                for remote in repo.remotes:
+                    remote.fetch()
 
-            for remote in repo.remotes:
-                remote.fetch()
-
-            if not (
-                diff := repo.git.log([f"HEAD..origin/{version.branch}", "--oneline"])
-            ):
-                return False
+                if not (
+                    diff := [*repo.iter_commits(f"HEAD..origin/{version.branch}")]
+                ):
+                    return False
         except Exception:
             return False
 
         res = "\n".join(
-            f"<b>{commit.split()[0]}</b>:"
-            f" <i>{utils.escape_html(' '.join(commit.split()[1:]))}</i>"
-            for commit in diff.splitlines()[:10]
+            f"<b>{commit.hexsha[:7]}</b>:"
+            f" <i>{utils.escape_html(commit.message.splitlines()[0])}</i>"
+            for commit in diff[:10]
         )
 
         if diff.count("\n") >= 10:
-            res += self.strings("more").format(len(diff.splitlines()) - 10)
+            res += self.strings("more").format(len(diff) - 10)
 
         return res
 
@@ -107,9 +106,10 @@ class UpdaterMod(loader.Module):
         if NO_GIT:
             return ""
         try:
-            return next(
-                git.Repo().iter_commits(f"origin/{version.branch}", max_count=1)
-            ).hexsha
+            with git.Repo() as repo:
+                return next(
+                    repo.iter_commits(f"origin/{version.branch}", max_count=1)
+                ).hexsha
         except Exception:
             return ""
 
@@ -254,7 +254,7 @@ class UpdaterMod(loader.Module):
         with open('CHANGELOG.md', mode='r', encoding='utf-8') as f:
             changelog = f.read().split('##')[1].strip()
         if (await self._client.get_me()).premium:
-            changelog.replace('🌑 Heroku', '<emoji document_id=5192765204898783881>🌘</emoji><emoji document_id=5195311729663286630>🌘</emoji><emoji document_id=5195045669324201904>🌘</emoji>')
+            changelog.replace('🌑 Heroku', '<tg-emoji emoji-id=5192765204898783881>🌘</tg-emoji><tg-emoji emoji-id=5195311729663286630>🌘</tg-emoji><tg-emoji emoji-id=5195045669324201904>🌘</tg-emoji>')
 
         await utils.answer(message, self.strings('changelog').format(changelog))
 
@@ -322,8 +322,6 @@ class UpdaterMod(loader.Module):
             self.strings("restarting_caption").format(
                 utils.get_platform_emoji()
                 if self._client.heroku_me.premium
-                and CUSTOM_EMOJIS
-                and isinstance(msg_obj, Message)
                 else "Heroku"
             ),
         )
@@ -355,23 +353,24 @@ class UpdaterMod(loader.Module):
 
     async def download_common(self):
         try:
-            repo = Repo(os.path.dirname(utils.get_base_dir()))
-            origin = repo.remote("origin")
-            r = origin.pull()
-            new_commit = repo.head.commit
-            for info in r:
-                if info.old_commit:
-                    for d in new_commit.diff(info.old_commit):
-                        if d.b_path == "requirements.txt":
-                            return True
+            with Repo(os.path.dirname(utils.get_base_dir())) as repo:
+                origin = repo.remote("origin")
+                r = origin.pull()
+                new_commit = repo.head.commit
+                for info in r:
+                    if info.old_commit:
+                        for d in new_commit.diff(info.old_commit):
+                            if d.b_path == "requirements.txt":
+                                return True
             return False
         except git.exc.InvalidGitRepositoryError:
             repo = Repo.init(os.path.dirname(utils.get_base_dir()))
-            origin = repo.create_remote("origin", self.config["GIT_ORIGIN_URL"])
-            origin.fetch()
-            repo.create_head("master", origin.refs.master)
-            repo.heads.master.set_tracking_branch(origin.refs.master)
-            repo.heads.master.checkout(True)
+            with repo:
+                origin = repo.create_remote("origin", self.config["GIT_ORIGIN_URL"])
+                origin.fetch()
+                repo.create_head("master", origin.refs.master)
+                repo.heads.master.set_tracking_branch(origin.refs.master)
+                repo.heads.master.checkout(True)
             return False
 
     @staticmethod
@@ -408,9 +407,10 @@ class UpdaterMod(loader.Module):
         try:
             args = utils.get_args_raw(message)
             current = utils.get_git_hash()
-            upcoming = next(
-                git.Repo().iter_commits(f"origin/{version.branch}", max_count=1)
-            ).hexsha
+            with git.Repo() as repo:
+                upcoming = next(
+                    repo.iter_commits(f"origin/{version.branch}", max_count=1)
+                ).hexsha
             if (
                 "-f" in args
                 or not self.inline.init_complete
@@ -461,8 +461,6 @@ class UpdaterMod(loader.Module):
                     self.strings("restarting_caption").format(
                         utils.get_platform_emoji()
                         if self._client.heroku_me.premium
-                        and CUSTOM_EMOJIS
-                        and isinstance(msg_obj, Message)
                         else "Heroku"
                     ),
                 )
@@ -499,7 +497,8 @@ class UpdaterMod(loader.Module):
 
     async def client_ready(self):
         try:
-            git.Repo()
+            with git.Repo():
+                pass
         except Exception as e:
             raise loader.LoadError("Can't load due to repo init error") from e
 

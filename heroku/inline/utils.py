@@ -820,7 +820,8 @@ class Utils(InlineUnit):
 
         return buttons
 
-    async def _get_webapp_session(self: "InlineManager", url: str):
+    @staticmethod
+    async def _get_webapp_session(url: str):
         session = aiohttp.ClientSession()
         params = unquote(url.split('tgWebAppData=')[1].split('&tgWebAppVersion')[0])
         base_url = url.split("?")[0]

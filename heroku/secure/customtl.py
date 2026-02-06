@@ -4,7 +4,8 @@ import time
 
 from herokutl.errors import InvalidBufferError, SecurityError
 from herokutl.extensions import BinaryReader
-from herokutl.network.connection import ConnectionTcpFull as ConnectionTcpFullOrig
+from herokutl.network.connection import \
+    ConnectionTcpFull as ConnectionTcpFullOrig
 from herokutl.network.mtprotostate import MTProtoState as MTProtoStateOrig
 from herokutl.tl.core import TLMessage
 from herokutl.tl.types import BadMsgNotification, BadServerSalt

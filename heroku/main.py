@@ -14,6 +14,8 @@
 
 import argparse
 import asyncio
+import base64
+import binascii
 import collections
 import contextlib
 import importlib
@@ -24,33 +26,22 @@ import random
 import signal
 import socket
 import sqlite3
+import string
 import sys
 import typing
-import string
 import zlib
-import base64
-import binascii
-
 from getpass import getpass
 from pathlib import Path
 
 import aiohttp
 import herokutl
-
 from herokutl import events
-from herokutl.errors import (
-    ApiIdInvalidError,
-    AuthKeyDuplicatedError,
-    FloodWaitError,
-    PasswordHashInvalidError,
-    PhoneNumberInvalidError,
-    SessionPasswordNeededError,
-    YouBlockedUserError,
-)
+from herokutl.errors import (ApiIdInvalidError, AuthKeyDuplicatedError,
+                             FloodWaitError, PasswordHashInvalidError,
+                             PhoneNumberInvalidError,
+                             SessionPasswordNeededError)
 from herokutl.network.connection import (
-    ConnectionTcpFull,
-    ConnectionTcpMTProxyRandomizedIntermediate,
-)
+    ConnectionTcpFull, ConnectionTcpMTProxyRandomizedIntermediate)
 from herokutl.password import compute_check
 from herokutl.sessions import MemorySession, SQLiteSession
 from herokutl.tl.functions.account import GetPasswordRequest
@@ -60,8 +51,8 @@ from herokutl.tl.functions.contacts import UnblockRequest
 from . import database, loader, utils, version
 from ._internal import print_banner, restart
 from .dispatcher import CommandDispatcher
-from .inline.utils import Utils as inutils
 from .inline.token_obtainment import TokenObtainment
+from .inline.utils import Utils as inutils
 from .qr import QRCode
 from .secure import patcher
 from .tl_cache import CustomTelegramClient
@@ -114,7 +105,7 @@ LATIN_MOCK = [
     "Unitas", "Universus", "Uterque", "Valde", "Vates",
     "Veritas", "Verus", "Vester", "Via", "Victoria",
     "Vita", "Vox", "Vultus", "Zephyrus", "Bimbalas", "Nywuctuu",
-    "Anyone", "Draher", "Hackimo", "Silvyr", 
+    "Anyone", "Draher", "Hackimo", "Silvyr",
 
 ]
 # fmt: on
@@ -504,7 +495,7 @@ class Heroku:
             CONFIG_PATH = BASE_PATH / "config.json"
         try:
             self.loop = asyncio.get_running_loop()
-            
+
         except RuntimeError:
             self.loop = asyncio.new_event_loop()
             asyncio.set_event_loop(self.loop)
@@ -762,7 +753,7 @@ class Heroku:
         for _ in range(5):
             await asyncio.sleep(1.5)
             try:
-                result = await inutils._get_webapp_session(None, url)
+                result = await inutils._get_webapp_session(url)
             except:
                 continue
             break
@@ -1005,7 +996,7 @@ class Heroku:
 
             while await self.amain(first, client):
                 first = False
-                
+
 
     async def _badge(self, client: CustomTelegramClient):
         """Call the badge in shell"""
@@ -1053,10 +1044,11 @@ class Heroku:
                 logging.getLogger().handlers[0].get_logid_by_client(client.tg_id),
                 "https://raw.githubusercontent.com/coddrago/assets/refs/heads/main/heroku/heroku_started.png",
                 caption=(
-                    "🪐 <b>Heroku {} started!</b>\n\n⚙ <b>GitHub commit SHA: <a"
-                    ' href="https://github.com/coddrago/Heroku/commit/{}">{}</a></b>\n🔎'
-                    " <b>Update status: {}</b>\n<b>{}</b>\n🕶 <b>Prefix:</b> <code>{}</code>"
+                    "{} <b>{} started!</b>\n\n<tg-emoji emoji-id=5231065262228250587>⚙</tg-emoji> <b>GitHub commit SHA: <a"
+                    ' href="https://github.com/coddrago/Heroku/commit/{}">{}</a></b>\n<tg-emoji emoji-id=5873225338984599714>🔎</tg-emoji>'
+                    " <b>Update status: {}</b>\n<b>{}</b>\n<tg-emoji emoji-id=5870903672937911120>🕶</tg-emoji> <b>Prefix:</b> <code>{}</code>"
                 ).format(
+                    utils.get_platform_emoji() if client.heroku_me.premium is True else "🪐 Heroku",
                     ".".join(list(map(str, list(__version__)))),
                     build,
                     build[:7],

@@ -14,10 +14,8 @@ import logging
 import random
 
 import herokutl
-from herokutl.tl.functions.messages import (
-    GetDialogFiltersRequest,
-    UpdateDialogFilterRequest,
-)
+from herokutl.tl.functions.messages import (GetDialogFiltersRequest,
+                                            UpdateDialogFilterRequest)
 from herokutl.tl.types import Message
 from herokutl.utils import get_display_name
 
@@ -349,6 +347,8 @@ class HerokuSettingsMod(loader.Module):
         )
 
     async def inline__setting(self, call: InlineCall, key: str, state: bool = False):
+
+        self.db.set(main.__name__, key, state)
 
         if key == "no_nickname" and state and self.get_prefix() == ".":
             await call.answer(

@@ -99,7 +99,7 @@ class LoaderMod(loader.Module):
             ),
             loader.ConfigValue(
                 "command_emoji",
-                "<emoji document_id=5197195523794157505>▫️</emoji>",
+                "<tg-emoji emoji-id=5197195523794157505>▫️</tg-emoji>",
                 lambda: "Emoji for command",
             ),
         )
@@ -787,7 +787,7 @@ class LoaderMod(loader.Module):
                         await utils.answer(
                             message,
                             (
-                                "<emoji document_id=5454225457916420314>😖</emoji>"
+                                "<tg-emoji emoji-id=5454225457916420314>😖</tg-emoji>"
                                 f" <b>{utils.escape_html(str(e))}</b>"
                             ),
                         )
@@ -868,7 +868,7 @@ class LoaderMod(loader.Module):
                         await utils.answer(
                             message,
                             (
-                                "<emoji document_id=5454225457916420314>😖</emoji>"
+                                "<tg-emoji emoji-id=5454225457916420314>😖</tg-emoji>"
                                 f" <b>{utils.escape_html(str(e))}</b>"
                             ),
                         )
@@ -895,7 +895,7 @@ class LoaderMod(loader.Module):
                     await utils.answer(
                         message,
                         (
-                            "<emoji document_id=5454225457916420314>😖</emoji>"
+                            "<tg-emoji emoji-id=5454225457916420314>😖</tg-emoji>"
                             f" <b>{utils.escape_html(str(e))}</b>"
                         ),
                     )
@@ -981,7 +981,7 @@ class LoaderMod(loader.Module):
 
         if instance.__doc__:
             mod_doc += (
-                "<i>\n<emoji document_id=5879813604068298387>ℹ️</emoji>"
+                "<i>\n<tg-emoji emoji-id=5879813604068298387>ℹ️</tg-emoji>"
                 f" {utils.escape_html(inspect.getdoc(instance))}</i>\n\n"
             )
 
@@ -993,7 +993,7 @@ class LoaderMod(loader.Module):
             value = getattr(instance, key)
             if isinstance(value, loader.Library):
                 depends_from.append(
-                    "<emoji document_id=5197195523794157505>▫️</emoji>"
+                    "<tg-emoji emoji-id=5197195523794157505>▫️</tg-emoji>"
                     " <code>{}</code> <b>{}</b> <code>{}</code>".format(
                         value.__class__.__name__,
                         self.strings("by"),
@@ -1004,7 +1004,11 @@ class LoaderMod(loader.Module):
                         ),
                     )
                 )
-
+        placeholders = utils.help_placeholders(
+            getattr(getattr(instance, "__class__"), "__name__"), 
+            self
+        )
+        
         depends_from = (
             self.strings("depends_from").format("\n".join(depends_from))
             if depends_from
@@ -1017,25 +1021,23 @@ class LoaderMod(loader.Module):
                 version, \
                 mod_doc, \
                 modhelp, \
+                placeholders, \
                 developer, \
                 origin, \
                 subscribe, \
                 blob_link, \
                 depends_from
-            placeholders = utils.help_placeholders(modname.strip()).replace("No docs", self.strings('undoc'))
-            if placeholders != "":
-                placeholders_info = f"<blockquote expandable>{self.strings('custom_placeholders')}\n{placeholders}</blockquote>"
-            else: 
-                placeholders_info = ""
             return self.strings("loaded").format(
                 modname.strip(),
                 version,
                 utils.ascii_face(),
-                mod_doc, 
+                mod_doc if mod_doc else "",
                 "<blockquote expandable>{}</blockquote>".format(
                     '\n'.join(modhelp)
                 ),
-                placeholders_info,
+                "<blockquote expandable>{}</blockquote>".format(
+                    '\n'.join(placeholders)
+                ),
                 developer if not subscribe or not use_subscribe else "",
                 depends_from,
                 (
@@ -1211,7 +1213,7 @@ class LoaderMod(loader.Module):
 
         msg = (
             self.strings("unloaded").format(
-                "<emoji document_id=5784993237412351403>✅</emoji>",
+                "<tg-emoji emoji-id=5784993237412351403>✅</tg-emoji>",
                 ", ".join(
                     [(mod[:-3] if mod.endswith("Mod") else mod) for mod in worked]
                 ),

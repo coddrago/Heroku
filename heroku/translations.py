@@ -34,11 +34,14 @@ SUPPORTED_LANGUAGES = {
     "de": "🇩🇪 Deutsch",
     "jp": "🇯🇵 日本語",
     "fr": "🇫🇷 Français",
+    "uz": "🇺🇿 O'zbek",
+    "kz": "🇰🇿 Қазақша"
 }
 MEME_LANGUAGES = {
     "leet": "🏴‍☠️ 1337",
     "uwu": "🏴‍☠️ UwU",
     "tiktok": "🏴‍☠️ TikTokKid",
+    "neofit": "🏴‍☠️ Neofit"
 }
 
 
@@ -227,7 +230,7 @@ class Strings:
                             ).split(" ") if self._translator is not None else ["en"])
                             for lang in (
                                 [original_lang] + 
-                                (["en"] if original_lang in ["leet", "uwu"] else 
+                                (["en"] if original_lang in ["leet", "uwu", "neofit"] else 
                                  ["ru"] if original_lang == "tiktok" else [])
                             )
                             if hasattr(self._mod, f"strings_{lang}")

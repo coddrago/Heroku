@@ -16,17 +16,13 @@ import os
 import string
 import typing
 
-from herokutl.errors import (
-    FloodWaitError,
-    PasswordHashInvalidError,
-    PhoneCodeExpiredError,
-    PhoneCodeInvalidError,
-    PhoneNumberInvalidError,
-    SessionPasswordNeededError,
-)
+from herokutl.errors import (FloodWaitError, PasswordHashInvalidError,
+                             PhoneCodeExpiredError, PhoneCodeInvalidError,
+                             PhoneNumberInvalidError,
+                             SessionPasswordNeededError)
 from herokutl.sessions import MemorySession
-from herokutl.utils import parse_phone
 from herokutl.tl.types import Message, User
+from herokutl.utils import parse_phone
 
 from .. import loader, main, utils
 from .._internal import restart

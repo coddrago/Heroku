@@ -13,10 +13,10 @@
 # 🔑 https://www.gnu.org/licenses/agpl-3.0.html
 
 import getpass
+import hashlib
 import os
 import subprocess
 import sys
-import hashlib
 
 from ._internal import restart
 
@@ -114,5 +114,5 @@ else:
         print("\U0001F504 Detected changes in requirements.txt, updating dependencies...")
         deps()
         restart()
-    
+
     main.heroku.main()

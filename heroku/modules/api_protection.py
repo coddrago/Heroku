@@ -17,11 +17,11 @@ import random
 import time
 import typing
 
+from aiogram.types import BufferedInputFile
 from herokutl.tl import functions
 from herokutl.tl.tlobject import TLRequest
 from herokutl.tl.types import Message
 from herokutl.utils import is_list_like
-from aiogram.types import BufferedInputFile
 
 from .. import loader, utils
 from ..inline.types import InlineCall

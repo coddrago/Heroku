@@ -18,6 +18,7 @@ import os
 import glob
 import requests
 import re
+import logging
 import emoji
 import herokutl
 
@@ -33,6 +34,8 @@ from herokutl.utils import get_display_name
 from .. import loader, utils, version
 import platform as lib_platform
 import getpass
+
+logger = logging.getLogger(__name__)
 
 @loader.tds
 class HerokuInfoMod(loader.Module):
@@ -122,12 +125,11 @@ class HerokuInfoMod(loader.Module):
 
     async def _render_info(self, start: float) -> str:
         try:
-            repo = git.Repo(search_parent_directories=True)
-            diff = repo.git.log([f"HEAD..origin/{version.branch}", "--oneline"])
-            if diff:
-                upd = (self.strings("update_required").format(prefix=self.get_prefix()))
-            else:
+            up_to_date = utils.is_up_to_date()
+            if up_to_date:
                 upd = self.strings["up-to-date"]
+            else:
+                upd = self.strings["update_required"].format(prefix=self.get_prefix())
         except Exception:
             upd = ""
 
@@ -143,26 +145,26 @@ class HerokuInfoMod(loader.Module):
         platform_emoji = utils.get_named_platform_emoji()
 
         for emoji, icon in [
-            ("🍊", "<emoji document_id=5449599833973203438>🧡</emoji>"),
-            ("🍇", "<emoji document_id=5449468596952507859>💜</emoji>"),
-            ("😶‍🌫️", "<emoji document_id=5370547013815376328>😶‍🌫️</emoji>"),
-            ("❓", "<emoji document_id=5407025283456835913>📱</emoji>"),
-            ("🍀", "<emoji document_id=5395325195542078574>🍀</emoji>"),
-            ("🦾", "<emoji document_id=5386766919154016047>🦾</emoji>"),
-            ("🚂", "<emoji document_id=5359595190807962128>🚂</emoji>"),
-            ("🐳", "<emoji document_id=5431815452437257407>🐳</emoji>"),
-            ("🕶", "<emoji document_id=5407025283456835913>📱</emoji>"),
-            ("🐈‍⬛", "<emoji document_id=6334750507294262724>🐈‍⬛</emoji>"),
-            ("✌️", "<emoji document_id=5469986291380657759>✌️</emoji>"),
-            ("💎", "<emoji document_id=5471952986970267163>💎</emoji>"),
-            ("🛡", "<emoji document_id=5282731554135615450>🌩</emoji>"),
-            ("🌼", "<emoji document_id=5224219153077914783>❤️</emoji>"),
-            ("🎡", "<emoji document_id=5226711870492126219>🎡</emoji>"),
-            ("🐧", "<emoji document_id=5361541227604878624>🐧</emoji>"),
-            ("🧃", "<emoji document_id=5422884965593397853>🧃</emoji>"),
-            ("🦅", "<emoji document_id=5427286516797831670>🦅</emoji>"),
-            ("💻", "<emoji document_id=5469825590884310445>💻</emoji>"),
-            ("🍏", "<emoji document_id=5372908412604525258>🍏</emoji>")
+            ("🍊", "<tg-emoji emoji-id=\"5449599833973203438\">🧡</tg-emoji>"),
+            ("🍇", "<tg-emoji emoji-id=\"5449468596952507859\">💜</tg-emoji>"),
+            ("😶‍🌫️", "<tg-emoji emoji-id=\"5370547013815376328\">😶‍🌫️</tg-emoji>"),
+            ("❓", "<tg-emoji emoji-id=\"5407025283456835913\">📱</tg-emoji>"),
+            ("🍀", "<tg-emoji emoji-id=\"5395325195542078574\">🍀</tg-emoji>"),
+            ("🦾", "<tg-emoji emoji-id=\"5386766919154016047\">🦾</tg-emoji>"),
+            ("🚂", "<tg-emoji emoji-id=\"5359595190807962128\">🚂</tg-emoji>"),
+            ("🐳", "<tg-emoji emoji-id=\"5431815452437257407\">🐳</tg-emoji>"),
+            ("🕶", "<tg-emoji emoji-id=\"5407025283456835913\">📱</tg-emoji>"),
+            ("🐈‍⬛", "<tg-emoji emoji-id=\"6334750507294262724\">🐈‍⬛</tg-emoji>"),
+            ("✌️", "<tg-emoji emoji-id=\"5469986291380657759\">✌️</tg-emoji>"),
+            ("💎", "<tg-emoji emoji-id=\"5471952986970267163\">💎</tg-emoji>"),
+            ("🛡", "<tg-emoji emoji-id=\"5282731554135615450\">🌩</tg-emoji>"),
+            ("🌼", "<tg-emoji emoji-id=\"5224219153077914783\">❤️</tg-emoji>"),
+            ("🎡", "<tg-emoji emoji-id=\"5226711870492126219\">🎡</tg-emoji>"),
+            ("🐧", "<tg-emoji emoji-id=\"5361541227604878624\">🐧</tg-emoji>"),
+            ("🧃", "<tg-emoji emoji-id=\"5422884965593397853\">🧃</tg-emoji>"),
+            ("🦅", "<tg-emoji emoji-id=\"5427286516797831670\">🦅</tg-emoji>"),
+            ("💻", "<tg-emoji emoji-id=\"5469825590884310445\">💻</tg-emoji>"),
+            ("🍏", "<tg-emoji emoji-id=\"5372908412604525258\">🍏</tg-emoji>")
         ]:
             platform_emoji = platform_emoji.replace(emoji, icon)
         data = {
@@ -188,13 +190,19 @@ class HerokuInfoMod(loader.Module):
             'git_status': utils.get_git_status(),
         }
         data = await utils.get_placeholders(data, self.config["custom_message"])
+        if self.config["custom_message"]:
+            try:
+                placeholders_msg = self.config["custom_message"].format(**data)
+            except KeyError:
+                logger.exception("Missing placeholder in custom_message")
+                placeholders_msg = "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji>"
         return (
             (
                 "🪐 Heroku\n"
                 if self.config["show_heroku"]
                 else ""
             )
-            + self.config["custom_message"].format(**data)
+            + placeholders_msg
             if self.config["custom_message"]
             else self.strings["info_message"].format(
                 (
@@ -221,7 +229,7 @@ class HerokuInfoMod(loader.Module):
         imgform = str(self.config['banner_url']).split('.')[-1]
         imgset = self.config['imgSettings']
         if imgform in ['jpg', 'jpeg', 'png', 'bmp', 'webp']:
-            response = requests.get(self.config['banner_url'] if not self.config['banner_url'].startswith('https://imgur') else self.imgur(self.config['banner_url']), stream=True, headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"})
+            response = requests.get(str(self.config['banner_url']) if not str(self.config['banner_url']).startswith('https://imgur') else self.imgur(str(self.config['banner_url'])), stream=True, headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"})
             img = Image.open(BytesIO(response.content))
             font = ImageFont.truetype(
                 glob.glob(f'{os.getcwd()}/assets/font.*')[0], 

@@ -5,71 +5,50 @@
 # You can redistribute it and/or modify it under the terms of the GNU AGPLv3
 # 🔑 https://www.gnu.org/licenses/agpl-3.0.html
 
+import asyncio
 import inspect
 import logging
 import random
-import asyncio
 import re
 import string
 import time
 import typing
 from urllib.parse import urlparse
-import emoji
 
+import emoji
 import herokutl
 import requests
 from aiogram.types import Message as AiogramMessage
 from herokutl import hints
 from herokutl.tl.custom.message import Message
 from herokutl.tl.functions.account import UpdateNotifySettingsRequest
-from herokutl.tl.functions.channels import (
-    CreateChannelRequest,
-    EditPhotoRequest,
-)
-from herokutl.tl.functions.messages import (
-    GetDialogFiltersRequest,
-    SetHistoryTTLRequest,
-    UpdateDialogFilterRequest,
-    CreateForumTopicRequest,
-    GetForumTopicsByIDRequest,
-    EditForumTopicRequest
-)
-from herokutl.tl.types import (
-    Channel,
-    InputPeerNotifySettings,
-    MessageEntityBankCard,
-    MessageEntityBlockquote,
-    MessageEntityBold,
-    MessageEntityBotCommand,
-    MessageEntityCashtag,
-    MessageEntityCode,
-    MessageEntityEmail,
-    MessageEntityHashtag,
-    MessageEntityItalic,
-    MessageEntityMention,
-    MessageEntityMentionName,
-    MessageEntityPhone,
-    MessageEntityPre,
-    MessageEntitySpoiler,
-    MessageEntityStrike,
-    MessageEntityTextUrl,
-    MessageEntityUnderline,
-    MessageEntityUnknown,
-    MessageEntityUrl,
-    PeerChannel,
-    PeerChat,
-    PeerUser,
-    UpdateNewChannelMessage,
-    User,
-    ForumTopic,
-    ForumTopicDeleted,
-)
-
-from .other import invite_inline_bot, run_sync
+from herokutl.tl.functions.channels import (CreateChannelRequest,
+                                            EditPhotoRequest)
+from herokutl.tl.functions.messages import (CreateForumTopicRequest,
+                                            EditForumTopicRequest,
+                                            GetDialogFiltersRequest,
+                                            GetForumTopicsByIDRequest,
+                                            GetForumTopicsRequest,
+                                            SetHistoryTTLRequest,
+                                            UpdateDialogFilterRequest)
+from herokutl.tl.types import (Channel, ForumTopic, ForumTopicDeleted,
+                               InputPeerNotifySettings, MessageEntityBankCard,
+                               MessageEntityBlockquote, MessageEntityBold,
+                               MessageEntityBotCommand, MessageEntityCashtag,
+                               MessageEntityCode, MessageEntityEmail,
+                               MessageEntityHashtag, MessageEntityItalic,
+                               MessageEntityMention, MessageEntityMentionName,
+                               MessageEntityPhone, MessageEntityPre,
+                               MessageEntitySpoiler, MessageEntityStrike,
+                               MessageEntityTextUrl, MessageEntityUnderline,
+                               MessageEntityUnknown, MessageEntityUrl,
+                               PeerChannel, PeerChat, PeerUser,
+                               UpdateNewChannelMessage, User)
 
 from .._internal import fw_protect
 from ..tl_cache import CustomTelegramClient
 from ..types import Module
+from .other import invite_inline_bot, run_sync
 
 FormattingEntity = typing.Union[
     MessageEntityUnknown,
@@ -357,7 +336,7 @@ async def asset_forum_topic(
 
         await fw_protect()
 
-        await client.send_message(entity=entity, message=(description if description else f"<emoji document_id=5258503720928288433>ℹ️</emoji> <b>Content related to <i>'{title}'</i> will be here</b>"), reply_to=result.updates[0].id)
+        await client.send_message(entity=entity, message=(description if description else f"<tg-emoji emoji-id=\"5258503720928288433\">ℹ️</tg-emoji> <b>Content related to <i>'{title}'</i> will be here</b>"), reply_to=result.updates[0].id)
 
         await fw_protect()
 
@@ -367,7 +346,22 @@ async def asset_forum_topic(
 
     forums_cache = db.get("heroku.forums", "forums_cache", {})
 
-    if (topic_id := forums_cache.get(entity.title, {}).get(title)):
+    async def _search_topic(topic_title: str) -> int | None:
+        result = await client(GetForumTopicsRequest(
+            peer=entity,
+            offset_date=None,
+            offset_id=0,
+            offset_topic=0,
+            limit=100,
+        ))
+        await fw_protect()
+        for found_topic in result.topics:
+            if found_topic.title == topic_title:
+                forums_cache.setdefault(entity.title, {})[topic_title] = found_topic.id
+                return found_topic.id
+        return None
+
+    if topic_id := forums_cache.get(entity.title, {}).get(title) or await _search_topic(title):
         await fw_protect()
         topic = await client(GetForumTopicsByIDRequest(peer=entity, topics=[topic_id]))
         topic = topic.topics[0]

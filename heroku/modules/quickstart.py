@@ -14,7 +14,7 @@ import logging
 import os
 from random import choice
 
-from .. import loader, translations, utils, main
+from .. import loader, main, translations, utils
 from ..inline.types import BotInlineCall
 
 logger = logging.getLogger(__name__)
@@ -69,20 +69,40 @@ class Quickstart(loader.Module):
                 )
             ).rstrip()
         )
-
-        content_channel, _ = await utils.asset_channel(
-            client=client,
-            title='heroku-userbot',
-            description='🪐 Content related to Heroku will be here',
-            silent=True,
-            invite_bot=True,
-            avatar="https://raw.githubusercontent.com/coddrago/assets/main/heroku/heroku.png",
-            forum=True,
-            hide_general=True,
-            _folder='heroku',
-        )
-
-        db.set("heroku.forums", "channel_id", int(content_channel.id))
+        try:
+            content_channel, _ = await utils.asset_channel(
+                client=client,
+                title='heroku-userbot',
+                description='🪐 Content related to Heroku will be here',
+                silent=True,
+                invite_bot=True,
+                avatar="https://raw.githubusercontent.com/coddrago/assets/main/heroku/heroku.png",
+                forum=True,
+                hide_general=True,
+                _folder='heroku',
+            )
+            if not content_channel:
+                raise RuntimeError("asset_channel method returned None!")
+            db.set("heroku.forums", "channel_id", int(content_channel.id))
+            try:
+                await utils.asset_forum_topic(
+                    client=self._client,
+                    db=db,
+                    peer=content_channel.id,
+                    title="Assets",
+                    description="🌆 Your Heroku assets will be stored here",
+                    icon_emoji_id=5877307202888273539,
+                )
+            except Exception:
+                logger.exception("Content channel was created successfully, but assets topic creation failed!")
+        except Exception:
+            logger.exception(
+                "Can't find and/or create content channel\n"
+                "This may cause several consequences, such as:\n"
+                "- Non working inline-logs, backups, assets features\n"
+                "- This error will occur every restart\n\n"
+                "You can try solving this by leaving some channels/groups"
+            )
 
         if self.get("no_msg"):
             return

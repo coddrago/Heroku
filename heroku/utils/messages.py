@@ -136,7 +136,6 @@ def smart_split(
     """
 
     # Authored by @bsolute
-    # https://t.me/LonamiWebs/27777
 
     encoded = text.encode("utf-16le")
     pending_entities = entities

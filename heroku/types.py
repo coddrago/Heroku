@@ -432,6 +432,7 @@ class Module:
 
     def internal_init(self):
         """Called after the class is initialized in order to pass the client and db. Do not call it yourself"""
+        self.allmodules: "Modules"
 
         origin = getattr(self, "__origin__", "")
         is_external = _is_external_origin(origin)
@@ -1216,6 +1217,7 @@ class ConfigValue:
     on_change: typing.Optional[
         typing.Union[typing.Callable[[], typing.Awaitable], typing.Callable]
     ] = None
+    folder: typing.Optional[str] = None
 
     def __post_init__(self):
         if isinstance(self.value, _Placeholder):

@@ -11,10 +11,10 @@
 # 🔑 https://www.gnu.org/licenses/agpl-3.0.html
 
 import getpass
-import platform as lib_platform
 import inspect
 import logging
 import os
+import platform as lib_platform
 import random
 import time
 import typing
@@ -90,7 +90,7 @@ class TestMod(loader.Module):
             ),
             loader.ConfigValue(
                 "custom_message",
-                "<emoji document_id=5920515922505765329>⚡️</emoji> <b>𝙿𝚒𝚗𝚐: </b><code>{ping}</code><b> 𝚖𝚜 </b>\n<emoji document_id=5900104897885376843>🕓</emoji><b> 𝚄𝚙𝚝𝚒𝚖𝚎: </b><code>{uptime}</code>",
+                "<tg-emoji emoji-id=5920515922505765329>⚡️</tg-emoji> <b>𝙿𝚒𝚗𝚐: </b><code>{ping}</code><b> 𝚖𝚜 </b>\n<tg-emoji emoji-id=5900104897885376843>🕓</tg-emoji><b> 𝚄𝚙𝚝𝚒𝚖𝚎: </b><code>{uptime}</code>",
                 lambda: (
                     "<blockquote expandable>" + self.strings("configping") + "\n" + self.strings("configpingph").format(
                         utils.config_placeholders()
@@ -369,9 +369,14 @@ class TestMod(loader.Module):
             "platform": utils.get_platform_name(),
         }
         data = await utils.get_placeholders(data, self.config["custom_message"])
+        try:
+            placeholders_msg = self.config["custom_message"].format(**data)
+        except KeyError:
+            logger.exception("Missing placeholder in custom_message")
+            placeholders_msg = "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji>"
         await utils.answer(
             message,
-            self.config["custom_message"].format(**data),
+            placeholders_msg,
             file = banner,
             invert_media = self.config["invert_media"]
         )
