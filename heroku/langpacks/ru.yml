@@ -419,6 +419,22 @@ updater:
   _cmd_doc_update: "Скачивает обновления юзербота"
   _cmd_doc_rollback: "Откатывает обновления юзербота"
 
+heroku_plugin_security:
+  name: "HikkaPluginSecurity"
+  no_hash: "<emoji document_id=5210952531676504517>🚫</emoji> <b>Нужно указать название модуля</b>"
+  hash_not_found: "<emoji document_id=5210952531676504517>🚫</emoji> <b>Модуль с таким названием не найден</b>"
+  hash_not_found_suggest: "<emoji document_id=5312383351217201533>⚠️</emoji> <b>Совпадений нет. Ближайшее:</b> <code>{}</code>"
+  hash_list: "<emoji document_id=5118861066981344121>✅</emoji> <b>Хеши модулей:</b>\n\n<blockquote expandable>{}</blockquote>"
+  no_hashes: "<emoji document_id=5210952531676504517>🚫</emoji> <b>Хеши модулей не найдены</b>"
+  external_removed: "<emoji document_id=5118861066981344121>✅</emoji> <b>Флаг is_external снят для</b> <code>{}</code>"
+  external_restored: "<emoji document_id=5118861066981344121>✅</emoji> <b>Флаг is_external возвращён для</b> <code>{}</code>"
+  already_internal: "<emoji document_id=5312383351217201533>⚠️</emoji> <b>Модуль</b> <code>{}</code> <b>уже внутренний</b>"
+  already_external: "<emoji document_id=5312383351217201533>⚠️</emoji> <b>Модуль</b> <code>{}</code> <b>уже внешний</b>"
+  session_allowed: "<emoji document_id=5118861066981344121>✅</emoji> <b>Доступ к .session разрешён для</b> <code>{}</code>"
+  session_denied: "<emoji document_id=5118861066981344121>✅</emoji> <b>Доступ к .session запрещён для</b> <code>{}</code>"
+  already_allowed: "<emoji document_id=5312383351217201533>⚠️</emoji> <b>Доступ к .session уже разрешён для</b> <code>{}</code>"
+  already_denied: "<emoji document_id=5312383351217201533>⚠️</emoji> <b>Доступ к .session уже запрещён для</b> <code>{}</code>"
+
 api_protection:
   warning: "⚠️ <b>ВНИМАНИЕ!</b>\n\nАккаунт вышел за лимиты запросов, указанные в конфиге. С целью предотвращения флуда Telegram API, юзербот был <b>полностью заморожен</b> на {} секунд. Дополнительная информация прикреплена в файле ниже. \n\nРекомендуется обратиться за помощью в <code>{prefix}support</code> группу!\n\nЕсли ты считаешь, что это запланированное поведение юзербота, просто подожди, пока закончится таймер и в следующий раз, когда запланируешь выполнять такую ресурсозатратную операцию, используй <code>{prefix}suspend_api_protect</code> &lt;время в секундах&gt;"
   args_invalid: "<emoji document_id=5210952531676504517>🚫</emoji> <b>Неверные аргументы</b>"
