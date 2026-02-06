@@ -204,10 +204,10 @@ def _external_stack_info() -> typing.Tuple[bool, typing.Optional[str], typing.Op
             origin = getattr(spec, "origin", None) if spec else None
             if not origin:
                 origin = frame.f_globals.get("__file__", "")
-            
+
             if origin and not isinstance(origin, str):
                 origin = str(origin)
-            
+
             mod_name = frame.f_globals.get("__name__", None)
             return True, origin or None, mod_name
         frame = frame.f_back
@@ -392,14 +392,6 @@ def _install_external_guards():
             ctypes.cdll.LoadLibrary = _wrap_external(ctypes.cdll.LoadLibrary, "ctypes.cdll.LoadLibrary")
         if hasattr(ctypes, "windll") and hasattr(ctypes.windll, "LoadLibrary"):
             ctypes.windll.LoadLibrary = _wrap_external(ctypes.windll.LoadLibrary, "ctypes.windll.LoadLibrary")
-    except Exception:
-        pass
-
-    try:
-        import pickle
-
-        pickle.dumps = _wrap_external(pickle.dumps, "pickle.dumps")
-        pickle.loads = _wrap_external(pickle.loads, "pickle.loads")
     except Exception:
         pass
 
