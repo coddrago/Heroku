@@ -444,6 +444,12 @@ def parse_arguments() -> dict:
         default=True,
         help="Do not print colorful output using ANSI escapes",
     )
+    parser.add_argument(
+        "--no-git",
+        dest="no_git",
+        action="store_true",
+        help="Disable git checks and updates",
+    )
     arguments = parser.parse_args()
     logging.debug(arguments)
     return arguments
@@ -490,6 +496,8 @@ class Heroku:
         global BASE_DIR, BASE_PATH, CONFIG_PATH
         self.omit_log = False
         self.arguments = parse_arguments()
+        if self.arguments.no_git:
+            os.environ["HEROKU_NO_GIT"] = "1"
         if self.arguments.data_root:
             BASE_DIR = self.arguments.data_root
             BASE_PATH = Path(BASE_DIR)
@@ -1002,13 +1010,17 @@ class Heroku:
     async def _badge(self, client: CustomTelegramClient):
         """Call the badge in shell"""
         try:
-            import git
+            if os.environ.get("HEROKU_NO_GIT") == "1":
+                build = "unknown"
+                upd = "Git disabled"
+            else:
+                import git
 
-            repo = git.Repo()
+                repo = git.Repo()
 
-            build = utils.get_git_hash()
-            diff = repo.git.log([f"HEAD..origin/{version.branch}", "--oneline"])
-            upd = "Update required" if diff else "Up-to-date"
+                build = utils.get_git_hash()
+                diff = repo.git.log([f"HEAD..origin/{version.branch}", "--oneline"])
+                upd = "Update required" if diff else "Up-to-date"
             pref = client.heroku_db.get("heroku.main", "command_prefix", None)
 
             logo = (

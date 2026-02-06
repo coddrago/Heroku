@@ -20,6 +20,9 @@ import hashlib
 
 from ._internal import restart
 
+if "--no-git" in sys.argv:
+    os.environ["HEROKU_NO_GIT"] = "1"
+
 def get_file_hash(filename):
     hasher = hashlib.sha256()
     try:

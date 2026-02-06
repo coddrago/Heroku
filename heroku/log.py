@@ -514,6 +514,8 @@ class TelegramLogsHandler(logging.Handler):
     
 
 async def check_branch(me_id: int, allowed_ids: list, self):
+    if os.environ.get("HEROKU_NO_GIT") == "1":
+        return
     repo_path = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 
     try:

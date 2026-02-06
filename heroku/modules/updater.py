@@ -11,7 +11,6 @@
 # 🔑 https://www.gnu.org/licenses/agpl-3.0.html
 
 
-import aiohttp
 import ast
 import asyncio
 import contextlib
@@ -22,20 +21,20 @@ import sys
 import time
 import typing
 
+import aiohttp
 import git
 from git import GitCommandError, Repo
 from herokutl.extensions.html import CUSTOM_EMOJIS
-from herokutl.tl.functions.messages import (
-    GetDialogFiltersRequest,
-    UpdateDialogFilterRequest,
-)
-from herokutl.tl.types import DialogFilter, TextWithEntities, Message
+from herokutl.tl.functions.messages import (GetDialogFiltersRequest,
+                                            UpdateDialogFilterRequest)
+from herokutl.tl.types import DialogFilter, Message, TextWithEntities
 
 from .. import loader, main, utils, version
 from .._internal import restart
-from ..inline.types import InlineCall, BotInlineCall
+from ..inline.types import BotInlineCall, InlineCall
 
 logger = logging.getLogger(__name__)
+NO_GIT = os.environ.get("HEROKU_NO_GIT") == "1"
 
 
 @loader.tds
@@ -72,12 +71,14 @@ class UpdaterMod(loader.Module):
             self.config["autoupdate"] = False
             await self.inline.bot(call.answer(self.strings("autoupdate_off").format(prefix=self.get_prefix())))
             return
-        
+
         self.config["autoupdate"] = True
 
         await self.inline.bot(call.answer(self.strings("autoupdate_on")))
 
     def get_changelog(self) -> str:
+        if NO_GIT:
+            return False
         try:
             repo = git.Repo()
 
@@ -103,6 +104,8 @@ class UpdaterMod(loader.Module):
         return res
 
     def get_latest(self) -> str:
+        if NO_GIT:
+            return ""
         try:
             return next(
                 git.Repo().iter_commits(f"origin/{version.branch}", max_count=1)
@@ -135,10 +138,12 @@ class UpdaterMod(loader.Module):
                         pass
             except Exception:
                 pass
-            
+
 
     @loader.loop(interval=60, autostart=True)
     async def poller(self):
+        if NO_GIT:
+            return
         if (self.config["disable_notifications"] and not self.config["autoupdate"]) or not self.get_changelog():
             return
 
@@ -161,7 +166,7 @@ class UpdaterMod(loader.Module):
                             headers={"Accept": "application/vnd.github.v3.raw"}
                         )
                         text = await r.text()
-                    
+
                     new_version = ""
                     for line in text.splitlines():
                         if line.strip().startswith("__version__"):
@@ -225,6 +230,9 @@ class UpdaterMod(loader.Module):
     @loader.callback_handler()
     async def update_call(self, call: InlineCall):
         """Process update buttons clicks"""
+        if NO_GIT:
+            await call.answer("Git disabled via --no-git.", show_alert=True)
+            return
         if call.data not in {"heroku/update", "heroku/ignore_upd"}:
             return
 
@@ -391,6 +399,12 @@ class UpdaterMod(loader.Module):
 
     @loader.command()
     async def update(self, message: Message):
+        if NO_GIT:
+            await utils.answer(
+                message,
+                "<b>Git disabled via --no-git.</b>",
+            )
+            return
         try:
             args = utils.get_args_raw(message)
             current = utils.get_git_hash()
@@ -430,7 +444,7 @@ class UpdaterMod(loader.Module):
             await utils.answer(message, self.strings["autoupdate_on"])
         else:
             await utils.answer(message, self.strings["autoupdate_off"].format(prefix=self.get_prefix()))
-            
+
     async def inline_update(
         self,
         msg_obj: typing.Union[InlineCall, Message],
@@ -550,7 +564,7 @@ class UpdaterMod(loader.Module):
             )
         except ValueError:
             folder_id = 2
-        
+
         folders = await self._client(GetDialogFiltersRequest())
         filters = getattr(folders, 'filters', folders)
         heroku_f = False
@@ -559,10 +573,10 @@ class UpdaterMod(loader.Module):
 
             for folder in filters:
                 title = getattr(folder, "title", None)
-        
+
                 if title:
                     raw_title = getattr(title, "text", title)
-                    
+
                     if str(raw_title).strip() == "Heroku":
                         heroku_f = True
 

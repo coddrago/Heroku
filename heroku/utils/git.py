@@ -8,6 +8,7 @@ import logging
 import typing
 import asyncio
 import subprocess
+import os
 
 import git
 import herokutl
@@ -15,12 +16,17 @@ import herokutl
 parser = herokutl.utils.sanitize_parse_mode("html")
 logger = logging.getLogger(__name__)
 
+def _is_no_git() -> bool:
+    return os.environ.get("HEROKU_NO_GIT") == "1"
+
 # GeekTG Compatibility
 def get_git_info() -> typing.Tuple[str, str]:
     """
     Get git info
     :return: Git info
     """
+    if _is_no_git():
+        return ("", "")
     hash_ = get_git_hash()
     return (
         hash_,
@@ -32,6 +38,8 @@ def get_git_hash() -> typing.Union[str, bool]:
     Get current Heroku git hash
     :return: Git commit hash
     """
+    if _is_no_git():
+        return False
     try:
         return git.Repo().head.commit.hexsha
     except Exception:
@@ -43,6 +51,8 @@ def get_commit_url() -> str:
     Get current Heroku git commit url
     :return: Git commit url
     """
+    if _is_no_git():
+        return "Unknown"
     try:
         hash_ = get_git_hash()
         return f'<a href="https://github.com/coddrago/Heroku/commit/{hash_}">#{hash_[:7]}</a>'
@@ -53,6 +63,8 @@ def get_git_status() -> str:
     """
     :return: 'Clean' or 'X files modified'.
     """
+    if _is_no_git():
+        return "Git disabled"
     try:
         process = subprocess.run(
             "git status --porcelain",
@@ -82,6 +94,8 @@ def get_last_commit_message() -> str:
     Get the message of the last commit
     :return: Last commit message
     """
+    if _is_no_git():
+        return "Unknown"
     try:
         repo = git.Repo()
         return repo.head.commit.message.strip()
@@ -94,6 +108,8 @@ def get_commit_count() -> int:
     Get the total number of commits in the repository
     :return: Number of commits
     """
+    if _is_no_git():
+        return 0
     try:
         repo = git.Repo()
         return len(list(repo.iter_commits()))
