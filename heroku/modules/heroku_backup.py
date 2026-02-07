@@ -131,7 +131,7 @@ class HerokuBackupMod(loader.Module):
                 self.get("last_backup") + self.get("period") - time.time()
             )
 
-            db = io.BytesIO(orjson.dumps(self._db))
+            db = io.BytesIO(orjson.dumps(self._db, option=orjson.OPT_INDENT_2))
             db.name = "db.json"
 
             mods = io.BytesIO()
@@ -141,7 +141,13 @@ class HerokuBackupMod(loader.Module):
                         if file.endswith(f"{self.tg_id}.py"):
                             with open(os.path.join(root, file), "rb") as f:
                                 zipf.writestr(file, f.read())
-                zipf.writestr("db_mods.json", orjson.dumps(self.lookup("Loader").get("loaded_modules", {})))
+                zipf.writestr(
+                    "db_mods.json", 
+                    orjson.dumps(
+                        self.lookup("Loader").get("loaded_modules", {}), 
+                        option=orjson.OPT_INDENT_2
+                    )
+                )
 
             mods.seek(0)
             mods.name = "mods.zip"
@@ -272,7 +278,7 @@ class HerokuBackupMod(loader.Module):
 
     @loader.command()
     async def backupdb(self, message: Message):
-        txt = io.BytesIO(orjson.dumps(self._db))
+        txt = io.BytesIO(orjson.dumps(self._db, option=orjson.OPT_INDENT_2))
         txt.name = f"db-backup-{datetime.datetime.now():%d-%m-%Y-%H-%M}.json"
         await self._client.send_file(
             "me",
@@ -340,7 +346,10 @@ class HerokuBackupMod(loader.Module):
         result = io.BytesIO()
         result.name = "mods.zip"
 
-        db_mods = orjson.dumps(self.lookup("Loader").get("loaded_modules", {}))
+        db_mods = orjson.dumps(
+            self.lookup("Loader").get("loaded_modules", {}),
+            option=orjson.OPT_INDENT_2
+        )
 
         with zipfile.ZipFile(result, "w", zipfile.ZIP_DEFLATED) as zipf:
             for root, _, files in os.walk(loader.LOADED_MODULES_DIR):
@@ -416,7 +425,7 @@ class HerokuBackupMod(loader.Module):
 
     @loader.command()
     async def backupall(self, message: Message):
-        db = io.BytesIO(orjson.dumps(self._db))
+        db = io.BytesIO(orjson.dumps(self._db, option=orjson.OPT_INDENT_2))
         db.name = "db.json"
 
         mods = io.BytesIO()
@@ -426,7 +435,13 @@ class HerokuBackupMod(loader.Module):
                     if file.endswith(f"{self.tg_id}.py"):
                         with open(os.path.join(root, file), "rb") as f:
                             zipf.writestr(file, f.read())
-            zipf.writestr("db_mods.json", orjson.dumps(self.lookup("Loader").get("loaded_modules", {})))
+            zipf.writestr(
+                "db_mods.json", 
+                orjson.dumps(
+                    self.lookup("Loader").get("loaded_modules", {}), 
+                    option=orjson.OPT_INDENT_2
+                )
+            )
 
         mods.seek(0)
         mods.name = "mods.zip"
