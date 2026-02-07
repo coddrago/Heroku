@@ -319,21 +319,23 @@ class Presets(loader.Module):
         )
     @loader.command(alias="lp")
     async def loadpreset(self, message: Message):
-        """| soon|"""
+        """Custom preset loader. Reply to a file or send a file with the command."""
         msg = message if message.file else (await message.get_reply_message())
         if not msg or not msg.file:
             await message.edit(self.lookup("loader").strings['no_file'])
             return
         try:
             data = orjson.loads(await msg.download_media(bytes))
-        except Exception as e:
+        except Exception:
             await message.edit(self.lookup("loader").strings['load_failed'])
             logger.exception("Failed to load preset from file")
             return
-        if not isinstance(data, dict) or "name" not in data or "links" not in data or not isinstance(data["links"], list):
+        
+        if not isinstance(data, dict) or "name" not in data or "modules" not in data or not isinstance(data["modules"], list):
             await message.edit(self.lookup("loader").strings['load_failed'])
-            logger.exception("Invalid preset format")
+            logger.error("Invalid preset format")
             return
+        
         chat = message.chat_id
         await message.delete()
         try: 
@@ -342,7 +344,7 @@ class Presets(loader.Module):
             description = self.lookup("help").strings["undoc"]
 
         modules_list = []
-        for link in data["links"]:
+        for link in data["modules"]:
             module_name = link.rsplit('/', maxsplit=1)[1].split('.')[0] if '/' in link else link
             if self._is_installed(link):
                 modules_list.append(f"✅ <b>{module_name}</b> (уже установлен)")
@@ -351,7 +353,11 @@ class Presets(loader.Module):
 
         modules = "\n".join(modules_list)
 
-        await self.inline.form(message=message, text=self.strings("preset").format(data["name"], description, modules), reply_markup=[
-            {"text": self.strings("install"), "callback": self._install, "args": (data["name"], data["links"], False, chat)},
-            {"text": self.lookup("settings").strings["cancel"], "callback": lambda call: call.delete()},
-        ])
+        await self.inline.form(
+            message=message,
+            text=self.strings("preset").format(data["name"], description, modules),
+            reply_markup=[
+                {"text": self.strings("install"), "callback": self._install, "args": (data["name"], data["modules"], False, chat)},
+                {"text": self.lookup("settings").strings["cancel"], "callback": lambda call: call.delete()},
+            ]
+        )
