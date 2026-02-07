@@ -318,7 +318,7 @@ class Presets(loader.Module):
             reply_markup=self._markup,
         )
     @loader.command(alias="lp")
-    async def loadpresets(self, message: Message):
+    async def loadpreset(self, message: Message):
         """| soon|"""
         msg = message if message.file else (await message.get_reply_message())
         if not msg or not msg.file:
