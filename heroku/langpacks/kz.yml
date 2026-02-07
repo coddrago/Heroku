@@ -501,7 +501,7 @@ help:
   all_header: "<b>{} модуль қолжетімді, {} жасырын:</b>"
   no_mod: "🚫 <b>Жасыру үшін модульді көрсетіңіз</b>"
   help_lib: "<tg-emoji emoji-id=5404553572727660202>❌</tg-emoji> <b>Пакет</b> <code>{}</code> <b>бұл кітапхана.</b>\n<tg-emoji emoji-id=5404553572727660202>❌</tg-emoji> <b>Кітапханаларда сипаттама жоқ...</b>"
-  developer: "<tg-emoji emoji-id=5287454910059654880>🫶</tg-emoji> Әзірлеуші: <code>{}</code>"
+  developer: "<tg-emoji emoji-id=5287454910059654880>🫶</tg-emoji> Әзірлеуші: {}"
   hidden_shown: "<b>{} модуль жасырылған, {} модуль көрсетілген:</b>\n{}\n{}"
   offchats: "<tg-emoji emoji-id=6019130940012370273>❔</tg-emoji> <a href=\"https://t.me/heroku_talks\"><b>Қолдау чаты</b></a>\n\n<tg-emoji emoji-id=6019151079114021083>💬</tg-emoji> <a href=\"https://t.me/heroku_offtop\"><b>Оффтоп чат</b></a>\n\n<tg-emoji emoji-id=6019094432790354513>📢</tg-emoji> <a href=\"https://t.me/heroku_ub\"><b>Ресми канал</b></a>"
   partial_load: "<tg-emoji emoji-id=5355133243773435190>☝️</tg-emoji> <b>Юзербот толық жүктелмеген, сондықтан барлық модульдер көрсетілмеген</b>"

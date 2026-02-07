@@ -466,7 +466,7 @@ help:
   all_header: "<b>{} Module verfügbar, {} verborgen:</b>"
   no_mod: "🚫 <b>Gib das Modul(-e) an, das(-e) versteckt werden soll(en)</b>"
   help_lib: "<tg-emoji emoji-id=5404553572727660202>❌</tg-emoji> <b>Das Paket</b> <code>{}</code> <b>ist eine Bibliothek.</b>\n<tg-emoji emoji-id=5404553572727660202>❌</tg-emoji> <b>Bibliotheken haben keine Beschreibung...</b>"
-  developer: "<tg-emoji emoji-id=5287454910059654880>🫶</tg-emoji> Entwickler: <code>{}</code>"
+  developer: "<tg-emoji emoji-id=5287454910059654880>🫶</tg-emoji> Entwickler: {}"
   hidden_shown: "<b>{} Module verborgen, {} Module angezeigt:</b>\n{}\n{}"
   offchats: "<tg-emoji emoji-id=6019130940012370273>❔</tg-emoji> <a href=\"https://t.me/heroku_talks\"><b>Support-Chat</b></a>\n\n<tg-emoji emoji-id=6019151079114021083>💬</tg-emoji> <a href=\"https://t.me/heroku_offtop\"><b>Offtopic-Chat</b></a>\n\n<tg-emoji emoji-id=6019094432790354513>📢</tg-emoji> <a href=\"https://t.me/heroku_ub\"><b>Offizieller Kanal</b></a>"
   _cls_doc: "Zeigt Hilfe zu Modulen an"
