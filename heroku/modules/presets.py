@@ -334,5 +334,7 @@ class Presets(loader.Module):
             await message.edit(self.lookup("loader").strings['load_failed'])
             logger.exception("Invalid preset format")
             return
-        self._install(call=message, preset=data["name"], modules=data["links"], origin=False)
+        await message.delete()
+        call = await self.inline.form(message=message, text=utils.ascii_face())
+        self._install(call=call, preset=data["name"], modules=data["links"], origin=False)
         
