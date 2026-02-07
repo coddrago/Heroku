@@ -328,11 +328,11 @@ class Presets(loader.Module):
             data = orjson.loads(await msg.download_media(bytes))
         except Exception as e:
             await message.edit(self.lookup("loader").strings['no_file'])
-            logger.exception("Failed to load preset from file: %s", e)
+            logger.exception("Failed to load preset from file")
             return
         if not isinstance(data, dict) or "name" not in data or "links" not in data or not isinstance(data["links"], list):
             await message.edit(self.lookup("loader").strings['load_failed'])
-            logger.exception("Invalid preset format: %s", data)
+            logger.exception("Invalid preset format")
             return
         self._install(call=message, preset=data["name"], modules=data["links"], origin=False)
         
