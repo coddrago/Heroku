@@ -13,6 +13,7 @@
 import asyncio
 import functools
 import logging
+import orjson
 from math import ceil
 
 from .. import loader, utils
@@ -219,7 +220,7 @@ class Presets(loader.Module):
         )
         
 
-    async def _switch(self, call: InlineCall, page: int, preset: str, index_of_module: int, to_remove: list):
+    async def _switch(self, call: InlineCall, page: int, preset: str, index_of_module: int, to_remove: list, origin: bool = True):
         if index_of_module in to_remove:
             to_remove.remove(index_of_module)
         else:
@@ -253,7 +254,8 @@ class Presets(loader.Module):
             self.lookup("loader").update_modules_in_db()
 
         await m.edit(self.strings("installed").format(preset))
-        await self._menu()
+        if origin:
+            await self._menu()
 
     def _is_installed(self, link: str) -> bool:
         return any(
@@ -315,3 +317,22 @@ class Presets(loader.Module):
             text=self.strings('welcome').replace('/presets', self.get_prefix() + 'presets'),
             reply_markup=self._markup,
         )
+    @loader.command(alias="lp")
+    async def loadpresets(self, message: Message):
+        """| soon|"""
+        msg = message if message.file else (await message.get_reply_message())
+        if not msg or not msg.file:
+            await message.edit(self.lookup("loader").strings['no_file'])
+            return
+        try:
+            data = orjson.loads(await msg.download_media(bytes))
+        except Exception as e:
+            await message.edit(self.lookup("loader").strings['no_file'])
+            logger.exception("Failed to load preset from file: %s", e)
+            return
+        if not isinstance(data, dict) or "name" not in data or "links" not in data or not isinstance(data["links"], list):
+            await message.edit(self.lookup("loader").strings['load_failed'])
+            logger.exception("Invalid preset format: %s", data)
+            return
+        self._install(call=message, preset=data["name"], modules=data["links"], origin=False)
+        
