@@ -228,7 +228,7 @@ class Presets(loader.Module):
         
         await self._choose_menu(call, page, preset, to_remove)
 
-    async def _install(self, call: InlineCall, preset: str, modules: list, origin: bool = True):
+    async def _install(self, call: InlineCall, preset: str, modules: list, origin: bool = True, chat: int | None = None):
         await call.delete()
         m = await self._client.send_message(
             chat if chat else self.inline.bot_id,
@@ -334,6 +334,7 @@ class Presets(loader.Module):
             await message.edit(self.lookup("loader").strings['load_failed'])
             logger.exception("Invalid preset format")
             return
+        chat = message.chat.id
         await message.delete()
         try: 
             description = data["description"]
@@ -349,8 +350,8 @@ class Presets(loader.Module):
                 modules_list.append(f"▫️ <b>{module_name}</b>")
 
         modules = "\n".join(modules_list)
-        
+
         await self.inline.form(message=message, text=self.strings("preset").format(data["name"], description, modules), reply_markup=[
-            {"text": self.strings("install"), "callback": self._install, "args": (data["name"], data["links"], False)},
+            {"text": self.strings("install"), "callback": self._install, "args": (data["name"], data["links"], False, chat)},
             {"text": self.lookup("settings").strings["cancel"], "callback": lambda call: call.delete()},
         ])
