@@ -335,7 +335,7 @@ class Presets(loader.Module):
             logger.exception("Invalid preset format")
             return
         await message.delete()
-        call = await self.inline.form(message=message, text=self.lookup("api_protection").strings['u_sure'], reply_markup=[
-            {"text": self.strings("install"), "callback": self._install, "args": (call, data["name"], data["links"], False)},
+        await self.inline.form(message=message, text=self.lookup("api_protection").strings['u_sure'], reply_markup=[
+            {"text": self.strings("install"), "callback": self._install, "args": (data["name", data["links"], False)},
             {"text": self.lookup("settings").strings["cancel"], "callback": lambda call: call.delete()},
         ])
