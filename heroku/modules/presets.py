@@ -334,7 +334,7 @@ class Presets(loader.Module):
             await message.edit(self.lookup("loader").strings['load_failed'])
             logger.exception("Invalid preset format")
             return
-        chat = message.chat.id
+        chat = message.chat_id
         await message.delete()
         try: 
             description = data["description"]
