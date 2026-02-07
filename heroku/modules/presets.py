@@ -231,7 +231,7 @@ class Presets(loader.Module):
     async def _install(self, call: InlineCall, preset: str, modules: list, origin: bool = True):
         await call.delete()
         m = await self._client.send_message(
-            self.inline.bot_id,
+            chat if chat else self.inline.bot_id,
             self.strings("installing").format(preset),
         )
         for i, module in enumerate(modules):
