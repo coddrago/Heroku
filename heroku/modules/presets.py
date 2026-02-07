@@ -327,7 +327,7 @@ class Presets(loader.Module):
         try:
             data = orjson.loads(await msg.download_media(bytes))
         except Exception as e:
-            await message.edit(self.lookup("loader").strings['no_file'])
+            await message.edit(self.lookup("loader").strings['load_failed'])
             logger.exception("Failed to load preset from file")
             return
         if not isinstance(data, dict) or "name" not in data or "links" not in data or not isinstance(data["links"], list):
