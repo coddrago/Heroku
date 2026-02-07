@@ -335,7 +335,38 @@ class Presets(loader.Module):
             logger.exception("Invalid preset format")
             return
         await message.delete()
-        await self.inline.form(message=message, text=self.lookup("APIRatelimiterMod").strings['u_sure'], reply_markup=[
+        try: 
+            description = data["description"]
+        except:
+            description = self.lookup("help").strings["undoc"]
+
+        modules = "\n".join(
+                    map(
+                        lambda x: x[0],
+                        sorted(
+                            [
+                                (
+                                    "{} <b>{}</b>".format(
+                                        (
+                                            self.strings("already_installed")
+                                            if self._is_installed(link)
+                                            else "▫️"
+                                        ),
+                                        (
+                                            f"<s>{link.rsplit('/', maxsplit=1)[1].split('.')[0]}</s>"
+                                            if link not in data["links"]
+                                            else link.rsplit('/', maxsplit=1)[1].split('.')[0]),
+                                    ),
+                                    int(self._is_installed(link)),
+                                )
+                                for link in data["links"]
+                            ],
+                            key=lambda x: x[1],
+                            reverse=True,
+                        ),
+                    )
+                ),
+        await self.inline.form(message=message, text=self.strings("preset").format(data["name"], description, modules), reply_markup=[
             {"text": self.strings("install"), "callback": self._install, "args": (data["name"], data["links"], False)},
             {"text": self.lookup("settings").strings["cancel"], "callback": lambda call: call.delete()},
         ])
