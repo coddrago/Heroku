@@ -220,7 +220,7 @@ class Presets(loader.Module):
         )
         
 
-    async def _switch(self, call: InlineCall, page: int, preset: str, index_of_module: int, to_remove: list, origin: bool = True):
+    async def _switch(self, call: InlineCall, page: int, preset: str, index_of_module: int, to_remove: list):
         if index_of_module in to_remove:
             to_remove.remove(index_of_module)
         else:
@@ -228,7 +228,7 @@ class Presets(loader.Module):
         
         await self._choose_menu(call, page, preset, to_remove)
 
-    async def _install(self, call: InlineCall, preset: str, modules: list):
+    async def _install(self, call: InlineCall, preset: str, modules: list, origin: bool = True):
         await call.delete()
         m = await self._client.send_message(
             self.inline.bot_id,
