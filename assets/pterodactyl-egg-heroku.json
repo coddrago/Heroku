@@ -1,0 +1,47 @@
+{
+    "_comment": "DO NOT EDIT: FILE GENERATED AUTOMATICALLY BY PANEL",
+    "meta": {
+        "version": "PLCN_v3",
+        "update_url": null
+    },
+    "exported_at": "2026-02-07T11:09:43+00:00",
+    "name": "Heroku",
+    "author": "fiksyt@proton.me",
+    "uuid": "76852413-ea05-4382-ad38-30c605ba89ed",
+    "description": "Heroku - The most popular fork of the Hikka userbot, it is constantly updated and has many new features.",
+    "image": null,
+    "tags": [],
+    "features": [],
+    "docker_images": {
+        "System": "ghcr.io/ptero-eggs/yolks:python_3.10"
+    },
+    "file_denylist": [],
+    "startup_commands": {
+        "Default": "export PTERODACTYL=True && python3 -m heroku --port {{SERVER_PORT} --root"
+    },
+    "config": {
+        "files": "{}",
+        "startup": "{\n    \"done\": \"\u2022 Build:\"\n}",
+        "logs": "{}",
+        "stop": "^C"
+    },
+    "scripts": {
+        "installation": {
+            "script": "#!/bin/bash\r\n\r\nREPO_URL=\"https://github.com/coddrago/Heroku\"\r\nAPP_DIR=\"/mnt/server\"\r\n\r\nmkdir -p \"$APP_DIR\"\r\ncd \"$APP_DIR\"\r\napt update -y\r\napt upgrade -y\r\napt install --no-install-recommends -y \\\r\n    build-essential \\\r\n    curl \\\r\n    ffmpeg \\\r\n    gcc \\\r\n    git \\\r\n    libavcodec-dev \\\r\n    libavdevice-dev \\\r\n    libavformat-dev \\\r\n    libavutil-dev \\\r\n    libcairo2 \\\r\n    libmagic1 \\\r\n    libswscale-dev \\\r\n    openssl \\\r\n    openssh-client \\\r\n    openssh-server \\\r\n    python3 \\\r\n    python3-dev \\\r\n    python3-pip \\\r\n    wkhtmltopdf \\\r\n    ca-certificates\r\ncurl -fsSL https://deb.nodesource.com/setup_18.x -o nodesource_setup.sh\r\nbash nodesource_setup.sh\r\napt-get install -y nodejs\r\nrm -f nodesource_setup.sh\r\nrm -rf /var/lib/apt/lists/* /var/cache/apt/archives/* /tmp/*\r\n\r\nif [ -d \"$APP_DIR/.git\" ]; then\r\n    git config --global --add safe.directory \"$APP_DIR\"\r\n    git fetch origin $BRANCH\r\n    git reset --hard origin/$BRANCH\r\nelse\r\n    git config --global --add safe.directory \"$APP_DIR\"\r\n    git clone \"$REPO_URL\" \"$APP_DIR\"\r\n    cd \"$APP_DIR\"\r\n    git fetch && git checkout $BRANCH\r\nfi\r\n\r\necho",
+            "container": "python:3.8-slim-bookworm",
+            "entrypoint": "bash"
+        }
+    },
+    "variables": [
+        {
+            "sort": 1,
+            "name": "Userbot branch",
+            "description": "",
+            "env_variable": "BRANCH",
+            "default_value": "master",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": []
+        }
+    ]
+}
