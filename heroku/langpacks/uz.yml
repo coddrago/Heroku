@@ -451,7 +451,6 @@ updater:
   ignore: "🚫 E'tiborsiz qoldirish"
   changelog: '<tg-emoji emoji-id=5434144690511290129>📰</tg-emoji> <b>So‘nggi yirik yangilanish o‘zgarishlar tarixi:</b><blockquote expandable>{}</blockquote>'
 
-
 api_protection:
   name: "APILimiter"
   warning: "⚠️ <b>DIQQAT!</b>\n\nHisobingiz konfiguratsiyada belgilangan so‘rovlar chegarasidan oshib ketdi. Telegram API Flood oldini olish uchun yuzerbot {} soniyaga <b>to‘liq muzlatildi</b>. Qo‘shimcha ma'lumot ilova qilingan faylda keltirilgan. \n\n<code>{prefix}support</code> guruhidan yordam olish tavsiya etiladi!\n\nAgar bu kutilgan xatti-harakat deb hisoblasangiz, yuzerbot blokdan chiqishini kuting va keyingi safar bunday operatsiyani bajarmoqchi bo‘lsangiz, <code>{prefix}suspend_api_protect</code> &lt;vaqt soniyada&gt; dan foydalaning"
@@ -496,6 +495,7 @@ HSearch:
   modules_list: "{emoji} <b>Barcha topilgan modullar:</b>"
   _cfg_doc_tracking: "HSearch boti bilan sinxronlashtirish uchun ma'lumotlaringizni (foydalanuvchi IDsi, til) kuzatishni yoqish kerakmi?"
   _cfg_doc_theme: "Emojilar uchun mavzu."
+  join_channel: "{emoji} Bu HSearch'dagi barcha yangilanishlar kanali!"
 
 help:
   name: "Help"

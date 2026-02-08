@@ -451,7 +451,6 @@ updater:
   ignore: "🚫 無視"
   changelog: '<tg-emoji emoji-id=5434144690511290129>📰</tg-emoji> <b>最後のメジャーアップデートの変更履歴:</b><blockquote expandable>{}</blockquote>'
 
-
 api_protection:
   name: "APILimiter"
   warning: "⚠️ <b>警告！</b>\n\nあなたのアカウントは設定で指定されたリクエスト制限を超えました。Telegram API フラッドを防ぐため、ユーザーボットは {} 秒間<b>完全に凍結</b>されました。詳細情報は添付ファイルに記載されています。\n\n<code>{prefix}support</code> グループで助けを求めることをお勧めします！\n\nこれが意図された動作であると思う場合は、ユーザーボットのロックが解除されるまで待ち、次回同様の操作を行う際は <code>{prefix}suspend_api_protect</code> &lt;秒数&gt; を使用してください"
@@ -496,6 +495,7 @@ HSearch:
   modules_list: "{emoji} <b>見つかったすべてのモジュール:</b>"
   _cfg_doc_tracking: "HSearchボットとの同期のためにデータ（ユーザーID、言語）の追跡を有効にしますか？"
   _cfg_doc_theme: "絵文字のテーマ。"
+  join_channel: "{emoji} これはHSearchのすべてのアップデートがあるチャンネルです！"
   
 help:
   name: "Help"

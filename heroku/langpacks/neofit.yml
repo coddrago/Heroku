@@ -495,6 +495,7 @@ HSearch:
   modules_list: "{emoji} <b>find /modules -type f:</b>"
   _cfg_doc_tracking: "Enable telemetry (UID, locale) sync with HSearch daemon?"
   _cfg_doc_theme: "export EMOJI_THEME="
+  join_channel: "{emoji} # All HSearch releases"
 
 help:
   name: "Help"

@@ -14,13 +14,18 @@ __version__ = (2, 0, 0)
 # 🔑 https://www.gnu.org/licenses/agpl-3.0.html
 
 import asyncio
-from typing import Dict, List, Optional
-from urllib.parse import parse_qs, unquote, urlparse
-
 import aiohttp
-from telethon.tl.functions.contacts import UnblockRequest
+import ast
+import sys
+import uuid
+from typing import Optional, Dict, List
+from urllib.parse import unquote
+from importlib.machinery import ModuleSpec
 
 from .. import loader, utils
+from ..types import CoreOverwriteError
+from herokutl.tl.functions.contacts import UnblockRequest
+from herokutl.errors.common import ScamDetectionError
 
 
 @loader.tds
@@ -133,9 +138,15 @@ class HSearch(loader.Module):
     async def client_ready(self, client, db):
         try:
             await client(UnblockRequest("@FHeta_robot"))
+            await utils.dnd(client, "@FHeta_robot", archive=True)
         except:
             pass
-            
+
+        await self.request_join(
+            "FHeta_Updates",
+            self.strings["join_channel"].format(emoji=self._get_emoji("channel"))
+        )
+        
         self.uid = (await client.get_me()).id
         self.token = db.get("HSearch", "token")
 
@@ -181,13 +192,6 @@ class HSearch(loader.Module):
                     pass
                     
                 await asyncio.sleep(60)
-            
-    async def on_dlmod(self, client, db):
-        try:
-            await client(UnblockRequest("@FHeta_robot"))
-            await utils.dnd(client, "@FHeta_robot", archive=True)
-        except:
-            pass
 
     async def _api_get(self, endpoint: str, **params):
         try:
@@ -603,7 +607,7 @@ class HSearch(loader.Module):
         
         if self.lookup("FHeta"):
             return
-
+        
         try:
             parsed_url = urlparse(link)
             qp = parse_qs(parsed_url.query)
@@ -611,23 +615,268 @@ class HSearch(loader.Module):
             ohd = qp.get('ohd', ['False'])[0]
             
             if ohd.lower() == 'false':
-                cross_msg = await message.respond("❌")
+                warn_msg = await message.respond("⚠️")
                 await asyncio.sleep(1)
-                await cross_msg.delete()
+                await warn_msg.delete()
                 await message.delete()
                 return
             
-            if ohd.lower() == 'true':
-                await self.lookup("loader").download_and_install(link, None)
-                
-                await asyncio.sleep(1)
-
-                if self.lookup("loader").fully_loaded:
-                    self.lookup("loader").update_modules_in_db()
-                
-                rose_msg = await message.respond("🌹")
-                await asyncio.sleep(1)
-                await rose_msg.delete()
+            lm = self.lookup("loader")
+            if not lm:
+                return
+            
+            try:
+                r = await lm._storage.fetch(link, auth=lm.config.get("basic_auth"))
+            except (aiohttp.ClientError, aiohttp.ClientResponseError):
+                status_msg = await message.respond("❌")
+                await asyncio.sleep(0.67)
+                await status_msg.delete()
                 await message.delete()
-        except:
-            pass
+                return
+            
+            doc = r
+            origin = link
+            
+            max_attempts = 5
+            for attempt in range(max_attempts):
+                try:
+                    result = await self._load_module(
+                        lm,
+                        doc,
+                        origin,
+                        attempt
+                    )
+                    
+                    if result == "success":
+                        if lm.fully_loaded:
+                            lm.update_modules_in_db()
+                        
+                        status_msg = await message.respond("✅")
+                        await asyncio.sleep(0.5)
+                        await status_msg.delete()
+                        await message.delete()
+                        return
+                    
+                    elif result == "retry":
+                        if attempt < max_attempts - 1:
+                            await asyncio.sleep(0.33)
+                            continue
+                        else:
+                            status_msg = await message.respond("📋")
+                            await asyncio.sleep(1)
+                            await status_msg.delete()
+                            await message.delete()
+                            return
+                    
+                    elif isinstance(result, dict) and result.get("type") == "requirements_error":
+                        deps = result.get("deps", [])
+                        if deps:
+                            deps_text = ",".join(deps[:5])
+                            status_msg = await message.respond(f"📋{deps_text}")
+                        else:
+                            status_msg = await message.respond("📋")
+                        await asyncio.sleep(1)
+                        await status_msg.delete()
+                        await message.delete()
+                        return
+                    
+                    elif result == "overwrite":
+                        status_msg = await message.respond("😨")
+                        await asyncio.sleep(1)
+                        await status_msg.delete()
+                        await message.delete()
+                        return
+                    
+                    else:
+                        status_msg = await message.respond("❌")
+                        await asyncio.sleep(0.67)
+                        await status_msg.delete()
+                        await message.delete()
+                        return
+                        
+                except Exception:
+                    status_msg = await message.respond("❌")
+                    await asyncio.sleep(0.67)
+                    await status_msg.delete()
+                    await message.delete()
+                    return
+            
+            status_msg = await message.respond("📋")
+            await asyncio.sleep(1)
+            await status_msg.delete()
+            await message.delete()
+            
+        except Exception:
+            status_msg = await message.respond("❌")
+            await asyncio.sleep(0.67)
+            await status_msg.delete()
+            await message.delete()
+
+    async def _load_module(self, lm, doc, origin, attempt):
+        if attempt == 0:
+            requirements = []
+            try:
+                requirements = list(
+                    filter(
+                        lambda x: not x.startswith(("-", "_", ".")),
+                        map(
+                            str.strip,
+                            loader.VALID_PIP_PACKAGES.search(doc)[1].split(),
+                        ),
+                    )
+                )
+            except (TypeError, AttributeError):
+                pass
+            
+            if requirements:
+                is_venv = hasattr(sys, 'real_prefix') or sys.prefix != getattr(sys, 'base_prefix', sys.prefix)
+                need_user_flag = loader.USER_INSTALL and not is_venv
+                
+                pip = await asyncio.create_subprocess_exec(
+                    sys.executable,
+                    "-m",
+                    "pip",
+                    "install",
+                    "--upgrade",
+                    "-q",
+                    "--disable-pip-version-check",
+                    "--no-warn-script-location",
+                    *["--user"] if need_user_flag else [],
+                    *requirements,
+                )
+                
+                rc = await pip.wait()
+                
+                if rc != 0:
+                    return {"type": "requirements_error", "deps": requirements}
+                
+                __import__('importlib').invalidate_caches()
+                return "retry"
+            
+            packages = []
+            try:
+                packages = list(
+                    filter(
+                        lambda x: not x.startswith(("-", "_", ".")),
+                        map(
+                            str.strip,
+                            loader.VALID_APT_PACKAGES.search(doc)[1].split(),
+                        ),
+                    )
+                )
+            except (TypeError, AttributeError):
+                pass
+            
+            if packages:
+                result = await lm.install_packages(packages)
+                if not result:
+                    return {"type": "requirements_error", "deps": packages}
+                __import__('importlib').invalidate_caches()
+                return "retry"
+        
+        try:
+            node = ast.parse(doc)
+            uid = next(
+                n.name
+                for n in node.body
+                if isinstance(n, ast.ClassDef)
+                and any(
+                    isinstance(base, ast.Attribute)
+                    and base.value.id == "Module"
+                    or isinstance(base, ast.Name)
+                    and base.id == "Module"
+                    for base in n.bases
+                )
+            )
+        except Exception:
+            uid = "__extmod_" + str(uuid.uuid4())
+        
+        module_name = f"heroku.modules.{uid}"
+        
+        try:
+            spec = ModuleSpec(
+                module_name,
+                loader.StringLoader(doc, f"<external {module_name}>"),
+                origin=f"<external {module_name}>",
+            )
+            instance = await lm.allmodules.register_module(
+                spec,
+                module_name,
+                origin,
+                save_fs=False,
+            )
+        except ImportError as e:
+            requirements = [
+                {
+                    "sklearn": "scikit-learn",
+                    "pil": "Pillow",
+                    "herokutl": "Heroku-TL-New",
+                }.get(e.name.lower(), e.name)
+            ]
+            
+            if not requirements:
+                return "error"
+            
+            is_venv = hasattr(sys, 'real_prefix') or sys.prefix != getattr(sys, 'base_prefix', sys.prefix)
+            need_user_flag = loader.USER_INSTALL and not is_venv
+            
+            pip = await asyncio.create_subprocess_exec(
+                sys.executable,
+                "-m",
+                "pip",
+                "install",
+                "--upgrade",
+                "-q",
+                "--disable-pip-version-check",
+                "--no-warn-script-location",
+                *["--user"] if need_user_flag else [],
+                *requirements,
+            )
+            
+            rc = await pip.wait()
+            
+            if rc != 0:
+                return {"type": "requirements_error", "deps": requirements}
+            
+            __import__('importlib').invalidate_caches()
+            return "retry"
+            
+        except CoreOverwriteError:
+            with __import__('contextlib').suppress(Exception):
+                await lm.allmodules.unload_module(instance.__class__.__name__)
+            with __import__('contextlib').suppress(Exception):
+                lm.allmodules.modules.remove(instance)
+            return "overwrite"
+        except (loader.LoadError, ScamDetectionError):
+            with __import__('contextlib').suppress(Exception):
+                await lm.allmodules.unload_module(instance.__class__.__name__)
+            with __import__('contextlib').suppress(Exception):
+                lm.allmodules.modules.remove(instance)
+            return "error"
+        except Exception:
+            return "error"
+        
+        try:
+            lm.allmodules.send_config_one(instance)
+            
+            await lm.allmodules.send_ready_one(
+                instance,
+                no_self_unload=True,
+                from_dlmod=False,
+            )
+        except CoreOverwriteError:
+            with __import__('contextlib').suppress(Exception):
+                await lm.allmodules.unload_module(instance.__class__.__name__)
+            with __import__('contextlib').suppress(Exception):
+                lm.allmodules.modules.remove(instance)
+            return "overwrite"
+        except (loader.LoadError, ScamDetectionError, loader.SelfUnload, loader.SelfSuspend):
+            with __import__('contextlib').suppress(Exception):
+                await lm.allmodules.unload_module(instance.__class__.__name__)
+            with __import__('contextlib').suppress(Exception):
+                lm.allmodules.modules.remove(instance)
+            return "error"
+        except Exception:
+            return "error"
+        
+        return "success"

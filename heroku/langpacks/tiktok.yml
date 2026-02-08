@@ -463,6 +463,7 @@ HSearch:
   modules_list: "{emoji} <b>Все найденные модули (залутал):</b>"
   _cfg_doc_tracking: "Врубить трекинг твоих данных (ID, язык) для синхры с ботом HSearch?"
   _cfg_doc_theme: "Тема для эмодзи (скины)"
+  join_channel: "{emoji} Это канал со всеми обновами HSearch, подписывайся чтоб не пропустить!"
   
 help:
   undoc: "🦥 Хз че это"
