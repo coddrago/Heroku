@@ -345,7 +345,7 @@ inline_stuff:
   token_invalid: "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>Указанный токен бота недействителен. Он должен содержать 8-10 цифр, </b><code>:</code> <b>и 34-36 символов</b>"
   bot_username_occupied: "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>Такой ник бота уже занят</b>"
   bot_updated: "<tg-emoji emoji-id=6318792204118656433>🎉</tg-emoji> <b>Настройки сохранены. Для их применения нужно перезагрузить юзербот</b>"
-  this_is_heroku: "🪐 <b>Привет! Это Heroku — мощный модульный Telegram юзербот. Вы можете установить его на свой аккаунт!</b>\n\n<b>🌍 <a href=\"https://github.com/coddrago/Heroku\">GitHub</a></b>\n<b>👥 <a href=\"https://t.me/heroku_talks\">Чат поддержки</a></b>"
+  this_is_heroku: "{} <b>Привет! Это {} — мощный модульный Telegram юзербот. Вы можете установить его на свой аккаунт!</b>\n\n<b><tg-emoji emoji-id=5231065262228250587>🌍</tg-emoji> <a href=\"https://github.com/coddrago/Heroku\">GitHub</a></b>\n<b><tg-emoji emoji-id=6019130940012370273>👥</tg-emoji> <a href=\"https://t.me/heroku_talks\">Чат поддержки</a></b>"
   profile_cmd: "ℹ️ Основная информация об юзерботе\n\n<blockquote>• Префикс: {prefix}\n• Использование RAM: {ram_usage} МБ\n• Использование CPU: {cpu_usage}%\n• Хостинг: {host}</blockquote>"
   restart: "🔄 Ваша Heroku перезапускается..."
   prefix_reset: "🔀 Префикс сброшен!"

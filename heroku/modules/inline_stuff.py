@@ -116,7 +116,7 @@ class InlineStuff(loader.Module):
             case "/start":
                 await message.answer_photo(
                     "https://raw.githubusercontent.com/coddrago/assets/refs/heads/main/heroku/start_cmd.png",
-                    caption=self.strings("this_is_heroku"),
+                    caption=self.strings("this_is_heroku").format("<tg-emoji emoji-id=5463379725441341739>🪐</tg-emoji>" if self._client.heroku_me.premium else "🪐", utils.get_platform_emoji() if self._client else "Heroku"),
                 )
             case "/profile":
                 if message.from_user.id != self.client.tg_id:

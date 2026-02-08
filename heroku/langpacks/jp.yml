@@ -371,7 +371,7 @@ inline_stuff:
   token_invalid: "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>指定されたボットトークンが無効です。8〜10桁の数字、</b><code>:</code><b>、および34〜36文字の記号を含める必要があります</b>"
   bot_username_occupied: "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>このユーザー名は既に使用されています</b>"
   bot_updated: "<tg-emoji emoji-id=6318792204118656433>🎉</tg-emoji> <b>設定が正常に保存されました。変更を適用するにはユーザーボットを再起動してください</b>"
-  this_is_heroku: "🪐 <b>こんにちは！これは Heroku です — パワフルなモジュール式 Telegram ユーザーボットです。あなたのアカウントにインストールできます！</b>\n\n<b>🌍 <a href=\"https://github.com/coddrago/Heroku\">GitHub</a></b>\n<b>👥 <a href=\"https://t.me/heroku_talks\">サポートチャット</a></b>"
+  this_is_heroku: "{} <b>こんにちは！これは {} です — パワフルなモジュール式 Telegram ユーザーボットです。あなたのアカウントにインストールできます！</b>\n\n<b><tg-emoji emoji-id=5231065262228250587>🌍</tg-emoji> <a href=\"https://github.com/coddrago/Heroku\">GitHub</a></b>\n<b><tg-emoji emoji-id=6019130940012370273>👥</tg-emoji> <a href=\"https://t.me/heroku_talks\">サポートチャット</a></b>"
   profile_cmd: "ℹ️ ユーザーボット主要情報\n\n<blockquote>• プレフィックス: {prefix}\n• RAM 使用量: {ram_usage} MB\n• CPU 使用率: {cpu_usage}%\n• ホスティング: {host}</blockquote>"
   restart: "🔄 Heroku を再起動しています..."
   prefix_reset: "🔀 プレフィックスをリセットしました！"

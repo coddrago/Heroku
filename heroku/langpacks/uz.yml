@@ -371,7 +371,7 @@ inline_stuff:
   token_invalid: "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>Belgilangan bot tokeni yaroqsiz. U 8-10 raqam, </b><code>:</code> <b>va 34-36 belgidan iborat bo‘lishi kerak</b>"
   bot_username_occupied: "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>Bu foydalanuvchi nomi allaqachon band</b>"
   bot_updated: "<tg-emoji emoji-id=6318792204118656433>🎉</tg-emoji> <b>Konfiguratsiya muvaffaqiyatli saqlandi. O‘zgarishlarni qo‘llash uchun yuzerbotni qayta ishga tushiring</b>"
-  this_is_heroku: "🪐 <b>Salom! Bu Heroku — kuchli modulli Telegram yuzerbot. Siz uni hisobingizga o‘rnatishingiz mumkin!</b>\n\n<b>🌍 <a href=\"https://github.com/coddrago/Heroku\">GitHub</a></b>\n<b>👥 <a href=\"https://t.me/heroku_talks\">Qo‘llab-quvvatlash guruhi</a></b>"
+  this_is_heroku: "{} <b>Salom! Bu {} — kuchli modulli Telegram yuzerbot. Siz uni hisobingizga o‘rnatishingiz mumkin!</b>\n\n<b><tg-emoji emoji-id=5231065262228250587>🌍</tg-emoji> <a href=\"https://github.com/coddrago/Heroku\">GitHub</a></b>\n<b><tg-emoji emoji-id=6019130940012370273>👥</tg-emoji> <a href=\"https://t.me/heroku_talks\">Qo‘llab-quvvatlash guruhi</a></b>"
   profile_cmd: "ℹ️ Yuzerbot Asosiy Ma'lumotlari\n\n<blockquote>• Prefiks: {prefix}\n• RAM Ishlatilishi: {ram_usage} MB\n• CPU Ishlatilishi: {cpu_usage}%\n• Xosting: {host}</blockquote>"
   restart: "🔄 Sizning Heroku qayta ishga tushirilmoqda.."
   prefix_reset: "🔀 Prefiks qayta o‘rnatildi!"

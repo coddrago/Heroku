@@ -371,7 +371,7 @@ inline_stuff:
   token_invalid: "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>Sp3c1f13d b07 70k3n 15 1nv4l1d. 17 mu57 c0n741n 8-10 numb3r5, </b><code>:</code> <b>& 34-36 symb0l5</b>"
   bot_username_occupied: "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>7h15 u53rn4m3 15 4lr34dy 0ccup13d</b>"
   bot_updated: "<tg-emoji emoji-id=6318792204118656433>🎉</tg-emoji> <b>C0nf1g 5ucc355fully s4v3d. R3574r7 u53rb07 2 4pply ch4ng35</b>"
-  this_is_heroku: "🪐 <b>H1! 7h15 15 H3r0ku — p0w3rful m0dul4r T3l3gr4m u53rb07. U c4n 1n574ll 17 2 ur 4cc!</b>\n\n<b>🌍 <a href=\"https://github.com/coddrago/Heroku\">GitHub</a></b>\n<b>👥 <a href=\"https://t.me/heroku_talks\">Supp0r7 ch47</a></b>"
+  this_is_heroku: "{} <b>H1! 7h15 15 H3r0ku — p0w3rful m0dul4r T3l3gr4m u53rb07. U c4n 1n574ll 17 2 ur 4cc!</b>\n\n<b><tg-emoji emoji-id=5231065262228250587>🌍</tg-emoji> <a href=\"https://github.com/coddrago/Heroku\">GitHub</a></b>\n<b><tg-emoji emoji-id=6019130940012370273>👥</tg-emoji> <a href=\"https://t.me/heroku_talks\">Supp0r7 ch47</a></b>"
   profile_cmd: "ℹ️ Us3rb07 M41n 1nf0\n\n<blockquote>• Pr3f1x: {prefix}\n• RAM U54g3: {ram_usage} MB\n• CPU U54g3: {cpu_usage}%\n• H0571ng: {host}</blockquote>"
   restart: "🔄 Ur H3r0ku 15 b31ng r3574r73d.."
   prefix_reset: "🔀 Pr3f1x r3537!"

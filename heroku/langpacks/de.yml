@@ -345,7 +345,7 @@ inline_stuff:
   token_invalid: "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>Das angegebene Bot-Token ist ungültig. Es muss 8-10 Zahlen, </b><code>:</code> <b>und 34-36 Symbole enthalten</b>"
   bot_username_occupied: "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>Dieser Bot-Benutzername ist bereits vergeben</b>"
   bot_updated: "<tg-emoji emoji-id=6318792204118656433>🎉</tg-emoji> <b>Einstellungen gespeichert. Um sie anzuwenden, starte den Userbot neu</b>"
-  this_is_heroku: "🪐 <b>Hallo! Das ist Heroku — ein leistungsstarker modularer Telegram-Userbot. Du kannst ihn auf deinem Account installieren!</b>\n\n<b>🌍 <a href=\"https://github.com/coddrago/Heroku\">GitHub</a></b>\n<b>👥 <a href=\"https://t.me/heroku_talks\">Support-Chat</a></b>"
+  this_is_heroku: "{} <b>Hallo! Das ist {} — ein leistungsstarker modularer Telegram-Userbot. Du kannst ihn auf deinem Account installieren!</b>\n\n<b><tg-emoji emoji-id=5231065262228250587>🌍</tg-emoji> <a href=\"https://github.com/coddrago/Heroku\">GitHub</a></b>\n<b><tg-emoji emoji-id=6019130940012370273>👥</tg-emoji> <a href=\"https://t.me/heroku_talks\">Support-Chat</a></b>"
   profile_cmd: "ℹ️ Grundlegende Userbot-Informationen\n\n<blockquote>• Präfix: {prefix}\n• RAM-Auslastung: {ram_usage} MB\n• CPU-Auslastung: {cpu_usage} %\n• Hosting: {host}</blockquote>"
   restart: "🔄 Dein Heroku wird neu gestartet..."
   prefix_reset: "🔀 Präfix zurückgesetzt!"
