@@ -527,6 +527,7 @@ HSearch:
   modules_list: "{emoji} <b>All found modules:</b>"
   _cfg_doc_tracking: "Enable tracking of your data (user ID, language) for synchronization with the HSearch bot?"
   _cfg_doc_theme: "Theme for emojis."
+  join_channel: "{emoji} This is the channel with all updates in HSearch!"
 
 help:
   name: "Help"
