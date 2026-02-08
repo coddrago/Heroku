@@ -505,6 +505,11 @@ api_protection:
 
 HSearch:
   name: "HSearch"
+  module_info_version: "{emoji} <code>{name}</code> <b>by</b> <code>{author}</code> (<code>v{version}</code>)"
+  query_label": "Query"
+  install_btn: "Installation command"
+  results_count: "{idx}/{total}"
+  modules_list: "{emoji} <b>All found modules:</b>"
   searching: "{emoji} <b>Searching...</b>"
   no_query: "{emoji} <b>Enter a query to search.</b>"
   no_results: "{emoji} <b>No modules found.</b>"

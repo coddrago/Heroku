@@ -1,6 +1,6 @@
 __version__ = (2, 0, 0)
 
-# ©️ Fixyres, 2024-2026
+# ©️ Fixyres, 2024-2030
 # 🌐 https://github.com/Fixyres/FHeta
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,14 +14,11 @@ __version__ = (2, 0, 0)
 # 🔑 https://www.gnu.org/licenses/agpl-3.0.html
 
 import asyncio
-import ssl
-import subprocess
-import sys
 from typing import Dict, List, Optional
-from urllib.parse import unquote
+from urllib.parse import parse_qs, unquote, urlparse
 
 import aiohttp
-from herokutl.tl.functions.contacts import UnblockRequest
+from telethon.tl.functions.contacts import UnblockRequest
 
 from .. import loader, utils
 
@@ -30,33 +27,90 @@ from .. import loader, utils
 class HSearch(loader.Module):
     '''Module for searching modules! Watch all HSearch news in @FHeta_Updates!'''
 
-    strings = {"name": "HSearch"}
-
+    strings = {
+        "name": "HSearch",
+    }
+    
     THEMES = {
         "default": {
-            "search": "🔎", "error": "❌", "warn": "❌", "result": "🔎", 
-            "install": "💾", "description": "📁", "command": "👨‍💻", "inline": "🤖", 
-            "like": "👍", "dislike": "👎", "prev": "◀️", "next": "▶️"
+            "search": '<tg-emoji emoji-id="5188217332748527444">🔍</tg-emoji>',
+            "error": '<tg-emoji emoji-id="5465665476971471368">❌</tg-emoji>',
+            "warn": '<tg-emoji emoji-id="5447644880824181073">⚠️</tg-emoji>',
+            "description": '<tg-emoji emoji-id="5334882760735598374">📝</tg-emoji>',
+            "command": '<tg-emoji emoji-id="5341715473882955310">⚙️</tg-emoji>',
+            "like": "👍",
+            "dislike": "👎",
+            "prev": "◀️",
+            "next": "▶️",
+            "module": '<tg-emoji emoji-id="5203996991054432397">📦</tg-emoji>',
+            "close": "❌",
+            "channel": '<tg-emoji emoji-id="5278256077954105203">📢</tg-emoji>',
+            "removed": "🗑️",
+            "modules_list": '<tg-emoji emoji-id="5197269100878907942">📋</tg-emoji>'
         },
         "winter": {
-            "search": "❄️", "error": "🧊", "warn": "🌨️", "result": "🎄", 
-            "install": "🎁", "description": "📜", "command": "🎅", "inline": "☃️", 
-            "like": "🍊", "dislike": "🥶", "prev": "⏮️", "next": "⏭️"
+            "search": '<tg-emoji emoji-id="5431895003821513760">❄️</tg-emoji>',
+            "error": '<tg-emoji emoji-id="5404728536810398694">🧊</tg-emoji>',
+            "warn": '<tg-emoji emoji-id="5447644880824181073">🌨️</tg-emoji>',
+            "description": '<tg-emoji emoji-id="5255850496291259327">📜</tg-emoji>',
+            "command": '<tg-emoji emoji-id="5199503707938505333">🎅</tg-emoji>',
+            "like": "☕",
+            "dislike": "🥶",
+            "prev": "⏮️",
+            "next": "⏭️",
+            "module": '<tg-emoji emoji-id="5197708768091061888">🎁</tg-emoji>',
+            "close": "❌",
+            "channel": '<tg-emoji emoji-id="5278256077954105203">📢</tg-emoji>',
+            "removed": "🗑️",
+            "modules_list": '<tg-emoji emoji-id="5345935030143196497">🎄</tg-emoji>'
         },
         "summer": {
-            "search": "☀️", "error": "🏖️", "warn": "🏜️", "result": "🌴", 
-            "install": "🍦", "description": "🍹", "command": "🏄", "inline": "🏊", 
-            "like": "🍓", "dislike": "🥵", "prev": "⬅️", "next": "➡️"
+            "search": '<tg-emoji emoji-id="5188217332748527444">🔍</tg-emoji>',
+            "error": '<tg-emoji emoji-id="5470049770997292425">🌡️</tg-emoji>',
+            "warn": '<tg-emoji emoji-id="5447644880824181073">⚠️</tg-emoji>',
+            "description": '<tg-emoji emoji-id="5361684086807076580">🍹</tg-emoji>',
+            "command": '<tg-emoji emoji-id="5442644589703866634">🏄</tg-emoji>',
+            "like": "🍓",
+            "dislike": "🥵",
+            "prev": "⬅️",
+            "next": "➡️",
+            "module": '<tg-emoji emoji-id="5433645645376264953">🏖️</tg-emoji>',
+            "close": "❌",
+            "channel": '<tg-emoji emoji-id="5278256077954105203">📢</tg-emoji>',
+            "removed": "🗑️",
+            "modules_list": '<tg-emoji emoji-id="5472178859300363509">🏖️</tg-emoji>'
         },
         "spring": {
-            "search": "🌱", "error": "🌷", "warn": "🥀", "result": "🌿", 
-            "install": "🌻", "description": "🍃", "command": "🦋", "inline": "🐝", 
-            "like": "🌸", "dislike": "🌧️", "prev": "⏪", "next": "⏩"
+            "search": '<tg-emoji emoji-id="5449885771420934013">🌱</tg-emoji>',
+            "error": '<tg-emoji emoji-id="5208923808169222461">🥀</tg-emoji>',
+            "warn": '<tg-emoji emoji-id="5447644880824181073">⚠️</tg-emoji>',
+            "description": '<tg-emoji emoji-id="5251524493561569780">🍃</tg-emoji>',
+            "command": '<tg-emoji emoji-id="5449850741667668411">🦋</tg-emoji>',
+            "like": "🌸",
+            "dislike": "🌧️",
+            "prev": "⏪",
+            "next": "⏩",
+            "module": '<tg-emoji emoji-id="5440911110838425969">🌿</tg-emoji>',
+            "close": "❌",
+            "channel": '<tg-emoji emoji-id="5278256077954105203">📢</tg-emoji>',
+            "removed": "🗑️",
+            "modules_list": '<tg-emoji emoji-id="5440748683765227563">🌺</tg-emoji>'
         },
         "autumn": {
-            "search": "🍂", "error": "🍁", "warn": "🕸️", "result": "🍄", 
-            "install": "🧺", "description": "📜", "command": "🧣", "inline": "🦔", 
-            "like": "🍎", "dislike": "🌧️", "prev": "👈", "next": "👉"
+            "search": '<tg-emoji emoji-id="5253944419870062295">🍂</tg-emoji>',
+            "error": '<tg-emoji emoji-id="5281026503658728615">🍁</tg-emoji>',
+            "warn": '<tg-emoji emoji-id="5447644880824181073">⚠️</tg-emoji>',
+            "description": '<tg-emoji emoji-id="5406631276042002796">📜</tg-emoji>',
+            "command": '<tg-emoji emoji-id="5212963577098417551">🍂</tg-emoji>',
+            "like": "🍎",
+            "dislike": "🌧️",
+            "prev": "👈",
+            "next": "👉",
+            "module": '<tg-emoji emoji-id="5249157915041865558">🍄</tg-emoji>',
+            "close": "❌",
+            "channel": '<tg-emoji emoji-id="5278256077954105203">📢</tg-emoji>',
+            "removed": "🗑️",
+            "modules_list": '<tg-emoji emoji-id="5305495722618010655">🍂</tg-emoji>'
         }
     }
 
@@ -81,10 +135,7 @@ class HSearch(loader.Module):
             await client(UnblockRequest("@FHeta_robot"))
         except:
             pass
-
-        self.ssl = ssl.create_default_context()
-        self.ssl.check_hostname = False
-        self.ssl.verify_mode = ssl.CERT_NONE
+            
         self.uid = (await client.get_me()).id
         self.token = db.get("HSearch", "token")
 
@@ -99,19 +150,6 @@ class HSearch(loader.Module):
                 pass
             
         asyncio.create_task(self._sync_loop())
-        asyncio.create_task(self._certifi_loop())
-
-    async def _certifi_loop(self):
-        while True:
-            try:
-                import certifi
-                assert certifi.__version__ == "2024.08.30"
-            except (ImportError, AssertionError):
-                await asyncio.to_thread(
-                    subprocess.check_call,
-                    [sys.executable, "-m", "pip", "install", "certifi==2024.8.30"]
-                )
-            await asyncio.sleep(60)
             
     async def _sync_loop(self):
         tracked = True
@@ -127,8 +165,7 @@ class HSearch(loader.Module):
                                 "user_id": self.uid,
                                 "lang": self.strings["lang"]
                             },
-                            headers={"Authorization": self.token},
-                            ssl=self.ssl
+                            headers={"Authorization": self.token}
                         ) as response:
                             tracked = True
                             await response.release()
@@ -136,8 +173,7 @@ class HSearch(loader.Module):
                         async with session.post(
                             "https://api.fixyres.com/rmd",
                             params={"user_id": self.uid},
-                            headers={"Authorization": self.token},
-                            ssl=self.ssl
+                            headers={"Authorization": self.token}
                         ) as response:
                             tracked = False
                             await response.release()
@@ -160,7 +196,6 @@ class HSearch(loader.Module):
                     f"https://api.fixyres.com/{endpoint}",
                     params=params,
                     headers={"Authorization": self.token},
-                    ssl=self.ssl,
                     timeout=aiohttp.ClientTimeout(total=180)
                 ) as response:
                     if response.status == 200:
@@ -177,7 +212,6 @@ class HSearch(loader.Module):
                     json=json,
                     params=params,
                     headers={"Authorization": self.token},
-                    ssl=self.ssl,
                     timeout=aiohttp.ClientTimeout(total=180)
                 ) as response:
                     if response.status == 200:
@@ -206,18 +240,21 @@ class HSearch(loader.Module):
         return self.THEMES[self.config["theme"]][key]
 
     def _fmt_mod(self, mod: Dict, query: str = "", idx: int = 1, total: int = 1, inline: bool = False) -> str:
-        info = self.strings["module_info"].format(
-            name=utils.escape_html(mod.get("name", "")),
-            author=utils.escape_html(mod.get("author", "???")),
-            version=utils.escape_html(mod.get("version", "?.?.?")),
-            install = f"{self.get_prefix()}{unquote(mod.get('install', ''))}",
-            emoji=self._get_emoji("install")
-        )
-
-        if total > 1:
-            info = self.strings["result_query"].format(idx=idx, total=total, query=utils.escape_html(query), emoji=self._get_emoji("result")) + info
-        elif query and not inline:
-            info = self.strings["result_single"].format(query=utils.escape_html(query), emoji=self._get_emoji("result")) + info
+        version = mod.get("version", "?.?.?")
+        
+        if version and version != "?.?.?":
+            info = self.strings["module_info_version"].format(
+                emoji=self._get_emoji("module"),
+                name=utils.escape_html(mod.get("name", "")),
+                author=utils.escape_html(mod.get("author", "???")),
+                version=utils.escape_html(version)
+            )
+        else:
+            info = self.strings["module_info"].format(
+                emoji=self._get_emoji("module"),
+                name=utils.escape_html(mod.get("name", "")),
+                author=utils.escape_html(mod.get("author", "???"))
+            )
 
         desc = mod.get("description")
         if desc:
@@ -232,8 +269,7 @@ class HSearch(loader.Module):
         return info
 
     def _fmt_cmds(self, cmds: List[Dict], limit: int) -> str:
-        regular_cmds = []
-        inline_cmds = []
+        cmd_lines = []
         lang = self.strings["lang"]
         current_len = 0
 
@@ -252,22 +288,17 @@ class HSearch(loader.Module):
 
             if cmd.get("inline"):
                 line = f"<code>@{self.inline.bot_username} {cmd_name}</code> {cmd_desc}"
-                if current_len + len(line) < limit:
-                    inline_cmds.append(line)
-                    current_len += len(line)
             else:
                 line = f"<code>{self.get_prefix()}{cmd_name}</code> {cmd_desc}"
-                if current_len + len(line) < limit:
-                    regular_cmds.append(line)
-                    current_len += len(line)
-
-        result = ""
-        if regular_cmds:
-            result += self.strings["cmds"].format(cmds="\n".join(regular_cmds), emoji=self._get_emoji("command"))
-        if inline_cmds:
-            result += self.strings["inline_cmds"].format(cmds="\n".join(inline_cmds), emoji=self._get_emoji("inline"))
             
-        return result
+            if current_len + len(line) < limit:
+                cmd_lines.append(line)
+                current_len += len(line)
+
+        if cmd_lines:
+            return self.strings["cmds"].format(cmds="\n".join(cmd_lines), emoji=self._get_emoji("command"))
+            
+        return ""
 
     def _mk_btns(self, install: str, stats: Dict, idx: int, mods: Optional[List] = None, query: str = "") -> List[List[Dict]]:
         like_emoji = self._get_emoji("like")
@@ -275,12 +306,27 @@ class HSearch(loader.Module):
         prev_emoji = self._get_emoji("prev")
         next_emoji = self._get_emoji("next")
         
-        buttons = [
-            [
-                {"text": f"{like_emoji} {stats.get('likes', 0)}", "callback": self._rate_cb, "args": (install, "like", idx, mods, query)},
-                {"text": f"{dislike_emoji} {stats.get('dislikes', 0)}", "callback": self._rate_cb, "args": (install, "dislike", idx, mods, query)}
-            ]
-        ]
+        buttons = []
+        
+        decoded_install = unquote(install.replace('%20', '___SPACE___')).replace('___SPACE___', '%20')
+        install_url = decoded_install[4:] if decoded_install.startswith('dlm ') else decoded_install
+        
+        if query:
+            buttons.append([
+                {"text": self.strings["query_label"], "copy": query}
+            ])
+
+            buttons.append([
+                {"text": self.strings["install_btn"], "copy": f"{self.get_prefix()}dlm {install_url}"}
+            ])
+        
+        buttons.append([
+            {"text": f"{like_emoji} {stats.get('likes', 0)}", "callback": self._rate_cb, "args": (install, "like", idx, mods, query)},
+            {"text": f"{dislike_emoji} {stats.get('dislikes', 0)}", "callback": self._rate_cb, "args": (install, "dislike", idx, mods, query)}
+        ])
+        
+        if mods and len(mods) > 1:
+            buttons[-1].insert(1, {"text": self.strings["results_count"].format(idx=idx+1, total=len(mods)), "callback": self._show_list_cb, "args": (idx, mods, query)})
 
         if mods and len(mods) > 1:
             nav_buttons = []
@@ -292,6 +338,104 @@ class HSearch(loader.Module):
                 buttons.append(nav_buttons)
 
         return buttons
+
+    def _mk_list_btns(self, mods: List, query: str, page: int = 0, current_idx: int = 0) -> List[List[Dict]]:
+        prev_emoji = self._get_emoji("prev")
+        next_emoji = self._get_emoji("next")
+        close_emoji = self._get_emoji("close")
+        
+        buttons = []
+        items_per_page = 8
+        total_pages = (len(mods) + items_per_page - 1) // items_per_page
+        
+        start_idx = page * items_per_page
+        end_idx = min(start_idx + items_per_page, len(mods))
+        
+        for i in range(start_idx, end_idx):
+            mod = mods[i]
+            name = mod.get("name", "Unknown")
+            author = mod.get("author", "???")
+            button_text = f"{i + 1}. {name} by {author}"
+            buttons.append([
+                {"text": button_text, "callback": self._select_from_list_cb, "args": (i, mods, query)}
+            ])
+        
+        nav_buttons = []
+        if page > 0:
+            nav_buttons.append({"text": prev_emoji, "callback": self._list_page_cb, "args": (page - 1, mods, query, current_idx)})
+        if page < total_pages - 1:
+            nav_buttons.append({"text": next_emoji, "callback": self._list_page_cb, "args": (page + 1, mods, query, current_idx)})
+        
+        if nav_buttons:
+            buttons.append(nav_buttons)
+        
+        buttons.append([
+            {"text": close_emoji, "callback": self._close_list_cb, "args": (current_idx, mods, query)}
+        ])
+        
+        return buttons
+
+    async def _show_list_cb(self, call, idx: int, mods: List, query: str):
+        try:
+            await call.edit(
+                text=self.strings["modules_list"].format(emoji=self._get_emoji("modules_list")),
+                reply_markup=self._mk_list_btns(mods, query, 0, idx)
+            )
+        except:
+            pass
+
+    async def _list_page_cb(self, call, page: int, mods: List, query: str, current_idx: int):
+        try:
+            await call.edit(
+                text=self.strings["modules_list"].format(emoji=self._get_emoji("modules_list")),
+                reply_markup=self._mk_list_btns(mods, query, page, current_idx)
+            )
+        except:
+            pass
+
+    async def _select_from_list_cb(self, call, idx: int, mods: List, query: str):
+        try:
+            await call.answer()
+        except:
+            pass
+        
+        if not (0 <= idx < len(mods)):
+            return
+        
+        mod = mods[idx]
+        install = mod.get('install', '')
+        
+        stats = mod if all(k in mod for k in ['likes', 'dislikes']) else {"likes": 0, "dislikes": 0}
+        
+        try:
+            await call.edit(
+                text=self._fmt_mod(mod, query, idx + 1, len(mods)),
+                reply_markup=self._mk_btns(install, stats, idx, mods, query)
+            )
+        except:
+            pass
+
+    async def _close_list_cb(self, call, idx: int, mods: List, query: str):
+        try:
+            await call.answer()
+        except:
+            pass
+        
+        if not (0 <= idx < len(mods)):
+            return
+        
+        mod = mods[idx]
+        install = mod.get('install', '')
+        
+        stats = mod if all(k in mod for k in ['likes', 'dislikes']) else {"likes": 0, "dislikes": 0}
+        
+        try:
+            await call.edit(
+                text=self._fmt_mod(mod, query, idx + 1, len(mods)),
+                reply_markup=self._mk_btns(install, stats, idx, mods, query)
+            )
+        except:
+            pass
 
     async def _rate_cb(self, call, install: str, action: str, idx: int, mods: Optional[List], query: str = ""):
         result = await self._api_post(f"rate/{self.uid}/{install}/{action}")
@@ -322,7 +466,7 @@ class HSearch(loader.Module):
                 elif result_status == "changed":
                     await call.answer(self.strings["rating_changed"].format(emoji=self._get_emoji("like")), show_alert=True)
                 elif result_status == "removed":
-                    await call.answer(self.strings["rating_removed"].format(emoji="🗑️"), show_alert=True)
+                    await call.answer(self.strings["rating_removed"].format(emoji=self._get_emoji("removed")), show_alert=True)
             except:
                 pass
 
@@ -349,9 +493,13 @@ class HSearch(loader.Module):
             pass
 
     @loader.inline_handler(
+        ru_doc="(запрос) - поиск модулей.",
+        ua_doc="(запит) - пошук модулів.",
+        kz_doc="(сұрау) - модульдерді іздеу.",
+        uz_doc="(so'rov) - modullarni qidirish.",
+        fr_doc="(requête) - rechercher des modules.",
         de_doc="(anfrage) - module suchen.",
-        ru_doc="(запрос) - искать модули.",
-        ua_doc="(запит) - шукати модулі.",
+        jp_doc="(クエリ) - モジュールを検索します。"
     )
     async def hs(self, query):
         '''(query) - search modules.'''        
@@ -359,7 +507,7 @@ class HSearch(loader.Module):
             return {
                 "title": self.strings["inline_no_query"],
                 "description": self.strings["inline_desc"],
-                "message": self.strings["no_query"].format(emoji=self._get_emoji("error")),
+                "message": self.strings["inline_no_query"].format(emoji=self._get_emoji("error")),
                 "thumb": "https://raw.githubusercontent.com/Fixyres/FHeta/refs/heads/main/assets/magnifying_glass.png",
             }
 
@@ -377,7 +525,7 @@ class HSearch(loader.Module):
             return {
                 "title": self.strings["inline_no_results"],
                 "description": self.strings["inline_desc"],
-                "message": self.strings["no_results"].format(emoji=self._get_emoji("error")),
+                "message": self.strings["inline_no_results"].format(emoji=self._get_emoji("error")),
                 "thumb": "https://raw.githubusercontent.com/Fixyres/FHeta/refs/heads/main/assets/try_other_query.png",
             }
 
@@ -398,33 +546,37 @@ class HSearch(loader.Module):
                 "description": utils.escape_html(str(desc)),
                 "thumb": await self._fetch_thumb(mod.get("pic")),
                 "message": self._fmt_mod(mod, query.args, inline=True),
-                "reply_markup": self._mk_btns(mod.get("install", ""), stats, 0, None),
+                "reply_markup": self._mk_btns(mod.get("install", ""), stats, 0, None, query.args),
             })
 
         return results
 
     @loader.command(
+        ru_doc="(запрос) - поиск модулей.",
+        ua_doc="(запит) - пошук модулів.",
+        kz_doc="(сұрау) - модульдерді іздеу.",
+        uz_doc="(so'rov) - modullarni qidirish.",
+        fr_doc="(requête) - rechercher des modules.",
         de_doc="(anfrage) - module suchen.",
-        ru_doc="(запрос) - искать модули.",
-        ua_doc="(запит) - шукати модулі.",
+        jp_doc="(クエリ) - モジュールを検索します。"
     )
     async def hscmd(self, message):
         '''(query) - search modules.'''        
         query = utils.get_args_raw(message)
         
         if not query:
-            await utils.answer(message, self.strings["no_query"].format(emoji=self._get_emoji("error")))
+            await utils.answer(message, self.strings["no_query"].format(emoji=self._get_emoji("error"), prefix=self.get_prefix()))
             return
 
         if len(query) > 168:
             await utils.answer(message, self.strings["query_too_big"].format(emoji=self._get_emoji("warn")))
             return
 
-        status_msg = await utils.answer(message, self.strings["searching"].format(emoji=self._get_emoji("search")))
+        status_msg = await utils.answer(message, self.strings["searching"].format(emoji=self._get_emoji("search"), query=utils.escape_html(query)))
         mods = await self._api_get("search", query=query, inline="false", token=self.token, user_id=self.uid, ood="true")
 
         if not mods or not isinstance(mods, list):
-            await utils.answer(message, self.strings["no_results"].format(emoji=self._get_emoji("error")))
+            await utils.answer(message, self.strings["no_results"].format(emoji=self._get_emoji("error"), query=utils.escape_html(query)))
             return
 
         first_mod = mods[0]
@@ -448,23 +600,34 @@ class HSearch(loader.Module):
         
         if not link.startswith("https://api.fixyres.com/module/"):
             return
-
-        loader_module = self.lookup("loader")
         
+        if self.lookup("FHeta"):
+            return
+
         try:
-            for _ in range(5):
-                await loader_module.download_and_install(link, None)
+            parsed_url = urlparse(link)
+            qp = parse_qs(parsed_url.query)
+            
+            ohd = qp.get('ohd', ['False'])[0]
+            
+            if ohd.lower() == 'false':
+                cross_msg = await message.respond("❌")
+                await asyncio.sleep(1)
+                await cross_msg.delete()
+                await message.delete()
+                return
+            
+            if ohd.lower() == 'true':
+                await self.lookup("loader").download_and_install(link, None)
                 
-                if getattr(loader_module, "fully_loaded", False):
-                    loader_module.update_modules_in_db()
+                await asyncio.sleep(1)
+
+                if self.lookup("loader").fully_loaded:
+                    self.lookup("loader").update_modules_in_db()
                 
-                is_loaded = any(mod.__origin__ == link for mod in self.allmodules.modules)
-                
-                if is_loaded:
-                    rose_msg = await message.respond("🌹")
-                    await asyncio.sleep(1)
-                    await rose_msg.delete()
-                    await message.delete()
-                    break
+                rose_msg = await message.respond("🌹")
+                await asyncio.sleep(1)
+                await rose_msg.delete()
+                await message.delete()
         except:
             pass

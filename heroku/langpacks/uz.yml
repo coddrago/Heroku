@@ -474,6 +474,11 @@ api_protection:
 
 HSearch:
   name: "HSearch"
+  _cls_doc: "Modullarni qidirish moduli! HSearch barcha yangilanishlarini @FHeta_Updates kanalida kuzatib bor @FHeta_Updates"
+  module_info_version: "{emoji} <code>{name}</code> <b>muallif</b> <code>{author}</code> (<code>v{version}</code>)"
+  query_label: "So'rov"
+  install_btn: "O'rnatish buyrug'i"
+  modules_list: "{emoji} <b>Barcha topilgan modullar:</b>"
   searching: "{emoji} <b>Qidirilmoqda...</b>"
   no_query: "{emoji} <b>Qidiruv so‘rovini kiriting.</b>"
   no_results: "{emoji} <b>Modullar topilmadi.</b>"

@@ -474,6 +474,11 @@ api_protection:
 
 HSearch:
   name: "HSearch"
+  _cls_doc: "Модульдерді іздеу модулі! HSearch барлық жаңалықтарын @FHeta_Updates арнасында қадағалаңыз!"
+  module_info_version: "{emoji} <code>{name}</code> <b>авторы</b> <code>{author}</code> (<code>v{version}</code>)"
+  query_label: "Сұрау"
+  install_btn: "Орнату командасы"
+  modules_list: "{emoji} <b>Барлық табылған модульдер:</b>"
   searching: "{emoji} <b>Іздеу...</b>"
   no_query: "{emoji} <b>Іздеу сұранысын енгізіңіз.</b>"
   no_results: "{emoji} <b>Модульдер табылмады.</b>"

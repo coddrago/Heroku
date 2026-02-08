@@ -474,6 +474,11 @@ api_protection:
 
 HSearch:
   name: "HSearch"
+  _cls_doc: "モジュール検索用モジュール！@FHeta_UpdatesでHSearchのすべてのニュースをフォローしてください！"
+  module_info_version: "{emoji} <code>{name}</code> <b>作成者</b> <code>{author}</code> (<code>v{version}</code>)"
+  query_label: "クエリ"
+  install_btn: "インストールコマンド"
+  modules_list: "{emoji} <b>見つかったすべてのモジュール:</b>"
   searching: "{emoji} <b>検索中...</b>"
   no_query: "{emoji} <b>検索クエリを入力してください。</b>"
   no_results: "{emoji} <b>モジュールが見つかりません。</b>"

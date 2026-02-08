@@ -440,6 +440,7 @@ api_protection:
 
 HSearch:
   name: "HSearch"
+  _cls_doc: "Modul zur Suche nach Modulen! Verfolgen Sie alle HSearch-Neuigkeiten auf @FHeta_Updates!"
   searching: "{emoji} <b>Suche läuft...</b>"
   no_query: "{emoji} <b>Gib eine Suchanfrage ein.</b>"
   no_results: "{emoji} <b>Keine Module gefunden.</b>"
@@ -458,6 +459,10 @@ HSearch:
   inline_desc: "Name, Befehl, Beschreibung, Autor."
   inline_no_results: "Versuche eine andere Anfrage."
   inline_query_too_big: "Deine Anfrage ist zu lang, bitte kürze sie auf 168 Zeichen."
+  module_info_version: "{emoji} <code>{name}</code> <b>von</b> <code>{author}</code> (<code>v{version}</code>)"
+  query_label: "Anfrage"
+  install_btn: "Installationsbefehl"
+  modules_list: "{emoji} <b>Alle gefundenen Module:</b>"
   _cfg_doc_tracking: "Datenverfolgung (User-ID, Sprache) für die Synchronisation mit dem HSearch-Bot aktivieren?"
   _cfg_doc_theme: "Emoji-Thema."
 
