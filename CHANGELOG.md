@@ -83,6 +83,9 @@
 - add developer in help
 - add folder for config
 - remove pyproject.toml
+- add more session protection
+- add custom presets
+- add message about no query answer
 
 ## 🪐 Heroku 1.7.2
 - added autoupdate
