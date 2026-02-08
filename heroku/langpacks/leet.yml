@@ -451,7 +451,6 @@ updater:
   ignore: "🚫 1gn0r3"
   changelog: '<tg-emoji emoji-id=5434144690511290129>📰</tg-emoji> <b>Ch4ng3l0g 0f 7h3 l457 m4j0r upd473:</b><blockquote expandable>{}</blockquote>'
 
-
 api_protection:
   name: "4P1L1m173r"
   warning: "⚠️ <b>W4RN1NG!</b>\n\nUr 4cc 3xc33d3d 7h3 l1m17 0f r3qu3575, sp3c1f13d 1n c0nf1g. 1n 0rd3r 2 pr3v3n7 T3l3gr4m 4P1 Fl00d, u53rb07 h45 b33n <b>fully fr0z3n</b> 4 {} s3c5. Fur7h3r 1nf0 15 pr0v1d3d 1n 4774ch3d f1l3. \n\n17 15 r3c0mm3nd3d 2 g37 h3lp 1n <code>{prefix}support</code> gr0up!\n\n1f u 7h1nk, 7h47 17 15 4n 1n73nd3d b3h4v10r, 7h3n w417 un71l u53rb07 g375 unl0ck3d & n3x7 71m3, wh3n u w1ll b3 g01ng 2 p3rf0rm such 4n 0p, u53 <code>{prefix}suspend_api_protect</code> &lt;time in seconds&gt;"
@@ -496,6 +495,7 @@ HSearch:
   modules_list: "{emoji} <b>4ll f0und m0dul35:</b>"
   _cfg_doc_tracking: "3n4bl3 7r4ck1ng 0f ur d474 (u53r 1D, l4ngu4g3) f0r 5ynchr0n1z4710n w17h 7h3 H53arch b07?"
   _cfg_doc_theme: "7h3m3 f0r 3m0j15."
+  join_channel: "{emoji} 7h15 15 7h3 ch4nn3l w17h 4ll upd4735 1n H534rch!"
 
 help:
   name: "H3lp"
