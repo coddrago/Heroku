@@ -485,7 +485,7 @@ HSearch:
   query_too_big: "{emoji} <b>クエリが長すぎます。168文字以内に短縮してください。</b>"
   result_query: "{emoji} <b>クエリ「<code>{query}</code>」の結果 {idx}/{total}:</b>\n"
   result_single: "{emoji} <b>クエリ「<code>{query}</code>」の結果:</b>\n"
-  module_info: "<code>{name}</code> <b>作:</b> <code>{author}</code> <b>(</b><code>v{version}</code><b>)</b>\n{emoji} <b>インストールコマンド:</b> <code>{install}</code>"
+  module_info: "{emoji} <code>{name}</code> <b>by</b> <code>{author}</code>"
   desc: "\n{emoji} <b>説明:</b> {desc}"
   cmds: "\n{emoji} <b>コマンド:</b>\n{cmds}"
   inline_cmds: "\n{emoji} <b>インラインコマンド:</b>\n{cmds}"

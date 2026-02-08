@@ -485,7 +485,7 @@ HSearch:
   query_too_big: "{emoji} <b>Sizning so‘rovingiz juda uzun, iltimos, uni 168 belgiga qadar qisqartiring.</b>"
   result_query: "{emoji} <b>So‘rov bo‘yicha natija {idx}/{total}:</b> <code>{query}</code>\n"
   result_single: "{emoji} <b>So‘rov bo‘yicha natija:</b> <code>{query}</code>\n"
-  module_info: "<code>{name}</code> <b>muallif:</b> <code>{author}</code> <b>(</b><code>v{version}</code><b>)</b>\n{emoji} <b>O‘rnatish uchun buyruq:</b> <code>{install}</code>"
+  module_info: "{emoji} <code>{name}</code> <b>by</b> <code>{author}</code>"
   desc: "\n{emoji} <b>Tavsif:</b> {desc}"
   cmds: "\n{emoji} <b>Buyruqlar:</b>\n{cmds}"
   inline_cmds: "\n{emoji} <b>Inline buyruqlar:</b>\n{cmds}"

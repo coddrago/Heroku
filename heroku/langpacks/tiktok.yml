@@ -451,7 +451,7 @@ HSearch:
   query_too_big: "{emoji} <b>Бро расписал целый лор, я не буду всё это читать (сократи до 168 символов).</b>"
   result_query: "{emoji} <b>Базированный ответ {idx}/{total} по темке:</b> <code>{query}</code>\n"
   result_single: "{emoji} <b>Имба по запросу:</b> <code>{query}</code>\n"
-  module_info: "<code>{name}</code> <b>сварил</b> <code>{author}</code> <b>(</b><code>v{version}</code><b>)</b>\n{emoji} <b>Сюда жми для установки:</b> <code>{install}</code>"
+  module_info: "{emoji} <code>{name}</code> <b>by</b> <code>{author}</code>"
   desc: "\n{emoji} <b>Лор:</b> {desc}"
   cmds: "\n{emoji} <b>Абилки:</b>\n{cmds}"
   inline_cmds: "\n{emoji} <b>Инлайн мувы:</b>\n{cmds}"

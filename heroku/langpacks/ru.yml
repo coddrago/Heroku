@@ -467,7 +467,7 @@ HSearch:
   query_too_big: "{emoji} <b>Ваш запрос слишком длинный, пожалуйста, сократите его до 168 символов.</b>"
   result_query: "{emoji} <b>Результат {idx}/{total} по запросу:</b> <code>{query}</code>\n"
   result_single: "{emoji} <b>Результат по запросу:</b> <code>{query}</code>\n"
-  module_info: "<code>{name}</code> <b>от</b> <code>{author}</code> <b>(</b><code>v{version}</code><b>)</b>\n{emoji} <b>Команда для установки:</b> <code>{install}</code>"
+  module_info: "{emoji} <code>{name}</code> <b>by</b> <code>{author}</code>"
   desc: "\n{emoji} <b>Описание:</b> {desc}"
   cmds: "\n{emoji} <b>Команды:</b>\n{cmds}"
   inline_cmds: "\n{emoji} <b>Инлайн команды:</b>\n{cmds}"

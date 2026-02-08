@@ -485,7 +485,7 @@ HSearch:
   query_too_big: "{emoji} <b>I-it's too big!! >///< (max 168 chaws).</b>"
   result_query: "{emoji} <b>Heww is {idx}/{total} fow:</b> <code>{query}</code>\n"
   result_single: "{emoji} <b>Fow u:</b> <code>{query}</code>\n"
-  module_info: "<code>{name}</code> <b>by</b> <code>{author}</code> <b>(</b><code>v{version}</code><b>)</b>\n{emoji} <b>Magic speww:</b> <code>{install}</code>"
+  module_info: "{emoji} <code>{name}</code> <b>bwy</b> <code>{author}</code>"
   desc: "\n{emoji} <b>Descwiption:</b> {desc}"
   cmds: "\n{emoji} <b>Commandz:</b>\n{cmds}"
   inline_cmds: "\n{emoji} <b>Inwine stuff:</b>\n{cmds}"

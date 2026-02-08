@@ -485,7 +485,7 @@ HSearch:
   query_too_big: "{emoji} <b>Сұранысыңыз тым ұзақ, оны 168 таңбаға дейін қысқартыңыз.</b>"
   result_query: "{emoji} <b>Сұраныс бойынша нәтиже {idx}/{total}:</b> <code>{query}</code>\n"
   result_single: "{emoji} <b>Сұраныс бойынша нәтиже:</b> <code>{query}</code>\n"
-  module_info: "<code>{name}</code> <b>авторы:</b> <code>{author}</code> <b>(</b><code>v{version}</code><b>)</b>\n{emoji} <b>Орнату пәрмені:</b> <code>{install}</code>"
+  module_info: "{emoji} <code>{name}</code> <b>by</b> <code>{author}</code>"
   desc: "\n{emoji} <b>Сипаттама:</b> {desc}"
   cmds: "\n{emoji} <b>Пәрмендер:</b>\n{cmds}"
   inline_cmds: "\n{emoji} <b>Инлайн пәрмендер:</b>\n{cmds}"

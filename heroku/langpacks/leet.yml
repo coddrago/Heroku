@@ -485,7 +485,7 @@ HSearch:
   query_too_big: "{emoji} <b>B0ffer 0v3rfl0w! R3duc3 2 168 ch4r5.</b>"
   result_query: "{emoji} <b>R35ul7 {idx}/{total} 4:</b> <code>{query}</code>\n"
   result_single: "{emoji} <b>R35ul7 4:</b> <code>{query}</code>\n"
-  module_info: "<code>{name}</code> <b>by</b> <code>{author}</code> <b>(</b><code>v{version}</code><b>)</b>\n{emoji} <b>Cmd 2 1n574ll:</b> <code>{install}</code>"
+  module_info: "{emoji} <code>{name}</code> <b>by</b> <code>{author}</code>"
   desc: "\n{emoji} <b>1nf0:</b> {desc}"
   cmds: "\n{emoji} <b>Cmd5:</b>\n{cmds}"
   inline_cmds: "\n{emoji} <b>1nl1n3 Cmd5:</b>\n{cmds}"
