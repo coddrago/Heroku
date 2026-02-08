@@ -133,9 +133,15 @@ class HSearch(loader.Module):
     async def client_ready(self, client, db):
         try:
             await client(UnblockRequest("@FHeta_robot"))
+            await utils.dnd(client, "@FHeta_robot", archive=True)
         except:
             pass
-            
+
+        await self.request_join(
+            "FHeta_Updates",
+            self.strings["join_channel"].format(emoji=self._get_emoji("channel"))
+        )
+        
         self.uid = (await client.get_me()).id
         self.token = db.get("HSearch", "token")
 
@@ -181,13 +187,6 @@ class HSearch(loader.Module):
                     pass
                     
                 await asyncio.sleep(60)
-            
-    async def on_dlmod(self, client, db):
-        try:
-            await client(UnblockRequest("@FHeta_robot"))
-            await utils.dnd(client, "@FHeta_robot", archive=True)
-        except:
-            pass
 
     async def _api_get(self, endpoint: str, **params):
         try:
