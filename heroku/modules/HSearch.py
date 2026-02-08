@@ -601,33 +601,17 @@ class HSearch(loader.Module):
         if not link.startswith("https://api.fixyres.com/module/"):
             return
         
-        if self.lookup("FHeta"):
-            return
-
         try:
-            parsed_url = urlparse(link)
-            qp = parse_qs(parsed_url.query)
+            await self.lookup("loader").download_and_install(link, None)
             
-            ohd = qp.get('ohd', ['False'])[0]
-            
-            if ohd.lower() == 'false':
-                cross_msg = await message.respond("❌")
-                await asyncio.sleep(1)
-                await cross_msg.delete()
-                await message.delete()
-                return
-            
-            if ohd.lower() == 'true':
-                await self.lookup("loader").download_and_install(link, None)
-                
-                await asyncio.sleep(1)
+            await asyncio.sleep(1)
 
-                if self.lookup("loader").fully_loaded:
-                    self.lookup("loader").update_modules_in_db()
-                
-                rose_msg = await message.respond("🌹")
-                await asyncio.sleep(1)
-                await rose_msg.delete()
-                await message.delete()
+            if self.lookup("loader").fully_loaded:
+                self.lookup("loader").update_modules_in_db()
+            
+            rose_msg = await message.respond("🌹")
+            await asyncio.sleep(1)
+            await rose_msg.delete()
+            await message.delete()
         except:
             pass
