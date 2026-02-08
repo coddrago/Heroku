@@ -75,6 +75,22 @@ FormattingEntity = typing.Union[
 parser = herokutl.utils.sanitize_parse_mode("html")
 logger = logging.getLogger(__name__)
 
+TAG_RE = re.compile(r"</?([a-zA-Z][a-zA-Z0-9\-]*)(?:\s[^<>]*)?>")
+
+TELEGRAM_HTML_TAGS = {
+    "strong", "b",
+    "em", "i",
+    "tg-spoiler",
+    "u",
+    "del", "s",
+    "blockquote",
+    "code",
+    "pre",
+    "a",
+    "tg-emoji",
+    "emoji",
+}
+
 def get_lang_flag(countrycode: str) -> str:
     """
     Gets an emoji of specified countrycode
@@ -547,6 +563,24 @@ def escape_html(text: str, /) -> str:  # sourcery skip
     :return: Escaped text
     """
     return str(text).replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+
+
+def escape_non_html(text: str) -> str:
+    """
+    Escape all characters that can be parsed as HTML tags, but are not supported by Telegram
+    :param text: Text to escape
+    :return: Escaped text
+    """
+    out = []
+    last = 0
+    for m in TAG_RE.finditer(text):
+        out.append(escape_html(text[last:m.start()]))
+        out.append(m.group(0) if m.group(1).lower() in TELEGRAM_HTML_TAGS else escape_html(m.group(0)))
+        last = m.end()
+
+    out.append(escape_html(text[last:]))
+
+    return "".join(out)
 
 
 def escape_quotes(text: str, /) -> str:
