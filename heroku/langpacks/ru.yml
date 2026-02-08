@@ -478,6 +478,7 @@ HSearch:
   modules_list: "{emoji} <b>Все найденные модули:</b>"
   _cfg_doc_tracking: "Включить отслеживание ваших данных (ID пользователя, язык) для синхронизации с ботом HSearch?"
   _cfg_doc_theme: "Тема для эмодзи."
+  join_channel: "{emoji} Это канал со всеми обновлениями в HSearch!"
   
 help:
   undoc: "<tg-emoji emoji-id=5469741319330996757>💫</tg-emoji> Нет описания"
