@@ -681,7 +681,7 @@ class HerokuConfigMod(loader.Module):
         args = [
             utils.escape_html(config_opt),
             utils.escape_html(mod),
-            module.config.getdoc(config_opt),
+            utils.escape_non_html(module.config.getdoc(config_opt)),
             self.prep_value(module.config.getdef(config_opt)),
             (
                 self.prep_value(module.config[config_opt])
