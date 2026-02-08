@@ -451,7 +451,6 @@ updater:
   ignore: "🚫 Ignorer"
   changelog: '<tg-emoji emoji-id=5434144690511290129>📰</tg-emoji> <b>Journal des modifications de la dernière mise à jour majeure :</b><blockquote expandable>{}</blockquote>'
 
-
 api_protection:
   name: "APILimiter"
   warning: "⚠️ <b>ATTENTION !</b>\n\nVotre compte a dépassé la limite de requêtes spécifiée dans la configuration. Afin d'éviter le Flood API Telegram, le userbot a été <b>entièrement gelé</b> pour {} secondes. Plus d'infos sont fournies dans le fichier joint. \n\nIl est recommandé d'obtenir de l'aide dans le groupe <code>{prefix}support</code> !\n\nSi vous pensez que c'est un comportement prévu, attendez que le userbot soit débloqué et la prochaine fois que vous comptez effectuer une telle opération, utilisez <code>{prefix}suspend_api_protect</code> &lt;temps en secondes&gt;"
@@ -496,6 +495,7 @@ HSearch:
   modules_list: "{emoji} <b>Tous les modules trouvés:</b>"
   _cfg_doc_tracking: "Activer le suivi de vos données (ID utilisateur, langue) pour la synchronisation avec le bot HSearch?"
   _cfg_doc_theme: "Thème pour les emojis."
+  join_channel: "{emoji} Ceci est le canal avec toutes les mises à jour dans HSearch!"
 
 help:
   name: "Help"
