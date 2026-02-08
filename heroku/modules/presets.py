@@ -13,8 +13,9 @@
 import asyncio
 import functools
 import logging
-import orjson
 from math import ceil
+
+import orjson
 
 from .. import loader, utils
 from ..inline.types import BotInlineMessage, InlineCall
@@ -317,6 +318,7 @@ class Presets(loader.Module):
             text=self.strings('welcome').replace('/presets', self.get_prefix() + 'presets'),
             reply_markup=self._markup,
         )
+        
     @loader.command(alias="lp")
     async def loadpreset(self, message: Message):
         """Custom preset loader. Reply to a file or send a file with the command."""

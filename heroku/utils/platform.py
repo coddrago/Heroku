@@ -20,7 +20,6 @@ IS_LAVHOST = "LAVHOST" in os.environ
 IS_HIKKAHOST = "HIKKAHOST" in os.environ
 IS_MACOS = "com.apple" in os.environ.get("PATH", "")
 IS_USERLAND = "userland" in os.environ.get("USER", "")
-IS_PTERODACTYL = "PTERODACTYL" in os.environ
 IS_JAMHOST = "JAMHOST" in os.environ
 IS_WSL = False
 IS_WINDOWS = False
@@ -57,8 +56,6 @@ def get_named_platform() -> str:
             return "JamHost"
         case _ if IS_USERLAND:
             return "UserLand"
-        case _ if IS_PTERODACTYL:
-            return "Pterodactyl"
         case _ if IS_HIKKAHOST:
             return "HikkaHost"
         case _ if IS_DOCKER:
@@ -96,8 +93,6 @@ def get_named_platform_emoji() -> str:
             return "🧃 "
         case _ if IS_USERLAND:
             return "🐧 "
-        case _ if IS_PTERODACTYL:
-            return "🦅 "
         case _ if IS_HIKKAHOST:
             return "🌼 "
         case _ if IS_DOCKER:
@@ -129,8 +124,6 @@ def get_platform_emoji() -> str:
             return BASE.format(5242536621659678947)
         case _ if IS_USERLAND:
             return BASE.format(5458877818031077824)
-        case _ if IS_PTERODACTYL:
-            return BASE.format(5427286516797831670)
         case _ if IS_LAVHOST:
             return BASE.format(5352753797531721191)
         case _ if IS_DOCKER:
