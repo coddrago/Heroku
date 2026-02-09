@@ -417,4 +417,4 @@ class Presets(loader.Module):
             return
         file = io.BytesIO(orjson.dumps({"name": folder_name, "description": self.strings("folder_description").format(folder_name), "modules": modules}))
         file.name = f"{folder_name}.json"
-        await message.reply(file=file, caption=self.strings("folder").format(folder_name))
+        await message.reply(file=file, caption=self.strings("folder").format(folder_name, prefix=self.get_prefix()))
