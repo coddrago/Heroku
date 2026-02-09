@@ -28,6 +28,8 @@ NUM_ROWS = 2
 
 ROW_SIZE = 4
 
+FOLDERS = {}
+
 PRESETS = {
     "fun": [
         "https://github.com/amm1edev/ame_repo/raw/refs/heads/main/aniquotes.py",
@@ -308,6 +310,9 @@ class Presets(loader.Module):
             return
 
         await self._menu()
+    
+    async def get_folders(self):
+        return FOLDERS
 
     @loader.command(ru_doc='| Пакеты модулей для загрузки', ua_doc='| Пакети модулів для завантаження', de_doc='| Pakete mit Modulen zum Laden')
     async def presets(self, message: Message):
@@ -363,3 +368,25 @@ class Presets(loader.Module):
                 {"text": self.lookup("settings").strings["cancel"], "callback": lambda call: call.delete()},
             ]
         )
+
+    @loader.command(alias="af")
+    async def addtofolder(self, message: Message):
+        """Add module to custom folder to see its config faster and send via preset."""
+        args = utils.get_args(message)
+        if len(args) < 2:
+            await message.edit(strings("add_to_folder_usage"))
+            return
+        command_info = args.split()
+        folder_name = command_info[0]
+        module_name = command_info[1]
+        if folder_name not in FOLDERS:
+            FOLDERS[folder_name] = []
+        if module_name in FOLDERS[folder_name]:
+            await message.edit(self.strings("already_in_folder").format(module_name, folder_name))
+            return
+        for mod in self.allmodules.modules:
+            if mod.__class__.__name__.lower() == module_name.lower():
+                FOLDERS[folder_name].append(module_name)
+                await message.edit(self.strings("added_to_folder").format(module_name, folder_name))
+                return
+        await message.edit(self.strings("module_not_found").format(module_name))
