@@ -393,9 +393,8 @@ class Presets(loader.Module):
                 return
         await message.edit(self.strings("module_not_found").format(module_name))
     @loader.command(alias="fl")
-    """send folder via file"""
     async def folderload(self, message: Message):
-        """Send folder via file to load all modules from it."""
+        """send folder via file"""
         args = utils.get_args(message)
         if self.db.get("presets", "folders") is None:
             self.db.set("presets", "folders", {})
