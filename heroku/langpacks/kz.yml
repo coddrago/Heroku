@@ -265,7 +265,7 @@ presets:
   installing_module: "<tg-emoji emoji-id=5451732530048802485>⏳</tg-emoji> <b>Жинақ орнатылуда</b> <code>{}</code> <b>({}/{} модуль)...</b>\n\n<tg-emoji emoji-id=5188377234380954537>🪐</tg-emoji> <i>Модуль орнатылуда {}...</i>"
   installed: "<tg-emoji emoji-id=5436040291507247633>🎉</tg-emoji> <b>Жинақ</b> <code>{}</code> <b>орнатылды!</b>"
   already_installed: "✅ [Орнатылған]"
-  add_to_folder_usage: "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>Модульді қосу үшін папка көрсетіңіз. </b> <code>{prefix}addtopreset <папка> <модуль></code>"
+  add_to_folder_usage: "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>Модульді қосу үшін папка көрсетіңіз. </b> <code>{prefix}addtofolder <папка> <модуль></code>"
   already_in_folder: "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>Модуль аллақачон папкада бор</b> <code>{}</code>"
   added_to_folder: "<tg-emoji emoji-id=5436040291507247633>🎉</tg-emoji> <b>Модуль {} папкаға қосылды</b> <code>{}</code>"
   module_not_found: "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>Модуль {} табылмады</b>"

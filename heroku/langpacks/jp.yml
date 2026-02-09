@@ -265,7 +265,7 @@ presets:
   installing_module: "<tg-emoji emoji-id=5451732530048802485>⏳</tg-emoji> <b>プリセット</b> <code>{}</code> <b>({}/{}) をインストールしています...</b>\n\n<tg-emoji emoji-id=5188377234380954537>🪐</tg-emoji> <i>モジュール {} をインストール中...</i>"
   installed: "<tg-emoji emoji-id=5436040291507247633>🎉</tg-emoji> <b>プリセット</b> <code>{}</code> <b>がインストールされました！</b>"
   already_installed: "✅ [インストール済み]"
-  add_to_folder_usage: "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>モジュールを追加するフォルダを指定してください。 </b> <code>{prefix}addtopreset <フォルダ> <モジュール></code>"
+  add_to_folder_usage: "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>モジュールを追加するフォルダを指定してください。 </b> <code>{prefix}addtofolder <フォルダ> <モジュール></code>"
   already_in_folder: "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>モジュールは既にフォルダ内にあります</b> <code>{}</code>"
   added_to_folder: "<tg-emoji emoji-id=5436040291507247633>🎉</tg-emoji> <b>モジュール {}がフォルダに追加されました</b> <code>{}</code>"
   module_not_found: "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>モジュール {}が見つかりません</b>"

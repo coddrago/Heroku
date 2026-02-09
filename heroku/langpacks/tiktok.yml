@@ -250,7 +250,7 @@ presets:
   installing_module: "<tg-emoji emoji-id=5451732530048802485>⏳</tg-emoji> <b>Качаю пак</b> <code>{}</code> <b>({}/{})...</b>\n\n<tg-emoji emoji-id=5188377234380954537>🪐</tg-emoji> <i>Ставлю модуль {}...</i>"
   installed: "<tg-emoji emoji-id=5436040291507247633>🎉</tg-emoji> <b>Пак</b> <code>{}</code> <b>накатил!</b>"
   already_installed: "✅ [Уже стоит]"
-  add_to_folder_usage: "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>Укажите папку для добави модуля 📁 </b> <code>{prefix}addtopreset <папка> <модуль></code>"
+  add_to_folder_usage: "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>Укажите папку для добави модуля 📁 </b> <code>{prefix}addtofolder <папка> <модуль></code>"
   already_in_folder: "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>Модульок уже в папочке находится 📂</b> <code>{}</code>"
   added_to_folder: "<tg-emoji emoji-id=5436040291507247633>🎉</tg-emoji> <b>Модульок {} папочке добавлен был 🎊</b> <code>{}</code>"
   module_not_found: "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>Модульок {} не нашла я 😭</b>"

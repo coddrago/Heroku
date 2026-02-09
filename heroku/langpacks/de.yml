@@ -250,7 +250,7 @@ presets:
   installing_module: "<tg-emoji emoji-id=5451732530048802485>⏳</tg-emoji> <b>Installation des Sets</b> <code>{}</code> <b>({}/{} Module)...</b>\n\n<tg-emoji emoji-id=5188377234380954537>🪐</tg-emoji> <i>Installation des Moduls {}...</i>"
   installed: "<tg-emoji emoji-id=5436040291507247633>🎉</tg-emoji> <b>Set</b> <code>{}</code> <b>wurde installiert!</b>"
   already_installed: "✅ [Installiert]"
-  add_to_folder_usage: "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>Geben Sie einen Ordner an, um ein Modul hinzuzufügen. </b> <code>{prefix}addtopreset <ordner> <modul></code>"
+  add_to_folder_usage: "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>Geben Sie einen Ordner an, um ein Modul hinzuzufügen. </b> <code>{prefix}addtofolder <ordner> <modul></code>"
   already_in_folder: "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>Modul befindet sich bereits im Ordner</b> <code>{}</code>"
   added_to_folder: "<tg-emoji emoji-id=5436040291507247633>🎉</tg-emoji> <b>Modul {} zum Ordner hinzugefügt</b> <code>{}</code>"
   module_not_found: "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>Modul {} nicht gefunden</b>"

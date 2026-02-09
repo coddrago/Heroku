@@ -265,7 +265,7 @@ presets:
   installing_module: "<tg-emoji emoji-id=5451732530048802485>⏳</tg-emoji> <b>Instawwing pweset</b> <code>{}</code> <b>({}/{} moduwes)...</b>\n\n<tg-emoji emoji-id=5188377234380954537>🪐</tg-emoji> <i>Instawwing moduwe {}...</i>"
   installed: "<tg-emoji emoji-id=5436040291507247633>🎉</tg-emoji> <b>Pweset</b> <code>{}</code> <b>instawwed! Yay!</b>"
   already_installed: "✅ [Instawwed]"
-  add_to_folder_usage: "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>Spwecify a fowdew to add a mowduwle 💕 </b> <code>{prefix}addtopreset <fowdew> <mowduwle></code>"
+  add_to_folder_usage: "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>Spwecify a fowdew to add a mowduwle 💕 </b> <code>{prefix}addtofolder <fowdew> <mowduwle></code>"
   already_in_folder: "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>Mowduwle iws awweady in the fowdew 😿</b> <code>{}</code>"
   added_to_folder: "<tg-emoji emoji-id=5436040291507247633>🎉</tg-emoji> <b>Mowduwle {} addwed to fowdew 💕</b> <code>{}</code>"
   module_not_found: "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>Mowduwle {} nowt fowund 😭</b>"

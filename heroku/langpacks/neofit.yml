@@ -265,7 +265,7 @@ presets:
   installing_module: "<tg-emoji emoji-id=5451732530048802485>⏳</tg-emoji> <b>Processing</b> <code>{}</code> <b>({}/{})...</b>\n\n<tg-emoji emoji-id=5188377234380954537>🪐</tg-emoji> <i>pip install {}...</i>"
   installed: "<tg-emoji emoji-id=5436040291507247633>🎉</tg-emoji> <b>Bundle</b> <code>{}</code> <b>installed!</b>"
   already_installed: "✅ [Installed]"
-  add_to_folder_usage: "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>Specify a folder to add a module. </b> <code>{prefix}addtopreset <folder> <module></code>"
+  add_to_folder_usage: "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>Specify a folder to add a module. </b> <code>{prefix}addtofolder <folder> <module></code>"
   already_in_folder: "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>Module is already in the folder</b> <code>{}</code>"
   added_to_folder: "<tg-emoji emoji-id=5436040291507247633>🎉</tg-emoji> <b>Module {} added to folder</b> <code>{}</code>"
   module_not_found: "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>Module {} not found</b>"
