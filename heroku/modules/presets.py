@@ -376,7 +376,7 @@ class Presets(loader.Module):
             self.db.set("presets", "folders", {})
         FOLDERS = self.db.get("presets", "folders")
         if len(args) < 2:
-            await message.edit(self.strings("add_to_folder_usage").format(self.get_prefix()))
+            await message.edit(self.strings("add_to_folder_usage").format(prefix=self.get_prefix()))
             return
         folder_name = args[0]
         module_name = args[1]
@@ -400,7 +400,7 @@ class Presets(loader.Module):
             self.db.set("presets", "folders", {})
         FOLDERS = self.db.get("presets", "folders")
         if len(args) < 1:
-            await message.edit(self.strings("folder_load_usage").format(self.get_prefix()))
+            await message.edit(self.strings("folder_load_usage").fformat(prefix=self.get_prefix()))
             return
         folder_name = args[0]
         if folder_name not in FOLDERS:
