@@ -374,11 +374,10 @@ class Presets(loader.Module):
         """Add module to custom folder to see its config faster and send via preset."""
         args = utils.get_args(message)
         if len(args) < 2:
-            await message.edit(strings("add_to_folder_usage"))
+            await message.edit(self.strings("add_to_folder_usage"))
             return
-        command_info = args.split()
-        folder_name = command_info[0]
-        module_name = command_info[1]
+        folder_name = args[0]
+        module_name = args[1]
         if folder_name not in FOLDERS:
             FOLDERS[folder_name] = []
         if module_name in FOLDERS[folder_name]:
