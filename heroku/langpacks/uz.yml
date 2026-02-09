@@ -264,8 +264,16 @@ presets:
   installing: "<tg-emoji emoji-id=5451732530048802485>⏳</tg-emoji> <b>To‘plam o‘rnatilmoqda</b> <code>{}</code><b>...</b>"
   installing_module: "<tg-emoji emoji-id=5451732530048802485>⏳</tg-emoji> <b>To‘plam o‘rnatilmoqda</b> <code>{}</code> <b>({}/{} modullar)...</b>\n\n<tg-emoji emoji-id=5188377234380954537>🪐</tg-emoji> <i>Modul o‘rnatilmoqda {}...</i>"
   installed: "<tg-emoji emoji-id=5436040291507247633>🎉</tg-emoji> <b>To‘plam</b> <code>{}</code> <b>o‘rnatildi!</b>"
-  already_installed: "✅ [O‘rnatilgan]"
-  _cls_doc: "Yangi Heroku foydalanuvchilariga yuklash uchun modul to‘plamlarini taklif qiladi"
+  add_to_folder_usage: "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>Modulni qo'shish uchun papka belgilang. </b> <code>{prefix}addtopreset <papka> <modul></code>"
+  already_in_folder: "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>Modul allaqachon papkada bor</b> <code>{}</code>"
+  added_to_folder: "<tg-emoji emoji-id=5436040291507247633>🎉</tg-emoji> <b>Modul {} papkaga qo'shildi</b> <code>{}</code>"
+  module_not_found: "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>Modul {} topilmadi</b>"
+  folder_load_usage: "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>Modullarni yuklash uchun papka belgilang. </b> <code>{prefix}fl <papka></code>"
+  folder_not_found: "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>Papka {} topilmadi</b>"
+  no_modules_in_folder: "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>Papka {} da modullar yo'q</b>"
+  folder: "<tg-emoji emoji-id=5256113064821926998>📁</tg-emoji> <b>Papka</b> {}\n\n<tg-emoji emoji-id=5134452506935427991>🪐</tg-emoji> <b>O'rnatish uchun bu xabarga {prefix}lp javob bering</b>"
+  _cls_doc: "Yangi Heroku foydalanuvchilariga yuklash uchun modul to'plamlarini taklif qiladi"
+
 
 settings:
   name: "Settings"

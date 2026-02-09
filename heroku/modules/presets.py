@@ -13,6 +13,7 @@
 import asyncio
 import functools
 import logging
+import io
 from math import ceil
 
 import orjson
@@ -27,8 +28,6 @@ logger = logging.getLogger(__name__)
 NUM_ROWS = 2
 
 ROW_SIZE = 4
-
-FOLDERS = {}
 
 PRESETS = {
     "fun": [
@@ -373,19 +372,50 @@ class Presets(loader.Module):
     async def addtofolder(self, message: Message):
         """Add module to custom folder to see its config faster and send via preset."""
         args = utils.get_args(message)
+        if self.db.get("presets", "folders") is None:
+            self.db.set("presets", "folders", {})
+        FOLDERS = self.db.get("presets", "folders")
         if len(args) < 2:
-            await message.edit(self.strings("add_to_folder_usage"))
+            await message.edit(self.strings("add_to_folder_usage").format(self.get_prefix()))
             return
         folder_name = args[0]
         module_name = args[1]
         if folder_name not in FOLDERS:
             FOLDERS[folder_name] = []
         if module_name in FOLDERS[folder_name]:
-            await message.edit(self.strings("already_in_folder").format(module_name, folder_name))
+            await message.edit(self.strings("already_in_folder").format(folder_name))
             return
         for mod in self.allmodules.modules:
             if mod.__class__.__name__.lower() == module_name.lower():
                 FOLDERS[folder_name].append(module_name)
+                self.db.set("presets", "folders", FOLDERS)
                 await message.edit(self.strings("added_to_folder").format(module_name, folder_name))
                 return
         await message.edit(self.strings("module_not_found").format(module_name))
+    @loader.command(alias="fl")
+    """send folder via file"""
+    async def folderload(self, message: Message):
+        """Send folder via file to load all modules from it."""
+        args = utils.get_args(message)
+        if self.db.get("presets", "folders") is None:
+            self.db.set("presets", "folders", {})
+        FOLDERS = self.db.get("presets", "folders")
+        if len(args) < 1:
+            await message.edit(self.strings("folder_load_usage").format(self.get_prefix()))
+            return
+        folder_name = args[0]
+        if folder_name not in FOLDERS:
+            await message.edit(self.strings("folder_not_found").format(folder_name))
+            return
+        modules = []
+        for module_name in FOLDERS[folder_name]:
+            for mod in self.allmodules.modules:
+                if mod.__class__.__name__.lower() == module_name.lower():
+                    modules.append(mod.__class__.__name__)
+                    break
+        if not modules:
+            await message.edit(self.strings("no_modules_in_folder").format(folder_name))
+            return
+        file = io.BytesIO(orjson.dumps({"name": folder_name, "description": self.strings("folder_description").format(folder_name), "modules": modules}))
+        file.name = f"{folder_name}.json"
+        await message.reply(file=file, caption=self.strings("folder").format(folder_name))

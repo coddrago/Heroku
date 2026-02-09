@@ -265,6 +265,14 @@ presets:
   installing_module: "<tg-emoji emoji-id=5451732530048802485>⏳</tg-emoji> <b>1n574ll1ng pr3537</b> <code>{}</code> <b>({}/{} m0d5)...</b>\n\n<tg-emoji emoji-id=5188377234380954537>🪐</tg-emoji> <i>1n574ll1ng m0dul3 {}...</i>"
   installed: "<tg-emoji emoji-id=5436040291507247633>🎉</tg-emoji> <b>Pr3537</b> <code>{}</code> <b>1n574ll3d!</b>"
   already_installed: "✅ [1n574ll3d]"
+  add_to_folder_usage: "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>5p3c1fy 4 f0ld3r t0 4dd 4 m0dul3. </b> <code>{prefix}addtopreset <f0ld3r> <m0dul3></code>"
+  already_in_folder: "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>M0dul3 1z 41r34dy 1n th3 f0ld3r</b> <code>{}</code>"
+  added_to_folder: "<tg-emoji emoji-id=5436040291507247633>🎉</tg-emoji> <b>M0dul3 {} 4dd3d t0 f0ld3r</b> <code>{}</code>"
+  module_not_found: "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>M0dul3 {} n0t f0und</b>"
+  folder_load_usage: "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>5p3c1fy 4 f0ld3r t0 l04d m0dul3z. </b> <code>{prefix}fl <f0ld3r></code>"
+  folder_not_found: "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>F0ld3r {} n0t f0und</b>"
+  no_modules_in_folder: "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>N0 m0dul3z 1n f0ld3r {}</b>"
+  folder: "<tg-emoji emoji-id=5256113064821926998>📁</tg-emoji> <b>F0ld3r</b> {}\n\n<tg-emoji emoji-id=5134452506935427991>🪐</tg-emoji> <b>{prefix}lp 1n r3ply t0 7h1z m3zz4g3 t0 1nzt4ll</b>"
   _cls_doc: "Sugg3575 n3w H3r0ku u53rz 4 p4ck5 0f m0d5 2 l04d"
 
 settings:

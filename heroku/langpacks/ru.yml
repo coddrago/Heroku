@@ -250,6 +250,15 @@ presets:
   installing_module: "<tg-emoji emoji-id=5451732530048802485>⏳</tg-emoji> <b>Установка набора</b> <code>{}</code> <b>({}/{} модулей)...</b>\n\n<tg-emoji emoji-id=5188377234380954537>🪐</tg-emoji> <i>Установка модуля {}...</i>"
   installed: "<tg-emoji emoji-id=5436040291507247633>🎉</tg-emoji> <b>Набор</b> <code>{}</code> <b>установлен!</b>"
   already_installed: "✅ [Установлен]"
+  add_to_folder_usage: "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>Укажи папку для добавления модуля. </b> <code>{prefix}addtopreset <папка> <модуль></code>"
+  already_in_folder: "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>Модуль уже находится в папке</b> <code>{}</code>"
+  added_to_folder: "<tg-emoji emoji-id=5436040291507247633>🎉</tg-emoji> <b>Модуль {} добавлен в папку</b> <code>{}</code>"
+  module_not_found: "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>Модуль {} не найден</b>"
+  folder_load_usage: "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>Укажи папку для загрузки модулей. </b> <code>{prefix}fl <папка></code>"
+  folder_not_found: "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>Папка {} не найдена</b>"
+  no_modules_in_folder: "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>В папке {} нет модулей</b>"
+  folder: "<tg-emoji emoji-id=5256113064821926998>📁</tg-emoji> <b>Папка</b> {}\n\n<tg-emoji emoji-id=5134452506935427991>🪐</tg-emoji> <b>{prefix}lp в ответ на это сообщение для установки</b>"
+  _cls_doc: "Предлагает новым пользователям Heroku готовые сборки модулей для загрузки"
 
 settings:
   choose_installation: "<tg-emoji emoji-id=5363805650327450240>🪐</tg-emoji> <b>Выберите вариант установки Heroku:</b>"
