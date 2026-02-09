@@ -858,8 +858,7 @@ class HerokuConfigMod(loader.Module):
                 if not config_value or not hasattr(config_value, 'folder') or not config_value.folder:
                     direct.append(param)
             else:
-                if config_value and hasattr(config_value, 'folder') and config_value.folder == folder:
-                    direct.append(param)
+                direct.append(param)
         
         btns = [
             {
