@@ -546,7 +546,7 @@ class Module:
             "https://raw.githubusercontent.com/coddrago/assets/refs/heads/main/heroku/join_request.png",
             caption=(
                 self._client.loader.lookup("translations")
-                .strings("requested_join")
+                .strings["requested_join"]
                 .format(
                     self.__class__.__name__,
                     channel.username,

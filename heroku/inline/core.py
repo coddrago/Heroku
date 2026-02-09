@@ -22,10 +22,12 @@ from aiogram import Bot, Dispatcher
 from aiogram.enums import ParseMode
 from aiogram.exceptions import TelegramConflictError, TelegramUnauthorizedError
 from aiogram.client.default import DefaultBotProperties
+from pyrogram.enums import ChatType
 from pyrogram.errors import InputUserDeactivated, YouBlockedUser
+from pyrogram.types import Chat
 from pyrogram.raw.functions.contacts.unblock import Unblock
 from pyrogram.raw.functions.messages import GetDialogFilters, UpdateDialogFilter
-from pyrogram.raw.types import Message, InputPeerUser
+from pyrogram.raw.types import Message
 from pyrogram.types.user_and_chats.folder import Folder
 from ..utils import get_display_name
 
@@ -175,18 +177,18 @@ class InlineManager(
             if getattr(folder, "title", None) == "Heroku":
                 if any(
                     [
-                        isinstance(peer, InputPeerUser)
-                        and peer.user_id == self.bot_id
-                        for peer in folder.include_peer
+                        isinstance(chat.type, ChatType.BOT)
+                        and chat.id == self.bot_id
+                        for chat in folder.included_chats
                     ]
                 ):
                     break
 
                 pinned = [
-                    await self._client.get_input_entity(self.bot_id)
+                    self.bot_id
                 ]
-                include = folder.included_chats
-                exclude = folder.excluded_chats
+                include = [*map(lambda x: x.id, folder.included_chats)]
+                exclude = [*map(lambda x: x.id, folder.excluded_chats)]
                 emoticon = folder.icon
                 color = folder.color
                 self._client.edit_folder(
@@ -199,7 +201,7 @@ class InlineManager(
                 )
  
 
-        await self._client.delete_messages(self.bot_username, m)
+        await self._client.delete_messages(self.bot_username, m.id)
 
         self._dp.inline_query.register(
             self._inline_handler,
