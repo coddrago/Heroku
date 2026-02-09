@@ -916,15 +916,16 @@ class HerokuConfigMod(loader.Module):
             if not hasattr(mod, "config") or not mod.config:
                 continue
             mod_name = mod.strings("name") if callable(mod.strings) else mod.__class__.__name__
+            module_folders = set()
             for param in mod.config:
                 config_value = mod.config._config.get(param)
                 if config_value and hasattr(config_value, 'folder') and config_value.folder:
-                    folder_name = config_value.folder
-                    if folder_name not in folders:
-                        folders[folder_name] = {}
-                    if mod_name not in folders[folder_name]:
-                        folders[folder_name][mod_name] = []
-                    folders[folder_name][mod_name].append(param)
+                    module_folders.add(config_value.folder)
+
+            for folder_name in module_folders:
+                if folder_name not in folders:
+                    folders[folder_name] = {}
+                folders[folder_name][mod_name] = [p for p in mod.config]
         try:
             from . import presets as _presets_mod
 
