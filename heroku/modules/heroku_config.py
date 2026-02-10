@@ -928,7 +928,7 @@ class HerokuConfigMod(loader.Module):
         try:
             from . import presets as _presets_mod
 
-            preset_folders = self.db.get(_presets_mod.__name__, "folders")
+            preset_folders = self.db.get("presets", "folders")
         except Exception:
             preset_folders = {}
 
