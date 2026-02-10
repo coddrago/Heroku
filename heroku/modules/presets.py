@@ -416,7 +416,7 @@ class Presets(loader.Module):
         if not modules:
             await message.edit(self.strings("no_modules_in_folder").format(folder_name))
             return
-        file = io.BytesIO(orjson.dumps({"name": folder_name, "description": self.strings("folder_description").format(folder_name), "modules": modules}))
+        file = io.BytesIO(orjson.dumps({"name": folder_name, "description": folder_name, "modules": modules}))
         file.name = f"{folder_name}.json"
         await utils.answer(
             message,
