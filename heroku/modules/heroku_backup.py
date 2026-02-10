@@ -276,14 +276,31 @@ class HerokuBackupMod(loader.Module):
     async def backupdb(self, message: Message):
         txt = io.BytesIO(orjson.dumps(self._db, option=orjson.OPT_INDENT_2))
         txt.name = f"db-backup-{datetime.datetime.now():%d-%m-%Y-%H-%M}.json"
-        await self._client.send_file(
-            "me",
-            txt,
+
+        if not getattr(self, "_content_channel_id", None):
+            self._content_channel_id = await utils.wait_for_content_channel(self._db)
+
+        backup_topic_id = await utils.get_topic_id(self._db, "Backups")
+        if not backup_topic_id:
+            logger.error("Backups topic not found in database")
+            await utils.answer(message, self.strings("backup_sent"))
+            return
+
+        backup_msg = await self.inline.bot.send_document(
+            int(f"-100{self._content_channel_id}"),
+            BufferedInputFile(txt.getvalue(), filename=txt.name),
             caption=self.strings("backup_caption").format(
                 prefix=utils.escape_html(self.get_prefix())
             ),
+            message_thread_id=backup_topic_id,
         )
-        await utils.answer(message, self.strings("backup_sent"))
+
+        await utils.answer(
+            message,
+            self.strings("backup_sent").format(
+                f"https://t.me/c/{self._content_channel_id}/{backup_topic_id}/{backup_msg.message_id}"
+            ),
+        )
 
     @loader.command()
     async def restoredb(self, message: Message):
@@ -360,12 +377,36 @@ class HerokuBackupMod(loader.Module):
         archive = io.BytesIO(result.getvalue())
         archive.name = f"mods-{datetime.datetime.now():%d-%m-%Y-%H-%M}.zip"
 
-        await utils.answer_file(
-            message,
-            archive,
+        if not getattr(self, "_content_channel_id", None):
+            self._content_channel_id = await utils.wait_for_content_channel(self._db)
+
+        backup_topic_id = await utils.get_topic_id(self._db, "Backups")
+        if not backup_topic_id:
+            logger.error("Backups topic not found in database")
+            await utils.answer_file(
+                message,
+                archive,
+                caption=self.strings("modules_backup").format(
+                    mods_quantity,
+                    utils.escape_html(self.get_prefix()),
+                ),
+            )
+            return
+
+        backup_msg = await self.inline.bot.send_document(
+            int(f"-100{self._content_channel_id}"),
+            BufferedInputFile(archive.getvalue(), filename=archive.name),
             caption=self.strings("modules_backup").format(
                 mods_quantity,
                 utils.escape_html(self.get_prefix()),
+            ),
+            message_thread_id=backup_topic_id,
+        )
+
+        await utils.answer(
+            message,
+            self.strings("backup_sent").format(
+                f"https://t.me/c/{self._content_channel_id}/{backup_topic_id}/{backup_msg.message_id}"
             ),
         )
 

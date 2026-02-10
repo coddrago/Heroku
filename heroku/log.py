@@ -326,7 +326,7 @@ class TelegramLogsHandler(logging.Handler):
             topic_id = await utils.get_topic_id(db, "Logs")
             return topic_id
         except Exception:
-            logger.exception("Failed to get logs topic ID")
+            logging.exception("Failed to get logs topic ID")
             return None
 
     async def sender(self):
