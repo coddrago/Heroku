@@ -69,15 +69,6 @@ class HerokuBackupMod(loader.Module):
 
         self._content_channel_id = await utils.wait_for_content_channel(self._db)
 
-        self._backup_topic = await utils.asset_forum_topic(
-            client=self._client,
-            db=self._db,
-            peer=self._content_channel_id,
-            title="Backups",
-            description="📼 Your database backups will appear here",
-            icon_emoji_id=6024106569430472546,
-        )
-
     async def _set_backup_period(self, call: BotInlineCall, value: int):
         if not value:
             self.set("period", "disabled")
@@ -159,6 +150,11 @@ class HerokuBackupMod(loader.Module):
 
             archive.name = f"backup-{datetime.datetime.now():%d-%m-%Y-%H-%M}.backup"
 
+            backup_topic_id = await utils.get_topic_id(self._db, "Backups")
+            if not backup_topic_id:
+                logger.error("Backups topic not found in database")
+                return
+
             await self.inline.bot.send_document(
                 int(f"-100{self._content_channel_id}"),
                 BufferedInputFile(archive.getvalue(), filename=archive.name),
@@ -172,7 +168,7 @@ class HerokuBackupMod(loader.Module):
                         ]
                     ]
                 ),
-                message_thread_id=self._backup_topic.id,
+                message_thread_id=backup_topic_id,
             )
 
             self.set("last_backup", round(time.time()))
@@ -475,10 +471,7 @@ class HerokuBackupMod(loader.Module):
         await utils.answer(
             message,
             self.strings["backupall_sent"].format(
-                f"https://t.me/c/{self._content_channel_id}/{self._backup_topic.id}/{backup_msg.message_id}"
-            ),
-        )
-
+                    f"https://t.me/c/{self._content_channel_id}/{backup_topic_id}/{backup_msg.message_id}"
     @loader.command()
     async def restoreall(self, message: Message):
         if not (reply := await message.get_reply_message()) or not reply.media:
