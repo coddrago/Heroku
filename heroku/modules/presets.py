@@ -419,7 +419,7 @@ class Presets(loader.Module):
         file.name = f"{folder_name}.json"
         await utils.answer(
             message,
-            self.strings("folder").format(folder_name),
+            self.strings("folder").format(folder=folder_name, prefix=self.get_prefix()),
             file=file,
             reply_to=getattr(message, "reply_to_msg_id", None),
         )

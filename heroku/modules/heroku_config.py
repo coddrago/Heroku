@@ -942,7 +942,7 @@ class HerokuConfigMod(loader.Module):
                             if mod.__class__.__name__.lower() == raw_mod.lower():
                                 mod_name = mod.strings("name") if callable(mod.strings) else mod.__class__.__name__
                                 if mod_name not in folders[folder_name]:
-                                    folders[folder_name][mod_name] = [p for p in mod.config]
+                                        folders[folder_name][mod_name] = [p for p in mod.config] if hasattr(mod, "config") and mod.config else []
                                 break
                         except Exception:
                             continue
@@ -1027,7 +1027,7 @@ class HerokuConfigMod(loader.Module):
                     except Exception:
                         raw_parts.append(f"<code>{utils.escape_html(param)}</code>")
                 text_parts.append(
-                    f"▫️ <b>{utils.escape_html(mod_name)}</b> → " + ", ".join(raw_parts)
+                    f"▫️ <b>{utils.escape_html(mod_name)}</b>"
                 )
             except Exception:
                 text_parts.append(f"▫️ <b>{utils.escape_html(mod_name)}</b>")
