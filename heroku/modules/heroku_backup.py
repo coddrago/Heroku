@@ -449,9 +449,15 @@ class HerokuBackupMod(loader.Module):
 
         archive.name = f"heroku-{datetime.datetime.now():%d-%m-%Y-%H-%M}.backup"
 
+        backup_topic_id = await utils.get_topic_id(self._db, "Backups")
+        if not backup_topic_id:
+            logger.error("Backups topic not found in database")
+            await utils.answer(message, "<b>Backups topic not found in database. Please run quickstart to create it.</b>")
+            return
+
         backup_msg = await self.inline.bot.send_document(
             int(f"-100{self._content_channel_id}"),
-            BufferedInputFile(archive.getvalue(), archive.name),
+            BufferedInputFile(archive.getvalue(), filename=archive.name),
             caption=self.strings["backupall_info"].format(
                 prefix=utils.escape_html(self.get_prefix()),
             ),
@@ -465,14 +471,14 @@ class HerokuBackupMod(loader.Module):
                     ],
                 ],
             ),
-            message_thread_id=self._backup_topic.id,
+            message_thread_id=backup_topic_id,
         )
 
         await utils.answer(
             message,
             self.strings["backupall_sent"].format(
                 f"https://t.me/c/{self._content_channel_id}/{backup_topic_id}/{backup_msg.message_id}"
-            )
+            ),
         )
         
     @loader.command()
