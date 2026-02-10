@@ -311,7 +311,7 @@ class Presets(loader.Module):
         await self._menu()
     
     async def get_folders(self):
-        return FOLDERS
+        return self.db.get("presets", "folders")
 
     @loader.command(ru_doc='| Пакеты модулей для загрузки', ua_doc='| Пакети модулів для завантаження', de_doc='| Pakete mit Modulen zum Laden')
     async def presets(self, message: Message):
