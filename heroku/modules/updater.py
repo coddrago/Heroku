@@ -392,8 +392,10 @@ class UpdaterMod(loader.Module):
                     "--user",
                 ],
                 check=True,
+                timeout=600,
+                capture_output=True,
             )
-        except subprocess.CalledProcessError:
+        except (subprocess.CalledProcessError, subprocess.TimeoutExpired):
             logger.exception("Req install failed")
 
     @loader.command()

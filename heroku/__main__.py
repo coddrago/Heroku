@@ -47,6 +47,8 @@ def deps():
             "requirements.txt",
         ],
         check=True,
+        timeout=600,
+        capture_output=True,
     )
     with open(".requirements_hash", "w") as f:
         f.write(get_file_hash("requirements.txt"))

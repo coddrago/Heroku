@@ -98,9 +98,11 @@ def check_commit_ancestor(commit, repo_path):
         proc = subprocess.run(
             ["git", "merge-base", "--is-ancestor", commit, "refs/remotes/origin/master"],
             cwd=repo_path,
+            capture_output=True,
+            timeout=5,
         )
         return proc.returncode == 0
-    except Exception:
+    except (subprocess.TimeoutExpired, Exception):
         return False
 
 
@@ -133,13 +135,13 @@ def get_branch_name(repo_path):
                 cwd=repo_path,
                 capture_output=True,
                 text=True,
-                timeout=3,
+                timeout=5,
             )
             if proc.returncode == 0:
                 candidate = proc.stdout.strip()
                 if candidate:
                     branch_name = candidate
-        except Exception:
+        except (subprocess.TimeoutExpired, Exception):
             pass
 
     if isinstance(branch_name, str):
@@ -158,9 +160,9 @@ def reset_to_master(repo_path):
         repo.heads.master.checkout(force=True)
     except Exception:
         try:
-            subprocess.run(["git", "reset", "--hard", "HEAD"], cwd=repo_path)
-            subprocess.run(["git", "checkout", "master", "-f"], cwd=repo_path)
-        except Exception:
+            subprocess.run(["git", "reset", "--hard", "HEAD"], cwd=repo_path, capture_output=True, timeout=5)
+            subprocess.run(["git", "checkout", "master", "-f"], cwd=repo_path, capture_output=True, timeout=5)
+        except (subprocess.TimeoutExpired, Exception):
             pass
 
 
@@ -171,14 +173,14 @@ def restore_worktree(repo_path):
     """
 
     try:
-        proc = subprocess.run(["git", "restore", "."], cwd=repo_path)
+        proc = subprocess.run(["git", "restore", "."], cwd=repo_path, capture_output=True, timeout=5)
         if proc.returncode == 0:
             return True
-    except Exception:
+    except (subprocess.TimeoutExpired, Exception):
         pass
 
     try:
-        proc = subprocess.run(["git", "reset", "--hard"], cwd=repo_path)
+        proc = subprocess.run(["git", "reset", "--hard"], cwd=repo_path, capture_output=True, timeout=5)
         return proc.returncode == 0
-    except Exception:
+    except (subprocess.TimeoutExpired, Exception):
         return False

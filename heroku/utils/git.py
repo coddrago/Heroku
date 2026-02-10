@@ -69,10 +69,10 @@ def get_git_status() -> str:
         return "Git disabled"
     try:
         process = subprocess.run(
-            "git status --porcelain",
-            shell=True,
+            ["git", "status", "--porcelain"],
             capture_output=True,
-            text=True
+            text=True,
+            timeout=5,
         )
 
         if process.returncode != 0:
@@ -87,6 +87,8 @@ def get_git_status() -> str:
         word = "file" if count == 1 else "files"
         return f"{count} {word} modified"
 
+    except subprocess.TimeoutExpired:
+        return "Unknown"
     except Exception:
         return "Unknown"
 

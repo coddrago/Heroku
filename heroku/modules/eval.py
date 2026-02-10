@@ -134,7 +134,17 @@ class Evaluator(loader.Module):
             subprocess.check_output(
                 ["gcc" if c else "g++", "--version"],
                 stderr=subprocess.STDOUT,
+                timeout=10,
             )
+        except subprocess.TimeoutExpired:
+            await utils.answer(
+                message,
+                self.strings("no_compiler").format(
+                    "4986046904228905931" if c else "4985844035743646190",
+                    "C (gcc)" if c else "C++ (g++)",
+                ),
+            )
+            return
         except Exception:
             await utils.answer(
                 message,
@@ -158,9 +168,13 @@ class Evaluator(loader.Module):
                     ["gcc" if c else "g++", "-o", "code", "code.cpp"],
                     cwd=tmpdir,
                     stderr=subprocess.STDOUT,
+                    timeout=30,
                 ).decode()
             except subprocess.CalledProcessError as e:
                 result = e.output.decode()
+                error = True
+            except subprocess.TimeoutExpired:
+                result = "Compilation timeout"
                 error = True
 
             if not result:
@@ -169,9 +183,13 @@ class Evaluator(loader.Module):
                         ["./code"],
                         cwd=tmpdir,
                         stderr=subprocess.STDOUT,
+                        timeout=10,
                     ).decode()
                 except subprocess.CalledProcessError as e:
                     result = e.output.decode()
+                    error = True
+                except subprocess.TimeoutExpired:
+                    result = "Execution timeout"
                     error = True
 
         with contextlib.suppress(MessageIdInvalidError):
@@ -196,7 +214,17 @@ class Evaluator(loader.Module):
             subprocess.check_output(
                 ["node", "--version"],
                 stderr=subprocess.STDOUT,
+                timeout=10,
             )
+        except subprocess.TimeoutExpired:
+            await utils.answer(
+                message,
+                self.strings("no_compiler").format(
+                    "4985643941807260310",
+                    "Node.js",
+                ),
+            )
+            return
         except Exception:
             await utils.answer(
                 message,
@@ -219,9 +247,13 @@ class Evaluator(loader.Module):
                     ["node", "code.js"],
                     cwd=tmpdir,
                     stderr=subprocess.STDOUT,
+                    timeout=10,
                 ).decode()
             except subprocess.CalledProcessError as e:
                 result = e.output.decode()
+                error = True
+            except subprocess.TimeoutExpired:
+                result = "Execution timeout"
                 error = True
 
         with contextlib.suppress(MessageIdInvalidError):
