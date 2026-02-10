@@ -319,8 +319,15 @@ class TelegramLogsHandler(logging.Handler):
     def get_logid_by_client(self, client_id: int) -> int:
         return self._mods[client_id].logchat
         
-    def get_logs_topic_id_by_client(self, client_id: int) -> int:
-        return self._mods[client_id]._logs_topic.id
+    async def get_logs_topic_id_by_client(self, client_id: int) -> typing.Optional[int]:
+        """Get logs topic ID from database"""
+        try:
+            db = self._mods[client_id].db
+            topic_id = await utils.get_topic_id(db, "Logs")
+            return topic_id
+        except Exception:
+            logging.exception("Failed to get logs topic ID")
+            return None
 
     async def sender(self):
         async with self._send_lock:
@@ -345,40 +352,51 @@ class TelegramLogsHandler(logging.Handler):
                 for client_id in self._mods
             }
 
-            self._exc_queue = {
-                client_id: [
-                    self._mods[client_id].inline.bot.send_message(
-                        self._mods[client_id].logchat,
-                        item[0].message,
-                        reply_markup=self._mods[client_id].inline.generate_markup(
-                            [
-                                {
-                                    "text": "🪐 Full traceback",
-                                    "callback": self._show_full_trace,
-                                    "args": (
-                                        self._mods[client_id].inline.bot,
-                                        item[0],
-                                    ),
-                                    "disable_security": True,
-                                },
-                            ],
-                        ),
-                        message_thread_id=self._mods[client_id]._logs_topic.id,
-                    )
-                    for item in self.tg_buff
-                    if isinstance(item[0], HerokuException)
-                    and (not item[1] or item[1] == client_id or self.force_send_all)
-                    and (
-                        not isinstance(item[0].sysinfo[1], INTERNET_ERRORS)
-                        or not getattr(
+            self._exc_queue = {}
+            for client_id in self._mods:
+                try:
+                    topic_id = await self.get_logs_topic_id_by_client(client_id)
+                except Exception:
+                    topic_id = None
+
+                coros = []
+                for item in self.tg_buff:
+                    if not isinstance(item[0], HerokuException):
+                        continue
+                    if not (not item[1] or item[1] == client_id or self.force_send_all):
+                        continue
+                    if (
+                        isinstance(item[0].sysinfo[1], INTERNET_ERRORS)
+                        and getattr(
                             self._mods[client_id].lookup("tester"),
                             "config",
                             {}
                         ).get("disable_internet_warn", False)
+                    ):
+                        continue
+
+                    coros.append(
+                        self._mods[client_id].inline.bot.send_message(
+                            self._mods[client_id].logchat,
+                            item[0].message,
+                            reply_markup=self._mods[client_id].inline.generate_markup(
+                                [
+                                    {
+                                        "text": "🪐 Full traceback",
+                                        "callback": self._show_full_trace,
+                                        "args": (
+                                            self._mods[client_id].inline.bot,
+                                            item[0],
+                                        ),
+                                        "disable_security": True,
+                                    },
+                                ],
+                            ),
+                            message_thread_id=topic_id,
+                        )
                     )
-                ]
-                for client_id in self._mods
-            }
+
+                self._exc_queue[client_id] = coros
 
             await asyncio.gather(
                 *(self._exc_sender(*exceptions)
@@ -405,7 +423,7 @@ class TelegramLogsHandler(logging.Handler):
                             "<b>🧳 Journals are too big to be sent as separate"
                             " messages</b>"
                         ),
-                        message_thread_id=self._mods[client_id]._logs_topic.id,
+                        message_thread_id=await self.get_logs_topic_id_by_client(client_id),
                     )
 
                     self._queue[client_id] = []
@@ -418,7 +436,7 @@ class TelegramLogsHandler(logging.Handler):
                                 self._mods[client_id].logchat,
                                 f"<code>{chunk}</code>",
                                 disable_notification=True,
-                                message_thread_id=self._mods[client_id]._logs_topic.id,
+                                message_thread_id=await self.get_logs_topic_id_by_client(client_id),
                             )
                         )
 

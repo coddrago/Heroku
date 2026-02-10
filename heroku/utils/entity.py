@@ -420,6 +420,19 @@ async def wait_for_content_channel(db: 'Database', delay: float = 10) -> int:
 
     return cid
 
+async def get_topic_id(db: 'Database', topic_name: str) -> typing.Optional[int]:
+    """
+    Get forum topic ID from database
+    :param db: Database instance
+    :param topic_name: Topic name (e.g., "Assets", "Logs", "Backups")
+    :return: Topic ID or None if not found
+    """
+    try:
+        forums_cache = db.get("heroku.forums", "forums_cache", {})
+        return forums_cache.get("heroku-userbot", {}).get(topic_name)
+    except Exception:
+        return None
+
 async def set_avatar(
     client: CustomTelegramClient,
     peer: hints.Entity,

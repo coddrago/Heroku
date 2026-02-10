@@ -1056,7 +1056,7 @@ class Heroku:
                     web_url,
                     "." if pref is None else pref,
                 ),
-                message_thread_id=logging.getLogger().handlers[0].get_logs_topic_id_by_client(client.tg_id),
+                message_thread_id=await logging.getLogger().handlers[0].get_logs_topic_id_by_client(client.tg_id),
             )
             logging.debug(
                 "· Started for %s · Prefix: «%s» ·",

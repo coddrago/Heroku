@@ -165,32 +165,22 @@ def get_ram_usage() -> float:
     except Exception:
         return 0
 
-run_first_time = True # workaround 0.00% cpu usage
 def get_cpu_usage():
+    """
+    Get CPU usage percentage using system-wide metrics
+    Falls back to psutil.cpu_percent() to avoid /proc/stat permission issues
+    """
     import psutil
-    global run_first_time
-
-    if run_first_time:
-        try:
-            psutil.cpu_count(logical=True)
-            for proc in psutil.process_iter():
-                try:
-                    proc.cpu_percent()
-                except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
-                    pass
-        except Exception: pass
-        run_first_time = False
-
+    
     try:
-        num_cores = psutil.cpu_count(logical=True)
-        cpu = 0.0
-        for proc in psutil.process_iter():
-            try:
-                cpu += proc.cpu_percent()
-            except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
-                pass
-        normalized_cpu = cpu / num_cores
-        return f"{normalized_cpu:.2f}"
+        cpu_percent = psutil.cpu_percent(interval=0.1)
+        return f"{cpu_percent:.2f}"
+    except PermissionError:
+        try:
+            cpu_percent = psutil.cpu_percent(interval=0)
+            return f"{cpu_percent:.2f}" if cpu_percent != 0 else "0.00"
+        except Exception:
+            return "0.00"
     except Exception:
         return "0.00"
 
