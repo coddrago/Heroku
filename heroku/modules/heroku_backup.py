@@ -471,7 +471,10 @@ class HerokuBackupMod(loader.Module):
         await utils.answer(
             message,
             self.strings["backupall_sent"].format(
-                    f"https://t.me/c/{self._content_channel_id}/{backup_topic_id}/{backup_msg.message_id}"
+                f"https://t.me/c/{self._content_channel_id}/{backup_topic_id}/{backup_msg.message_id}"
+            )
+        )
+        
     @loader.command()
     async def restoreall(self, message: Message):
         if not (reply := await message.get_reply_message()) or not reply.media:
