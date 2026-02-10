@@ -410,7 +410,8 @@ class Presets(loader.Module):
         for module_name in FOLDERS[folder_name]:
             for mod in self.allmodules.modules:
                 if mod.__class__.__name__.lower() == module_name.lower():
-                    modules.append(mod.__class__.__name__)
+                    if mod.__origin != "<core>" and mod.__origin__ != "<file>":
+                    modules.append(mod.__origin__)
                     break
         if not modules:
             await message.edit(self.strings("no_modules_in_folder").format(folder_name))
