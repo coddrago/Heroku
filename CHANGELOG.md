@@ -86,6 +86,11 @@
 - add more session protection
 - add custom presets
 - add message about no query answer
+- add ulm -f
+- fix permission denied in info 
+- add hsearch 
+- add hiding the phone in htl
+- add more protection for official telegram account (777000)
 
 ## 🪐 Heroku 1.7.2
 - added autoupdate
