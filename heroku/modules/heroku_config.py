@@ -117,6 +117,7 @@ class HerokuConfigMod(loader.Module):
                         "text": self.strings("back_btn"),
                         "callback": self.inline__configure,
                         "args": (mod,),
+                        "style": "primary",
                         "kwargs": {"obj_type": obj_type},
                     },
                     {"text": self.strings("close_btn"), "action": "close"},
@@ -149,6 +150,7 @@ class HerokuConfigMod(loader.Module):
                         "text": self.strings("back_btn"),
                         "callback": self.inline__configure,
                         "args": (mod,),
+                        "style": "primary",
                         "kwargs": {"obj_type": obj_type},
                     },
                     {"text": self.strings("close_btn"), "action": "close"},
@@ -234,6 +236,7 @@ class HerokuConfigMod(loader.Module):
                             "text": f"❌ {self.strings('set')} `False`",
                             "callback": self.inline__set_bool,
                             "args": (mod, option, False),
+                            "style": "danger",
                             "kwargs": {"obj_type": obj_type},
                         }
                     ]
@@ -243,6 +246,7 @@ class HerokuConfigMod(loader.Module):
                             "text": f"✅ {self.strings('set')} `True`",
                             "callback": self.inline__set_bool,
                             "args": (mod, option, True),
+                            "style": "success",
                             "kwargs": {"obj_type": obj_type},
                         }
                     ]
@@ -268,9 +272,10 @@ class HerokuConfigMod(loader.Module):
                     "text": self.strings("back_btn"),
                     "callback": self.inline__configure,
                     "args": (mod,),
+                    "style": "primary",
                     "kwargs": {"obj_type": obj_type},
                 },
-                {"text": self.strings("close_btn"), "action": "close"},
+                {"text": self.strings("close_btn"), "action": "close", "style": "danger"},
             ],
         ]
 
@@ -319,9 +324,10 @@ class HerokuConfigMod(loader.Module):
                         "text": self.strings("back_btn"),
                         "callback": self.inline__configure,
                         "args": (mod,),
+                        "style": "primary",
                         "kwargs": {"obj_type": obj_type},
                     },
-                    {"text": self.strings("close_btn"), "action": "close"},
+                    {"text": self.strings("close_btn"), "action": "close", "style": "danger"},
                 ]
             ],
             inline_message_id=inline_message_id,
@@ -384,9 +390,10 @@ class HerokuConfigMod(loader.Module):
                         "text": self.strings("back_btn"),
                         "callback": self.inline__configure,
                         "args": (mod,),
+                        "style": "primary",
                         "kwargs": {"obj_type": obj_type},
                     },
-                    {"text": self.strings("close_btn"), "action": "close"},
+                    {"text": self.strings("close_btn"), "action": "close", "style": "danger"},
                 ]
             ],
             inline_message_id=inline_message_id,
@@ -451,9 +458,10 @@ class HerokuConfigMod(loader.Module):
                     "text": self.strings("back_btn"),
                     "callback": self.inline__configure,
                     "args": (mod,),
+                    "style": "primary",
                     "kwargs": {"obj_type": obj_type},
                 },
-                {"text": self.strings("close_btn"), "action": "close"},
+                {"text": self.strings("close_btn"), "action": "close", "style": "danger"},
             ],
         ]
 
@@ -492,9 +500,10 @@ class HerokuConfigMod(loader.Module):
                         "text": self.strings("back_btn"),
                         "callback": self.inline__configure,
                         "args": (mod,),
+                        "style": "primary",
                         "kwargs": {"obj_type": obj_type},
                     },
-                    {"text": self.strings("close_btn"), "action": "close"},
+                    {"text": self.strings("close_btn"), "action": "close", "style": "danger"},
                 ]
             ],
         )
@@ -593,9 +602,10 @@ class HerokuConfigMod(loader.Module):
                     "text": self.strings("back_btn"),
                     "callback": self.inline__configure,
                     "args": (mod,),
+                    "style": "primary",
                     "kwargs": {"obj_type": obj_type},
                 },
-                {"text": self.strings("close_btn"), "action": "close"},
+                {"text": self.strings("close_btn"), "action": "close", "style": "danger"},
             ],
         ]
 
@@ -662,9 +672,10 @@ class HerokuConfigMod(loader.Module):
                     "text": self.strings("back_btn"),
                     "callback": self.inline__configure,
                     "args": (mod,),
+                    "style": "primary",
                     "kwargs": {"obj_type": obj_type},
                 },
-                {"text": self.strings("close_btn"), "action": "close"},
+                {"text": self.strings("close_btn"), "action": "close", "style": "danger"},
             ],
         ]
 
@@ -902,9 +913,10 @@ class HerokuConfigMod(loader.Module):
                     {
                         "text": self.strings("back_btn"),
                         "callback": self.inline__global_config,
+                        "style": "primary",
                         "kwargs": {"obj_type": obj_type},
                     },
-                    {"text": self.strings("close_btn"), "action": "close"},
+                    {"text": self.strings("close_btn"), "action": "close", "style": "danger"},
                 ]
             ],
         )
@@ -991,7 +1003,7 @@ class HerokuConfigMod(loader.Module):
                     else []
                 ),
                 *list(utils.chunks(folder_btns, 2)),
-                [{"text": self.strings("close_btn"), "action": "close"}],
+                [{"text": self.strings("close_btn"), "action": "close", "style": "danger"}],
             ],
         )
 
@@ -1043,8 +1055,9 @@ class HerokuConfigMod(loader.Module):
                     {
                         "text": self.strings("back_btn"),
                         "callback": self.inline__choose_category,
+                        "style": "primary",
                     },
-                    {"text": self.strings("close_btn"), "action": "close"},
+                    {"text": self.strings("close_btn"), "action": "close", "style": "danger"},
                 ]
             ],
         )
@@ -1101,8 +1114,9 @@ class HerokuConfigMod(loader.Module):
                 {
                     "text": self.strings("back_btn"),
                     "callback": self.inline__choose_category,
+                    "style": "primary",
                 },
-                {"text": self.strings("close_btn"), "action": "close"},
+                {"text": self.strings("close_btn"), "action": "close", "style": "danger"},
             ]
         ]
 
