@@ -153,7 +153,7 @@ class HerokuConfigMod(loader.Module):
                         "style": "primary",
                         "kwargs": {"obj_type": obj_type},
                     },
-                    {"text": self.strings("close_btn"), "action": "close"},
+                    {"text": self.strings("close_btn"), "action": "close", "style": "danger"},
                 ]
             ],
         )
@@ -259,6 +259,7 @@ class HerokuConfigMod(loader.Module):
                             "text": self.strings("set_default_btn"),
                             "callback": self.inline__reset_default,
                             "args": (mod, option),
+                            "style": "primary",
                             "kwargs": {"obj_type": obj_type},
                         }
                     ]
@@ -445,6 +446,7 @@ class HerokuConfigMod(loader.Module):
                             "text": self.strings("set_default_btn"),
                             "callback": self.inline__reset_default,
                             "args": (mod, option),
+                            "style": "primary",
                             "kwargs": {"obj_type": obj_type},
                         }
                     ]
@@ -589,6 +591,7 @@ class HerokuConfigMod(loader.Module):
                             "text": self.strings("set_default_btn"),
                             "callback": self.inline__reset_default,
                             "args": (mod, option),
+                            "style": "primary",
                             "kwargs": {"obj_type": obj_type},
                         }
                     ]
@@ -659,6 +662,7 @@ class HerokuConfigMod(loader.Module):
                             "text": self.strings("set_default_btn"),
                             "callback": self.inline__reset_default,
                             "args": (mod, option),
+                            "style": "primary",
                             "kwargs": {"obj_type": obj_type},
                         }
                     ]
@@ -713,6 +717,7 @@ class HerokuConfigMod(loader.Module):
                         {
                             "text": self.strings("hide_value"),
                             "callback": self.inline__configure_option,
+                            "style": "primary",
                             "kwargs": {"obj_type": obj_type, "mod": mod, "config_opt": config_opt, "force_hidden": False},
                         }
                     ]
@@ -723,6 +728,7 @@ class HerokuConfigMod(loader.Module):
                         {
                             "text": self.strings("show_hidden"),
                             "callback": self.inline__configure_option,
+                            "style": "danger"
                             "kwargs": {"obj_type": obj_type, "mod": mod, "config_opt": config_opt, "force_hidden": True},
                         }
                     ]
@@ -840,6 +846,7 @@ class HerokuConfigMod(loader.Module):
                         "text": self.strings("set_default_btn"),
                         "callback": self.inline__reset_default,
                         "args": (mod, config_opt),
+                        "style": "primary",
                         "kwargs": {"obj_type": obj_type},
                     }
                 ],
@@ -848,9 +855,14 @@ class HerokuConfigMod(loader.Module):
                         "text": self.strings("back_btn"),
                         "callback": self.inline__configure,
                         "args": (mod,),
+                        "style": "primary",
                         "kwargs": {"obj_type": obj_type},
                     },
-                    {"text": self.strings("close_btn"), "action": "close"},
+                    {
+                        "text": self.strings("close_btn"), 
+                        "action": "close", 
+                        "style": "danger"
+                    },
                 ],
             ],
         )
@@ -952,11 +964,13 @@ class HerokuConfigMod(loader.Module):
                     {
                         "text": self.strings("builtin"),
                         "callback": self.inline__global_config,
+                        "style": "primary",
                         "kwargs": {"obj_type": True},
                     },
                     {
                         "text": self.strings("external"),
                         "callback": self.inline__global_config,
+                        "style": "primary",
                     },
                 ],
                 *(
@@ -965,6 +979,7 @@ class HerokuConfigMod(loader.Module):
                             {
                                 "text": self.strings("libraries"),
                                 "callback": self.inline__global_config,
+                                "style": "primary",
                                 "kwargs": {"obj_type": "library"},
                             }
                         ]
