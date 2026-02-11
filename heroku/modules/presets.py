@@ -353,7 +353,7 @@ class Presets(loader.Module):
         for link in data["modules"]:
             module_name = link.rsplit('/', maxsplit=1)[1].split('.')[0] if '/' in link else link
             if self._is_installed(link):
-                modules_list.append(f"✅ <b>{module_name}</b> (уже установлен)")
+                modules_list.append(f"<b>{module_name}</b> {self.strings('already_installed')}")
             else:
                 modules_list.append(f"▫️ <b>{module_name}</b>")
 
