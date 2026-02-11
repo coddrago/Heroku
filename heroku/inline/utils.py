@@ -88,7 +88,7 @@ class Utils(InlineUnit):
         emoji_id = button.get("emoji_id")
 
         if emoji_id:
-            return str(emoji_id).strip()
+            return int(emoji_id)
         return None
     
     def _generate_markup(
