@@ -382,7 +382,7 @@ class Presets(loader.Module):
         module_name = args[1]
         if folder_name not in FOLDERS:
             FOLDERS[folder_name] = []
-        if module_name in FOLDERS[folder_name]:
+        if module_name.lower() in [m.lower() for m in FOLDERS[folder_name]]:
             await message.edit(self.strings("already_in_folder").format(folder_name))
             return
         for mod in self.allmodules.modules:
