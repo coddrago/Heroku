@@ -276,8 +276,9 @@ class UpdaterMod(loader.Module):
                             "text": self.strings("btn_restart"),
                             "callback": self.inline_restart,
                             "args": (secure_boot,),
+                            "style": "primary",
                         },
-                        {"text": self.strings("cancel"), "action": "close"},
+                        {"text": self.strings("cancel"), "action": "close", "style": "danger"},
                     ],
                 )
             ):
@@ -429,8 +430,9 @@ class UpdaterMod(loader.Module):
                         {
                             "text": self.strings("btn_update"),
                             "callback": self.inline_update,
+                            "style": "primary",
                         },
-                        {"text": self.strings("cancel"), "action": "close"},
+                        {"text": self.strings("cancel"), "action": "close", "style": "danger"},
                     ],
                 )
             ):
@@ -506,8 +508,8 @@ class UpdaterMod(loader.Module):
 
         self._markup = lambda: self.inline.generate_markup(
             [
-                {"text": self.strings("update"), "data": "heroku/update"},
-                {"text": self.strings("ignore"), "data": "heroku/ignore_upd"},
+                {"text": self.strings("update"), "data": "heroku/update", "style": "primary",},
+                {"text": self.strings("ignore"), "data": "heroku/ignore_upd", "style": "danger"},
             ]
         )
 
@@ -539,6 +541,7 @@ class UpdaterMod(loader.Module):
                                 "text": f"✅ Turn on",
                                 "callback": self._set_autoupdate_state,
                                 "args": (True,),
+                                "style": "success",
                             }
                         ],
                         [
@@ -546,6 +549,7 @@ class UpdaterMod(loader.Module):
                                 "text": "🚫 Turn off",
                                 "callback": self._set_autoupdate_state,
                                 "args": (False,),
+                                "style": "danger",
                             }
                         ]
                     ]
@@ -729,12 +733,14 @@ class UpdaterMod(loader.Module):
                         "text": "✅",
                         "callback": self.rollback_confirm,
                         "args": [args],
+                        "style": "success",
                     }
                 ],
                 [
                     {
                         "text": "❌",
                         "action": "close",
+                        "style": "danger",
                     }
                 ]
             ]
