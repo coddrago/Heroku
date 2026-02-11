@@ -36,6 +36,9 @@ from aiogram.types import (
     InputMediaPhoto,
     InputMediaVideo,
 )
+ 
+from aiogram.enums import ButtonStyle
+
 from aiogram.exceptions import (
     TelegramBadRequest,
     TelegramAPIError,
@@ -68,8 +71,25 @@ BOT_ID_PATTERN = (
 )
 BOT_BASE_PATTERN = re.compile(BOT_ID_PATTERN.format(r"\w*_[0-9a-zA-Z]{6}_bot"))
 
+VALID_BUTTON_STYLES = {"danger", "primary", "success"}
+
 
 class Utils(InlineUnit):
+    def _get_button_style(self, button: dict) -> typing.Optional[str]:
+        """Extract and validate button style from button dict"""
+        style = button.get("style")
+        if style and style in VALID_BUTTON_STYLES:
+            return style
+        return None
+    
+    def _get_button_emoji_id(self, button: dict) -> typing.Optional[str]:
+        """Extract button custom emoji ID (for premium emoji support)"""
+        emoji_id = button.get("emoji_id") or button.get("icon_emoji_id") or button.get("icon_custom_emoji_id")
+
+        if emoji_id and isinstance(emoji_id, str):
+            return emoji_id
+        return None
+    
     def _generate_markup(
         self: "InlineManager",
         markup_obj: typing.Optional[typing.Union[HerokuReplyMarkup, str]],
@@ -144,20 +164,28 @@ class Utils(InlineUnit):
                                 )
                                 continue
 
-                            line += [
-                                InlineKeyboardButton(
-                                    text=str(button["text"]),
-                                    url=button["url"],
-                                )
-                            ]
+                            btn_kwargs = {
+                                "text": str(button["text"]),
+                                "url": button["url"],
+                            }
+                            if style := self._get_button_style(button):
+                                btn_kwargs["style"] = style
+                            if emoji_id := self._get_button_emoji_id(button):
+                                btn_kwargs["icon_custom_emoji_id"] = emoji_id
+
+                            line += [InlineKeyboardButton(**btn_kwargs)]
 
                         case _ if "callback" in button:
-                            line += [
-                                InlineKeyboardButton(
-                                    text=str(button["text"]),
-                                    callback_data=button["_callback_data"],
-                                )
-                            ]
+                            btn_kwargs = {
+                                "text": str(button["text"]),
+                                "callback_data": button["_callback_data"],
+                            }
+                            if style := self._get_button_style(button):
+                                btn_kwargs["style"] = style
+                            if emoji_id := self._get_button_emoji_id(button):
+                                btn_kwargs["icon_custom_emoji_id"] = emoji_id
+
+                            line += [InlineKeyboardButton(**btn_kwargs)]
                             if setup_callbacks:
                                 self._custom_map[button["_callback_data"]] = {
                                     "handler": button["callback"],
@@ -189,59 +217,76 @@ class Utils(InlineUnit):
                                 }
 
                         case _ if "input" in button:
-                            line += [
-                                InlineKeyboardButton(
-                                    text=str(button["text"]),
-                                    switch_inline_query_current_chat=button["_switch_query"]
-                                    + " ",
-                                )
-                            ]
+                            btn_kwargs = {
+                                "text": str(button["text"]),
+                                "switch_inline_query_current_chat": button["_switch_query"] + " ",
+                            }
+                            if style := self._get_button_style(button):
+                                btn_kwargs["style"] = style
+                            if emoji_id := self._get_button_emoji_id(button):
+                                btn_kwargs["icon_custom_emoji_id"] = emoji_id
+
+                            line += [InlineKeyboardButton(**btn_kwargs)]
 
                         case _ if "data" in button:
-                            line += [
-                                InlineKeyboardButton(
-                                    text=str(button["text"]),
-                                    callback_data=button["data"],
-                                )
-                            ]
+                            btn_kwargs = {
+                                "text": str(button["text"]),
+                                "callback_data": button["data"],
+                            }
+                            if style := self._get_button_style(button):
+                                btn_kwargs["style"] = style
+                            if emoji_id := self._get_button_emoji_id(button):
+                                btn_kwargs["icon_custom_emoji_id"] = emoji_id
+
+                            line += [InlineKeyboardButton(**btn_kwargs)]
 
                         case _ if "web_app" in button:
-                            line += [
-                                InlineKeyboardButton(
-                                    text=str(button["text"]),
-                                    web_app=WebAppInfo(button["data"]),
-                                )
-                            ]
+                            btn_kwargs = {
+                                "text": str(button["text"]),
+                                "web_app": WebAppInfo(button["data"]),
+                            }
+                            if style := self._get_button_style(button):
+                                btn_kwargs["style"] = style
+                            if emoji_id := self._get_button_emoji_id(button):
+                                btn_kwargs["icon_custom_emoji_id"] = emoji_id
+
+                            line += [InlineKeyboardButton(**btn_kwargs)]
 
                         case _ if "copy" in button:
-                            line += [
-                                InlineKeyboardButton(
-                                    text=str(button["text"]),
-                                    copy_text=CopyTextButton(
-                                        text=button["copy"]
-                                    )
-                                )
-                            ]
+                            btn_kwargs = {
+                                "text": str(button["text"]),
+                                "copy_text": CopyTextButton(text=button["copy"]),
+                            }
+                            if style := self._get_button_style(button):
+                                btn_kwargs["style"] = style
+                            if emoji_id := self._get_button_emoji_id(button):
+                                btn_kwargs["icon_custom_emoji_id"] = emoji_id
+
+                            line += [InlineKeyboardButton(**btn_kwargs)]
 
                         case _ if "switch_inline_query_current_chat" in button:
-                            line += [
-                                InlineKeyboardButton(
-                                    text=str(button["text"]),
-                                    switch_inline_query_current_chat=button[
-                                        "switch_inline_query_current_chat"
-                                    ],
-                                )
-                            ]
+                            btn_kwargs = {
+                                "text": str(button["text"]),
+                                "switch_inline_query_current_chat": button["switch_inline_query_current_chat"],
+                            }
+                            if style := self._get_button_style(button):
+                                btn_kwargs["style"] = style
+                            if emoji_id := self._get_button_emoji_id(button):
+                                btn_kwargs["icon_custom_emoji_id"] = emoji_id
+
+                            line += [InlineKeyboardButton(**btn_kwargs)]
 
                         case _ if "switch_inline_query" in button:
-                            line += [
-                                InlineKeyboardButton(
-                                    text=str(button["text"]),
-                                    switch_inline_query_current_chat=button[
-                                        "switch_inline_query"
-                                    ],
-                                )
-                            ]
+                            btn_kwargs = {
+                                "text": str(button["text"]),
+                                "switch_inline_query_current_chat": button["switch_inline_query"],
+                            }
+                            if style := self._get_button_style(button):
+                                btn_kwargs["style"] = style
+                            if emoji_id := self._get_button_emoji_id(button):
+                                btn_kwargs["icon_custom_emoji_id"] = emoji_id
+
+                            line += [InlineKeyboardButton(**btn_kwargs)]
 
                         case _:
                             logger.warning(
