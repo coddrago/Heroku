@@ -728,7 +728,7 @@ class HerokuConfigMod(loader.Module):
                         {
                             "text": self.strings("show_hidden"),
                             "callback": self.inline__configure_option,
-                            "style": "danger"
+                            "style": "danger",
                             "kwargs": {"obj_type": obj_type, "mod": mod, "config_opt": config_opt, "force_hidden": True},
                         }
                     ]
@@ -861,7 +861,7 @@ class HerokuConfigMod(loader.Module):
                     {
                         "text": self.strings("close_btn"), 
                         "action": "close", 
-                        "style": "danger"
+                        "style": "danger",
                     },
                 ],
             ],
