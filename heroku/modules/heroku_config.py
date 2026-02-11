@@ -1027,7 +1027,7 @@ class HerokuConfigMod(loader.Module):
                     except Exception:
                         raw_parts.append(f"<code>{utils.escape_html(param)}</code>")
                 text_parts.append(
-                    f"▫️ <b>{utils.escape_html(mod_name)}</b> → " + ", ".join(raw_parts)
+                    f"▫️ <b>{utils.escape_html(mod_name)}</b>"
                 )
             except Exception:
                 text_parts.append(f"▫️ <b>{utils.escape_html(mod_name)}</b>")
