@@ -44,7 +44,7 @@ class HerokuWebMod(loader.Module):
     @loader.command()
     async def weburl(self, message: Message, force: bool = False):
 
-        if "OTHERHOST" in os.environ or "JAMHOST" in os.environ:
+        if "JAMHOST" in os.environ:
             await utils.answer(message, self.strings["host_denied"])
         else:
         
@@ -135,7 +135,7 @@ class HerokuWebMod(loader.Module):
     @loader.command()
     async def addacc(self, message: Message):
 
-        if "JAMHOST" in os.environ or "LAVHOST" in os.environ or "OTHERHOST" in os.environ:
+        if "JAMHOST" in os.environ or "LAVHOST" in os.environ:
             await utils.answer(message, self.strings["host_denied"])
         else:
 
@@ -165,6 +165,9 @@ class HerokuWebMod(loader.Module):
                 )
                 return
         
+            if user.id == self.tg_id:
+                await self._inline_login(message, user)
+
             if "force_insecure" in message.text.lower():
                 await self._inline_login(message, user)
         

