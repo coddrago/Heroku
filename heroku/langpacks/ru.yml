@@ -455,7 +455,6 @@ api_protection:
   _cmd_doc_suspend_api_protect: "<время в секундах> - Заморозить защиту API на N секунд"
 
 HSearch:
-  name: "HSearch"
   _cls_doc: "Модуль для поиска модулей! Следите за всеми новостями HSearch в @FHeta_Updates!"
   searching: "{emoji} <b>Поиск по запросу <code>{query}</code>...</b>"
   no_query: "{emoji} <b>Вы не ввели запрос для поиска, пример: <code>{prefix}hs ваш запрос</code></b>"
@@ -474,10 +473,16 @@ HSearch:
   inline_no_results: "Попробуйте другой запрос."
   inline_query_too_big: "Ваш запрос слишком большой, пожалуйста, сократите его до 168 символов."
   query_label: "Запрос"
-  install_btn: "Команда для установки"
+  install_btn: "Установить"
   modules_list: "{emoji} <b>Все найденные модули:</b>"
-  _cfg_doc_tracking: "Включить отслеживание ваших данных (ID пользователя, язык) для синхронизации с ботом HSearch?"
+  success: "{emoji} Модуль успешно установлен!"
+  error: "{emoji} Ошибка, возможно, модуль поломан!"
+  overwrite: "{emoji} Ошибка, модуль пытался перезаписать встроенный модуль!"
+  requirements: "{emoji} Ошибка установки зависимостей!"
+  requirements_deps: "{emoji} Ошибка установки зависимостей ({deps})!"
   _cfg_doc_theme: "Тема для эмодзи."
+  _cmd_doc_hs: "(запрос) - поиск модулей."
+  _ihandle_doc_hs: "(запрос) - поиск модулей."
   
 help:
   undoc: "<tg-emoji emoji-id=5469741319330996757>💫</tg-emoji> Нет описания"
