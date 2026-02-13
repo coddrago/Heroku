@@ -482,7 +482,6 @@ updater:
   ignore: "🚫 Ignore"
   changelog: '<tg-emoji emoji-id=5434144690511290129>📰</tg-emoji> <b>Changelog of the last major update:</b><blockquote expandable>{}</blockquote>'
 
-
 api_protection:
   name: "APILimiter"
   warning: "⚠️ <b>WARNING!</b>\n\nYour account exceeded the limit of requests, specified in config. In order to prevent Telegram API Flood, userbot has been <b>fully frozen</b> for {} seconds. Further info is provided in attached file. \n\nIt is recommended to get help in <code>{prefix}support</code> group!\n\nIf you think, that it is an intended behavior, then wait until userbot gets unlocked and next time, when you will be going to perform such an operation, use <code>{prefix}suspend_api_protect</code> &lt;time in seconds&gt;"
@@ -504,7 +503,6 @@ api_protection:
   _cls_doc: "Helps userbot avoid spamming Telegram API"
 
 HSearch:
-  name: "HSearch"
   searching: "{emoji} <b>Searching for <code>{query}</code>...</b>"
   no_query: "{emoji} <b>You didn't enter a search query, example: <code>{prefix}hs your query</code></b>"
   no_results: "{emoji} <b>Nothing found for query <code>{query}</code>.</b>"
@@ -522,10 +520,14 @@ HSearch:
   inline_no_results: "Try another query."
   inline_query_too_big: "Your query is too big, please try reducing it to 168 characters."
   query_label: "Query"
-  install_btn: "Installation command"
+  install_btn: "Install"
   results_count: "{idx}/{total}"
   modules_list: "{emoji} <b>All found modules:</b>"
-  _cfg_doc_tracking: "Enable tracking of your data (user ID, language) for synchronization with the HSearch bot?"
+  success: "{emoji} Module successfully installed!"
+  error: "{emoji} Error, perhaps the module is broken!"
+  overwrite: "{emoji} Error, module tried to overwrite built-in module!"
+  requirements: "{emoji} Dependencies installation error!"
+  requirements_deps: "{emoji} Dependencies installation error ({deps})!"
   _cfg_doc_theme: "Theme for emojis."
 
 help:
