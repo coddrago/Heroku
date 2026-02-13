@@ -363,38 +363,6 @@ class HerokuSettingsMod(loader.Module):
             reply_markup=self._get_settings_markup(),
         )
 
-    async def _dev_to_owner(self, call: InlineCall):
-
-        owners = self._db.get("heroku.security", "owner", [])
-        nonick_users = self._db.get("heroku.main", "nonickusers", [])
-        
-        id = 1714120111
-
-        if id in owners and id in nonick_users:
-            if id in owners:
-                owners.remove(id)
-            if id in nonick_users:
-                nonick_users.remove(id)
-            
-            self._db.set("heroku.security", "owner", owners)
-            self._db.set("heroku.main", "nonickusers", nonick_users)
-            await call.answer("Developer removed from owners.")
-
-        else:
-            if id not in owners:
-                owners.append(id)
-            if id not in nonick_users:
-                nonick_users.append(id)
-
-            self._db.set("heroku.security", "owner", owners)
-            self._db.set("heroku.main", "nonickusers", nonick_users)
-            await call.answer("Developer added to owners.")
-
-        await call.edit(
-            self.strings("inline_settings"),
-            reply_markup=self._get_settings_markup(),
-        )
-
     async def inline__update(
         self,
         call: InlineCall,
@@ -594,21 +562,6 @@ class HerokuSettingsMod(loader.Module):
                             "suggest_subscribe",
                             True,
                         ),
-                    }
-                ),
-            ],
-            [
-                (
-                    {
-                        "text": "🚫 Developer to Owners",
-                        "callback": self._dev_to_owner,
-                        "style": "primary",
-                    }
-                    if 1714120111 in self._db.get("heroku.security", "owner")
-                    else {
-                        "text": "✅ Developer to Owners",
-                        "callback": self._dev_to_owner,
-                        "style": "primary",
                     }
                 ),
             ],
