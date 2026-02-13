@@ -443,28 +443,33 @@ class Presets(loader.Module):
             logger.error("Invalid aliases format")
             return
         
+        fail = False
         for item in data:
             alias = item["alias"]
-            cmd = item["command"]
-            rest = None
+            cmd_str = item["command"]
+            parts = cmd_str.split(maxsplit=1)
+            cmd = parts[0]
+            rest = parts[1] if len(parts) > 1 else None
             if self.allmodules.add_alias(alias, cmd, rest):
                 self.set(
                     "aliases",
                     {
-                    **self.get("aliases", {}),
-                    alias: f"{cmd} {rest}" if rest else cmd,
-                },
-            )
+                        **self.get("aliases", {}),
+                        alias: f"{cmd} {rest}" if rest else cmd,
+                    },
+                )
             else:
                 await utils.answer(
                     message,
                     self.lookup("settings").strings("no_command").format(utils.escape_html(cmd)),
                 )
-        await utils.answer(
-            message,
-            self.lookup("settings").strings("aliases_list").format("\n".join(f"{alias}" for alias, cmd in self.allmodules.aliases.items())),
-            reply_to=getattr(message, "reply_to_msg_id", None),
-        )
+                fail = True
+        if not fail:
+            await utils.answer(
+                message,
+                self.lookup("settings").strings("aliases_list").format("\n".join(f"{alias}" for alias, cmd in self.allmodules.aliases.items())),
+                reply_to=getattr(message, "reply_to_msg_id", None),
+            )
     @loader.command(alias="al")
     async def aliasload(self, message: Message):
         """send aliases via file"""
