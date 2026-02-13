@@ -302,6 +302,8 @@ settings:
   id_not_found_scgroup: "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> Bu obyekt hech qanday xavfsizlik guruhida mavjud emas. Shuning uchun unga prefiks qo‘shish befoyda"
   invalid_id_or_username: "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> Noto‘g‘ri id/username berildi"
   alias_created: "<tg-emoji emoji-id=5197474765387864959>👍</tg-emoji> <b>Alias yaratildi. Unga</b> <code>{}</code> <b>bilan kiring</b>"
+  aliases_list: "<b>🔗 Aliaslar import qilindi:</b>\n\n<blockquote expandable>{}</blockquote>"
+  aliases_file: "<tg-emoji emoji-id=5256113064821926998>📁</tg-emoji> <b>Sizning aliaslaringiz</b>\n\n<tg-emoji emoji-id=5134452506935427991>🪐</tg-emoji> <b>{prefix}la bu xabarga javob sifatida aliaslarni import qilish uchun</b>"
   aliases: "<b>🔗 Aliaslar:</b>\n"
   no_command: "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>Buyruq</b> <code>{}</code> <b>mavjud emas</b>"
   alias_args: "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>Siz buyruq va uning aliasini taqdim etishingiz kerak</b>"

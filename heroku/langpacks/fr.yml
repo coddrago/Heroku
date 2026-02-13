@@ -302,6 +302,8 @@ settings:
   id_not_found_scgroup: "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> Cette entité n'existe dans aucun groupe de sécurité. Par conséquent, ajouter un préfixe pour elle est inutile"
   invalid_id_or_username: "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> ID/nom d'utilisateur invalide donné"
   alias_created: "<tg-emoji emoji-id=5197474765387864959>👍</tg-emoji> <b>Alias créé. Accédez-y avec</b> <code>{}</code>"
+  aliases_list: "<b>🔗 Aliases importés :</b>\n\n<blockquote expandable>{}</blockquote>"
+  aliases_file: "<tg-emoji emoji-id=5256113064821926998>📁</tg-emoji> <b>Vos alias</b>\n\n<tg-emoji emoji-id=5134452506935427991>🪐</tg-emoji> <b>{prefix}la en réponse à ce message pour importer des alias</b>"
   aliases: "<b>🔗 Alias :</b>\n"
   no_command: "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>La commande</b> <code>{}</code> <b>n'existe pas</b>"
   alias_args: "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>Vous devez fournir une commande et l'alias pour celle-ci</b>"

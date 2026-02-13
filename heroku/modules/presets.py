@@ -425,3 +425,60 @@ class Presets(loader.Module):
             file=file,
             reply_to=getattr(message, "reply_to_msg_id", None),
         )
+    @loader.command(alias="la")
+    async def loadaliases(self, message: Message):
+        """Load aliases from file. Send a file with the command or reply to a file."""
+        msg = message if message.file else (await message.get_reply_message())
+        if not msg or not msg.file:
+            await message.edit(self.lookup("loader").strings['no_file'])
+            return
+        try:
+            data = orjson.loads(await msg.download_media(bytes))
+        except Exception:
+            await message.edit(self.lookup("loader").strings['load_failed'])
+            logger.exception("Failed to load aliases from file")
+            return
+        if not isinstance(data, list) or not all(isinstance(item, dict) and "alias" in item and "command" in item for item in data):
+            await message.edit(self.lookup("loader").strings['load_failed'])
+            logger.error("Invalid aliases format")
+            return
+        
+        for item in data:
+            alias = item["alias"]
+            cmd = item["command"]
+            rest = None
+            if self.allmodules.add_alias(alias, cmd, rest):
+                self.set(
+                    "aliases",
+                    {
+                    **self.get("aliases", {}),
+                    alias: f"{cmd} {rest}" if rest else cmd,
+                },
+            )
+            else:
+                await utils.answer(
+                    message,
+                    self.lookup("settings").strings("no_command").format(utils.escape_html(cmd)),
+                )
+        await utils.answer(
+            message,
+            self.strings("aliases_list").format("\n".join(f"{alias}" for alias, cmd in self.allmodules.aliases.items())),
+            reply_to=getattr(message, "reply_to_msg_id", None),
+        )
+    @loader.command(alias="al")
+    async def aliasload(self, message: Message):
+        """send aliases via file"""
+        aliases = self.allmodules.aliases.items()
+        if not aliases:
+            await message.edit(self.lookup("settings").strings("no_aliases"))
+            return
+        file = io.BytesIO(orjson.dumps([{"alias": alias, "command": cmd} for alias, cmd in aliases]))
+        file.name = "aliases.json"
+        await utils.answer(
+            message,
+            self.strings("aliases_file"),
+            file=file,
+            reply_to=getattr(message, "reply_to_msg_id", None),
+        )
+        
+# dict_items([('htl', 'terminal pip uninstall -y heroku-tl-new && pip install git+https://github.com/coddrago/heroku-tl')])
