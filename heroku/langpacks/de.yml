@@ -439,7 +439,6 @@ api_protection:
   _cmd_doc_suspend_api_protect: "<Zeit in Sekunden> - Friert den API-Schutz für N Sekunden ein"
 
 HSearch:
-  name: "HSearch"
   _cls_doc: "Modul zur Suche nach Modulen! Verfolgen Sie alle HSearch-Neuigkeiten auf @FHeta_Updates!"
   searching: "{emoji} <b>Suche nach <code>{query}</code>...</b>"
   no_query: "{emoji} <b>Sie haben keine Suchanfrage eingegeben, Beispiel: <code>{prefix}hs ihre anfrage</code></b>"
@@ -458,10 +457,16 @@ HSearch:
   inline_no_results: "Versuchen Sie eine andere Anfrage."
   inline_query_too_big: "Ihre Anfrage ist zu groß, bitte reduzieren Sie sie auf 168 Zeichen."
   query_label: "Anfrage"
-  install_btn: "Installationsbefehl"
+  install_btn: "Installieren"
   modules_list: "{emoji} <b>Alle gefundenen Module:</b>"
-  _cfg_doc_tracking: "Tracking Ihrer Daten (Benutzer-ID, Sprache) für die Synchronisierung mit dem HSearch-Bot aktivieren?"
+  success: "{emoji} Modul erfolgreich installiert!"
+  error: "{emoji} Fehler, vielleicht ist das Modul kaputt!"
+  overwrite: "{emoji} Fehler, Modul hat versucht, das integrierte Modul zu überschreiben!"
+  requirements: "{emoji} Fehler bei der Installation von Abhängigkeiten!"
+  requirements_deps: "{emoji} Fehler bei der Installation von Abhängigkeiten ({deps})!"
   _cfg_doc_theme: "Thema für Emojis."
+  _cmd_doc_hs: "(anfrage) - module suchen."
+  _ihandle_doc_hs: "(anfrage) - module suchen."
 
 help:
   undoc: "🦥 Keine Beschreibung"
