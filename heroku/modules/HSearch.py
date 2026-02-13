@@ -1,4 +1,5 @@
 __version__ = (2, 0, 0)
+# meta developer: @FModules
 
 # ©️ Fixyres, 2024-2030
 # 🌐 https://github.com/Fixyres/FHeta
@@ -14,13 +15,18 @@ __version__ = (2, 0, 0)
 # 🔑 https://www.gnu.org/licenses/agpl-3.0.html
 
 import asyncio
-from typing import Dict, List, Optional
-from urllib.parse import parse_qs, unquote, urlparse
-
 import aiohttp
-from telethon.tl.functions.contacts import UnblockRequest
+import ast
+import sys
+import uuid
+from typing import Optional, Dict, List
+from urllib.parse import unquote
+from importlib.machinery import ModuleSpec
 
 from .. import loader, utils
+from ..types import CoreOverwriteError
+from herokutl.tl.functions.contacts import UnblockRequest
+from herokutl.errors.common import ScamDetectionError
 
 
 @loader.tds
@@ -28,7 +34,7 @@ class HSearch(loader.Module):
     '''Module for searching modules! Watch all HSearch news in @FHeta_Updates!'''
 
     strings = {
-        "name": "HSearch",
+        "name": "HSearch"
     }
     
     THEMES = {
@@ -42,11 +48,14 @@ class HSearch(loader.Module):
             "dislike": "👎",
             "prev": "◀️",
             "next": "▶️",
-            "module": '<tg-emoji emoji-id="5203996991054432397">📦</tg-emoji>',
+            "module": '<tg-emoji emoji-id="5454112830989025752">📦</tg-emoji>',
             "close": "❌",
-            "channel": '<tg-emoji emoji-id="5278256077954105203">📢</tg-emoji>',
             "removed": "🗑️",
-            "modules_list": '<tg-emoji emoji-id="5197269100878907942">📋</tg-emoji>'
+            "modules_list": '<tg-emoji emoji-id="5197269100878907942">📋</tg-emoji>',
+            "notify_success": "✅",
+            "notify_error": "❌",
+            "notify_overwrite": "⚠️",
+            "notify_requirements": "❌"
         },
         "winter": {
             "search": '<tg-emoji emoji-id="5431895003821513760">❄️</tg-emoji>',
@@ -60,9 +69,12 @@ class HSearch(loader.Module):
             "next": "⏭️",
             "module": '<tg-emoji emoji-id="5197708768091061888">🎁</tg-emoji>',
             "close": "❌",
-            "channel": '<tg-emoji emoji-id="5278256077954105203">📢</tg-emoji>',
             "removed": "🗑️",
-            "modules_list": '<tg-emoji emoji-id="5345935030143196497">🎄</tg-emoji>'
+            "modules_list": '<tg-emoji emoji-id="5345935030143196497">🎄</tg-emoji>',
+            "notify_success": "🎁",
+            "notify_error": "🧊",
+            "notify_overwrite": "🌨️",
+            "notify_requirements": "🧊"
         },
         "summer": {
             "search": '<tg-emoji emoji-id="5188217332748527444">🔍</tg-emoji>',
@@ -76,9 +88,12 @@ class HSearch(loader.Module):
             "next": "➡️",
             "module": '<tg-emoji emoji-id="5433645645376264953">🏖️</tg-emoji>',
             "close": "❌",
-            "channel": '<tg-emoji emoji-id="5278256077954105203">📢</tg-emoji>',
             "removed": "🗑️",
-            "modules_list": '<tg-emoji emoji-id="5472178859300363509">🏖️</tg-emoji>'
+            "modules_list": '<tg-emoji emoji-id="5472178859300363509">🏖️</tg-emoji>',
+            "notify_success": "🍹",
+            "notify_error": "🌡️",
+            "notify_overwrite": "🥵",
+            "notify_requirements": "🌡️"
         },
         "spring": {
             "search": '<tg-emoji emoji-id="5449885771420934013">🌱</tg-emoji>',
@@ -92,9 +107,12 @@ class HSearch(loader.Module):
             "next": "⏩",
             "module": '<tg-emoji emoji-id="5440911110838425969">🌿</tg-emoji>',
             "close": "❌",
-            "channel": '<tg-emoji emoji-id="5278256077954105203">📢</tg-emoji>',
             "removed": "🗑️",
-            "modules_list": '<tg-emoji emoji-id="5440748683765227563">🌺</tg-emoji>'
+            "modules_list": '<tg-emoji emoji-id="5440748683765227563">🌺</tg-emoji>',
+            "notify_success": "🌺",
+            "notify_error": "🥀",
+            "notify_overwrite": "🌧️",
+            "notify_requirements": "🥀"
         },
         "autumn": {
             "search": '<tg-emoji emoji-id="5253944419870062295">🍂</tg-emoji>',
@@ -108,24 +126,21 @@ class HSearch(loader.Module):
             "next": "👉",
             "module": '<tg-emoji emoji-id="5249157915041865558">🍄</tg-emoji>',
             "close": "❌",
-            "channel": '<tg-emoji emoji-id="5278256077954105203">📢</tg-emoji>',
             "removed": "🗑️",
-            "modules_list": '<tg-emoji emoji-id="5305495722618010655">🍂</tg-emoji>'
+            "modules_list": '<tg-emoji emoji-id="5305495722618010655">🍂</tg-emoji>',
+            "notify_success": "🍄",
+            "notify_error": "🍁",
+            "notify_overwrite": "🌧️",
+            "notify_requirements": "🍁"
         }
     }
 
     def __init__(self):
         self.config = loader.ModuleConfig(
             loader.ConfigValue(
-                "tracking",
-                True,
-                lambda: self.strings["_cfg_doc_tracking"],
-                validator=loader.validators.Boolean()
-            ),
-            loader.ConfigValue(
                 "theme",
                 "default",
-                lambda: self.strings["_cfg_doc_theme"],
+                lambda: self.strings("_cfg_doc_theme"),
                 validator=loader.validators.Choice(["default", "winter", "summer", "spring", "autumn"])
             )
         )
@@ -133,6 +148,7 @@ class HSearch(loader.Module):
     async def client_ready(self, client, db):
         try:
             await client(UnblockRequest("@FHeta_robot"))
+            await utils.dnd(client, "@FHeta_robot", archive=True)
         except:
             pass
             
@@ -149,45 +165,31 @@ class HSearch(loader.Module):
             except:
                 pass
             
+        self.token = db.get("HSearch", "token")
         asyncio.create_task(self._sync_loop())
-            
+
     async def _sync_loop(self):
-        tracked = True
-        timeout = aiohttp.ClientTimeout(total=5)
-        
-        async with aiohttp.ClientSession(timeout=timeout) as session:
+        ll = None
+
+        async with aiohttp.ClientSession(timeout=aiohttp.ClientTimeout(total=5)) as session:
             while True:
                 try:
-                    if self.config["tracking"]:
+                    cl = self.strings["lang"]
+                    if cl != ll:
                         async with session.post(
                             "https://api.fixyres.com/dataset",
                             params={
                                 "user_id": self.uid,
-                                "lang": self.strings["lang"]
+                                "lang": cl
                             },
                             headers={"Authorization": self.token}
                         ) as response:
-                            tracked = True
                             await response.release()
-                    elif tracked:
-                        async with session.post(
-                            "https://api.fixyres.com/rmd",
-                            params={"user_id": self.uid},
-                            headers={"Authorization": self.token}
-                        ) as response:
-                            tracked = False
-                            await response.release()
+                        ll = cl
                 except:
                     pass
-                    
+
                 await asyncio.sleep(60)
-            
-    async def on_dlmod(self, client, db):
-        try:
-            await client(UnblockRequest("@FHeta_robot"))
-            await utils.dnd(client, "@FHeta_robot", archive=True)
-        except:
-            pass
 
     async def _api_get(self, endpoint: str, **params):
         try:
@@ -220,22 +222,6 @@ class HSearch(loader.Module):
         except:
             return {}
 
-    async def _fetch_thumb(self, url: Optional[str]) -> str:
-        default_thumb = "https://raw.githubusercontent.com/Fixyres/FHeta/refs/heads/main/assets/empty_pic.png"
-
-        if not url:
-            return default_thumb
-        
-        try:
-            async with aiohttp.ClientSession() as session:
-                async with session.get(url, timeout=aiohttp.ClientTimeout(total=1)) as response:
-                    if response.status == 200:
-                        return str(response.url)
-        except:
-            pass
-        
-        return default_thumb
-
     def _get_emoji(self, key: str) -> str:
         return self.THEMES[self.config["theme"]][key]
 
@@ -263,20 +249,16 @@ class HSearch(loader.Module):
             else:
                 text = desc
             
-            info += self.strings["desc"].format(desc=utils.escape_html(text[:800]), emoji=self._get_emoji("description"))
+            info += self.strings["desc"].format(desc=utils.escape_html(text), emoji=self._get_emoji("description"))
 
-        info += self._fmt_cmds(mod.get("commands", []), limit=3800 - len(info))
+        info += self._fmt_cmds(mod.get("commands", []), limit=3700 - len(info))
         return info
 
     def _fmt_cmds(self, cmds: List[Dict], limit: int) -> str:
         cmd_lines = []
         lang = self.strings["lang"]
-        current_len = 0
-
+        
         for cmd in cmds:
-            if current_len >= limit:
-                break
-
             desc_dict = cmd.get("description", {})
             desc_text = desc_dict.get(lang) or desc_dict.get("doc") or ""
             
@@ -291,9 +273,13 @@ class HSearch(loader.Module):
             else:
                 line = f"<code>{self.get_prefix()}{cmd_name}</code> {cmd_desc}"
             
-            if current_len + len(line) < limit:
-                cmd_lines.append(line)
-                current_len += len(line)
+            current_text = "\n".join(cmd_lines)
+            test_text = current_text + ("\n" if current_text else "") + line
+            
+            if len(test_text) > limit:
+                break
+            
+            cmd_lines.append(line)
 
         if cmd_lines:
             return self.strings["cmds"].format(cmds="\n".join(cmd_lines), emoji=self._get_emoji("command"))
@@ -313,11 +299,9 @@ class HSearch(loader.Module):
         
         if query:
             buttons.append([
-                {"text": self.strings["query_label"], "copy": query}
-            ])
-
-            buttons.append([
-                {"text": self.strings["install_btn"], "copy": f"{self.get_prefix()}dlm {install_url}"}
+                {"text": self.strings["query_label"], "copy": query},
+                {"text": self.strings["install_btn"], "callback": self._install_cb, "args": (install_url, idx, mods, query)},
+                {"text": "URL", "copy": install_url}
             ])
         
         buttons.append([
@@ -374,15 +358,6 @@ class HSearch(loader.Module):
         ])
         
         return buttons
-
-    async def _show_list_cb(self, call, idx: int, mods: List, query: str):
-        try:
-            await call.edit(
-                text=self.strings["modules_list"].format(emoji=self._get_emoji("modules_list")),
-                reply_markup=self._mk_list_btns(mods, query, 0, idx)
-            )
-        except:
-            pass
 
     async def _list_page_cb(self, call, page: int, mods: List, query: str, current_idx: int):
         try:
@@ -470,6 +445,118 @@ class HSearch(loader.Module):
             except:
                 pass
 
+    async def _install_cb(self, call, install_url: str, idx: int, mods: Optional[List], query: str = ""):
+        lm = self.lookup("loader")
+        
+        try:
+            r = await lm._storage.fetch(install_url, auth=lm.config.get("basic_auth"))
+        except (aiohttp.ClientError, aiohttp.ClientResponseError) as e:
+            try:
+                await call.answer(
+                    self.strings["error"].format(emoji=self._get_emoji("notify_error")),
+                    show_alert=True
+                )
+            except:
+                pass
+            return
+        
+        doc = r
+        origin = install_url
+        
+        max_attempts = 5
+        for attempt in range(max_attempts):
+            try:
+                result = await self._load_module(lm, doc, origin, attempt)
+                
+                if result == "success":
+                    if lm.fully_loaded:
+                        lm.update_modules_in_db()
+                    
+                    try:
+                        await call.answer(
+                            self.strings["success"].format(emoji=self._get_emoji("notify_success")),
+                            show_alert=False
+                        )
+                    except:
+                        pass
+                    return
+                
+                elif result == "retry":
+                    if attempt < max_attempts - 1:
+                        await asyncio.sleep(0.33)
+                        continue
+                    else:
+                        try:
+                            await call.answer(
+                                self.strings["requirements"].format(emoji=self._get_emoji("notify_requirements")),
+                                show_alert=True
+                            )
+                        except Exception:
+                            pass
+                        return
+                
+                elif isinstance(result, dict) and result.get("type") == "requirements_error":
+                    deps = result.get("deps", [])
+                    if deps:
+                        deps_text = ", ".join(deps[:5])
+                        try:
+                            await call.answer(
+                                self.strings["requirements_deps"].format(
+                                    emoji=self._get_emoji("notify_requirements"),
+                                    deps=deps_text
+                                ),
+                                show_alert=True
+                            )
+                        except:
+                            pass
+                    else:
+                        try:
+                            await call.answer(
+                                self.strings["requirements"].format(emoji=self._get_emoji("notify_requirements")),
+                                show_alert=True
+                            )
+                        except:
+                            pass
+                    return
+                
+                elif result == "overwrite":
+                    try:
+                        await call.answer(
+                            self.strings["overwrite"].format(emoji=self._get_emoji("notify_overwrite")),
+                            show_alert=True
+                        )
+                    except:
+                        pass
+                    return
+                
+                else:
+                    try:
+                        await call.answer(
+                            self.strings["error"].format(emoji=self._get_emoji("notify_error")),
+                            show_alert=True
+                        )
+                    except:
+                        pass
+                    return
+                    
+            except:
+                try:
+                    await call.answer(
+                        self.strings["error"].format(emoji=self._get_emoji("notify_error")),
+                        show_alert=True
+                    )
+                except:
+                    pass
+                return
+        
+        try:
+            await call.answer(
+                self.strings["requirements"].format(emoji=self._get_emoji("notify_requirements")),
+                show_alert=True
+            )
+        except:
+            pass
+
     async def _nav_cb(self, call, idx: int, mods: List, query: str = ""):
         try:
             await call.answer()
@@ -492,17 +579,9 @@ class HSearch(loader.Module):
         except:
             pass
 
-    @loader.inline_handler(
-        ru_doc="(запрос) - поиск модулей.",
-        ua_doc="(запит) - пошук модулів.",
-        kz_doc="(сұрау) - модульдерді іздеу.",
-        uz_doc="(so'rov) - modullarni qidirish.",
-        fr_doc="(requête) - rechercher des modules.",
-        de_doc="(anfrage) - module suchen.",
-        jp_doc="(クエリ) - モジュールを検索します。"
-    )
+    @loader.inline_handler()
     async def hs(self, query):
-        '''(query) - search modules.'''        
+        '''(query) - search modules.'''
         if not query.args:
             return {
                 "title": self.strings["inline_no_query"],
@@ -544,24 +623,16 @@ class HSearch(loader.Module):
             results.append({
                 "title": utils.escape_html(mod.get("name", "")),
                 "description": utils.escape_html(str(desc)),
-                "thumb": await self._fetch_thumb(mod.get("pic")),
+                "thumb": mod.get("pic") or "https://raw.githubusercontent.com/Fixyres/FHeta/refs/heads/main/assets/empty_pic.png",
                 "message": self._fmt_mod(mod, query.args, inline=True),
                 "reply_markup": self._mk_btns(mod.get("install", ""), stats, 0, None, query.args),
             })
 
         return results
 
-    @loader.command(
-        ru_doc="(запрос) - поиск модулей.",
-        ua_doc="(запит) - пошук модулів.",
-        kz_doc="(сұрау) - модульдерді іздеу.",
-        uz_doc="(so'rov) - modullarni qidirish.",
-        fr_doc="(requête) - rechercher des modules.",
-        de_doc="(anfrage) - module suchen.",
-        jp_doc="(クエリ) - モジュールを検索します。"
-    )
+    @loader.command()
     async def hscmd(self, message):
-        '''(query) - search modules.'''        
+        '''(query) - search modules.'''
         query = utils.get_args_raw(message)
         
         if not query:
@@ -603,7 +674,7 @@ class HSearch(loader.Module):
         
         if self.lookup("FHeta"):
             return
-
+        
         try:
             parsed_url = urlparse(link)
             qp = parse_qs(parsed_url.query)
@@ -611,23 +682,266 @@ class HSearch(loader.Module):
             ohd = qp.get('ohd', ['False'])[0]
             
             if ohd.lower() == 'false':
-                cross_msg = await message.respond("❌")
+                warn_msg = await message.respond("⚠️")
                 await asyncio.sleep(1)
-                await cross_msg.delete()
+                await warn_msg.delete()
+                await message.delete()
+                return
+
+            lm = self.lookup("loader")
+            
+            try:
+                r = await lm._storage.fetch(link, auth=lm.config.get("basic_auth"))
+            except (aiohttp.ClientError, aiohttp.ClientResponseError):
+                status_msg = await message.respond("❌")
+                await asyncio.sleep(0.67)
+                await status_msg.delete()
                 await message.delete()
                 return
             
-            if ohd.lower() == 'true':
-                await self.lookup("loader").download_and_install(link, None)
-                
-                await asyncio.sleep(1)
+            doc = r
+            origin = link
+            
+            max_attempts = 5
+            for attempt in range(max_attempts):
+                try:
+                    result = await self._load_module(
+                        lm,
+                        doc,
+                        origin,
+                        attempt
+                    )
+                    
+                    if result == "success":
+                        if lm.fully_loaded:
+                            lm.update_modules_in_db()
+                        
+                        status_msg = await message.respond("✅")
+                        await asyncio.sleep(0.5)
+                        await status_msg.delete()
+                        await message.delete()
+                        return
+                    
+                    elif result == "retry":
+                        if attempt < max_attempts - 1:
+                            await asyncio.sleep(0.33)
+                            continue
+                        else:
+                            status_msg = await message.respond("📋")
+                            await asyncio.sleep(1)
+                            await status_msg.delete()
+                            await message.delete()
+                            return
+                    
+                    elif isinstance(result, dict) and result.get("type") == "requirements_error":
+                        deps = result.get("deps", [])
+                        if deps:
+                            deps_text = ",".join(deps[:5])
+                            status_msg = await message.respond(f"📋{deps_text}")
+                        else:
+                            status_msg = await message.respond("📋")
+                        await asyncio.sleep(1)
+                        await status_msg.delete()
+                        await message.delete()
+                        return
+                    
+                    elif result == "overwrite":
+                        status_msg = await message.respond("😨")
+                        await asyncio.sleep(1)
+                        await status_msg.delete()
+                        await message.delete()
+                        return
+                    
+                    else:
+                        status_msg = await message.respond("❌")
+                        await asyncio.sleep(0.67)
+                        await status_msg.delete()
+                        await message.delete()
+                        return
+                        
+                except Exception:
+                    status_msg = await message.respond("❌")
+                    await asyncio.sleep(0.67)
+                    await status_msg.delete()
+                    await message.delete()
+                    return
+            
+            status_msg = await message.respond("📋")
+            await asyncio.sleep(1)
+            await status_msg.delete()
+            await message.delete()
+            
+        except Exception:
+            status_msg = await message.respond("❌")
+            await asyncio.sleep(0.67)
+            await status_msg.delete()
+            await message.delete()
 
-                if self.lookup("loader").fully_loaded:
-                    self.lookup("loader").update_modules_in_db()
+    async def _load_module(self, lm, doc, origin, attempt):
+        if attempt == 0:
+            requirements = []
+            try:
+                requirements = list(
+                    filter(
+                        lambda x: not x.startswith(("-", "_", ".")),
+                        map(
+                            lambda s: s.strip().rstrip(','),
+                            loader.VALID_PIP_PACKAGES.search(doc)[1].split(),
+                        ),
+                    )
+                )
+            except (TypeError, AttributeError):
+                pass
+            
+            if requirements:
+                is_venv = hasattr(sys, 'real_prefix') or sys.prefix != getattr(sys, 'base_prefix', sys.prefix)
+                need_user_flag = loader.USER_INSTALL and not is_venv
                 
-                rose_msg = await message.respond("🌹")
-                await asyncio.sleep(1)
-                await rose_msg.delete()
-                await message.delete()
-        except:
-            pass
+                pip = await asyncio.create_subprocess_exec(
+                    sys.executable,
+                    "-m",
+                    "pip",
+                    "install",
+                    "--upgrade",
+                    "-q",
+                    "--disable-pip-version-check",
+                    "--no-warn-script-location",
+                    *["--user"] if need_user_flag else [],
+                    *requirements,
+                )
+                
+                rc = await pip.wait()
+                
+                if rc != 0:
+                    return {"type": "requirements_error", "deps": requirements}
+                
+                __import__('importlib').invalidate_caches()
+                return "retry"
+            
+            packages = []
+            try:
+                packages = list(
+                    filter(
+                        lambda x: not x.startswith(("-", "_", ".")),
+                        map(
+                            lambda s: s.strip().rstrip(','),
+                            loader.VALID_APT_PACKAGES.search(doc)[1].split(),
+                        ),
+                    )
+                )
+            except (TypeError, AttributeError):
+                pass
+            
+            if packages:
+                result = await lm.install_packages(packages)
+                if not result:
+                    return {"type": "requirements_error", "deps": packages}
+                __import__('importlib').invalidate_caches()
+                return "retry"
+        
+        try:
+            node = ast.parse(doc)
+            uid = next(
+                n.name
+                for n in node.body
+                if isinstance(n, ast.ClassDef)
+                and any(
+                    isinstance(base, ast.Attribute)
+                    and base.value.id == "Module"
+                    or isinstance(base, ast.Name)
+                    and base.id == "Module"
+                    for base in n.bases
+                )
+            )
+        except Exception:
+            uid = "__extmod_" + str(uuid.uuid4())
+        
+        module_name = f"heroku.modules.{uid}"
+        
+        try:
+            spec = ModuleSpec(
+                module_name,
+                loader.StringLoader(doc, f"<external {module_name}>"),
+                origin=f"<external {module_name}>",
+            )
+            instance = await lm.allmodules.register_module(
+                spec,
+                module_name,
+                origin,
+                save_fs=False,
+            )
+        except ImportError as e:
+            requirements = [
+                {
+                    "sklearn": "scikit-learn",
+                    "pil": "Pillow",
+                    "herokutl": "Heroku-TL-New",
+                }.get(e.name.lower(), e.name)
+            ]
+            
+            if not requirements:
+                return "error"
+            
+            is_venv = hasattr(sys, 'real_prefix') or sys.prefix != getattr(sys, 'base_prefix', sys.prefix)
+            need_user_flag = loader.USER_INSTALL and not is_venv
+            
+            pip = await asyncio.create_subprocess_exec(
+                sys.executable,
+                "-m",
+                "pip",
+                "install",
+                "--upgrade",
+                "-q",
+                "--disable-pip-version-check",
+                "--no-warn-script-location",
+                *["--user"] if need_user_flag else [],
+                *requirements,
+            )
+            
+            rc = await pip.wait()
+            
+            if rc != 0:
+                return {"type": "requirements_error", "deps": requirements}
+            
+            __import__('importlib').invalidate_caches()
+            return "retry"
+            
+        except CoreOverwriteError:
+            with __import__('contextlib').suppress(Exception):
+                await lm.allmodules.unload_module(instance.__class__.__name__)
+            with __import__('contextlib').suppress(Exception):
+                lm.allmodules.modules.remove(instance)
+            return "overwrite"
+        except (loader.LoadError, ScamDetectionError):
+            with __import__('contextlib').suppress(Exception):
+                await lm.allmodules.unload_module(instance.__class__.__name__)
+            with __import__('contextlib').suppress(Exception):
+                lm.allmodules.modules.remove(instance)
+            return "error"
+        except Exception:
+            return "error"
+        
+        try:
+            lm.allmodules.send_config_one(instance)
+            
+            await lm.allmodules.send_ready_one(
+                instance,
+                no_self_unload=True,
+                from_dlmod=False,
+            )
+        except CoreOverwriteError:
+            with __import__('contextlib').suppress(Exception):
+                await lm.allmodules.unload_module(instance.__class__.__name__)
+            with __import__('contextlib').suppress(Exception):
+                lm.allmodules.modules.remove(instance)
+            return "overwrite"
+        except (loader.LoadError, ScamDetectionError, loader.SelfUnload, loader.SelfSuspend):
+            with __import__('contextlib').suppress(Exception):
+                await lm.allmodules.unload_module(instance.__class__.__name__)
+            with __import__('contextlib').suppress(Exception):
+                lm.allmodules.modules.remove(instance)
+            return "error"
+        except Exception:
+            return "error"
+        
+        return "success"
