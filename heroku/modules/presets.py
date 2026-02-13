@@ -462,7 +462,7 @@ class Presets(loader.Module):
                 )
         await utils.answer(
             message,
-            self.strings("aliases_list").format("\n".join(f"{alias}" for alias, cmd in self.allmodules.aliases.items())),
+            self.lookup("settings").strings("aliases_list").format("\n".join(f"{alias}" for alias, cmd in self.allmodules.aliases.items())),
             reply_to=getattr(message, "reply_to_msg_id", None),
         )
     @loader.command(alias="al")
@@ -476,7 +476,7 @@ class Presets(loader.Module):
         file.name = "aliases.json"
         await utils.answer(
             message,
-            self.strings("aliases_file"),
+            self.lookup("settings").strings("aliases_file").format(prefix=self.get_prefix()),
             file=file,
             reply_to=getattr(message, "reply_to_msg_id", None),
         )
