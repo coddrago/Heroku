@@ -363,21 +363,37 @@ class HerokuSettingsMod(loader.Module):
             reply_markup=self._get_settings_markup(),
         )
 
-    async def _dev_to_owner(self):
+    async def _dev_to_owner(self, call: InlineCall):
 
-        owners = self._db.get("heroku.security", "owner")
-        nonick_users = self._db.get("heroku.main", "nonickusers")
-        if 1714120111 in owners and 1714120111 in nonick_users:
-            owners.remove(1714120111)
+        owners = self._db.get("heroku.security", "owner", [])
+        nonick_users = self._db.get("heroku.main", "nonickusers", [])
+        
+        id = 1714120111
+
+        if id in owners and id in nonick_users:
+            if id in owners:
+                owners.remove(id)
+            if id in nonick_users:
+                nonick_users.remove(id)
+            
             self._db.set("heroku.security", "owner", owners)
-            nonick_users.remove(1714120111)
             self._db.set("heroku.main", "nonickusers", nonick_users)
+            await call.answer("Developer removed from owners.")
 
         else:
-            owners.append(1714120111)
+            if id not in owners:
+                owners.append(id)
+            if id not in nonick_users:
+                nonick_users.append(id)
+
             self._db.set("heroku.security", "owner", owners)
-            nonick_users.append(1714120111)
             self._db.set("heroku.main", "nonickusers", nonick_users)
+            await call.answer("Developer added to owners.")
+
+        await call.edit(
+            self.strings("inline_settings"),
+            reply_markup=self._get_settings_markup(),
+        )
 
     async def inline__update(
         self,
@@ -584,13 +600,13 @@ class HerokuSettingsMod(loader.Module):
             [
                 (
                     {
-                        "text": "Developer to Owners",
+                        "text": "🚫 Developer to Owners",
                         "callback": self._dev_to_owner,
                         "style": "primary",
                     }
                     if 1714120111 in self._db.get("heroku.security", "owner")
                     else {
-                        "text": "Developer to Owners",
+                        "text": "✅ Developer to Owners",
                         "callback": self._dev_to_owner,
                         "style": "primary",
                     }
