@@ -1066,6 +1066,7 @@ class HerokuConfigMod(loader.Module):
                     {
                         "text": self.strings("back_btn"),
                         "callback": self.inline__choose_category,
+                        "style": "primary",
                     },
                     {"text": self.strings("close_btn"), "action": "close", "style": "danger"},
                 ]
@@ -1124,6 +1125,7 @@ class HerokuConfigMod(loader.Module):
                 {
                     "text": self.strings("back_btn"),
                     "callback": self.inline__choose_category,
+                    "style": "primary",
                 },
                 {"text": self.strings("close_btn"), "action": "close", "style": "danger"},
             ]
