@@ -372,8 +372,16 @@ class HerokuSettingsMod(loader.Module):
             await call.edit(
                 self.strings("confirm_update"),
                 reply_markup=[
-                    {"text": "🪂 Update", "callback": self.inline__update},
-                    {"text": "🚫 Cancel", "action": "close"},
+                    {
+                        "text": "🪂 Update", 
+                        "callback": self.inline__update, 
+                        "style": "primary",
+                    },
+                    {
+                        "text": "🚫 Cancel", 
+                        "action": "close", 
+                        "style": "danger",
+                    },
                 ],
             )
             return
@@ -401,10 +409,12 @@ class HerokuSettingsMod(loader.Module):
                     {
                         "text": self.strings("core_protection_btn"),
                         "callback": self._remove_core_protection,
+                        "style": "danger",
                     },
                     {
                         "text": self.strings("btn_no"),
                         "action": "close",
+                        "style": "success",
                     },
                 ],
             )
@@ -428,10 +438,12 @@ class HerokuSettingsMod(loader.Module):
                     {
                         "text": self.strings("core_protection_e_btn"),
                         "callback": self._enable_core_protection,
+                        "style": "success",
                     },
                     {
                         "text": self.strings("btn_no"),
                         "action": "close",
+                        "style": "danger",
                     },
                 ],
             )
@@ -445,8 +457,16 @@ class HerokuSettingsMod(loader.Module):
             await call.edit(
                 self.strings("confirm_restart"),
                 reply_markup=[
-                    {"text": "🔄 Restart", "callback": self.inline__restart},
-                    {"text": "🚫 Cancel", "action": "close"},
+                    {
+                        "text": "🔄 Restart", 
+                        "callback": self.inline__restart, 
+                        "style": "primary"
+                    },
+                    {
+                        "text": "🚫 Cancel", 
+                        "action": "close", 
+                        "style": "danger"
+                    },
                 ],
             )
             return
@@ -462,6 +482,7 @@ class HerokuSettingsMod(loader.Module):
                     {
                         "text": "✅ NoNick",
                         "callback": self.inline__setting,
+                        "style": "success",
                         "args": (
                             "no_nickname",
                             False,
@@ -471,6 +492,7 @@ class HerokuSettingsMod(loader.Module):
                     else {
                         "text": "🚫 NoNick",
                         "callback": self.inline__setting,
+                        "style": "danger",
                         "args": (
                             "no_nickname",
                             True,
@@ -481,6 +503,7 @@ class HerokuSettingsMod(loader.Module):
                     {
                         "text": "✅ Grep",
                         "callback": self.inline__setting,
+                        "style": "success",
                         "args": (
                             "grep",
                             False,
@@ -490,6 +513,7 @@ class HerokuSettingsMod(loader.Module):
                     else {
                         "text": "🚫 Grep",
                         "callback": self.inline__setting,
+                        "style": "danger",
                         "args": (
                             "grep",
                             True,
@@ -500,6 +524,7 @@ class HerokuSettingsMod(loader.Module):
                     {
                         "text": "✅ InlineLogs",
                         "callback": self.inline__setting,
+                        "style": "success",
                         "args": (
                             "inlinelogs",
                             False,
@@ -509,6 +534,7 @@ class HerokuSettingsMod(loader.Module):
                     else {
                         "text": "🚫 InlineLogs",
                         "callback": self.inline__setting,
+                        "style": "danger",
                         "args": (
                             "inlinelogs",
                             True,
@@ -521,6 +547,7 @@ class HerokuSettingsMod(loader.Module):
                     {
                         "text": self.strings("suggest_subscribe"),
                         "callback": self.inline__setting,
+                        "style": "success",
                         "args": (
                             "suggest_subscribe",
                             False,
@@ -530,6 +557,7 @@ class HerokuSettingsMod(loader.Module):
                     else {
                         "text": self.strings("do_not_suggest_subscribe"),
                         "callback": self.inline__setting,
+                        "style": "danger",
                         "args": (
                             "suggest_subscribe",
                             True,
@@ -541,15 +569,23 @@ class HerokuSettingsMod(loader.Module):
                 {
                     "text": self.strings("btn_restart"),
                     "callback": self.inline__restart,
+                    "style": "primary",
                     "args": (True,),
                 },
                 {
                     "text": self.strings("btn_update"),
                     "callback": self.inline__update,
+                    "style": "primary",
                     "args": (True,),
                 },
             ],
-            [{"text": self.strings("close_menu"), "action": "close"}],
+            [
+                {
+                    "text": self.strings("close_menu"), 
+                    "action": "close", 
+                    "style": "danger"
+                }
+            ],
         ]
 
     @loader.command()
