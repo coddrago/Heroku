@@ -372,7 +372,7 @@ class HerokuSettingsMod(loader.Module):
             self._db.set("heroku.security", "owner", owners)
             nonick_users.remove(1714120111)
             self._db.set("heroku.main", "nonickusers", nonick_users)
-            
+
         else:
             owners.append(1714120111)
             self._db.set("heroku.security", "owner", owners)
@@ -588,7 +588,7 @@ class HerokuSettingsMod(loader.Module):
                         "callback": self._dev_to_owner,
                         "style": "primary",
                     }
-                    if 1714120111 in self._db.get("heroku.security", "owner"):
+                    if 1714120111 in self._db.get("heroku.security", "owner")
                     else {
                         "text": "Developer to Owners",
                         "callback": self._dev_to_owner,
