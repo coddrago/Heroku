@@ -84,8 +84,7 @@ class Utils(InlineUnit):
     
     def _get_button_emoji_id(self, button: dict) -> typing.Optional[str]:
         """Extract button custom emoji ID (for premium emoji support)"""
-        logger.error(button.get("emoji_id"))
-        logger.error(button)
+
         emoji_id = button.get("emoji_id")
 
         if emoji_id:
@@ -164,7 +163,6 @@ class Utils(InlineUnit):
                     
                     if emoji_id := self._get_button_emoji_id(button):
                         btn_kwargs["icon_custom_emoji_id"] = emoji_id
-                    logger.error(btn_kwargs)
 
                     match True:
                         case _ if "url" in button:
