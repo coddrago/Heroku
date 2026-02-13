@@ -451,7 +451,6 @@ updater:
   ignore: "🚫 E'tiborsiz qoldirish"
   changelog: '<tg-emoji emoji-id=5434144690511290129>📰</tg-emoji> <b>So‘nggi yirik yangilanish o‘zgarishlar tarixi:</b><blockquote expandable>{}</blockquote>'
 
-
 api_protection:
   name: "APILimiter"
   warning: "⚠️ <b>DIQQAT!</b>\n\nHisobingiz konfiguratsiyada belgilangan so‘rovlar chegarasidan oshib ketdi. Telegram API Flood oldini olish uchun yuzerbot {} soniyaga <b>to‘liq muzlatildi</b>. Qo‘shimcha ma'lumot ilova qilingan faylda keltirilgan. \n\n<code>{prefix}support</code> guruhidan yordam olish tavsiya etiladi!\n\nAgar bu kutilgan xatti-harakat deb hisoblasangiz, yuzerbot blokdan chiqishini kuting va keyingi safar bunday operatsiyani bajarmoqchi bo‘lsangiz, <code>{prefix}suspend_api_protect</code> &lt;vaqt soniyada&gt; dan foydalaning"
@@ -473,7 +472,6 @@ api_protection:
   _cls_doc: "Yuzerbotga Telegram API spamini oldini olishga yordam beradi"
 
 HSearch:
-  name: "HSearch"
   _cls_doc: "Modullarni qidirish moduli! HSearch barcha yangilanishlarini @FHeta_Updates kanalida kuzatib boring!"
   searching: "{emoji} <b><code>{query}</code> so'rovi bo'yicha qidiruv...</b>"
   no_query: "{emoji} <b>Siz qidiruv so'rovini kiritmadingiz, misol: <code>{prefix}hs sizning sorovingiz</code></b>"
@@ -492,10 +490,16 @@ HSearch:
   inline_no_results: "Boshqa so'rovni sinab ko'ring."
   inline_query_too_big: "Sizning so'rovingiz juda katta, iltimos uni 168 belgigacha qisqartiring."
   query_label: "So'rov"
-  install_btn: "O'rnatish buyrug'i"
+  install_btn: "O'rnatish"
   modules_list: "{emoji} <b>Barcha topilgan modullar:</b>"
-  _cfg_doc_tracking: "HSearch boti bilan sinxronlashtirish uchun ma'lumotlaringizni (foydalanuvchi IDsi, til) kuzatishni yoqish kerakmi?"
+  success: "{emoji} Modul muvaffaqiyatli o'rnatildi!"
+  error: "{emoji} Xatolik, ehtimol modul buzilgan!"
+  overwrite: "{emoji} Xatolik, modul o'rnatilgan modulni qayta yozishga harakat qildi!"
+  requirements: "{emoji} Bog'liqliklarni o'rnatish xatosi!"
+  requirements_deps: "{emoji} Bog'liqliklarni o'rnatish xatosi ({deps})!"
   _cfg_doc_theme: "Emojilar uchun mavzu."
+  _cmd_doc_hs: "(so'rov) - modullarni qidirish."
+  _ihandle_doc_hs: "(so'rov) - modullarni qidirish."
 
 help:
   name: "Help"
