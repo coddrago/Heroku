@@ -164,6 +164,7 @@ class Utils(InlineUnit):
                     
                     if emoji_id := self._get_button_emoji_id(button):
                         btn_kwargs["icon_custom_emoji_id"] = emoji_id
+                    logger.error(btn_kwargs)
 
                     match True:
                         case _ if "url" in button:
