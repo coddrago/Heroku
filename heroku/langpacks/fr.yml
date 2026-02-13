@@ -451,7 +451,6 @@ updater:
   ignore: "🚫 Ignorer"
   changelog: '<tg-emoji emoji-id=5434144690511290129>📰</tg-emoji> <b>Journal des modifications de la dernière mise à jour majeure :</b><blockquote expandable>{}</blockquote>'
 
-
 api_protection:
   name: "APILimiter"
   warning: "⚠️ <b>ATTENTION !</b>\n\nVotre compte a dépassé la limite de requêtes spécifiée dans la configuration. Afin d'éviter le Flood API Telegram, le userbot a été <b>entièrement gelé</b> pour {} secondes. Plus d'infos sont fournies dans le fichier joint. \n\nIl est recommandé d'obtenir de l'aide dans le groupe <code>{prefix}support</code> !\n\nSi vous pensez que c'est un comportement prévu, attendez que le userbot soit débloqué et la prochaine fois que vous comptez effectuer une telle opération, utilisez <code>{prefix}suspend_api_protect</code> &lt;temps en secondes&gt;"
@@ -473,7 +472,6 @@ api_protection:
   _cls_doc: "Aide le userbot à éviter de spammer l'API Telegram"
 
 HSearch:
-  name: "HSearch"
   _cls_doc: "Module de recherche de modules! Suivez toutes les actualités HSearch sur @FHeta_Updates!"
   searching: "{emoji} <b>Recherche pour <code>{query}</code>...</b>"
   no_query: "{emoji} <b>Vous n'avez pas entré de requête de recherche, exemple: <code>{prefix}hs votre requête</code></b>"
@@ -492,10 +490,16 @@ HSearch:
   inline_no_results: "Essayez une autre requête."
   inline_query_too_big: "Votre requête est trop longue, veuillez la réduire à 168 caractères."
   query_label: "Requête"
-  install_btn: "Commande d'installation"
+  install_btn: "Installer"
   modules_list: "{emoji} <b>Tous les modules trouvés:</b>"
-  _cfg_doc_tracking: "Activer le suivi de vos données (ID utilisateur, langue) pour la synchronisation avec le bot HSearch?"
+  success: "{emoji} Module installé avec succès!"
+  error: "{emoji} Erreur, le module est peut-être cassé!"
+  overwrite: "{emoji} Erreur, le module a tenté d'écraser le module intégré!"
+  requirements: "{emoji} Erreur d'installation des dépendances!"
+  requirements_deps: "{emoji} Erreur d'installation des dépendances ({deps})!"
   _cfg_doc_theme: "Thème pour les emojis."
+  _cmd_doc_hs: "(requête) - rechercher des modules."
+  _ihandle_doc_hs: "(requête) - rechercher des modules."
 
 help:
   name: "Help"
