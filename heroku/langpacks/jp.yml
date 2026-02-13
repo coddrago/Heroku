@@ -451,7 +451,6 @@ updater:
   ignore: "🚫 無視"
   changelog: '<tg-emoji emoji-id=5434144690511290129>📰</tg-emoji> <b>最後のメジャーアップデートの変更履歴:</b><blockquote expandable>{}</blockquote>'
 
-
 api_protection:
   name: "APILimiter"
   warning: "⚠️ <b>警告！</b>\n\nあなたのアカウントは設定で指定されたリクエスト制限を超えました。Telegram API フラッドを防ぐため、ユーザーボットは {} 秒間<b>完全に凍結</b>されました。詳細情報は添付ファイルに記載されています。\n\n<code>{prefix}support</code> グループで助けを求めることをお勧めします！\n\nこれが意図された動作であると思う場合は、ユーザーボットのロックが解除されるまで待ち、次回同様の操作を行う際は <code>{prefix}suspend_api_protect</code> &lt;秒数&gt; を使用してください"
@@ -473,7 +472,6 @@ api_protection:
   _cls_doc: "ユーザーボットが Telegram API をスパムするのを防ぎます"
 
 HSearch:
-  name: "HSearch"
   _cls_doc: "モジュール検索用モジュール！@FHeta_UpdatesでHSearchのすべてのニュースをフォローしてください！"
   searching: "{emoji} <b><code>{query}</code>を検索中...</b>"
   no_query: "{emoji} <b>検索クエリを入力していません、例: <code>{prefix}hs あなたのクエリ</code></b>"
@@ -492,10 +490,16 @@ HSearch:
   inline_no_results: "別のクエリを試してください。"
   inline_query_too_big: "クエリが大きすぎます。168文字に短縮してください。"
   query_label: "クエリ"
-  install_btn: "インストールコマンド"
+  install_btn: "インストール"
   modules_list: "{emoji} <b>見つかったすべてのモジュール:</b>"
-  _cfg_doc_tracking: "HSearchボットとの同期のためにデータ（ユーザーID、言語）の追跡を有効にしますか？"
+  success: "{emoji} モジュールが正常にインストールされました!"
+  error: "{emoji} エラー、モジュールが壊れている可能性があります!"
+  overwrite: "{emoji} エラー、モジュールが組み込みモジュールを上書きしようとしました!"
+  requirements: "{emoji} 依存関係のインストールエラー!"
+  requirements_deps: "{emoji} 依存関係のインストールエラー ({deps})!"
   _cfg_doc_theme: "絵文字のテーマ。"
+  _cmd_doc_hs: "(クエリ) - モジュールを検索します。"
+  _ihandle_doc_hs: "(クエリ) - モジュールを検索します。"
   
 help:
   name: "Help"
