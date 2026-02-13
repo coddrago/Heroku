@@ -84,7 +84,8 @@ class Utils(InlineUnit):
     
     def _get_button_emoji_id(self, button: dict) -> typing.Optional[str]:
         """Extract button custom emoji ID (for premium emoji support)"""
-
+        logger.error(button.get("emoji_id"))
+        logger.error(button)
         emoji_id = button.get("emoji_id")
 
         if emoji_id:
