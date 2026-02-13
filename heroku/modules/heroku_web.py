@@ -165,13 +165,6 @@ class HerokuWebMod(loader.Module):
                 )
                 return
         
-            if user.id == self._client.tg_id:
-                await utils.answer(
-                    message,
-                    self.strings("cant_add_self")
-                )
-                return
-        
             if "force_insecure" in message.text.lower():
                 await self._inline_login(message, user)
         
