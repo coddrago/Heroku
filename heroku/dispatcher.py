@@ -313,7 +313,7 @@ class CommandDispatcher:
         match True:
             case _ if (
                 event.message.message.startswith(str.translate(prefix, _LAYOUT_TRANSLATION))
-                #and str.translate(prefix, _LAYOUT_TRANSLATION) != prefix
+                and str.translate(prefix, _LAYOUT_TRANSLATION) != prefix
             ):
                 message.message = str.translate(message.message, _LAYOUT_TRANSLATION)
                 message.text = str.translate(message.text, _LAYOUT_TRANSLATION)
