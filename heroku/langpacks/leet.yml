@@ -451,7 +451,6 @@ updater:
   ignore: "🚫 1gn0r3"
   changelog: '<tg-emoji emoji-id=5434144690511290129>📰</tg-emoji> <b>Ch4ng3l0g 0f 7h3 l457 m4j0r upd473:</b><blockquote expandable>{}</blockquote>'
 
-
 api_protection:
   name: "4P1L1m173r"
   warning: "⚠️ <b>W4RN1NG!</b>\n\nUr 4cc 3xc33d3d 7h3 l1m17 0f r3qu3575, sp3c1f13d 1n c0nf1g. 1n 0rd3r 2 pr3v3n7 T3l3gr4m 4P1 Fl00d, u53rb07 h45 b33n <b>fully fr0z3n</b> 4 {} s3c5. Fur7h3r 1nf0 15 pr0v1d3d 1n 4774ch3d f1l3. \n\n17 15 r3c0mm3nd3d 2 g37 h3lp 1n <code>{prefix}support</code> gr0up!\n\n1f u 7h1nk, 7h47 17 15 4n 1n73nd3d b3h4v10r, 7h3n w417 un71l u53rb07 g375 unl0ck3d & n3x7 71m3, wh3n u w1ll b3 g01ng 2 p3rf0rm such 4n 0p, u53 <code>{prefix}suspend_api_protect</code> &lt;time in seconds&gt;"
@@ -473,30 +472,32 @@ api_protection:
   _cls_doc: "H3lp5 u53rb07 4v01d sp4mm1ng T3l3gr4m 4P1"
 
 HSearch:
-  name: "H534rch"
-  searching: "{emoji} <b>534rch1ng f0r <code>{query}</code>...</b>"
+  searching: "{emoji} <b>S34rch1ng f0r <code>{query}</code>...</b>"
   no_query: "{emoji} <b>U d1dn'7 3n73r 4 534rch qu3ry, 3x4mpl3: <code>{prefix}hs ur qu3ry</code></b>"
   no_results: "{emoji} <b>N07h1ng f0und f0r qu3ry <code>{query}</code>.</b>"
-  query_too_big: "{emoji} <b>Ur qu3ry 15 700 b1g, plz 7ry r3duc1ng 17 2 168 ch4r4c73r5.</b>"
+  query_too_big: "{emoji} <b>Ur qu3ry 15 700 b1g, pl3453 7ry r3duc1ng 17 70 168 ch4r5.</b>"
   module_info: "{emoji} <code>{name}</code> <b>by</b> <code>{author}</code>"
   module_info_version: "{emoji} <code>{name}</code> <b>by</b> <code>{author}</code> (<code>v{version}</code>)"
   desc: "\n\n{emoji} <b>D35cr1p710n:</b>\n<blockquote expandable>{desc}</blockquote>"
-  cmds: "\n\n{emoji} <b>C0mm4nd5:</b>\n<blockquote expandable>{cmds}</blockquote>"
-  lang: "leet"
+  cmds: "\n\n{emoji} <b>C0mm4ndz:</b>\n<blockquote expandable>{cmds}</blockquote>"
   rating_added: "{emoji} R471ng 5ubm1773d!"
   rating_changed: "{emoji} R471ng h45 b33n ch4ng3d!"
   rating_removed: "{emoji} R471ng d3l373d!"
-  inline_no_query: "3n73r 4 qu3ry 2 534rch."
+  inline_no_query: "3n73r 4 qu3ry 70 534rch."
   inline_desc: "N4m3, c0mm4nd, d35cr1p710n, 4u7h0r."
   inline_no_results: "7ry 4n07h3r qu3ry."
-  inline_query_too_big: "Ur qu3ry 15 700 b1g, plz 7ry r3duc1ng 17 2 168 ch4r4c73r5."
+  inline_query_too_big: "Ur qu3ry 15 700 b1g, pl3453 7ry r3duc1ng 17 70 168 ch4r5."
   query_label: "Qu3ry"
-  install_btn: "1n574ll4710n c0mm4nd"
+  install_btn: "1n574ll"
   results_count: "{idx}/{total}"
-  modules_list: "{emoji} <b>4ll f0und m0dul35:</b>"
-  _cfg_doc_tracking: "3n4bl3 7r4ck1ng 0f ur d474 (u53r 1D, l4ngu4g3) f0r 5ynchr0n1z4710n w17h 7h3 H53arch b07?"
+  modules_list: "{emoji} <b>4ll f0und m0dul3z:</b>"
+  success: "{emoji} M0dul3 5ucc355fully 1n574ll3d!"
+  error: "{emoji} 3rr0r, p3rh4p5 7h3 m0dul3 15 br0k3n!"
+  overwrite: "{emoji} 3rr0r, m0dul3 7r13d 70 0v3rwr173 bu1l7-1n m0dul3!"
+  requirements: "{emoji} D3p5 1n574ll 3rr0r!"
+  requirements_deps: "{emoji} D3p5 1n574ll 3rr0r ({deps})!"
   _cfg_doc_theme: "7h3m3 f0r 3m0j15."
-
+  
 help:
   name: "H3lp"
   undoc: "🦥 N0 d0c5"
