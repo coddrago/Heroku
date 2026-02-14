@@ -359,6 +359,15 @@ class HSearch(loader.Module):
         
         return buttons
 
+    async def _show_list_cb(self, call, idx: int, mods: List, query: str):
+        try:
+            await call.edit(
+                text=self.strings["modules_list"].format(emoji=self._get_emoji("modules_list")),
+                reply_markup=self._mk_list_btns(mods, query, 0, idx)
+            )
+        except:
+            pass
+
     async def _list_page_cb(self, call, page: int, mods: List, query: str, current_idx: int):
         try:
             await call.edit(
