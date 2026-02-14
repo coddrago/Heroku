@@ -1,5 +1,4 @@
 __version__ = (2, 0, 0)
-# meta developer: @FModules
 
 # ©️ Fixyres, 2024-2030
 # 🌐 https://github.com/Fixyres/FHeta
@@ -14,19 +13,20 @@ __version__ = (2, 0, 0)
 # You can redistribute it and/or modify it under the terms of the GNU AGPLv3
 # 🔑 https://www.gnu.org/licenses/agpl-3.0.html
 
-import asyncio
-import aiohttp
 import ast
+import asyncio
 import sys
 import uuid
-from typing import Optional, Dict, List
-from urllib.parse import unquote
 from importlib.machinery import ModuleSpec
+from typing import Dict, List, Optional
+from urllib.parse import unquote
+
+import aiohttp
+from herokutl.errors.common import ScamDetectionError
+from herokutl.tl.functions.contacts import UnblockRequest
 
 from .. import loader, utils
 from ..types import CoreOverwriteError
-from herokutl.tl.functions.contacts import UnblockRequest
-from herokutl.errors.common import ScamDetectionError
 
 
 @loader.tds
@@ -39,95 +39,95 @@ class HSearch(loader.Module):
     
     THEMES = {
         "default": {
-            "search": '<tg-emoji emoji-id="5188217332748527444">🔍</tg-emoji>',
-            "error": '<tg-emoji emoji-id="5465665476971471368">❌</tg-emoji>',
-            "warn": '<tg-emoji emoji-id="5447644880824181073">⚠️</tg-emoji>',
-            "description": '<tg-emoji emoji-id="5334882760735598374">📝</tg-emoji>',
-            "command": '<tg-emoji emoji-id="5341715473882955310">⚙️</tg-emoji>',
+            "search": '<tg-emoji emoji-id=5188217332748527444>🔍</tg-emoji>',
+            "error": '<tg-emoji emoji-id=5465665476971471368>❌</tg-emoji>',
+            "warn": '<tg-emoji emoji-id=5447644880824181073>⚠️</tg-emoji>',
+            "description": '<tg-emoji emoji-id=5334882760735598374>📝</tg-emoji>',
+            "command": '<tg-emoji emoji-id=5341715473882955310>⚙️</tg-emoji>',
             "like": "👍",
             "dislike": "👎",
             "prev": "◀️",
             "next": "▶️",
-            "module": '<tg-emoji emoji-id="5454112830989025752">📦</tg-emoji>',
+            "module": '<tg-emoji emoji-id=5454112830989025752>📦</tg-emoji>',
             "close": "❌",
             "removed": "🗑️",
-            "modules_list": '<tg-emoji emoji-id="5197269100878907942">📋</tg-emoji>',
+            "modules_list": '<tg-emoji emoji-id=5197269100878907942>📋</tg-emoji>',
             "notify_success": "✅",
             "notify_error": "❌",
             "notify_overwrite": "⚠️",
             "notify_requirements": "❌"
         },
         "winter": {
-            "search": '<tg-emoji emoji-id="5431895003821513760">❄️</tg-emoji>',
-            "error": '<tg-emoji emoji-id="5404728536810398694">🧊</tg-emoji>',
-            "warn": '<tg-emoji emoji-id="5447644880824181073">🌨️</tg-emoji>',
-            "description": '<tg-emoji emoji-id="5255850496291259327">📜</tg-emoji>',
-            "command": '<tg-emoji emoji-id="5199503707938505333">🎅</tg-emoji>',
+            "search": '<tg-emoji emoji-id=5431895003821513760>❄️</tg-emoji>',
+            "error": '<tg-emoji emoji-id=5404728536810398694>🧊</tg-emoji>',
+            "warn": '<tg-emoji emoji-id=5447644880824181073>🌨️</tg-emoji>',
+            "description": '<tg-emoji emoji-id=5255850496291259327>📜</tg-emoji>',
+            "command": '<tg-emoji emoji-id=5199503707938505333>🎅</tg-emoji>',
             "like": "☕",
             "dislike": "🥶",
             "prev": "⏮️",
             "next": "⏭️",
-            "module": '<tg-emoji emoji-id="5197708768091061888">🎁</tg-emoji>',
+            "module": '<tg-emoji emoji-id=5197708768091061888>🎁</tg-emoji>',
             "close": "❌",
             "removed": "🗑️",
-            "modules_list": '<tg-emoji emoji-id="5345935030143196497">🎄</tg-emoji>',
+            "modules_list": '<tg-emoji emoji-id=5345935030143196497>🎄</tg-emoji>',
             "notify_success": "🎁",
             "notify_error": "🧊",
             "notify_overwrite": "🌨️",
             "notify_requirements": "🧊"
         },
         "summer": {
-            "search": '<tg-emoji emoji-id="5188217332748527444">🔍</tg-emoji>',
-            "error": '<tg-emoji emoji-id="5470049770997292425">🌡️</tg-emoji>',
-            "warn": '<tg-emoji emoji-id="5447644880824181073">⚠️</tg-emoji>',
-            "description": '<tg-emoji emoji-id="5361684086807076580">🍹</tg-emoji>',
-            "command": '<tg-emoji emoji-id="5442644589703866634">🏄</tg-emoji>',
+            "search": '<tg-emoji emoji-id=5188217332748527444>🔍</tg-emoji>',
+            "error": '<tg-emoji emoji-id=5470049770997292425>🌡️</tg-emoji>',
+            "warn": '<tg-emoji emoji-id=5447644880824181073>⚠️</tg-emoji>',
+            "description": '<tg-emoji emoji-id=5361684086807076580>🍹</tg-emoji>',
+            "command": '<tg-emoji emoji-id=5442644589703866634>🏄</tg-emoji>',
             "like": "🍓",
             "dislike": "🥵",
             "prev": "⬅️",
             "next": "➡️",
-            "module": '<tg-emoji emoji-id="5433645645376264953">🏖️</tg-emoji>',
+            "module": '<tg-emoji emoji-id=5433645645376264953>🏖️</tg-emoji>',
             "close": "❌",
             "removed": "🗑️",
-            "modules_list": '<tg-emoji emoji-id="5472178859300363509">🏖️</tg-emoji>',
+            "modules_list": '<tg-emoji emoji-id=5472178859300363509>🏖️</tg-emoji>',
             "notify_success": "🍹",
             "notify_error": "🌡️",
             "notify_overwrite": "🥵",
             "notify_requirements": "🌡️"
         },
         "spring": {
-            "search": '<tg-emoji emoji-id="5449885771420934013">🌱</tg-emoji>',
-            "error": '<tg-emoji emoji-id="5208923808169222461">🥀</tg-emoji>',
-            "warn": '<tg-emoji emoji-id="5447644880824181073">⚠️</tg-emoji>',
-            "description": '<tg-emoji emoji-id="5251524493561569780">🍃</tg-emoji>',
-            "command": '<tg-emoji emoji-id="5449850741667668411">🦋</tg-emoji>',
+            "search": '<tg-emoji emoji-id=5449885771420934013>🌱</tg-emoji>',
+            "error": '<tg-emoji emoji-id=5208923808169222461>🥀</tg-emoji>',
+            "warn": '<tg-emoji emoji-id=5447644880824181073>⚠️</tg-emoji>',
+            "description": '<tg-emoji emoji-id=5251524493561569780>🍃</tg-emoji>',
+            "command": '<tg-emoji emoji-id=5449850741667668411>🦋</tg-emoji>',
             "like": "🌸",
             "dislike": "🌧️",
             "prev": "⏪",
             "next": "⏩",
-            "module": '<tg-emoji emoji-id="5440911110838425969">🌿</tg-emoji>',
+            "module": '<tg-emoji emoji-id=5440911110838425969>🌿</tg-emoji>',
             "close": "❌",
             "removed": "🗑️",
-            "modules_list": '<tg-emoji emoji-id="5440748683765227563">🌺</tg-emoji>',
+            "modules_list": '<tg-emoji emoji-id=5440748683765227563>🌺</tg-emoji>',
             "notify_success": "🌺",
             "notify_error": "🥀",
             "notify_overwrite": "🌧️",
             "notify_requirements": "🥀"
         },
         "autumn": {
-            "search": '<tg-emoji emoji-id="5253944419870062295">🍂</tg-emoji>',
-            "error": '<tg-emoji emoji-id="5281026503658728615">🍁</tg-emoji>',
-            "warn": '<tg-emoji emoji-id="5447644880824181073">⚠️</tg-emoji>',
-            "description": '<tg-emoji emoji-id="5406631276042002796">📜</tg-emoji>',
-            "command": '<tg-emoji emoji-id="5212963577098417551">🍂</tg-emoji>',
+            "search": '<tg-emoji emoji-id=5253944419870062295>🍂</tg-emoji>',
+            "error": '<tg-emoji emoji-id=5281026503658728615>🍁</tg-emoji>',
+            "warn": '<tg-emoji emoji-id=5447644880824181073>⚠️</tg-emoji>',
+            "description": '<tg-emoji emoji-id=5406631276042002796>📜</tg-emoji>',
+            "command": '<tg-emoji emoji-id=5212963577098417551>🍂</tg-emoji>',
             "like": "🍎",
             "dislike": "🌧️",
             "prev": "👈",
             "next": "👉",
-            "module": '<tg-emoji emoji-id="5249157915041865558">🍄</tg-emoji>',
+            "module": '<tg-emoji emoji-id=5249157915041865558>🍄</tg-emoji>',
             "close": "❌",
             "removed": "🗑️",
-            "modules_list": '<tg-emoji emoji-id="5305495722618010655">🍂</tg-emoji>',
+            "modules_list": '<tg-emoji emoji-id=5305495722618010655>🍂</tg-emoji>',
             "notify_success": "🍄",
             "notify_error": "🍁",
             "notify_overwrite": "🌧️",
