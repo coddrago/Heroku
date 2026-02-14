@@ -120,7 +120,11 @@ class HerokuConfigMod(loader.Module):
                         "style": "primary",
                         "kwargs": {"obj_type": obj_type},
                     },
-                    {"text": self.strings("close_btn"), "action": "close", "style": "danger"},
+                    {
+                        "text": self.strings("close_btn"), 
+                        "action": "close", 
+                        "style": "danger"
+                    },
                 ]
             ],
             inline_message_id=inline_message_id,
@@ -153,7 +157,11 @@ class HerokuConfigMod(loader.Module):
                         "style": "primary",
                         "kwargs": {"obj_type": obj_type},
                     },
-                    {"text": self.strings("close_btn"), "action": "close", "style": "danger"},
+                    {
+                        "text": self.strings("close_btn"), 
+                        "action": "close", 
+                        "style": "danger"
+                    },
                 ]
             ],
         )
@@ -276,7 +284,11 @@ class HerokuConfigMod(loader.Module):
                     "style": "primary",
                     "kwargs": {"obj_type": obj_type},
                 },
-                {"text": self.strings("close_btn"), "action": "close", "style": "danger"},
+                {
+                    "text": self.strings("close_btn"), 
+                    "action": "close", 
+                    "style": "danger"
+                },
             ],
         ]
 
@@ -328,7 +340,11 @@ class HerokuConfigMod(loader.Module):
                         "style": "primary",
                         "kwargs": {"obj_type": obj_type},
                     },
-                    {"text": self.strings("close_btn"), "action": "close", "style": "danger"},
+                    {
+                        "text": self.strings("close_btn"), 
+                        "action": "close", 
+                        "style": "danger"
+                    },
                 ]
             ],
             inline_message_id=inline_message_id,
@@ -394,7 +410,11 @@ class HerokuConfigMod(loader.Module):
                         "style": "primary",
                         "kwargs": {"obj_type": obj_type},
                     },
-                    {"text": self.strings("close_btn"), "action": "close", "style": "danger"},
+                    {
+                        "text": self.strings("close_btn"), 
+                        "action": "close", 
+                        "style": "danger"
+                    },
                 ]
             ],
             inline_message_id=inline_message_id,
@@ -463,7 +483,11 @@ class HerokuConfigMod(loader.Module):
                     "style": "primary",
                     "kwargs": {"obj_type": obj_type},
                 },
-                {"text": self.strings("close_btn"), "action": "close", "style": "danger"},
+                {
+                    "text": self.strings("close_btn"), 
+                    "action": "close", 
+                    "style": "danger"
+                },
             ],
         ]
 
@@ -505,7 +529,11 @@ class HerokuConfigMod(loader.Module):
                         "style": "primary",
                         "kwargs": {"obj_type": obj_type},
                     },
-                    {"text": self.strings("close_btn"), "action": "close", "style": "danger"},
+                    {
+                        "text": self.strings("close_btn"), 
+                        "action": "close", 
+                        "style": "danger"
+                    },
                 ]
             ],
         )
@@ -608,7 +636,11 @@ class HerokuConfigMod(loader.Module):
                     "style": "primary",
                     "kwargs": {"obj_type": obj_type},
                 },
-                {"text": self.strings("close_btn"), "action": "close", "style": "danger"},
+                {
+                    "text": self.strings("close_btn"), 
+                    "action": "close", 
+                    "style": "danger"
+                },
             ],
         ]
 
@@ -679,7 +711,11 @@ class HerokuConfigMod(loader.Module):
                     "style": "primary",
                     "kwargs": {"obj_type": obj_type},
                 },
-                {"text": self.strings("close_btn"), "action": "close", "style": "danger"},
+                {
+                    "text": self.strings("close_btn"), 
+                    "action": "close", 
+                    "style": "danger"
+                },
             ],
         ]
 
@@ -858,7 +894,11 @@ class HerokuConfigMod(loader.Module):
                         "style": "primary",
                         "kwargs": {"obj_type": obj_type},
                     },
-                    {"text": self.strings("close_btn"), "action": "close", "style": "danger"},
+                    {
+                        "text": self.strings("close_btn"), 
+                        "action": "close", 
+                        "style": "danger"
+                    },
                 ],
             ],
         )
@@ -924,7 +964,11 @@ class HerokuConfigMod(loader.Module):
                         "style": "primary",
                         "kwargs": {"obj_type": obj_type},
                     },
-                    {"text": self.strings("close_btn"), "action": "close", "style": "danger"},
+                    {
+                        "text": self.strings("close_btn"), 
+                        "action": "close", 
+                        "style": "danger"
+                    },
                 ]
             ],
         )
@@ -1014,7 +1058,13 @@ class HerokuConfigMod(loader.Module):
                     else []
                 ),
                 *list(utils.chunks(folder_btns, 2)),
-                [{"text": self.strings("close_btn"), "action": "close", "style": "danger"}],
+                [
+                    {
+                        "text": self.strings("close_btn"), 
+                        "action": "close", 
+                        "style": "danger"
+                    }
+                ],
             ],
         )
 
@@ -1068,7 +1118,11 @@ class HerokuConfigMod(loader.Module):
                         "callback": self.inline__choose_category,
                         "style": "primary",
                     },
-                    {"text": self.strings("close_btn"), "action": "close", "style": "danger"},
+                    {
+                        "text": self.strings("close_btn"), 
+                        "action": "close", 
+                        "style": "danger"
+                    },
                 ]
             ],
         )
@@ -1127,7 +1181,11 @@ class HerokuConfigMod(loader.Module):
                     "callback": self.inline__choose_category,
                     "style": "primary",
                 },
-                {"text": self.strings("close_btn"), "action": "close", "style": "danger"},
+                {
+                    "text": self.strings("close_btn"), 
+                    "action": "close", 
+                    "style": "danger"
+                },
             ]
         ]
 
