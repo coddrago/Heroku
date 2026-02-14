@@ -296,6 +296,14 @@ presets:
   installing_module: "<tg-emoji emoji-id=5451732530048802485>⏳</tg-emoji> <b>Installing preset</b> <code>{}</code> <b>({}/{} modules)...</b>\n\n<tg-emoji emoji-id=5188377234380954537>🪐</tg-emoji> <i>Installing module {}...</i>"
   installed: "<tg-emoji emoji-id=5436040291507247633>🎉</tg-emoji> <b>Preset</b> <code>{}</code> <b>installed!</b>"
   already_installed: "✅ [Installed]"
+  add_to_folder_usage: "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>Specify a folder to add a module. </b> <code>{prefix}addtofolder <folder> <module></code>"
+  already_in_folder: "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>Module is already in the folder</b> <code>{}</code>"
+  added_to_folder: "<tg-emoji emoji-id=5436040291507247633>🎉</tg-emoji> <b>Module {} added to folder</b> <code>{}</code>"
+  module_not_found: "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>Module {} not found</b>"
+  folder_load_usage: "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>Specify a folder to load modules. </b> <code>{prefix}fl <folder></code>"
+  folder_not_found: "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>Folder {} not found</b>"
+  no_modules_in_folder: "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>No modules in folder {}</b>"
+  folder: "<tg-emoji emoji-id=5256113064821926998>📁</tg-emoji> <b>Folder</b> {}\n\n<tg-emoji emoji-id=5134452506935427991>🪐</tg-emoji> <b>{prefix}lp in reply to this message to install</b>"
   _cls_doc: "Suggests new Heroku users a packs of modules to load"
 
 settings:
@@ -325,6 +333,8 @@ settings:
   id_not_found_scgroup: "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> This entity does not exist in any security group. Therefore, adding a prefix for it is pointless"
   invalid_id_or_username: "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> Invalid id/username was given"
   alias_created: "<tg-emoji emoji-id=5197474765387864959>👍</tg-emoji> <b>Alias created. Access it with</b> <code>{}</code>"
+  aliases_list: "<b>🔗 Imported aliases:</b>\n\n<blockquote expandable>{}</blockquote>"
+  aliases_file: "<tg-emoji emoji-id=5256113064821926998>📁</tg-emoji> <b>Your aliases</b>\n\n<tg-emoji emoji-id=5134452506935427991>🪐</tg-emoji> <b>{prefix}la in reply to this message to import aliases</b>"
   aliases: "<b>🔗 Aliases:</b>\n"
   no_command: "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>Command</b> <code>{}</code> <b>does not exist</b>"
   alias_args: "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>You must provide a command and the alias for it</b>"

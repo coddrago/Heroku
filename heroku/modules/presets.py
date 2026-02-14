@@ -13,6 +13,7 @@
 import asyncio
 import functools
 import logging
+import io
 from math import ceil
 
 import orjson
@@ -308,6 +309,9 @@ class Presets(loader.Module):
             return
 
         await self._menu()
+    
+    async def get_folders(self):
+        return self.db.get("presets", "folders")
 
     @loader.command(ru_doc='| Пакеты модулей для загрузки', ua_doc='| Пакети модулів для завантаження', de_doc='| Pakete mit Modulen zum Laden')
     async def presets(self, message: Message):
@@ -349,7 +353,7 @@ class Presets(loader.Module):
         for link in data["modules"]:
             module_name = link.rsplit('/', maxsplit=1)[1].split('.')[0] if '/' in link else link
             if self._is_installed(link):
-                modules_list.append(f"✅ <b>{module_name}</b> (уже установлен)")
+                modules_list.append(f"<b>{module_name}</b> {self.strings('already_installed')}")
             else:
                 modules_list.append(f"▫️ <b>{module_name}</b>")
 
@@ -363,3 +367,123 @@ class Presets(loader.Module):
                 {"text": self.lookup("settings").strings["cancel"], "callback": lambda call: call.delete()},
             ]
         )
+
+    @loader.command(alias="af")
+    async def addtofolder(self, message: Message):
+        """Add module to custom folder to see its config faster and send via preset."""
+        args = utils.get_args(message)
+        if self.db.get("presets", "folders") is None:
+            self.db.set("presets", "folders", {})
+        FOLDERS = self.db.get("presets", "folders")
+        if len(args) < 2:
+            await message.edit(self.strings("add_to_folder_usage").format(prefix=self.get_prefix()))
+            return
+        folder_name = args[0]
+        module_name = args[1]
+        if folder_name not in FOLDERS:
+            FOLDERS[folder_name] = []
+        if module_name.lower() in [m.lower() for m in FOLDERS[folder_name]]:
+            await message.edit(self.strings("already_in_folder").format(folder_name))
+            return
+        for mod in self.allmodules.modules:
+            if mod.__class__.__name__.lower() == module_name.lower():
+                FOLDERS[folder_name].append(module_name)
+                self.db.set("presets", "folders", FOLDERS)
+                await message.edit(self.strings("added_to_folder").format(module_name, folder_name))
+                return
+        await message.edit(self.strings("module_not_found").format(module_name))
+    @loader.command(alias="fl")
+    async def folderload(self, message: Message):
+        """send folder via file"""
+        args = utils.get_args(message)
+        if self.db.get("presets", "folders") is None:
+            self.db.set("presets", "folders", {})
+        FOLDERS = self.db.get("presets", "folders")
+        if len(args) < 1:
+            await message.edit(self.strings("folder_load_usage").format(prefix=self.get_prefix()))
+            return
+        folder_name = args[0]
+        if folder_name not in FOLDERS:
+            await message.edit(self.strings("folder_not_found").format(folder_name))
+            return
+        modules = []
+        for module_name in FOLDERS[folder_name]:
+            for mod in self.allmodules.modules:
+                if mod.__class__.__name__.lower() == module_name.lower():
+                    origin = getattr(mod, "__origin__", "")
+                    if origin not in ("<core>", "<file>"):
+                        modules.append(origin)
+                    break
+        if not modules:
+            await message.edit(self.strings("no_modules_in_folder").format(folder_name))
+            return
+        file = io.BytesIO(orjson.dumps({"name": folder_name, "description": folder_name, "modules": modules}))
+        file.name = f"{folder_name}.json"
+        await utils.answer(
+            message,
+            self.strings("folder").format(folder_name, prefix=self.get_prefix()),
+            file=file,
+            reply_to=getattr(message, "reply_to_msg_id", None),
+        )
+    @loader.command(alias="la")
+    async def loadaliases(self, message: Message):
+        """Load aliases from file. Send a file with the command or reply to a file."""
+        msg = message if message.file else (await message.get_reply_message())
+        if not msg or not msg.file:
+            await message.edit(self.lookup("loader").strings['no_file'])
+            return
+        try:
+            data = orjson.loads(await msg.download_media(bytes))
+        except Exception:
+            await message.edit(self.lookup("loader").strings['load_failed'])
+            logger.exception("Failed to load aliases from file")
+            return
+        if not isinstance(data, list) or not all(isinstance(item, dict) and "alias" in item and "command" in item for item in data):
+            await message.edit(self.lookup("loader").strings['load_failed'])
+            logger.error("Invalid aliases format")
+            return
+        
+        fail = False
+        for item in data:
+            alias = item["alias"]
+            cmd_str = item["command"]
+            parts = cmd_str.split(maxsplit=1)
+            cmd = parts[0]
+            rest = parts[1] if len(parts) > 1 else None
+            if self.allmodules.add_alias(alias, cmd, rest):
+                self.set(
+                    "aliases",
+                    {
+                        **self.get("aliases", {}),
+                        alias: f"{cmd} {rest}" if rest else cmd,
+                    },
+                )
+            else:
+                await utils.answer(
+                    message,
+                    self.lookup("settings").strings("no_command").format(utils.escape_html(cmd)),
+                )
+                fail = True
+        if not fail:
+            await utils.answer(
+                message,
+                self.lookup("settings").strings("aliases_list").format("\n".join(f"{alias}" for alias, cmd in self.allmodules.aliases.items())),
+                reply_to=getattr(message, "reply_to_msg_id", None),
+            )
+    @loader.command(alias="al")
+    async def aliasload(self, message: Message):
+        """send aliases via file"""
+        aliases = self.allmodules.aliases.items()
+        if not aliases:
+            await message.edit(self.lookup("settings").strings("no_aliases"))
+            return
+        file = io.BytesIO(orjson.dumps([{"alias": alias, "command": cmd} for alias, cmd in aliases]))
+        file.name = "aliases.json"
+        await utils.answer(
+            message,
+            self.lookup("settings").strings("aliases_file").format(prefix=self.get_prefix()),
+            file=file,
+            reply_to=getattr(message, "reply_to_msg_id", None),
+        )
+        
+# dict_items([('htl', 'terminal pip uninstall -y heroku-tl-new && pip install git+https://github.com/coddrago/heroku-tl')])
