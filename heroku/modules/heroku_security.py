@@ -130,6 +130,19 @@ class HerokuSecurityMod(loader.Module):
             self.strings("global"),
             reply_markup=self._build_markup_global(is_inline),
         )
+    
+    async def inline__switch_perm_inline_query(self, call: InlineCall):
+        query = self._db.get(security.__name__, "allow_inline_query", False)
+        self._db.set(security.__name__, "allow_inline_query", not query)
+
+        await call.answer("Inline query permission set!")
+        await call.edit(
+            self.strings("querysec_info"),
+            reply_markup={
+                "text": "❌" if query else "✅",
+                "callback": self.inline__switch_perm_inline_query,
+            },
+        )
 
     def _build_markup(
         self,
@@ -495,6 +508,19 @@ class HerokuSecurityMod(loader.Module):
                 self.allmodules.inline_handlers[args],
                 True,
             ),
+            message=message,
+            ttl=5 * 60,
+        )
+    
+    @loader.command()
+    async def querysec(self, message: Message):
+        query = self._db.get(security.__name__, "allow_inline_query", False)
+        await self.inline.form(
+            self.strings("querysec_info"),
+            reply_markup={
+                "text": "❌" if query else "✅",
+                "callback": self.inline__switch_perm_inline_query,
+            },
             message=message,
             ttl=5 * 60,
         )
