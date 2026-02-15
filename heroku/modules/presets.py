@@ -486,4 +486,3 @@ class Presets(loader.Module):
             reply_to=getattr(message, "reply_to_msg_id", None),
         )
         
-# dict_items([('htl', 'terminal pip uninstall -y heroku-tl-new && pip install git+https://github.com/coddrago/heroku-tl')])
