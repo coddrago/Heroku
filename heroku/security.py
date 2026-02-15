@@ -167,6 +167,7 @@ class SecurityManager:
         self._tsec_chat = self.tsec_chat = db.pointer(__name__, "tsec_chat", [])
         self._tsec_user = self.tsec_user = db.pointer(__name__, "tsec_user", [])
         self._owner = self.owner = db.pointer(__name__, "owner", [])
+        self._all_users = self.all_users = db.pointer(__name__, "all_users", [])
 
         self._reload_rights()
 
@@ -201,6 +202,9 @@ class SecurityManager:
         ub_owners = self.owner.copy()
 
         all_users = sgroup_users + tsec_users + ub_owners
+
+        self._all_users.clear()
+        self._all_users.extend(set(all_users))
 
         prefixes = self._db.get(main.__name__, "command_prefixes", {})
 

@@ -59,6 +59,9 @@ class Events(InlineUnit):
 
     async def _inline_handler(self: "InlineManager", inline_query: AiogramInlineQuery):
         """Inline query handler (forms' calls)"""
+        if inline_query.from_user.id not in self._client.dispatcher.security.all_users:
+            return
+
         if not (query := inline_query.query):
             await self._query_help(inline_query)
             return
