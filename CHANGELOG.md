@@ -93,6 +93,9 @@
 - add more protection for official telegram account (777000)
 - add button styles support for aiogram 3.25.0+ (danger, primary, success)
 - add premium emoji support in buttons via icon_custom_emoji_id (aiogram 3.25.0+)
+- add aliases export/import
+- add folders
+- restrict inline queries for not allowed users
 
 ## 🪐 Heroku 1.7.2
 - added autoupdate
