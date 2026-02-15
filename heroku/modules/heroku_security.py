@@ -518,7 +518,7 @@ class HerokuSecurityMod(loader.Module):
         await self.inline.form(
             self.strings("querysec_info"),
             reply_markup={
-                "text": "❌" if query else "✅",
+                "text": "✅" if query else "❌",
                 "callback": self.inline__switch_perm_inline_query,
             },
             message=message,
