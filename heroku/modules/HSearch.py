@@ -144,17 +144,22 @@ class HSearch(loader.Module):
                 validator=loader.validators.Choice(["default", "winter", "summer", "spring", "autumn"])
             )
         )
-
+    
     async def client_ready(self, client, db):
         try:
             await client(UnblockRequest("@FHeta_robot"))
             await utils.dnd(client, "@FHeta_robot", archive=True)
         except:
             pass
-            
+        
         self.uid = (await client.get_me()).id
         self.token = db.get("HSearch", "token")
-
+        
+        if self.token:
+            result = await self._api_get("validatetkn", user_id=str(self.uid))
+            if not (isinstance(result, bool) and result):
+                self.token = None
+        
         if not self.token:
             try:
                 async with client.conversation("@FHeta_robot") as conv:
@@ -164,8 +169,7 @@ class HSearch(loader.Module):
                     db.set("HSearch", "token", self.token)
             except:
                 pass
-            
-        self.token = db.get("HSearch", "token")
+        
         asyncio.create_task(self._sync_loop())
 
     async def _sync_loop(self):
