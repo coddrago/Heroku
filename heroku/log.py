@@ -27,11 +27,11 @@ import git
 from logging.handlers import RotatingFileHandler
 from collections.abc import Coroutine
 
-import herokutl
+import pyrogram
 from aiogram.exceptions import TelegramNetworkError, TelegramRetryAfter
-from herokutl.errors import PersistentTimestampOutdatedError
-from herokutl.errors.rpcbaseerrors import (
-    ServerError,
+from pyrogram.errors import PersistentTimestampOutdated
+from pyrogram.errors import (
+    # ServerError,
     RPCError
 )
 
@@ -43,12 +43,12 @@ from ._internal import (
     restore_worktree,
     restart,
 )
-from .tl_cache import CustomTelegramClient
+from .tl_cache import CustomClient
 from .types import BotInlineCall, Module, CoreOverwriteError
 
 INTERNET_ERRORS = (
     TelegramNetworkError, asyncio.exceptions.TimeoutError,
-    ServerError, PersistentTimestampOutdatedError
+    PersistentTimestampOutdated
 )
 old = linecache.getlines
 
@@ -84,31 +84,26 @@ linecache.getlines = getlines
 
 def override_text(exception: Exception) -> typing.Optional[str]:
     """Returns error-specific description if available, else `None`"""
+
+    if isinstance(exception, (TelegramNetworkError, asyncio.exceptions.TimeoutError)):
+        return "✈️ <b>You have problems with internet connection on your server.</b>"
+
+    if isinstance(exception, PersistentTimestampOutdated):
+        return "✈️ <b>Telegram has problems with their datacenters.</b>"
+
+    if isinstance(exception, CoreOverwriteError):
+        return f"⚠️ {str(exception)}"
+
+    if isinstance(exception, RPCError) and "TRANSLATION_TIMEOUT" in str(exception):
+        return ("🕓 <b>Telegram translation service timed out. Please try again later.</b>")
+
+    if isinstance(exception, ModuleNotFoundError):
+        return f"📦 {traceback.format_exception_only(type(exception), exception)[0].split(':')[1].strip()}"
     
-    match exception:
-        case TelegramNetworkError() | asyncio.exceptions.TimeoutError():
-            return "✈️ <b>You have problems with internet connection on your server.</b>"
-        
-        case PersistentTimestampOutdatedError():
-            return "✈️ <b>Telegram has problems with their datacenters.</b>"
+    if isinstance(exception, TelegramRetryAfter):
+        return f"✋ <b>Bot is hitting limits on {type(exception.method).__name__!r} method and got {exception.retry_after} seconds floodwait</b>"
 
-        case CoreOverwriteError():
-            return f"⚠️ {str(exception)}"
-
-        case ServerError():
-            return "📡 <b>Telegram servers are currently experiencing issues. Please try again later.</b>"
-
-        case RPCError() if "TRANSLATION_TIMEOUT" in str(exception):
-            return "🕓 <b>Telegram translation service timed out. Please try again later.</b>"
-
-        case ModuleNotFoundError():
-            return f"📦 {traceback.format_exception_only(type(exception), exception)[0].split(':')[1].strip()}"
-        
-        case TelegramRetryAfter():
-            return f"✋ <b>Bot is hitting limits on {type(exception.method).__name__!r} method and got {exception.retry_after} seconds floodwait</b>"
-
-        case _:
-            return None
+    return None
 
 
 class HerokuException:
@@ -137,21 +132,26 @@ class HerokuException:
         def to_hashable(dictionary: dict) -> dict:
             dictionary = dictionary.copy()
             for key, value in dictionary.items():
-                match value:
-                    case dict():
-                        dictionary[key] = to_hashable(value)
-                    case _ if getattr(getattr(value, "__class__", None), "__name__", None) == "Database":
-                        dictionary[key] = "<Database>"
-                    case herokutl.TelegramClient() | CustomTelegramClient():
-                        dictionary[key] = f"<{value.__class__.__name__}>"
-                    case _:
-                        try:
-                            if len(str(value)) > 512:
-                                dictionary[key] = f"{str(value)[:512]}..."
-                            else:
-                                dictionary[key] = str(value)
-                        except Exception:
+                if isinstance(value, dict):
+                    dictionary[key] = to_hashable(value)
+                else:
+                    try:
+                        if (
+                            getattr(getattr(value, "__class__", None), "__name__", None)
+                            == "Database"
+                        ):
+                            dictionary[key] = "<Database>"
+                        elif isinstance(
+                            value,
+                            (pyrogram.Client, CustomClient),
+                        ):
                             dictionary[key] = f"<{value.__class__.__name__}>"
+                        elif len(str(value)) > 512:
+                            dictionary[key] = f"{str(value)[:512]}..."
+                        else:
+                            dictionary[key] = str(value)
+                    except Exception:
+                        dictionary[key] = f"<{value.__class__.__name__}>"
 
             return dictionary
 
@@ -300,7 +300,7 @@ class TelegramLogsHandler(logging.Handler):
     ):
         chunks = item.message + "\n\n<b>🪐 Full traceback:</b>\n" + f"<pre><code class=\"language-python\">{item.full_stack}</code></pre>"
 
-        chunks = list(utils.smart_split(*herokutl.extensions.html.parse(chunks), 4096))
+        chunks = list(utils.smart_split(*pyrogram.extensions.html.parse(chunks), 4096))
 
         await call.edit(
             chunks[0]
@@ -552,7 +552,6 @@ async def check_branch(me_id: int, allowed_ids: list, self):
             try:
                 reset_to_master(repo_path)
                 restore_worktree(repo_path)
-                self.client.log_out()
             except Exception:
                 pass
 
@@ -598,7 +597,7 @@ def init():
         TelegramLogsHandler((handler, rotating_handler), 7000)
     )
     logging.getLogger().setLevel(logging.NOTSET)
-    logging.getLogger("herokutl").setLevel(logging.WARNING)
+    logging.getLogger("pyrogram").setLevel(logging.WARNING)
     logging.getLogger("matplotlib").setLevel(logging.WARNING)
     logging.getLogger("aiohttp").setLevel(logging.WARNING)
     logging.getLogger("aiogram").setLevel(logging.WARNING)

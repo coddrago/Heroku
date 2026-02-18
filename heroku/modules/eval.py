@@ -21,10 +21,10 @@ import typing
 from io import StringIO
 from types import ModuleType
 
-import herokutl
-from herokutl.errors.rpcerrorlist import MessageIdInvalidError
-from herokutl.sessions import StringSession
-from herokutl.tl.types import Message
+import pyrogram
+from pyrogram.errors import MessageIdInvalid
+# from pyrogram.sessions import StringSession
+from pyrogram.types import Message
 from meval import meval
 
 from .. import loader, main, utils
@@ -59,7 +59,7 @@ class Evaluator(loader.Module):
     @loader.command(alias="eval")
     async def e(self, message: Message):
         args = utils.get_args_raw(message)
-        reply = await message.get_reply_message()
+        reply = message.reply_to_message
 
         if not args and reply and reply.text:
             args = utils.remove_html(reply.text)
@@ -88,7 +88,7 @@ class Evaluator(loader.Module):
                     "python",
                     args,
                     "error",
-                    self.censor(
+                    await self.censor(
                         (
                             "\n".join(item.full_stack.splitlines()[:-1])
                             + "\n\n"
@@ -109,7 +109,7 @@ class Evaluator(loader.Module):
         
         exec_time = time.time() - start_time
 
-        with contextlib.suppress(MessageIdInvalidError):
+        with contextlib.suppress(MessageIdInvalid):
             await utils.answer(
                 message,
                 self.strings("eval_py").format(
@@ -118,12 +118,12 @@ class Evaluator(loader.Module):
                     utils.escape_html(args),
                 ) + (self.strings["eval_result"].format(
                     "python",
-                     utils.escape_html(self.censor(str(result)))
+                     utils.escape_html(await self.censor(str(result)))
                     ) if result or not print_output else ""
                 ) + (self.strings["print_outp"].format(
                     "python",
                     print_output,
-                    utils.escape_html(self.censor(print_output))
+                    utils.escape_html(await self.censor(print_output))
                     ) if print_output else ""
                 ) + (self.strings["time_exec"].format(round(exec_time, 2)))
             )
@@ -192,7 +192,7 @@ class Evaluator(loader.Module):
                     result = "Execution timeout"
                     error = True
 
-        with contextlib.suppress(MessageIdInvalidError):
+        with contextlib.suppress(MessageIdInvalid):
             await utils.answer(
                 message,
                 self.strings("err" if error else "eval").format(
@@ -256,7 +256,7 @@ class Evaluator(loader.Module):
                 result = "Execution timeout"
                 error = True
 
-        with contextlib.suppress(MessageIdInvalidError):
+        with contextlib.suppress(MessageIdInvalid):
             await utils.answer(
                 message,
                 self.strings("err" if error else "eval").format(
@@ -269,8 +269,8 @@ class Evaluator(loader.Module):
             )
 
 
-    def censor(self, ret: str) -> str:
-        ret = ret.replace(str(self._client.heroku_me.phone), "&lt;phone&gt;")
+    async def censor(self, ret: str) -> str:
+        ret = ret.replace(str(self._client.heroku_me.phone_number), "&lt;phone&gt;")
 
         if redis := os.environ.get("REDIS_URL") or main.get_config_key("redis_uri"):
             ret = ret.replace(redis, f'redis://{"*" * 26}')
@@ -288,24 +288,22 @@ class Evaluator(loader.Module):
             ret = ret.replace(htoken, f'eugeo_{"*" * 26}')
 
         ret = ret.replace(
-            StringSession.save(self._client.session),
-            "StringSession(**************************)",
+            await self._client.export_session_string(),
+            "**************************",
         )
 
         return ret
 
     async def getattrs(self, message: Message) -> dict:
-        reply = await message.get_reply_message()
+        reply = message.reply_to_message
         return {
             "message": message,
             "client": self._client,
             "reply": reply,
             "r": reply,
             "event": message,
-            "chat": message.to_id,
-            "herokutl": herokutl,
-            "telethon": herokutl,
-            "hikkatl": herokutl,
+            "chat": message.chat.id,
+            "pyrogram": pyrogram,
             "utils": utils,
             "main": main,
             "loader": loader,
@@ -314,8 +312,8 @@ class Evaluator(loader.Module):
             "lookup": self.lookup,
             "self": self,
             "db": self.db,
-            **self.get_sub(herokutl.tl.functions),
-            **self.get_sub(herokutl.tl.types),
+            **self.get_sub(pyrogram.raw.types),
+            **self.get_sub(pyrogram.raw.functions),
         }
 
     def get_sub(self, obj: typing.Any, _depth: int = 1) -> dict:
@@ -337,7 +335,7 @@ class Evaluator(loader.Module):
                             lambda x: x[0][0] != "_"
                             and isinstance(x[1], ModuleType)
                             and x[1] != obj
-                            and x[1].__package__.rsplit(".", _depth)[0] == "herokutl.tl",
+                            and x[1].__package__.rsplit(".", _depth)[0] == "pyrogram.tl",
                             obj.__dict__.items(),
                         )
                     ]

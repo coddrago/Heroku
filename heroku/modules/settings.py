@@ -11,9 +11,9 @@
 # 🔑 https://www.gnu.org/licenses/agpl-3.0.html
 
 import contextlib
-import herokutl
-from herokutl.extensions.html import CUSTOM_EMOJIS
-from herokutl.tl.types import Message, User
+import pyrogram
+from pyrogram.extensions.html import CUSTOM_EMOJIS
+from pyrogram.types import Message, User
 
 from .. import loader, main, utils, version
 from ..inline.types import InlineCall
@@ -92,7 +92,7 @@ class CoreMod(loader.Module):
                 ),
                 *version.__version__,
                 utils.get_commit_url(),
-                f"{herokutl.__version__} #{herokutl.tl.alltlobjects.LAYER}",
+                f"{pyrogram.__version__} #{pyrogram.tl.alltlobjects.LAYER}",
             )
             + (
                 ""
@@ -131,8 +131,8 @@ class CoreMod(loader.Module):
         try:
             return int(utils.get_args(message)[0])
         except (ValueError, IndexError):
-            if reply := await message.get_reply_message():
-                return reply.sender_id
+            if reply := message.reply_to_message:
+                return reply.from_user.id
 
             return message.to_id.user_id if message.is_private else False
 
@@ -194,12 +194,12 @@ class CoreMod(loader.Module):
             
             if entity.id != self.tg_id:
                 sgroup_users = []
-                for g in self._client.dispatcher.security._sgroups.values():
+                for g in self._client._heroku_dispatcher.security._sgroups.values():
                     for u in g.users:
                         sgroup_users.append(u)
 
-                tsec_users = [rule['target'] for rule in self._client.dispatcher.security._tsec_user]
-                ub_owners = self._client.dispatcher.security.owner.copy()
+                tsec_users = [rule['target'] for rule in self._client._heroku_dispatcher.security._tsec_user]
+                ub_owners = self._client._heroku_dispatcher.security.owner.copy()
 
                 all_users = sgroup_users + tsec_users + ub_owners
 

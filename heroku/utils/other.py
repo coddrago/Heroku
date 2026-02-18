@@ -14,20 +14,22 @@ import signal
 import typing
 import inspect
 
-import herokutl
-from herokutl import hints
-from herokutl.tl.functions.channels import (
-    EditAdminRequest,
-    InviteToChannelRequest,
+import pyrogram
+from pyrogram.raw.functions.channels import (
+    EditAdmin,
+    InviteToChannel,
 )
-from herokutl.tl.types import (
+from pyrogram.raw.types import (
     ChatAdminRights,
 )
 
-from ..tl_cache import CustomTelegramClient
+from ..tl_cache import CustomClient
 from ..types import ListLike
 
-parser = herokutl.utils.sanitize_parse_mode("html")
+if typing.TYPE_CHECKING:
+    from ..types import EntityLike
+
+# parser = pyrogram.utils.sanitize_parse_mode("html")
 logger = logging.getLogger(__name__)
 
 custom_placeholders = {}
@@ -43,8 +45,8 @@ def rand(size: int, /) -> str:
     )
 
 async def invite_inline_bot(
-    client: CustomTelegramClient,
-    peer: hints.EntityLike,
+    client: CustomClient,
+    peer: 'EntityLike',
 ) -> None:
     """
     Invites inline bot to a chat
@@ -55,15 +57,15 @@ async def invite_inline_bot(
     """
 
     try:
-        await client(InviteToChannelRequest(peer, [client.loader.inline.bot_username]))
+        await client.invoke(InviteToChannel(peer, [client.loader.inline.bot_username]))
     except Exception as e:
         raise RuntimeError(
             "Can't invite inline bot to old asset chat, which is required by module"
         ) from e
 
     with contextlib.suppress(Exception):
-        await client(
-            EditAdminRequest(
+        await client.invoke(
+            EditAdmin(
                 channel=peer,
                 user_id=client.loader.inline.bot_username,
                 admin_rights=ChatAdminRights(ban_users=True),

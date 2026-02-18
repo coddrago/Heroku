@@ -13,8 +13,8 @@ import re
 import typing
 
 import grapheme
-import herokutl
-from herokutl.tl.types import (
+import pyrogram
+from pyrogram.raw.types import (
     Channel,
     Chat,
     InputDocument,
@@ -42,7 +42,7 @@ emoji_pattern = re.compile(
     flags=re.UNICODE,
 )
 
-parser = herokutl.utils.sanitize_parse_mode("html")
+# parser = pyrogram.utils.sanitize_parse_mode("html")
 logger = logging.getLogger(__name__)
 
 def get_topic(message: Message) -> typing.Optional[int]:
@@ -128,7 +128,7 @@ def smart_split(
 
     :example:
         >>> utils.smart_split(
-            *herokutl.extensions.html.parse(
+            *pyrogram.extensions.html.parse(
                 "<b>Hello, world!</b>"
             )
         )
@@ -335,7 +335,7 @@ async def answer(
         case _ if "reply_to" in kwargs:
             kwargs.pop("reply_to")
 
-    parse_mode = herokutl.utils.sanitize_parse_mode(
+    parse_mode = pyrogram.utils.sanitize_parse_mode(
         kwargs.pop(
             "parse_mode",
             message.client.parse_mode,
@@ -382,7 +382,7 @@ async def answer(
 
                 return result
 
-        result = await (message.edit if edit else message.respond)(
+        result = await (message.edit if edit else message.answer)(
             text,
             parse_mode=lambda t: (t, entities),
             **kwargs,
@@ -398,7 +398,7 @@ async def answer(
                 link_preview=isinstance(response.media, MessageMediaWebPage),
             )
         else:
-            result = await message.respond(response, **kwargs)
+            result = await message.answer(response, **kwargs)
     else:
         if isinstance(response, bytes):
             response = io.BytesIO(response)

@@ -33,9 +33,9 @@ from aiogram.types import (
     InlineQueryResultVideo,
     InputTextMessageContent,
 )
-from herokutl.errors.rpcerrorlist import ChatSendInlineForbiddenError
-from herokutl.extensions.html import CUSTOM_EMOJIS
-from herokutl.tl.types import Message
+from pyrogram.errors import ChatSendInlineForbidden
+# from pyrogram.extensions.html import CUSTOM_EMOJIS
+from pyrogram.types import Message
 
 from .. import main, utils
 from ..types import HerokuReplyMarkup
@@ -277,7 +277,7 @@ class Form(InlineUnit):
         if isinstance(message, Message) and not silent:
             try:
                 status_message = await (
-                    message.edit if message.out else message.respond
+                    message.edit if message.out else message.answer
                 )(
                     (
                         utils.get_platform_emoji()
@@ -344,7 +344,7 @@ class Form(InlineUnit):
         async def answer(msg: str):
             nonlocal message
             if isinstance(message, Message):
-                await (message.edit if message.out else message.respond)(
+                await (message.edit if message.out else message.answer)(
                     msg,
                     **({} if message.out else {"reply_to": utils.get_topic(message)}),
                 )
@@ -353,7 +353,7 @@ class Form(InlineUnit):
 
         try:
             m = await self._invoke_unit(unit_id, message)
-        except ChatSendInlineForbiddenError:
+        except ChatSendInlineForbidden:
             await answer(self.translator.getkey("inline.inline403"))
         except Exception as e:
             if "No query results" in str(e):
@@ -415,7 +415,7 @@ class Form(InlineUnit):
                     and button["_switch_query"] == query
                     and inline_query.from_user.id
                     in [self._me]
-                    + self._client.dispatcher.security._owner
+                    + self._client._heroku_dispatcher.security._owner
                     + unit.get("always_allow", [])
                 ):
                     await inline_query.answer(

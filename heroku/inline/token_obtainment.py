@@ -11,13 +11,17 @@
 # 🔑 https://www.gnu.org/licenses/agpl-3.0.html
 
 import asyncio
+import aiohttp
 import logging
 import os
+
 import random
 import re
 import typing
 
-import aiohttp
+from pyrogram.errors import YouBlockedUser
+from pyrogram.raw.functions.contacts import Unblock
+
 
 from .. import main, utils
 from .._internal import fw_protect
@@ -39,11 +43,12 @@ class TokenObtainment(InlineUnit):
     ):
         logger.info("User doesn't have bot, attempting creating new one")
 
-        if self._db.get("heroku.inline", "custom_bot", False):
-            username = self._db.get("heroku.inline", "custom_bot").strip("@")
-            username = f"@{username}"
+        if (
+            username := self._db.get("heroku.inline", "custom_bot", False)
+        ):
+            username = f"@{username.strip('@')}"
             try:
-                await self._client.get_entity(username)
+                await self._client.get_chat(username)
             except ValueError:
                 pass
             else:
@@ -147,7 +152,7 @@ class TokenObtainment(InlineUnit):
         ids = None
         bot_id = None
             
-        username = self._db.get("heroku.inline", "custom_bot", False)
+        username: str = self._db.get("heroku.inline", "custom_bot", False)
         if username:
             ids = re.search(inutils.BOT_ID_PATTERN.format(username.strip("@")), content)
             
@@ -238,9 +243,9 @@ class TokenObtainment(InlineUnit):
             asyncio.ensure_future(self.reassert_token())
         else:
             return await self._reassert_token(session, url, _hash)
-    
+
+    @staticmethod
     async def _check_bot(
-        self: "InlineManager",
         session: aiohttp.ClientSession,
         url: str,
         _hash: str,

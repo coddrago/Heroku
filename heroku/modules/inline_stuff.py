@@ -14,9 +14,9 @@ import re
 import string
 import random
 
-from herokutl.errors.rpcerrorlist import YouBlockedUserError
-from herokutl.tl.functions.contacts import UnblockRequest
-from herokutl.tl.types import Message
+from pyrogram.errors import YouBlockedUser
+from pyrogram.raw.functions.contacts import Unblock
+from pyrogram.types import Message
 
 from .. import loader, utils
 from ..inline.types import BotInlineMessage, InlineCall
@@ -45,7 +45,7 @@ class InlineStuff(loader.Module):
 
         await message.delete()
 
-        m = await message.respond("🪐", reply_to=utils.get_topic(message))
+        m = await message.answer("🪐", reply_to=utils.get_topic(message))
 
         await self.inline.gallery(
             message=m,

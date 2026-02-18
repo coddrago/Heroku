@@ -16,8 +16,8 @@ import functools
 import typing
 from math import ceil
 
-from herokutl.tl.types import Message
-from herokutl.extensions import html
+from pyrogram.types import Message
+from pyrogram.extensions import html
 
 from .. import loader, translations, utils
 from ..inline.types import InlineCall
@@ -1230,7 +1230,7 @@ class HerokuConfigMod(loader.Module):
     @loader.command(alias="fcfg")
     async def fconfig(self, message: Message):
         raw = utils.get_args_raw(message).strip()
-        reply = await message.get_reply_message()
+        reply = message.reply_to_message
 
         if not raw:
             await utils.answer(message, self.strings("args"))

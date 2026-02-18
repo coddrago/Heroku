@@ -24,14 +24,14 @@ import traceback
 import typing
 
 import requests
-from herokutl import events
-from herokutl.errors import FloodWaitError, RPCError
-from herokutl.tl.types import Message
+# from pyrogram import events
+from pyrogram.errors import FloodWait, RPCError
+from pyrogram.types import ChatEvent, ChatEventFilter, Message
 
 from . import loader, main, security, utils
 from .database import Database
 from .loader import Modules
-from .tl_cache import CustomTelegramClient
+from .tl_cache import CustomClient
 
 logger = logging.getLogger(__name__)
 
@@ -101,7 +101,7 @@ class CommandDispatcher:
     def __init__(
         self,
         modules: Modules,
-        client: CustomTelegramClient,
+        client: CustomClient,
         db: Database,
     ):
         self._modules = modules
@@ -142,24 +142,24 @@ class CommandDispatcher:
 
         func = getattr(func, "__func__", func)
         ret = True
-        chat = self._ratelimit_storage_chat[message.chat_id]
+        chat = self._ratelimit_storage_chat[message.chat.id]
 
-        if message.sender_id:
-            user = self._ratelimit_storage_user[message.sender_id]
+        if message.from_user.id:
+            user = self._ratelimit_storage_user[message.chat.id]
             severity = (5 if getattr(func, "ratelimit", False) else 2) * (
                 (user + chat) // 30 + 1
             )
             user += severity
-            self._ratelimit_storage_user[message.sender_id] = user
+            self._ratelimit_storage_user[message.chat.id] = user
             if user > self._ratelimit_max_user:
                 ret = False
             else:
-                self._ratelimit_storage_chat[message.chat_id] = chat
+                self._ratelimit_storage_chat[message.chat.id] = chat
 
             _decrement_ratelimit(
                 self._ratelimit_max_user * severity,
                 self._ratelimit_storage_user,
-                message.sender_id,
+                message.chat.id,
                 severity,
             )
         else:
@@ -175,7 +175,7 @@ class CommandDispatcher:
         _decrement_ratelimit(
             self._ratelimit_max_chat * severity,
             self._ratelimit_storage_chat,
-            message.chat_id,
+            message.chat.id,
             severity,
         )
 
@@ -183,7 +183,7 @@ class CommandDispatcher:
 
     def _handle_grep(self, message: Message) -> Message:
         # Allow escaping grep with double stick
-        if "||grep" in message.text or "|| grep" in message.text:
+        if "||grep" in message.text.html or "|| grep" in message.text.html:
             message.raw_text = re.sub(r"\|\| ?grep", "| grep", message.raw_text)
             message.text = re.sub(r"\|\| ?grep", "| grep", message.text)
             message.message = re.sub(r"\|\| ?grep", "| grep", message.message)
@@ -209,7 +209,7 @@ class CommandDispatcher:
 
         old_edit = message.edit
         old_reply = message.reply
-        old_respond = message.respond
+        old_respond = message.answer
 
         def process_text(text: str) -> str:
             nonlocal grep, ungrep
@@ -261,20 +261,20 @@ class CommandDispatcher:
 
         message.edit = my_edit
         message.reply = my_reply
-        message.respond = my_respond
+        message.answer = my_respond
         message.heroku_grepped = True
 
         return message
 
     async def _handle_command(
         self,
-        event: typing.Union[events.NewMessage, events.MessageDeleted],
+        event: "typing.Union[events.NewMessage, events.MessageDeleted]",
         watcher: bool = False,
     ) -> typing.Union[bool, typing.Tuple[Message, str, str, callable]]:
         if not hasattr(event, "message") or not hasattr(event.message, "message"):
             return False
 
-        initiator = getattr(event, "sender_id", 0)
+        initiator = getattr(event, "from_user.id", 0)
 
         main_prefix = self._db.get(main.__name__, "command_prefix", ".")
         if initiator == self._client.tg_id:
@@ -399,13 +399,13 @@ class CommandDispatcher:
             return False
 
         if message.is_channel and message.edit_date and not message.is_group:
-            async for event in self._client.iter_admin_log(
+            async for event in self._client.get_chat_event_log(
                 chat_id,
                 limit=10,
-                edit=True,
+                filters=ChatEventFilter(edited_messages=True),
             ):
-                if event.action.prev_message.id == message.id:
-                    if event.user_id != self._client.tg_id:
+                if event.old_message.id == message.id:
+                    if event.user.id != self._client.tg_id:
                         logger.debug("Ignoring edit in channel")
                         return False
 
@@ -430,7 +430,7 @@ class CommandDispatcher:
 
         return message, prefix, txt, func
 
-    async def handle_raw(self, event: events.Raw):
+    async def handle_raw(self, event: "events.Raw"):
         """Handle raw events."""
         for handler in self.raw_handlers:
             if isinstance(event, tuple(handler.updates)):
@@ -441,7 +441,7 @@ class CommandDispatcher:
 
     async def handle_command(
         self,
-        event: typing.Union[events.NewMessage, events.MessageDeleted],
+        event: "typing.Union[events.NewMessage, events.MessageDeleted]",
     ):
         """Handle all commands"""
         message = await self._handle_command(event)
@@ -463,10 +463,10 @@ class CommandDispatcher:
         exc = sys.exc_info()[1]
         logger.exception("Command failed", extra={"stack": inspect.stack()})
         if isinstance(exc, RPCError):
-            if isinstance(exc, FloodWaitError):
-                hours = exc.seconds // 3600
-                minutes = (exc.seconds % 3600) // 60
-                seconds = exc.seconds % 60
+            if isinstance(exc, FloodWait):
+                hours = exc.value // 3600
+                minutes = (exc.value % 3600) // 60
+                seconds = exc.value % 60
                 hours = f"{hours} hours, " if hours else ""
                 minutes = f"{minutes} minutes, " if minutes else ""
                 seconds = f"{seconds} seconds" if seconds else ""
@@ -519,14 +519,14 @@ class CommandDispatcher:
 
     async def _handle_tags(
         self,
-        event: typing.Union[events.NewMessage, events.MessageDeleted],
+        event: "typing.Union[events.NewMessage, events.MessageDeleted]",
         func: callable,
     ) -> bool:
         return bool(await self._handle_tags_ext(event, func))
 
     async def _handle_tags_ext(
         self,
-        event: typing.Union[events.NewMessage, events.MessageDeleted],
+        event: "typing.Union[events.NewMessage, events.MessageDeleted]",
         func: callable,
     ) -> str:
         """
@@ -593,12 +593,12 @@ class CommandDispatcher:
             ),
             "contains": lambda: isinstance(m, Message) and func.contains in m.raw_text,
             "filter": lambda: callable(func.filter) and func.filter(m),
-            "from_id": lambda: getattr(m, "sender_id", None) == func.from_id,
+            "from_id": lambda: getattr(m, "from_user.id", None) == func.from_id,
             "chat_id": lambda: utils.get_chat_id(m)
             == (
-                func.chat_id
-                if not str(func.chat_id).startswith("-100")
-                else int(str(func.chat_id)[4:])
+                func.chat.id
+                if not str(func.chat.id).startswith("-100")
+                else int(str(func.chat.id)[4:])
             ),
             "regex": lambda: (
                 isinstance(m, Message) and re.search(func.regex, m.raw_text)
@@ -628,7 +628,7 @@ class CommandDispatcher:
 
     async def handle_incoming(
         self,
-        event: typing.Union[events.NewMessage, events.MessageDeleted],
+        event: "typing.Union[events.NewMessage, events.MessageDeleted]",
     ):
         """Handle all incoming messages"""
         message = utils.censor(getattr(event, "message", event))

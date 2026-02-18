@@ -11,11 +11,12 @@ import subprocess
 import typing
 
 import git
-import herokutl
+import pyrogram
+
+# parser = pyrogram.utils.sanitize_parse_mode("html")
 
 from .. import version
 
-parser = herokutl.utils.sanitize_parse_mode("html")
 logger = logging.getLogger(__name__)
 
 def _is_no_git() -> bool:

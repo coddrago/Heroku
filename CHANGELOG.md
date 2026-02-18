@@ -584,7 +584,7 @@
 
 - Completely drop fast_uploader support
 - Add :method:`utils.import_lib`
-- Add protection for :obj:`CheckChatInviteRequest` in forbid_joins
+- Add protection for :obj:`CheckChatInvite` in forbid_joins
 - Add ability to search modules by classname in :method:`self.lookup`
 - Add anonymous stats of modules loading (YOU CAN DISABLE THEM IN `.settings`)
 - Add telethon objects formatting in `.e`

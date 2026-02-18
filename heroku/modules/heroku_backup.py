@@ -24,7 +24,7 @@ import orjson
 from pathlib import Path
 
 from aiogram.types import BufferedInputFile
-from herokutl.tl.types import Message
+from pyrogram.types import Message
 
 from .. import loader, utils
 from ..inline.types import BotInlineCall
@@ -197,9 +197,9 @@ class HerokuBackupMod(loader.Module):
         try:
             file = await (
                 await self._client.get_messages(
-                    self._content_channel_id, ids=[call.message.message_id]
+                    self._content_channel_id, message_ids=[call.message.message_id]
                 )
-            )[0].download_media(bytes)
+            )[0].download(in_memory=True)
 
             zipfile_bytes = io.BytesIO(file)
             with zipfile.ZipFile(zipfile_bytes) as zf:
@@ -231,7 +231,7 @@ class HerokuBackupMod(loader.Module):
                                 path.write_bytes(module.read())
 
             await self.inline.bot(call.answer(self.strings("all_restored"), show_alert=True))
-            await self.invoke("restart", "-f", peer=call.message.peer_id)
+            await self.invoke("restart", "-f", peer=call.message.chat.id)
         except Exception:
             logger.exception("Restore from backupall failed")
             await self.inline.bot(call.answer(self.strings("reply_to_file"), show_alert=True))
@@ -304,14 +304,14 @@ class HerokuBackupMod(loader.Module):
 
     @loader.command()
     async def restoredb(self, message: Message):
-        if not (reply := await message.get_reply_message()) or not reply.media:
+        if not (reply := message.reply_to_message) or not reply.media:
             await utils.answer(
                 message,
                 self.strings("reply_to_file"),
             )
             return
 
-        file = await reply.download_media(bytes)
+        file = await reply.download(in_memory=True)
         try:
 
             decoded_text = orjson.loads(file.decode())
@@ -412,7 +412,7 @@ class HerokuBackupMod(loader.Module):
 
     @loader.command()
     async def restoremods(self, message: Message):
-        if not (reply := await message.get_reply_message()) or not reply.media:
+        if not (reply := message.reply_to_message) or not reply.media:
             await utils.answer(message, self.strings("reply_to_file"))
             return
 
@@ -524,11 +524,11 @@ class HerokuBackupMod(loader.Module):
         
     @loader.command()
     async def restoreall(self, message: Message):
-        if not (reply := await message.get_reply_message()) or not reply.media:
+        if not (reply := message.reply_to_message) or not reply.media:
             await utils.answer(message, self.strings("reply_to_file"))
             return
 
-        file = await reply.download_media(bytes)
+        file = await reply.download(in_memory=True)
         try:
             zipfile_bytes = io.BytesIO(file)
             with zipfile.ZipFile(zipfile_bytes) as zf:

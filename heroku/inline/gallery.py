@@ -31,9 +31,9 @@ from aiogram.types import (
     InputMediaPhoto,
 )
 from aiogram.exceptions import TelegramBadRequest, TelegramRetryAfter
-from herokutl.errors.rpcerrorlist import ChatSendInlineForbiddenError
-from herokutl.extensions.html import CUSTOM_EMOJIS
-from herokutl.tl.types import Message
+from pyrogram.errors import ChatSendInlineForbidden
+CUSTOM_EMOJIS = True# from pyrogram.extensions.html import CUSTOM_EMOJIS
+from pyrogram.types import Message
 
 from .. import main, utils
 from ..types import HerokuReplyMarkup
@@ -263,7 +263,7 @@ class Gallery(InlineUnit):
         if isinstance(message, Message) and not silent:
             try:
                 status_message = await (
-                    message.edit if message.out else message.respond
+                    message.edit if message.out else message.answer
                 )(
                     (
                         utils.get_platform_emoji()
@@ -281,7 +281,7 @@ class Gallery(InlineUnit):
         async def answer(msg: str):
             nonlocal message
             if isinstance(message, Message):
-                await (message.edit if message.out else message.respond)(
+                await (message.edit if message.out else message.answer)(
                     msg,
                     **({} if message.out else {"reply_to": utils.get_topic(message)}),
                 )
@@ -290,7 +290,7 @@ class Gallery(InlineUnit):
 
         try:
             m = await self._invoke_unit(unit_id, message)
-        except ChatSendInlineForbiddenError:
+        except ChatSendInlineForbidden:
             await answer(self.translator.getkey("inline.inline403"))
         except Exception:
             logger.exception("Error sending inline gallery")

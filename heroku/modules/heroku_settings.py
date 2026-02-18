@@ -13,11 +13,13 @@
 import logging
 import random
 
-import herokutl
-from herokutl.tl.functions.messages import (GetDialogFiltersRequest,
-                                            UpdateDialogFilterRequest)
-from herokutl.tl.types import Message
-from herokutl.utils import get_display_name
+import pyrogram
+from pyrogram.raw.functions.messages import (
+    GetDialogFilters,
+    UpdateDialogFilter,
+)
+from pyrogram.types import Message
+from ..utils import get_display_name
 
 from .. import loader, log, main, utils
 from .._internal import fw_protect, restart
@@ -174,11 +176,11 @@ class HerokuSettingsMod(loader.Module):
 
     @loader.command()
     async def nonickuser(self, message: Message):
-        if not (reply := await message.get_reply_message()):
+        if not (reply := message.reply_to_message):
             await utils.answer(message, self.strings("reply_required"))
             return
 
-        u = reply.sender_id
+        u = reply.from_user.id
         if not isinstance(u, int):
             u = u.user_id
 

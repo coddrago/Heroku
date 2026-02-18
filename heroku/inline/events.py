@@ -280,7 +280,7 @@ class Events(InlineUnit):
                                 await self.check_inline_security(
                                     func=unit.get(
                                         "perms_map",
-                                        lambda: self._client.dispatcher.security._default,
+                                        lambda: self._client._heroku_dispatcher.security._default,
                                     )(),
                                     user=call.from_user.id,
                                 )
@@ -290,7 +290,7 @@ class Events(InlineUnit):
                         ):
                             pass
                         case _ if call.from_user.id not in (
-                            self._client.dispatcher.security._owner
+                            self._client._heroku_dispatcher.security._owner
                             + unit.get("always_allow", [])
                             + button.get("always_allow", [])
                         ):
@@ -333,7 +333,7 @@ class Events(InlineUnit):
                         await self.check_inline_security(
                             func=self._custom_map[call.data].get(
                                 "perms_map",
-                                lambda: self._client.dispatcher.security._default,
+                                lambda: self._client._heroku_dispatcher.security._default,
                             )(),
                             user=call.from_user.id,
                         )
@@ -343,7 +343,7 @@ class Events(InlineUnit):
                 ):
                     pass
                 case _ if (
-                    call.from_user.id not in self._client.dispatcher.security._owner
+                    call.from_user.id not in self._client._heroku_dispatcher.security._owner
                     and call.from_user.id
                     not in self._custom_map[call.data].get("always_allow", [])
                 ):
@@ -388,7 +388,7 @@ class Events(InlineUnit):
                     and button["_switch_query"] == query.split()[0]
                     and chosen_inline_query.from_user.id
                     in [self._me]
-                    + self._client.dispatcher.security._owner
+                    + self._client._heroku_dispatcher.security._owner
                     + unit.get("always_allow", [])
                 ):
                     query = query.split(maxsplit=1)[1] if len(query.split()) > 1 else ""

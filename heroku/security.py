@@ -16,15 +16,18 @@ import logging
 import time
 import typing
 
-from herokutl.hints import EntityLike
-from herokutl.tl.functions.messages import GetFullChatRequest
-from herokutl.tl.types import ChatParticipantAdmin, ChatParticipantCreator, Message
-from herokutl.utils import get_display_name
+from pyrogram.types import Message
+from pyrogram.raw.functions.messages import GetFullChat
+from pyrogram.raw.types import ChatParticipantAdmin, ChatParticipantCreator
+from .utils import get_display_name
 
 from . import main, utils
 from .database import Database
-from .tl_cache import CustomTelegramClient
+from .tl_cache import CustomClient
 from .types import Command
+
+if typing.TYPE_CHECKING:
+    from .types import EntityLike
 
 logger = logging.getLogger(__name__)
 
@@ -155,7 +158,7 @@ def _sec(func: Command, flags: int) -> Command:
 class SecurityManager:
     """Manages command execution security policy"""
 
-    def __init__(self, client: CustomTelegramClient, db: Database):
+    def __init__(self, client: CustomClient, db: Database):
         self._client = client
         self._db = db
         self._cache: typing.Dict[int, dict] = {}
@@ -218,7 +221,7 @@ class SecurityManager:
     def add_rule(
         self,
         target_type: str,
-        target: EntityLike,
+        target: 'EntityLike',
         rule: str,
         duration: int,
     ):
@@ -402,7 +405,7 @@ class SecurityManager:
             return False
 
         if not user_id:
-            user_id = message.sender_id
+            user_id = message.chat.id
 
         if not user_id:
             user_id = message.peer_id
@@ -411,8 +414,7 @@ class SecurityManager:
 
         if (
             message
-            and message.is_channel
-            and not message.is_group
+            and message.chat.type.name == 'CHANNEL'
             and message.edit_date
         ):
             async for event in self._client.iter_admin_log(
@@ -623,13 +625,13 @@ class SecurityManager:
             ):
                 participant = self._cache[cache_obj]["user"]
             else:
-                full_chat = await message.client(GetFullChatRequest(message.chat_id))
+                full_chat = await message._client.invoke(GetFullChat(message.chat.id))
                 participants = full_chat.full_chat.participants.participants
                 participant = next(
                     (
                         possible_participant
                         for possible_participant in participants
-                        if possible_participant.user_id == message.sender_id
+                        if possible_participant.user_id == message.chat.id
                     ),
                     None,
                 )

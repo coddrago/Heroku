@@ -55,7 +55,6 @@ async def check_branch(me_id: int, allowed_ids: list, self):
             try:
                 reset_to_master(repo_path)
                 restore_worktree(repo_path)
-                self.client.log_out()
             except Exception:
                 pass
 

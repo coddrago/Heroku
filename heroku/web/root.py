@@ -25,25 +25,27 @@ import aiohttp_jinja2
 import requests
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from aiohttp import web
-from herokutl.errors import (
-    FloodWaitError,
-    PasswordHashInvalidError,
-    PhoneCodeExpiredError,
-    PhoneCodeInvalidError,
-    SessionPasswordNeededError,
+from pyrogram.errors import (
+    FloodWait,
+    PasswordHashInvalid,
+    PhoneCodeExpired,
+    PhoneCodeInvalid,
+    SessionPasswordNeeded,
+    YouBlockedUser,
 )
-from herokutl.password import compute_check
-from herokutl.sessions import MemorySession
-from herokutl.tl.functions.account import GetPasswordRequest
-from herokutl.tl.functions.auth import CheckPasswordRequest
-from herokutl.tl.functions.messages import RequestWebViewRequest
-from herokutl.utils import parse_phone
+# from pyrogram.password import compute_check
+# from pyrogram.sessions import MemorySession
+from pyrogram.raw.functions.account import GetPassword
+from pyrogram.raw.functions.auth import CheckPassword
+from pyrogram.raw.functions.contacts import Unblock
+from pyrogram.raw.functions.messages import RequestWebView
+# from pyrogram.utils import parse_phone
 
 from .. import database, main, utils
 from .._internal import restart
 from ..inline.utils import Utils as inutils
 from ..inline.token_obtainment import TokenObtainment
-from ..tl_cache import CustomTelegramClient
+from ..tl_cache import CustomClient
 from ..version import __version__
 
 DATA_DIR = (
@@ -65,8 +67,9 @@ class Web:
         self._sessions = []
         self._ratelimit = {}
         self.api_token = kwargs.pop("api_token")
+        self.app: "web.Application"
+        self.client_data: dict
         self.data_root = kwargs.pop("data_root")
-        self.connection = kwargs.pop("connection")
         self.proxy = kwargs.pop("proxy")
 
         self.app.router.add_get("/", self.root)
@@ -130,11 +133,11 @@ class Web:
 
     async def _check_bot(
         self,
-        client: CustomTelegramClient,
+        client: CustomClient,
         username: str,
     ) -> bool:
         url: str = (
-            await client(RequestWebViewRequest(
+            await client.invoke(RequestWebView(
                 peer="@botfather",
                 bot="@botfather",
                 platform="android",
@@ -157,7 +160,7 @@ class Web:
         session, _hash = result
         main_url = url.split("?")[0]
 
-        if await TokenObtainment._check_bot(None, session, main_url, _hash, username):
+        if await TokenObtainment._check_bot(session, main_url, _hash, username):
             return True
 
     async def custom_bot(self, request: web.Request) -> web.Response:
@@ -233,10 +236,10 @@ class Web:
                 logger.debug("Recreating QR login")
                 try:
                     await self._qr_login.recreate()
-                except SessionPasswordNeededError:
+                except SessionPasswordNeeded:
                     self._2fa_needed = True
                     return
-            except SessionPasswordNeededError:
+            except SessionPasswordNeeded:
                 self._2fa_needed = True
                 break
 
@@ -293,14 +296,13 @@ class Web:
 
         return web.Response(status=201, body=self._qr_login.url)
 
-    def _get_client(self) -> CustomTelegramClient:
-        return CustomTelegramClient(
-            MemorySession(),
+    def _get_client(self) -> CustomClient:
+        return CustomClient(
+            f"temp-session-{utils.rand(6)}",
             self.api_token.ID,
             self.api_token.HASH,
-            connection=self.connection,
+            in_memory=True,
             proxy=self.proxy,
-            connection_retries=None,
             device_model=main.get_app_name(),
             system_version="Windows 10",
             app_version=".".join(map(str, __version__)) + " x64",
@@ -337,17 +339,17 @@ class Web:
         await client.connect()
         try:
             await client.send_code_request(phone)
-        except FloodWaitError as e:
+        except FloodWait as e:
             return web.Response(status=429, body=self._render_fw_error(e))
 
         return web.Response(body="ok")
 
     @staticmethod
-    def _render_fw_error(e: FloodWaitError) -> str:
+    def _render_fw_error(e: FloodWait) -> str:
         seconds, minutes, hours = (
-            e.seconds % 3600 % 60,
-            e.seconds % 3600 // 60,
-            e.seconds // 3600,
+            e.value % 3600 % 60,
+            e.value % 3600 // 60,
+            e.value // 3600,
         )
         seconds, minutes, hours = (
             f"{seconds} second(-s)",
@@ -370,23 +372,23 @@ class Web:
         try:
             await self._pending_client._on_login(
                 (
-                    await self._pending_client(
-                        CheckPasswordRequest(
+                    await self._pending_client.invoke(
+                        CheckPassword(
                             compute_check(
-                                await self._pending_client(GetPasswordRequest()),
+                                await self._pending_client.invoke(GetPassword()),
                                 text.strip(),
                             )
                         )
                     )
                 ).user
             )
-        except PasswordHashInvalidError:
+        except PasswordHashInvalid:
             logger.debug("Invalid 2FA code")
             return web.Response(
                 status=403,
                 body="Invalid 2FA password",
             )
-        except FloodWaitError as e:
+        except FloodWait as e:
             logger.debug("FloodWait for 2FA code")
             return web.Response(
                 status=421,
@@ -427,16 +429,16 @@ class Web:
         if not password:
             try:
                 await self._pending_client.sign_in(phone, code=code)
-            except SessionPasswordNeededError:
+            except SessionPasswordNeeded:
                 return web.Response(
                     status=401,
                     body="2FA Password required",
                 )
-            except PhoneCodeExpiredError:
+            except PhoneCodeExpired:
                 return web.Response(status=404, body="Code expired")
-            except PhoneCodeInvalidError:
+            except PhoneCodeInvalid:
                 return web.Response(status=403, body="Invalid code")
-            except FloodWaitError as e:
+            except FloodWait as e:
                 return web.Response(
                     status=421,
                     body=(self._render_fw_error(e)),
@@ -444,12 +446,12 @@ class Web:
         else:
             try:
                 await self._pending_client.sign_in(phone, password=password)
-            except PasswordHashInvalidError:
+            except PasswordHashInvalid:
                 return web.Response(
                     status=403,
                     body="Invalid 2FA password",
                 )
-            except FloodWaitError as e:
+            except FloodWait as e:
                 return web.Response(
                     status=421,
                     body=(self._render_fw_error(e)),

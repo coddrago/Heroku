@@ -13,6 +13,7 @@
 
 import ast
 import asyncio
+import base64
 import contextlib
 import copy
 import importlib
@@ -22,6 +23,7 @@ import inspect
 import logging
 import os
 import re
+import struct
 import sys
 import time
 import typing
@@ -29,10 +31,22 @@ from dataclasses import dataclass, field
 from importlib.abc import SourceLoader
 
 import requests
-from herokutl.hints import EntityLike
-from herokutl.tl.functions.account import UpdateNotifySettingsRequest
-from herokutl.tl.types import (Channel, ChannelForbidden, ChannelFull,
-                               InputPeerNotifySettings, Message, UserFull)
+from pyrogram import raw
+from pyrogram.client import Client
+from pyrogram.storage.sqlite_storage import (
+    SQLiteStorage,
+    TEST,
+    PROD
+)
+from pyrogram.types import (
+    Message,
+)
+from pyrogram.raw.types import (
+    Channel,
+    ChannelForbidden,
+    ChannelFull,
+    UserFull,
+)
 
 from . import version
 from ._reference_finder import replace_all_refs
@@ -403,9 +417,14 @@ SafeAllModulesProxy = _make_safe_allmodules_proxy()
 
 
 JSONSerializable = typing.Union[str, int, float, bool, list, dict, None]
+HerokuReplyMarkup = typing.Union[typing.List[typing.List[dict]], typing.List[dict], dict]
+Entity = typing.Union[raw.base.User, raw.base.Chat]
+EntityLike = typing.Union[
+    str, int, Entity, raw.base.Peer, raw.base.InputPeer, raw.base.UserFull,
+    raw.base.ChatFull, raw.base.messages.chat_full.ChatFull
+]
 ListLike = typing.Union[list, set, tuple]
 Command = typing.Callable[..., typing.Awaitable[typing.Any]]
-
 
 class StringLoader(SourceLoader):
     """Load a python module/file from a string"""
@@ -504,7 +523,7 @@ class Module:
         self,
         command: str,
         args: typing.Optional[str] = None,
-        peer: typing.Optional[EntityLike] = None,
+        peer: typing.Optional['EntityLike'] = None,
         message: typing.Optional[Message] = None,
         edit: bool = False,
     ) -> Message:
@@ -527,7 +546,7 @@ class Module:
         message = (
             (await self._client.send_message(peer, cmd))
             if peer
-            else (await (message.edit if edit else message.respond)(cmd))
+            else (await (message.edit if edit else message.answer)(cmd))
         )
         await self.allmodules.commands[command](message)
         return message
@@ -673,7 +692,7 @@ class Module:
     async def _decline(
         self,
         call: InlineCall,
-        channel: EntityLike,
+        channel: 'EntityLike',
         event: asyncio.Event,
     ):
         from . import utils
@@ -695,7 +714,7 @@ class Module:
 
     async def request_join(
         self,
-        peer: EntityLike,
+        peer: 'EntityLike',
         reason: str,
         assure_joined: typing.Optional[bool] = False,
     ) -> bool:
@@ -745,11 +764,10 @@ class Module:
             return True
 
         event = asyncio.Event()
-        await self.client(
-            UpdateNotifySettingsRequest(
-                peer=self.inline.bot_username,
-                settings=InputPeerNotifySettings(show_previews=False, silent=False),
-            )
+        await self.client.update_chat_notifications(
+            chat_id=self.inline.bot_username,
+            show_previews=False,
+            mute=False
         )
 
         await self.inline.bot.send_photo(
@@ -757,7 +775,7 @@ class Module:
             "https://raw.githubusercontent.com/coddrago/assets/refs/heads/main/heroku/join_request.png",
             caption=(
                 self._client.loader.lookup("translations")
-                .strings("requested_join")
+                .strings["requested_join"]
                 .format(
                     self.__class__.__name__,
                     channel.username,
@@ -1340,11 +1358,72 @@ def _get_members(
     }
 
 
+class SQLiteStringStorage(SQLiteStorage):
+    def __init__(self, client: Client):
+        name = client.name
+        workdir = client.WORKDIR
+        super().__init__(name, workdir)
+
+    async def import_session_string(self, session_string: str):
+        if self.conn is None:
+            await self.open()
+        # Old format
+        if len(session_string) in [
+            self.SESSION_STRING_SIZE,
+            self.SESSION_STRING_SIZE_64,
+        ]:
+            dc_id, test_mode, auth_key, user_id, is_bot = struct.unpack(
+                (
+                    self.OLD_SESSION_STRING_FORMAT
+                    if len(session_string) == self.SESSION_STRING_SIZE
+                    else self.OLD_SESSION_STRING_FORMAT_64
+                ),
+                base64.urlsafe_b64decode(
+                    session_string + "=" * (-len(session_string) % 4)
+                ),
+            )
+
+            await self.dc_id(dc_id)
+            await self.test_mode(test_mode)
+            await self.auth_key(auth_key)
+            await self.user_id(user_id)
+            await self.is_bot(is_bot)
+            await self.date(0)
+
+            logger.warning(
+                "You are using an old session string format. Use export_session_string to update"
+            )
+            return
+
+        dc_id, api_id, test_mode, auth_key, user_id, is_bot = struct.unpack(
+            self.SESSION_STRING_FORMAT,
+            base64.urlsafe_b64decode(
+                session_string + "=" * (-len(session_string) % 4)
+            ),
+        )
+
+        await self.dc_id(dc_id)
+
+        if test_mode:
+            await self.server_address(TEST[dc_id])
+            await self.port(80)
+        else:
+            await self.server_address(PROD[dc_id])
+            await self.port(443)
+
+        await self.api_id(api_id)
+        await self.test_mode(test_mode)
+        await self.auth_key(auth_key)
+        await self.user_id(user_id)
+        await self.is_bot(is_bot)
+        await self.date(0)
+
+
 class CacheRecordEntity:
     def __init__(
         self,
         hashable_entity: "Hashable",  # type: ignore  # noqa: F821
-        resolved_entity: EntityLike,
+        resolved_entity: 'EntityLike',
         exp: int,
     ):
         self.entity = copy.deepcopy(resolved_entity)
@@ -1377,7 +1456,7 @@ class CacheRecordPerms:
         self,
         hashable_entity: "Hashable",  # type: ignore  # noqa: F821
         hashable_user: "Hashable",  # type: ignore  # noqa: F821
-        resolved_perms: EntityLike,
+        resolved_perms: 'EntityLike',
         exp: int,
     ):
         self.perms = copy.deepcopy(resolved_perms)

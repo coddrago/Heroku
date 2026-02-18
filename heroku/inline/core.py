@@ -22,17 +22,19 @@ from aiogram import Bot, Dispatcher
 from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
 from aiogram.exceptions import TelegramConflictError, TelegramUnauthorizedError
-from herokutl.errors.rpcerrorlist import (InputUserDeactivatedError,
-                                          YouBlockedUserError)
-from herokutl.tl.functions.contacts import UnblockRequest
-from herokutl.tl.functions.messages import (GetDialogFiltersRequest,
-                                            UpdateDialogFilterRequest)
-from herokutl.tl.types import DialogFilter, InputPeerUser, Message
-from herokutl.utils import get_display_name
+from aiogram.client.default import DefaultBotProperties
+from pyrogram.enums import ChatType
+from pyrogram.errors import InputUserDeactivated, YouBlockedUser
+from pyrogram.types import Chat
+from pyrogram.raw.functions.contacts.unblock import Unblock
+from pyrogram.raw.functions.messages import GetDialogFilters, UpdateDialogFilter
+from pyrogram.raw.types import Message
+from pyrogram.types.user_and_chats.folder import Folder
+from ..utils import get_display_name
 
 from .. import utils
 from ..database import Database
-from ..tl_cache import CustomTelegramClient
+from ..tl_cache import CustomClient
 from ..translations import Translator
 from .bot_pm import BotPM
 from .events import Events
@@ -70,7 +72,7 @@ class InlineManager(
 
     def __init__(
         self,
-        client: CustomTelegramClient,
+        client: CustomClient,
         db: Database,
         allmodules: "Modules",  # type: ignore  # noqa: F821
     ):
@@ -148,7 +150,7 @@ class InlineManager(
 
         try:
             m = await self._client.send_message(self.bot_username, "/start heroku init")
-        except (InputUserDeactivatedError, ValueError):
+        except (InputUserDeactivated, ValueError):
             self._db.set("heroku.inline", "bot_token", None)
             self._token = False
 
@@ -157,8 +159,8 @@ class InlineManager(
 
             self.init_complete = False
             return False
-        except YouBlockedUserError:
-            await self._client(UnblockRequest(id=self.bot_username))
+        except YouBlockedUser:
+            await self._client.unblock_user(self.bot_username)
             try:
                 m = await self._client.send_message(
                     self.bot_username, "/start heroku init"
@@ -171,42 +173,36 @@ class InlineManager(
             logger.critical("Initialization of inline manager failed!", exc_info=True)
             return False
         
-        _folders = await self._client(GetDialogFiltersRequest())
-        for folder in _folders.filters:
+        _folders = await self._client.get_folders()
+        for folder in _folders:
             if getattr(folder, "title", None) == "Heroku":
                 if any(
                     [
-                        isinstance(peer, InputPeerUser)
-                        and peer.user_id == self.bot_id
-                        for peer in folder.include_peer
+                        isinstance(chat.type, ChatType.BOT)
+                        and chat.id == self.bot_id
+                        for chat in folder.included_chats
                     ]
                 ):
                     break
 
                 pinned = [
-                    await self._client.get_input_entity(self.bot_id)
+                    self.bot_id
                 ]
-                include = folder.include_peers
-                exclude = folder.exclude_peers
-                emoticon = folder.emoticon
+                include = [*map(lambda x: x.id, folder.included_chats)]
+                exclude = [*map(lambda x: x.id, folder.excluded_chats)]
+                emoticon = folder.icon
                 color = folder.color
-
-                await self._client(
-                    UpdateDialogFilterRequest(
-                        folder.id,
-                        DialogFilter(
-                            folder.id,
-                            pinned_peers=pinned,
-                            include_peers=include,
-                            exclude_peers=exclude,
-                            emoticon=emoticon,
-                            color=color,
-                        )
-                    )
+                self._client.edit_folder(
+                    folder.id,
+                    pinned_chats=pinned,
+                    included_chats=include,
+                    excluded_chats=exclude,
+                    icon=emoticon,
+                    color=color,
                 )
-                break
+ 
 
-        await self._client.delete_messages(self.bot_username, m)
+        await self._client.delete_messages(self.bot_username, m.id)
 
         self._dp.inline_query.register(
             self._inline_handler,
@@ -276,7 +272,7 @@ class InlineManager(
         async def result_getter():
             nonlocal unit_id, q
             with contextlib.suppress(Exception):
-                q = await self._client.inline_query(self.bot_username, unit_id)
+                q = await self._client.get_inline_bot_results(self.bot_username, unit_id)
 
         async def event_poller():
             nonlocal exception

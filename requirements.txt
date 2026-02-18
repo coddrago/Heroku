@@ -1,4 +1,4 @@
-git+https://github.com/coddrago/heroku-tl
+https://github.com/KurimuzonAkuma/kurigram/archive/dev.zip
 pyaes
 aiofile==3.8.1
 aiofiles==24.1.0

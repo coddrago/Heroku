@@ -32,7 +32,7 @@ from pathlib import Path
 from types import FunctionType
 from uuid import uuid4
 
-from herokutl.tl.tlobject import TLObject
+from pyrogram.raw.core import TLObject
 
 from . import main, security, utils, validators
 from .database import Database
@@ -46,7 +46,7 @@ from .types import (Command, ConfigValue, CoreOverwriteError, CoreUnloadError,
                     get_callback_handlers, get_commands, get_inline_handlers)
 
 if typing.TYPE_CHECKING:
-    from .tl_cache import CustomTelegramClient
+    from .tl_cache import CustomClient
 
 __all__ = [
     "Modules",
@@ -453,15 +453,14 @@ def patched_import(name: str, *args, **kwargs):
         return native_import(name, *args, **kwargs)
     token = _IMPORT_DEPTH.set(depth + 1)
     try:
-        match name:
-            case s if s.startswith("telethon"):
-                return native_import("herokutl" + name[8:], *args, **kwargs)
-            case s if s.startswith("hikkatl"):
-                return native_import("herokutl" + name[7:], *args, **kwargs)
-            case s if s.startswith("hikkalls"):
-                return native_import(name, *args, **kwargs)
-            case s if s.startswith("hikka"):
-                return native_import("heroku" + name[5:], *args, **kwargs)
+        if name.startswith("telethon"):
+            return native_import("pyrogram" + name[8:], *args, **kwargs)
+        elif name.startswith("hikkatl"):
+            return native_import("pyrogram" + name[7:], *args, **kwargs)
+        elif name.startswith("hikkalls"):
+            return native_import(name, *args, **kwargs)
+        elif name.startswith("hikka"):
+            return native_import("heroku" + name[5:], *args, **kwargs)
 
         return native_import(name, *args, **kwargs)
     finally:
@@ -787,7 +786,7 @@ def callback_handler(*args, **kwargs):
     return _mark_method("is_callback_handler", *args, **kwargs)
 
 
-def raw_handler(*updates: TLObject):
+def raw_handler(*updates: "TLObject"):
     """
     Decorator that marks function as raw telethon events handler
     Use it to prevent zombie-event-handlers, left by unloaded modules
@@ -810,7 +809,7 @@ class Modules:
 
     def __init__(
         self,
-        client: "CustomTelegramClient",  # type: ignore  # noqa: F821
+        client: "CustomClient",  # type: ignore  # noqa: F821
         db: Database,
         allclients: list,
         translator: Translator,
@@ -837,6 +836,7 @@ class Modules:
         asyncio.ensure_future(self._junk_collector())
         self.inline = InlineManager(self.client, self._db, self)
         self.client.heroku_inline = self.inline
+        self.check_security: typing.Callable
 
     async def _junk_collector(self):
         """
@@ -1074,7 +1074,7 @@ class Modules:
         """Register event handlers for a module"""
         for name, handler in utils.iter_attrs(instance):
             if getattr(handler, "is_raw_handler", False):
-                self.client.dispatcher.raw_handlers.append(handler)
+                self.client._heroku_dispatcher.raw_handlers.append(handler)
                 logger.debug(
                     "Registered raw handler %s for %s. ID: %s",
                     name,
@@ -1648,9 +1648,9 @@ class Modules:
 
     def unregister_raw_handlers(self, instance: Module, purpose: str):
         """Unregister event handlers for a module"""
-        for handler in self.client.dispatcher.raw_handlers:
+        for handler in self.client._heroku_dispatcher.raw_handlers:
             if handler.__self__.__class__.__name__ == instance.__class__.__name__:
-                self.client.dispatcher.raw_handlers.remove(handler)
+                self.client._heroku_dispatcher.raw_handlers.remove(handler)
                 logger.debug(
                     "Unregistered raw handler of module %s for %s. ID: %s",
                     instance.__class__.__name__,

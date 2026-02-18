@@ -695,7 +695,7 @@ class HSearch(loader.Module):
             ohd = qp.get('ohd', ['False'])[0]
             
             if ohd.lower() == 'false':
-                warn_msg = await message.respond("⚠️")
+                warn_msg = await message.answer("⚠️")
                 await asyncio.sleep(1)
                 await warn_msg.delete()
                 await message.delete()
@@ -706,7 +706,7 @@ class HSearch(loader.Module):
             try:
                 r = await lm._storage.fetch(link, auth=lm.config.get("basic_auth"))
             except (aiohttp.ClientError, aiohttp.ClientResponseError):
-                status_msg = await message.respond("❌")
+                status_msg = await message.answer("❌")
                 await asyncio.sleep(0.67)
                 await status_msg.delete()
                 await message.delete()
@@ -729,7 +729,7 @@ class HSearch(loader.Module):
                         if lm.fully_loaded:
                             lm.update_modules_in_db()
                         
-                        status_msg = await message.respond("✅")
+                        status_msg = await message.answer("✅")
                         await asyncio.sleep(0.5)
                         await status_msg.delete()
                         await message.delete()
@@ -740,7 +740,7 @@ class HSearch(loader.Module):
                             await asyncio.sleep(0.33)
                             continue
                         else:
-                            status_msg = await message.respond("📋")
+                            status_msg = await message.answer("📋")
                             await asyncio.sleep(1)
                             await status_msg.delete()
                             await message.delete()
@@ -750,42 +750,42 @@ class HSearch(loader.Module):
                         deps = result.get("deps", [])
                         if deps:
                             deps_text = ",".join(deps[:5])
-                            status_msg = await message.respond(f"📋{deps_text}")
+                            status_msg = await message.answer(f"📋{deps_text}")
                         else:
-                            status_msg = await message.respond("📋")
+                            status_msg = await message.answer("📋")
                         await asyncio.sleep(1)
                         await status_msg.delete()
                         await message.delete()
                         return
                     
                     elif result == "overwrite":
-                        status_msg = await message.respond("😨")
+                        status_msg = await message.answer("😨")
                         await asyncio.sleep(1)
                         await status_msg.delete()
                         await message.delete()
                         return
                     
                     else:
-                        status_msg = await message.respond("❌")
+                        status_msg = await message.answer("❌")
                         await asyncio.sleep(0.67)
                         await status_msg.delete()
                         await message.delete()
                         return
                         
                 except Exception:
-                    status_msg = await message.respond("❌")
+                    status_msg = await message.answer("❌")
                     await asyncio.sleep(0.67)
                     await status_msg.delete()
                     await message.delete()
                     return
             
-            status_msg = await message.respond("📋")
+            status_msg = await message.answer("📋")
             await asyncio.sleep(1)
             await status_msg.delete()
             await message.delete()
             
         except Exception:
-            status_msg = await message.respond("❌")
+            status_msg = await message.answer("❌")
             await asyncio.sleep(0.67)
             await status_msg.delete()
             await message.delete()

@@ -38,41 +38,41 @@ def api_config(tty: typing.Optional[bool] = None):
     from ._internal import print_banner
 
     if tty is None:
-        print("\033[0;91mThe quick brown fox jumps over the lazy dog\033[0m")
+        print("\033[1;38;2;255;120;0mThe quick brown fox jumps over the lazy dog\033[0m")
         tty = input("Is the text above colored? [y/N]").lower() == "y"
 
     if tty:
         print_banner("banner.txt")
 
-    tty_print("\033[0;95mWelcome to Heroku Userbot!\033[0m", tty)
-    tty_print("\033[0;96m1. Go to https://my.telegram.org and login\033[0m", tty)
-    tty_print("\033[0;96m2. Click on \033[1;96mAPI development tools\033[0m", tty)
+    tty_print("\033[38;2;255;165;0mWelcome to Heroku Userbot!\033[0m", tty)
+    tty_print("\033[38;2;255;120;0m1. Go to https://my.telegram.org and login\033[0m", tty)
+    tty_print("\033[38;2;255;120;0m2. Click on \033[1;38;2;255;120;0mAPI development tools\033[0m", tty)
     tty_print(
         (
-            "\033[0;96m3. Create a new application, by entering the required"
+            "\033[38;2;255;120;0m3. Create a new application, by entering the required"
             " details\033[0m"
         ),
         tty,
     )
     tty_print(
         (
-            "\033[0;96m4. Copy your \033[1;96mAPI ID\033[0;96m and \033[1;96mAPI"
-            " hash\033[0m"
+            "\033[38;2;255;120;0m4. Copy your \033[1;38;2;255;120;0mAPI ID\033[38;2;255;120;0m and"
+            " \033[1;38;2;255;120;0mAPI hash\033[0m"
         ),
         tty,
     )
 
-    while api_id := tty_input("\033[0;95mEnter API ID: \033[0m", tty):
+    while api_id := tty_input("\033[38;2;255;165;0mEnter API ID: \033[0m", tty):
         if api_id.isdigit():
             break
 
-        tty_print("\033[0;91mInvalid ID\033[0m", tty)
+        tty_print("\033[38;2;255;165;0mInvalid ID\033[0m", tty)
 
     if not api_id:
         tty_print("\033[0;91mCancelled\033[0m", tty)
         sys.exit(0)
 
-    while api_hash := tty_input("\033[0;95mEnter API hash: \033[0m", tty):
+    while api_hash := tty_input("\033[38;2;255;165;0mEnter API hash: \033[0m", tty):
         if len(api_hash) == 32 and all(
             symbol in string.hexdigits for symbol in api_hash
         ):
@@ -86,4 +86,4 @@ def api_config(tty: typing.Optional[bool] = None):
 
     main.save_config_key("api_id", int(api_id))
     main.save_config_key("api_hash", api_hash)
-    tty_print("\033[0;92mAPI config saved\033[0m", tty)
+    tty_print("\033[1;92mAPI config saved\033[0m", tty)

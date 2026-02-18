@@ -16,18 +16,22 @@ import os
 import string
 import typing
 
-from herokutl.errors import (FloodWaitError, PasswordHashInvalidError,
-                             PhoneCodeExpiredError, PhoneCodeInvalidError,
-                             PhoneNumberInvalidError,
-                             SessionPasswordNeededError)
-from herokutl.sessions import MemorySession
-from herokutl.tl.types import Message, User
-from herokutl.utils import parse_phone
+from pyrogram.errors import (
+    FloodWait,
+    PasswordHashInvalid,
+    PhoneCodeExpired,
+    PhoneCodeInvalid,
+    PhoneNumberInvalid,
+    SessionPasswordNeeded,
+)
+# from pyrogram.sessions import MemorySession
+# from pyrogram.utils import parse_phone
+from pyrogram.types import Message, User
 
 from .. import loader, main, utils
 from .._internal import restart
 from ..inline.types import InlineCall
-from ..tl_cache import CustomTelegramClient
+from ..tl_cache import CustomClient
 from ..version import __version__
 from ..web import core
 
@@ -141,8 +145,8 @@ class HerokuWebMod(loader.Module):
 
             id = utils.get_args(message)
             if not id:
-                reply = await message.get_reply_message()
-                id = reply.sender_id if reply else None
+                reply = message.reply_to_message
+                id = reply.from_user.id if reply else None
             else:
                 id = id[0]
         
@@ -216,8 +220,8 @@ class HerokuWebMod(loader.Module):
         )
 
 
-    def _get_client(self) -> CustomTelegramClient:
-        return CustomTelegramClient(
+    def _get_client(self) -> CustomClient:
+        return CustomClient(
             MemorySession(),
             main.heroku.api_token.ID,
             main.heroku.api_token.HASH,
@@ -251,14 +255,14 @@ class HerokuWebMod(loader.Module):
         await client.connect()
         try:
             await client.send_code_request(phone)
-        except FloodWaitError as e:
+        except FloodWait as e:
             await utils.answer(
                 call,
-                self.strings("floodwait_error").format(e.seconds),
+                self.strings("floodwait_error").format(e.value),
                 reply_markup={"text": self.strings("btn_no"), "action": "close"},
             )
             return
-        except PhoneNumberInvalidError:
+        except PhoneNumberInvalid:
             await self._inline_login(call, user, after_fail=True)
             return
         
@@ -293,7 +297,7 @@ class HerokuWebMod(loader.Module):
         
         try:
             await client.sign_in(phone, code=data)
-        except SessionPasswordNeededError:
+        except SessionPasswordNeeded:
             reply_markup = [
                 {"text": self.strings("enter_2fa"), "input": self.strings("your_2fa"), "handler": self.inline_2fa_handler, "args": (client, phone, user,)},
             ]
@@ -304,7 +308,7 @@ class HerokuWebMod(loader.Module):
                 always_allow=[user.id]
             )
             return 
-        except PhoneCodeExpiredError:
+        except PhoneCodeExpired:
             reply_markup = [
                 {"text": self.strings("request_code"), "callback": self.inline_phone_handler, "args": (phone, user)}
             ]
@@ -315,7 +319,7 @@ class HerokuWebMod(loader.Module):
                 always_allow=[user.id],
             )
             return 
-        except PhoneCodeInvalidError:
+        except PhoneCodeInvalid:
             await utils.answer(
                 call,
                 self.strings("invalid_code"),
@@ -323,10 +327,10 @@ class HerokuWebMod(loader.Module):
                 always_allow=[user.id]
             )
             return 
-        except FloodWaitError as e:
+        except FloodWait as e:
             await utils.answer(
                 call,
-                self.strings("floodwait_error").format(e.seconds),
+                self.strings("floodwait_error").format(e.value),
                 reply_markup={"text": self.strings("btn_no"), "action": "close"},
             )
             return
@@ -347,7 +351,7 @@ class HerokuWebMod(loader.Module):
         
         try:
             await client.sign_in(phone, password=data)
-        except PasswordHashInvalidError:
+        except PasswordHashInvalid:
             await utils.answer(
                 call,
                 self.strings("invalid_password"),
@@ -355,10 +359,10 @@ class HerokuWebMod(loader.Module):
                 always_allow=[user.id]
             )
             return 
-        except FloodWaitError as e:
+        except FloodWait as e:
             await utils.answer(
                 call,
-                self.strings("floodwait_error").format(e.seconds),
+                self.strings("floodwait_error").format(e.value),
                 reply_markup={"text": self.strings("btn_no"), "action": "close"},
             )
             return

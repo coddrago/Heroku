@@ -20,7 +20,8 @@ import time
 import typing
 import signal
 
-import herokutl
+import pyrogram
+from pyrogram.errors import MessageEmpty, MessageNotModified, MessageTooLong
 
 from .. import loader, utils
 
@@ -61,7 +62,7 @@ async def sleep_for_task(func: callable, data: bytes, delay: float):
 class MessageEditor:
     def __init__(
         self,
-        message: herokutl.tl.types.Message,
+        message: pyrogram.tl.types.Message,
         command: str,
         config,
         strings,
@@ -102,10 +103,10 @@ class MessageEditor:
             exec_time = time.time() - self.start_time
             text += (self.strings["time_exec"].format(round(exec_time, 2)))
 
-        with contextlib.suppress(herokutl.errors.rpcerrorlist.MessageNotModifiedError):
+        with contextlib.suppress(MessageNotModified):
             try:
                 self.message = await utils.answer(self.message, text)
-            except herokutl.errors.rpcerrorlist.MessageTooLongError as e:
+            except MessageTooLong as e:
                 logger.error(e)
                 logger.error(text)
         # The message is never empty due to the template header
@@ -120,6 +121,8 @@ class MessageEditor:
 
 
 class SudoMessageEditor(MessageEditor):
+    # Let's just hope these are safe to parse
+    # Who wrote this?
     PASS_REQ = ["[sudo] password for", "[sudo] пароль для"]
     WRONG_PASS = [r"\[sudo\] password for (.*): Sorry, try again\.", r"\[sudo\] пароль для (.*): Попробуйте еще раз.\."]
     TOO_MANY_TRIES = [r"\[sudo\] password for (.*): sudo: [0-9]+ incorrect password attempts", r"\[sudo\] пароль для (.*): sudo: [0-9]+ неверные попытки ввода пароля"]  # fmt: skip
@@ -163,7 +166,7 @@ class SudoMessageEditor(MessageEditor):
 
             try:
                 await utils.answer(self.message, text)
-            except herokutl.errors.rpcerrorlist.MessageNotModifiedError as e:
+            except MessageNotModified as e:
                 logger.debug(e)
 
             logger.debug("edited message with link to self")
@@ -179,7 +182,7 @@ class SudoMessageEditor(MessageEditor):
             self.message.client.remove_event_handler(self.on_message_edited)
             self.message.client.add_event_handler(
                 self.on_message_edited,
-                herokutl.events.messageedited.MessageEdited(chats=["me"]),
+                pyrogram.events.messageedited.MessageEdited(chats=["me"]),
             )
 
             logger.debug("registered handler")
@@ -227,7 +230,7 @@ class SudoMessageEditor(MessageEditor):
             # The user has provided interactive authentication. Send password to stdin for sudo.
             try:
                 self.authmsg = await utils.answer(message, self.strings("auth_ongoing"))
-            except herokutl.errors.rpcerrorlist.MessageNotModifiedError:
+            except MessageNotModified:
                 # Try to clear personal info if the edit fails
                 await message.delete()
 
@@ -279,13 +282,13 @@ class RawMessageEditor(SudoMessageEditor):
         logger.debug(text)
 
         with contextlib.suppress(
-            herokutl.errors.rpcerrorlist.MessageNotModifiedError,
-            herokutl.errors.rpcerrorlist.MessageEmptyError,
+            MessageNotModified,
+            MessageEmpty,
             ValueError,
         ):
             try:
                 await utils.answer(self.message, text)
-            except herokutl.errors.rpcerrorlist.MessageTooLongError as e:
+            except MessageTooLong as e:
                 logger.error(e)
                 logger.error(text)
 
@@ -350,7 +353,7 @@ class TerminalMod(loader.Module):
 
     async def run_command(
         self,
-        message: herokutl.tl.types.Message,
+        message: pyrogram.tl.types.Message,
         cmd: str,
         editor: typing.Optional[MessageEditor] = None,
     ):
@@ -414,9 +417,9 @@ class TerminalMod(loader.Module):
             await utils.answer(message, self.strings("what_to_kill"))
             return
 
-        if hash_msg(await message.get_reply_message()) in self.activecmds:
+        if hash_msg(message.reply_to_message) in self.activecmds:
             try:
-                kill_pids = self.activecmds[hash_msg(await message.get_reply_message())] 
+                kill_pids = self.activecmds[hash_msg(message.reply_to_message)] 
                 if "-f" not in utils.get_args_raw(message):
                      os.killpg(kill_pids.pid, signal.SIGTERM)
                 else:

@@ -33,10 +33,10 @@ from importlib.machinery import ModuleSpec
 from urllib.parse import urlparse
 
 import requests
-from herokutl.errors.common import ScamDetectionError
-from herokutl.errors.rpcerrorlist import MediaCaptionTooLongError
-from herokutl.tl.functions.channels import JoinChannelRequest
-from herokutl.tl.types import Channel, Message
+# from pyrogram.errors.common import ScamDetectionError
+from pyrogram.errors import MediaCaptionTooLong
+from pyrogram.raw.functions.channels import JoinChannel
+from pyrogram.raw.types import Channel, Message
 
 from .. import loader, main, utils
 from .._local_storage import RemoteStorage
@@ -385,7 +385,7 @@ class LoaderMod(loader.Module):
     async def loadmod(self, message: Message):
         args = utils.get_args_raw(message)
 
-        msg = message if message.file else (await message.get_reply_message())
+        msg = message if message.file else (message.reply_to_message)
 
         if msg is None or msg.media is None:
             await utils.answer(message, self.strings("provide_module"))
@@ -427,7 +427,7 @@ class LoaderMod(loader.Module):
         """
         Don't you dare call it externally
         """
-        await self._client(JoinChannelRequest(channel))
+        await self._client.invoke(JoinChannel(channel))
         event.status = True
         event.set()
 
@@ -721,7 +721,7 @@ class LoaderMod(loader.Module):
                     {
                         "sklearn": "scikit-learn",
                         "pil": "Pillow",
-                        "herokutl": "Heroku-TL-New",
+                        "pyrogram": "Heroku-TL-New",
                     }.get(e.name.lower(), e.name)
                 ]
 
@@ -1130,7 +1130,7 @@ class LoaderMod(loader.Module):
 
         try:
             await utils.answer(message, loaded_msg(), reply_markup=subscribe_markup)
-        except MediaCaptionTooLongError:
+        except MediaCaptionTooLong:
             await message.reply(loaded_msg(False))
 
     async def _inline__subscribe(
@@ -1146,7 +1146,7 @@ class LoaderMod(loader.Module):
             await call.answer(self.strings("not_subscribed"))
             return
 
-        await self._client(JoinChannelRequest(entity))
+        await self._client.invoke(JoinChannel(entity))
         await utils.answer(call, msg())
         await call.answer(self.strings("subscribed"))
 

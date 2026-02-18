@@ -34,19 +34,25 @@ from getpass import getpass
 from pathlib import Path
 
 import aiohttp
-import herokutl
+import pyrogram
 from herokutl import events
-from herokutl.errors import (ApiIdInvalidError, AuthKeyDuplicatedError,
-                             FloodWaitError, PasswordHashInvalidError,
-                             PhoneNumberInvalidError,
-                             SessionPasswordNeededError)
-from herokutl.network.connection import (
-    ConnectionTcpFull, ConnectionTcpMTProxyRandomizedIntermediate)
-from herokutl.password import compute_check
+from pyrogram import Client, filters, handlers
+from pyrogram.qrlogin import QRLogin
+from pyrogram.errors import (
+    ApiIdInvalid,
+    AuthKeyDuplicated,
+    BadRequest,
+    FloodWait,
+    PhoneNumberInvalid,
+    SessionPasswordNeeded,
+    YouBlockedUser,
+)
 from herokutl.sessions import MemorySession, SQLiteSession
-from herokutl.tl.functions.account import GetPasswordRequest
-from herokutl.tl.functions.auth import CheckPasswordRequest
-from herokutl.tl.functions.contacts import UnblockRequest
+from pyrogram.enums import ParseMode
+from pyrogram.methods.utilities import idle
+from pyrogram.raw.functions.account import GetPassword
+from pyrogram.raw.functions.auth import CheckPassword
+from pyrogram.raw.functions.contacts import Unblock
 
 from . import database, loader, utils, version
 from ._internal import print_banner, restart
@@ -54,8 +60,8 @@ from .dispatcher import CommandDispatcher
 from .inline.token_obtainment import TokenObtainment
 from .inline.utils import Utils as inutils
 from .qr import QRCode
-from .secure import patcher
-from .tl_cache import CustomTelegramClient
+from .types import SQLiteStringStorage
+from .tl_cache import CustomClient
 from .translations import Translator
 from .version import __version__
 
@@ -355,7 +361,7 @@ def gen_port(cfg: str = "port", no8080: bool = False) -> int:
     return port
 
 
-def parse_arguments() -> dict:
+def parse_arguments():
     """
     Parses the arguments
     :returns: Dictionary with arguments
@@ -472,7 +478,7 @@ class SuperList(list):
 
 
 class InteractiveAuthRequired(Exception):
-    """Is being rased by Telethon, if phone is required"""
+    """Is being rased by Pyrogram, if phone is required"""
 
 
 def raise_auth():
@@ -500,7 +506,7 @@ class Heroku:
             self.loop = asyncio.new_event_loop()
             asyncio.set_event_loop(self.loop)
 
-        self.clients = SuperList()
+        self.clients: list[CustomClient] = SuperList()
         self.ready = asyncio.Event()
         self._read_sessions()
         self._get_api_token()
@@ -511,29 +517,41 @@ class Heroku:
         Get proxy tuple from --proxy-host, --proxy-port and --proxy-secret
         and connection to use (depends on proxy - provided or not)
         """
-        match (self.arguments.proxy_host, self.arguments.proxy_port, self.arguments.proxy_secret):
-            case (host, port, secret) if host and port and secret:
-                logging.debug("Using proxy: %s:%s", host, port)
-                self.proxy = (host, port, secret)
-                self.conn = ConnectionTcpMTProxyRandomizedIntermediate
-            case _:
-                self.proxy, self.conn = None, ConnectionTcpFull
+        if (
+            self.arguments.proxy_host is not None
+            and self.arguments.proxy_port is not None
+            and self.arguments.proxy_secret is not None
+        ):
+            logging.warning("The use of MTProto proxies is not yet available")
+            self.proxy = None
+            return
+            logging.debug(
+                "Using proxy: %s:%s",
+                self.arguments.proxy_host,
+                self.arguments.proxy_port,
+            )
+            self.proxy = (
+                (
+                    self.arguments.proxy_host,
+                    self.arguments.proxy_port,
+                    self.arguments.proxy_secret,
+                )
+            )
+            return
+
+        self.proxy = None
 
     def _read_sessions(self):
         """Gets sessions from environment and data directory"""
-        self.sessions = []
+        self.sessions: list[str] = []
         self.sessions += [
-            SQLiteSession(
-                os.path.join(
-                    BASE_DIR,
-                    session.rsplit(".session", maxsplit=1)[0],
-                )
-            )
+            session.rsplit(".session", maxsplit=1)[0]
             for session in filter(
-                lambda f: f.startswith("heroku-") or f.startswith("hikka-") and f.endswith(".session"),
+                lambda f: (f.startswith("heroku-") or f.startswith("hikka-")) and f.endswith(".session"),
                 os.listdir(BASE_DIR),
             )
         ]
+        print(self.sessions, os.listdir(BASE_DIR))
 
     def _get_api_token(self):
         """Get API Token from disk or environment"""
@@ -585,7 +603,6 @@ class Heroku:
             data_root=BASE_DIR,
             api_token=self.api_token,
             proxy=self.proxy,
-            connection=self.conn,
         )
 
     async def _get_token(self):
@@ -605,7 +622,7 @@ class Heroku:
 
     async def save_client_session(
         self,
-        client: CustomTelegramClient,
+        client: CustomClient,
         *,
         delay_restart: bool = False,
     ):
@@ -621,35 +638,34 @@ class Heroku:
             client.hikka_me = me
             client.heroku_me = me
 
-        session = SQLiteSession(
-            os.path.join(
-                BASE_DIR,
-                f"heroku-{telegram_id}",
-            )
+        session = f"heroku-{telegram_id}"
+        init_kwargs = client._export_init_kwargs()
+        session_str = await client.export_session_string()
+
+        cli = CustomClient(
+            session,
+            **init_kwargs
         )
 
-        session.set_dc(
-            client.session.dc_id,
-            client.session.server_address,
-            client.session.port,
-        )
+        await client.disconnect()
 
-        session.auth_key = client.session.auth_key
+        storage = SQLiteStringStorage(cli)
+        await storage.import_session_string(session_str)
+        cli.storage = storage
 
-        session.save()
+        await cli.connect()
 
         if not delay_restart:
-            client.disconnect()
+            logging.info("restart")
             restart()
 
-        client.session = session
         # Set db attribute to this client in order to save
         # custom bot nickname from web
-        client.heroku_db = database.Database(client)
-        await client.heroku_db.init()
+        cli.heroku_db = database.Database(cli)
+        await cli.heroku_db.init()
 
         try:
-            db = client.heroku_db
+            db = cli.heroku_db
             existing = db.get("heroku.inline", "custom_bot", False)
         except Exception:
             existing = False
@@ -665,7 +681,7 @@ class Heroku:
                     print("Invalid username: must end with 'bot'.")
                     continue
                 try:
-                    if await self._check_bot(client, bot):
+                    if await self._check_bot(cli, bot):
                         db.set("heroku.inline", "custom_bot", bot)
                         print("Bot username saved!")
                         break
@@ -676,7 +692,7 @@ class Heroku:
                     print("Something went wrong")
 
         if delay_restart:
-            client.disconnect()
+            await cli.disconnect()
             await asyncio.sleep(3600)  # Will be restarted from web anyway
 
     async def _web_banner(self):
@@ -701,14 +717,14 @@ class Heroku:
 
         return False
 
-    async def _phone_login(self, client: CustomTelegramClient) -> bool:
-        phone = input(
-            "\033[0;96mEnter phone: \033[0m"
-            if self.arguments.tty
-            else "Enter phone: "
-        )
+    async def _phone_login(self, client: CustomClient) -> bool:
+        # phone = input(
+        #     "\033[0;96mEnter phone: \033[0m"
+        #     if self.arguments.tty
+        #     else "Enter phone: "
+        # )
 
-        await client.start(phone)
+        await client.start()
 
         me = await client.get_me()
         telegram_id = me.id
@@ -738,18 +754,17 @@ class Heroku:
 
     async def _check_bot(
         self,
-        client: CustomTelegramClient,
+        client: CustomClient,
         username: str,
     ) -> bool:
         url: str = (
-            await client(herokutl.functions.messages.RequestWebViewRequest(
-                peer="@botfather",
-                bot="@botfather",
+            await client.open_web_app(
+                chat_id="@botfather",
+                bot_user_id="@botfather",
                 platform="android",
-                from_bot_menu=False,
-                url="https://webappinternal.telegram.org/botfather?")
+                url="https://webappinternal.telegram.org/botfather?"
             )
-        ).url
+        )
         for _ in range(5):
             await asyncio.sleep(1.5)
             try:
@@ -764,13 +779,14 @@ class Heroku:
         session, _hash = result
         main_url = url.split("?")[0]
 
-        if await TokenObtainment._check_bot(None, session, main_url, _hash, username):
+        if await TokenObtainment._check_bot(session, main_url, _hash, username):
             return True
 
         try:
-            await client.get_entity(f"{username}")
+            await client.get_chat(f"{username}", force_full=False)
         except:
             return True
+
 
     async def _initial_setup(self) -> bool:
         """Responsible for first start"""
@@ -778,20 +794,19 @@ class Heroku:
             return False
 
         if not self.web:
-            client = CustomTelegramClient(
-                MemorySession(),
+            client = CustomClient(
+                "",
                 self.api_token.ID,
                 self.api_token.HASH,
-                connection=self.conn,
-                proxy=self.proxy,
-                connection_retries=None,
-                device_model=get_app_name(),
-                system_version=generate_random_system_version(),
-                app_version=".".join(map(str, __version__)) + " x64",
-                lang_code="en",
-                system_lang_code="en-US",
+                in_memory=True,
+                proxy = self.proxy,
+                workdir=BASE_PATH,
+                device_model = get_app_name(),
+                system_version = generate_random_system_version(),
+                app_version = ".".join(map(str, __version__)) + " x64",
+                lang_code = "en",
+                system_lang_code = "en-US",
             )
-            await client.connect()
 
             print(
                 (
@@ -810,12 +825,12 @@ class Heroku:
 
             match user_choice:
                 case "y":
-                    pass
+                    await client.connect()
                 case _:
                     return await self._phone_login(client)
 
             print("\033[0;96mLoading QR code...\033[0m")
-            qr_login = await client.qr_login()
+            qr_login = QRLogin(client)
 
             def print_qr():
                 qr = QRCode()
@@ -834,9 +849,9 @@ class Heroku:
                         try:
                             await qr_login.recreate()
                             print_qr()
-                        except SessionPasswordNeededError:
+                        except SessionPasswordNeeded:
                             return True
-                    except SessionPasswordNeededError:
+                    except SessionPasswordNeeded:
                         return True
                     except KeyboardInterrupt:
                         print("\033[2J\033[3;1f")
@@ -850,7 +865,7 @@ class Heroku:
 
                 case True:
                     print_banner("2fa.txt")
-                    password = await client(GetPasswordRequest())
+                    password = await client.invoke(GetPassword())
                     while True:
                         _2fa = getpass(
                             f"\033[0;96mEnter 2FA password ({password.hint}): \033[0m"
@@ -858,22 +873,14 @@ class Heroku:
                             else f"Enter 2FA password ({password.hint}): "
                         )
                         try:
-                            await client._on_login(
-                                (
-                                    await client(
-                                        CheckPasswordRequest(
-                                            compute_check(password, _2fa.strip())
-                                        )
-                                    )
-                                ).user
-                            )
-                        except PasswordHashInvalidError:
+                            await client.check_password(_2fa)
+                        except BadRequest:
                             print("\033[0;91mInvalid 2FA password!\033[0m")
-                        except FloodWaitError as e:
+                        except FloodWait as e:
                             seconds, minutes, hours = (
-                                e.seconds % 3600 % 60,
-                                e.seconds % 3600 // 60,
-                                e.seconds // 3600,
+                                e.value % 3600 % 60,
+                                e.value % 3600 // 60,
+                                e.value // 3600,
                             )
                             seconds, minutes, hours = (
                                 f"{seconds} second(-s)",
@@ -887,13 +894,14 @@ class Heroku:
                             return False
                         else:
                             break
+
                 case False:
                     pass
 
             print_banner("success.txt")
             print("\033[0;92mLogged in successfully!\033[0m")
-            await self.save_client_session(client)
-            self.clients += [client]
+            cli = await self.save_client_session(client)
+            self.clients += [cli]
             return True
 
         if not self.web.running.is_set():
@@ -914,41 +922,43 @@ class Heroku:
         """
         for session in self.sessions.copy():
             try:
-                client = CustomTelegramClient(
+                client = CustomClient(
                     session,
                     self.api_token.ID,
                     self.api_token.HASH,
-                    connection=self.conn,
                     proxy=self.proxy,
-                    connection_retries=None,
+                    workdir=BASE_PATH,
                     device_model=get_app_name(),
                     system_version=generate_random_system_version(),
                     app_version=".".join(map(str, __version__)) + " x64",
                     lang_code="en",
                     system_lang_code="en-US",
                 )
-                if session.server_address == "0.0.0.0":
-                    patcher.patch(client, session)
+                # if session.server_address == "0.0.0.0":
+                #     patcher.patch(client, session)
 
-                await client.connect()
-                client.phone = "None"
+                rslt = await client.connect()
+                if not rslt:
+                    raise InteractiveAuthRequired()
+
+                client.phone_number = None
 
                 self.clients += [client]
             except sqlite3.OperationalError:
                 logging.error(
                     "Check that this is the only instance running. "
                     "If that doesn't help, delete the file '%s'",
-                    session.filename,
+                    session,
                 )
                 continue
-            except (TypeError, AuthKeyDuplicatedError):
-                Path(session.filename).unlink(missing_ok=True)
+            except (TypeError, AuthKeyDuplicated):
+                Path(session).unlink(missing_ok=True)
                 self.sessions.remove(session)
-            except (ValueError, ApiIdInvalidError):
+            except (ValueError, ApiIdInvalid):
                 # Bad API hash/ID
                 run_config()
                 return False
-            except PhoneNumberInvalidError:
+            except PhoneNumberInvalid:
                 logging.error(
                     "Phone number is incorrect. Use international format (+XX...) "
                     "and don't put spaces in it."
@@ -957,15 +967,15 @@ class Heroku:
             except InteractiveAuthRequired:
                 logging.error(
                     "Session %s was terminated and re-auth is required",
-                    session.filename,
+                    session,
                 )
                 self.sessions.remove(session)
 
         return bool(self.sessions)
 
-    async def amain_wrapper(self, client: CustomTelegramClient):
+    async def amain_wrapper(self, client: CustomClient):
         """Wrapper around amain"""
-        async with client:
+        try:
             first = True
             me = await client.get_me()
             client._tg_id = me.id
@@ -996,9 +1006,11 @@ class Heroku:
 
             while await self.amain(first, client):
                 first = False
+        finally:
+            if client.is_connected:
+                await client.disconnect()
 
-
-    async def _badge(self, client: CustomTelegramClient):
+    async def _badge(self, client: CustomClient):
         """Call the badge in shell"""
         try:
             if os.environ.get("HEROKU_NO_GIT") == "1":
@@ -1068,44 +1080,44 @@ class Heroku:
 
     async def _add_dispatcher(
         self,
-        client: CustomTelegramClient,
+        client: CustomClient,
         modules: loader.Modules,
         db: database.Database,
     ):
         """Inits and adds dispatcher instance to client"""
         dispatcher = CommandDispatcher(modules, client, db)
-        client.dispatcher = dispatcher
+        client._heroku_dispatcher = dispatcher
         modules.check_security = dispatcher.check_security
 
-        client.add_event_handler(
-            dispatcher.handle_incoming,
-            events.NewMessage,
+        client.add_handler(
+            handlers.MessageHandler(dispatcher.handle_incoming),
         )
 
-        client.add_event_handler(
+        client.add_handler(
             dispatcher.handle_incoming,
             events.ChatAction,
         )
 
-        client.add_event_handler(
-            dispatcher.handle_command,
-            events.NewMessage(forwards=False),
+        client.add_handler(
+            handlers.MessageHandler(
+                dispatcher.handle_command,
+                filters=~filters.forwarded
+            )
         )
 
-        client.add_event_handler(
-            dispatcher.handle_command,
-            events.MessageEdited(),
+        client.add_handler(
+            handlers.EditedMessageHandler(dispatcher.handle_command),
         )
 
-        client.add_event_handler(
-            dispatcher.handle_raw,
-            events.Raw(),
+        client.add_handler(
+            handlers.RawUpdateHandler(dispatcher.handle_raw),
         )
 
-    async def amain(self, first: bool, client: CustomTelegramClient):
+    async def amain(self, first: bool, client: CustomClient):
         """Entrypoint for async init, run once for each user"""
-        client.parse_mode = "HTML"
-        await client.start()
+        client.parse_mode = ParseMode.HTML
+        if not client.is_connected:
+            await client.start()
 
         db = database.Database(client)
         client.heroku_db = db
@@ -1137,7 +1149,7 @@ class Heroku:
         if first:
             await self._badge(client)
 
-        await client.run_until_disconnected()
+        await idle.idle()
 
     async def _main(self):
         """Main entrypoint"""
@@ -1167,9 +1179,24 @@ class Heroku:
 
         await asyncio.gather(*[self.amain_wrapper(client) for client in self.clients])
 
+        async with aiohttp.ClientSession() as session:
+                async with session.get("https://raw.githubusercontent.com/coddrago/modules-web/main/mods/ids/allowed_ids.txt") as response:
+                    if response.status == 200:
+                        content = await response.text()
+                        allowed_ids = [int(line.strip()) for line in content.split('\n') if line.strip()]
+                    else:
+                        logging.error(f"Exception on loading allowed beta testers ids: {response.status}")
+                        return []
+
+        await asyncio.gather(*[version.check_branch((await client.get_me()).id, allowed_ids) for client in self.clients])
+
     async def _shutdown_handler(self):
         for client in self.clients:
-            inline = getattr(client.loader, "inline", None)
+            inline = getattr(
+                getattr(client, "loader", None),
+                "inline",
+                None
+            )
             if inline:
                 for t in (inline._task, inline._cleaner_task):
                     if t:
@@ -1193,7 +1220,7 @@ class Heroku:
                     signal.SIGINT,
                     lambda: asyncio.create_task(self._shutdown_handler())
                 )
-            except NotImplementedError:
+            except NotImplemented:
                 logging.warning("Signal handlers not supported on this platform.")
         else:
             logging.info("Running on Windows — skipping signal handler.")
@@ -1212,6 +1239,6 @@ class Heroku:
             except:
                 pass
 
-herokutl.extensions.html.CUSTOM_EMOJIS = not get_config_key("disable_custom_emojis")
+# pyrogram.extensions.html.CUSTOM_EMOJIS = not get_config_key("disable_custom_emojis")
 
 heroku = Heroku()

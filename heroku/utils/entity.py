@@ -15,38 +15,59 @@ import time
 import typing
 from urllib.parse import urlparse
 
-import emoji
-import herokutl
+import pyrogram
 import requests
 from aiogram.types import Message as AiogramMessage
-from herokutl import hints
-from herokutl.tl.custom.message import Message
-from herokutl.tl.functions.account import UpdateNotifySettingsRequest
-from herokutl.tl.functions.channels import (CreateChannelRequest,
-                                            EditPhotoRequest)
-from herokutl.tl.functions.messages import (CreateForumTopicRequest,
-                                            EditForumTopicRequest,
-                                            GetDialogFiltersRequest,
-                                            GetForumTopicsByIDRequest,
-                                            GetForumTopicsRequest,
-                                            SetHistoryTTLRequest,
-                                            UpdateDialogFilterRequest)
-from herokutl.tl.types import (Channel, ForumTopic, ForumTopicDeleted,
-                               InputPeerNotifySettings, MessageEntityBankCard,
-                               MessageEntityBlockquote, MessageEntityBold,
-                               MessageEntityBotCommand, MessageEntityCashtag,
-                               MessageEntityCode, MessageEntityEmail,
-                               MessageEntityHashtag, MessageEntityItalic,
-                               MessageEntityMention, MessageEntityMentionName,
-                               MessageEntityPhone, MessageEntityPre,
-                               MessageEntitySpoiler, MessageEntityStrike,
-                               MessageEntityTextUrl, MessageEntityUnderline,
-                               MessageEntityUnknown, MessageEntityUrl,
-                               PeerChannel, PeerChat, PeerUser,
-                               UpdateNewChannelMessage, User)
+from pyrogram import types
+from pyrogram.types import Message
+from pyrogram.raw.functions.channels import (
+    CreateChannel,
+    EditPhoto,
+)
+from pyrogram.raw.functions.messages import (
+    GetDialogFilters,
+    SetHistoryTTL,
+    UpdateDialogFilter,
+    CreateForumTopic,
+    GetForumTopics,
+    GetForumTopicsByID,
+    EditForumTopic,
+)
+from pyrogram.raw.types import (
+    Channel,
+    MessageEntityBankCard,
+    MessageEntityBlockquote,
+    MessageEntityBold,
+    MessageEntityBotCommand,
+    MessageEntityCashtag,
+    MessageEntityCode,
+    MessageEntityEmail,
+    MessageEntityHashtag,
+    MessageEntityItalic,
+    MessageEntityMention,
+    MessageEntityMentionName,
+    MessageEntityPhone,
+    MessageEntityPre,
+    MessageEntitySpoiler,
+    MessageEntityStrike,
+    MessageEntityTextUrl,
+    MessageEntityUnderline,
+    MessageEntityUnknown,
+    MessageEntityUrl,
+    PeerChannel,
+    PeerChat,
+    PeerUser,
+    UpdateNewChannelMessage,
+    User,
+    ForumTopic,
+    ForumTopicDeleted,
+)
+from pyrogram.utils import get_raw_peer_id
+
+from .other import invite_inline_bot, run_sync
 
 from .._internal import fw_protect
-from ..tl_cache import CustomTelegramClient
+from ..tl_cache import CustomClient
 from ..types import Module
 from .other import invite_inline_bot, run_sync
 
@@ -72,7 +93,10 @@ FormattingEntity = typing.Union[
     MessageEntitySpoiler,
 ]
 
-parser = herokutl.utils.sanitize_parse_mode("html")
+if typing.TYPE_CHECKING:
+    from ..types import Entity
+
+# parser = pyrogram.utils.sanitize_parse_mode("html")
 logger = logging.getLogger(__name__)
 
 TAG_RE = re.compile(r"</?([a-zA-Z][a-zA-Z0-9\-]*)(?:\s[^<>]*)?>")
@@ -197,7 +221,7 @@ def get_link(user: typing.Union[User, Channel], /) -> str:
 
 
 async def asset_channel(
-    client: CustomTelegramClient,
+    client: CustomClient,
     title: str,
     description: str,
     *,
@@ -262,8 +286,8 @@ async def asset_channel(
     await fw_protect()
 
     peer = (
-        await client(
-            CreateChannelRequest(
+        await client.invoke(
+            CreateChannel(
                 title,
                 description,
                 megagroup=not channel,
@@ -289,20 +313,23 @@ async def asset_channel(
 
     if hide_general and forum:
         await fw_protect()
-        await client(EditForumTopicRequest(peer=peer, topic_id=1, hidden=True))
+        await client.invoke(EditForumTopic(peer=peer, topic_id=1, hidden=True))
 
     if ttl:
         await fw_protect()
-        await client(SetHistoryTTLRequest(peer=peer, period=ttl))
+        await client.invoke(SetHistoryTTL(peer=peer, period=ttl))
 
     if _folder:
-        folders = (await client(GetDialogFiltersRequest())).filters
+        if _folder != "Heroku":
+            raise NotImplementedError
+
+        folders = (await client.invoke(GetDialogFilters())).filters
 
         try:
             folder = next(
                 folder
                 for folder in folders
-                if not isinstance(folder, herokutl.tl.types.DialogFilterDefault)
+                if not isinstance(folder, pyrogram.raw.types.DialogFilterDefault)
                 and folder.title.text.lower() == _folder.lower()
             )
         except Exception:
@@ -316,8 +343,8 @@ async def asset_channel(
             folder.include_peers.append(await client.get_input_entity(peer))
             print(len(folder.include_peers))
 
-            await client(
-                UpdateDialogFilterRequest(
+            await client.invoke(
+                UpdateDialogFilter(
                     folder.id,
                     folder,
                 )
@@ -330,9 +357,9 @@ if typing.TYPE_CHECKING:
     from ..database import Database
 
 async def asset_forum_topic(
-    client: CustomTelegramClient,
+    client: CustomClient,
     db: 'Database',
-    peer: hints.Entity,
+    peer: 'hints.Entity',
     title: str,
     description: typing.Optional[str] = None,
     icon_emoji_id: typing.Optional[int] = None,
@@ -344,10 +371,10 @@ async def asset_forum_topic(
         raise TypeError(f"Expected entity to be 'Channel', but got '{type(entity).__name__}'")
 
     async def create_topic() -> ForumTopic:
-        result = await client(CreateForumTopicRequest(
+        result = await client.invoke(CreateForumTopic(
             peer=entity,
             title=title,
-            icon_emoji_id=(icon_emoji_id if client.heroku_me.premium else None)
+            icon_emoji_id=(icon_emoji_id if client.heroku_me.is_premium else None)
         ))
 
         await fw_protect()
@@ -356,14 +383,14 @@ async def asset_forum_topic(
 
         await fw_protect()
 
-        result = await client(GetForumTopicsByIDRequest(peer=entity, topics=[result.updates[0].id]))
+        result = await client.invoke(GetForumTopicsByID(peer=entity, topics=[result.updates[0].id]))
 
         return result.topics[0]
 
     forums_cache = db.get("heroku.forums", "forums_cache", {})
 
     async def _search_topic(topic_title: str) -> int | None:
-        result = await client(GetForumTopicsRequest(
+        result = await client.invoke(GetForumTopics(
             peer=entity,
             offset_date=None,
             offset_id=0,
@@ -379,7 +406,7 @@ async def asset_forum_topic(
 
     if topic_id := forums_cache.get(entity.title, {}).get(title) or await _search_topic(title):
         await fw_protect()
-        topic = await client(GetForumTopicsByIDRequest(peer=entity, topics=[topic_id]))
+        topic = await client.invoke(GetForumTopicsByID(peer=entity, topics=[topic_id]))
         topic = topic.topics[0]
 
         if not isinstance(topic, ForumTopicDeleted):
@@ -434,8 +461,8 @@ async def get_topic_id(db: 'Database', topic_name: str) -> typing.Optional[int]:
         return None
 
 async def set_avatar(
-    client: CustomTelegramClient,
-    peer: hints.Entity,
+    client: CustomClient,
+    peer: 'Entity',
     avatar: str,
 ) -> bool:
     """
@@ -458,10 +485,10 @@ async def set_avatar(
         return False
 
     await fw_protect()
-    res = await client(
-        EditPhotoRequest(
+    res = await client.invoke(
+        EditPhoto(
             channel=peer,
-            photo=await client.upload_file(f, file_name="photo.png"),
+            photo=await client.save_file(f, file_name="photo.png"),
         )
     )
 
@@ -505,7 +532,7 @@ async def get_target(message: Message, arg_no: int = 0) -> typing.Optional[int]:
     if len(get_args(message)) > arg_no:
         user = get_args(message)[arg_no]
     elif message.is_reply:
-        return (await message.get_reply_message()).sender_id
+        return (message.reply_to_message).from_user.id
     elif hasattr(message.peer_id, "user_id"):
         user = message.peer_id.user_id
     else:
@@ -539,7 +566,7 @@ async def get_user(message: Message) -> typing.Optional[User]:
             message.peer_id,
             aggressive=True,
         ):
-            if user.id == message.sender_id:
+            if user.id == message.from_user.id:
                 return user
 
         logger.error("User isn't in the group where they sent the message")
@@ -548,25 +575,37 @@ async def get_user(message: Message) -> typing.Optional[User]:
     logger.error("`peer_id` is not a user, chat or channel")
     return None
 
+def get_display_name(entity: 'Entity'):
+    """
+    Get the full name of entity
+    """
+    if not (name := getattr(entity, "full_name", None)):
+        if isinstance(entity, User):
+            name = " ".join(filter(None, [entity.first_name, entity.last_name])) or None
+        else:
+            name = getattr(entity, "title", "")
+
+    return name
+
 def get_chat_id(message: typing.Union[Message, AiogramMessage]) -> int:
     """
     Get the chat ID, but without -100 if its a channel
     :param message: Message to get chat ID from
     :return: Chat ID
     """
-    return herokutl.utils.resolve_id(
+    return pyrogram.utils.resolve_id(
         getattr(message, "chat_id", None)
         or getattr(getattr(message, "chat", None), "id", None)
     )[0]
 
 
-def get_entity_id(entity: hints.Entity) -> int:
+def get_entity_id(entity: 'Entity') -> int:
     """
     Get entity ID
     :param entity: Entity to get ID from
     :return: Entity ID
     """
-    return herokutl.utils.get_peer_id(entity)
+    return pyrogram.utils.get_peer_id(entity)
 
 
 def escape_html(text: str, /) -> str:  # sourcery skip
@@ -679,8 +718,8 @@ def find_caller(
     )
 
 async def dnd(
-    client: CustomTelegramClient,
-    peer: hints.Entity,
+    client: CustomClient,
+    peer: 'Entity',
     archive: bool = True,
 ) -> bool:
     """
@@ -690,20 +729,14 @@ async def dnd(
     :return: `True` on success, otherwise `False`
     """
     try:
-        await client(
-            UpdateNotifySettingsRequest(
-                peer=peer,
-                settings=InputPeerNotifySettings(
-                    show_previews=False,
-                    silent=True,
-                    mute_until=2**31 - 1,
-                ),
-            )
+        await client.update_chat_notifications(
+            show_previews=False,
+            mute=True
         )
 
         if archive:
             await fw_protect()
-            await client.edit_folder(peer, 1)
+            await client.archive_chats(get_raw_peer_id(peer))
     except Exception:
         logger.exception("utils.dnd error")
         return False

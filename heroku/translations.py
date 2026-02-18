@@ -20,7 +20,7 @@ from ruamel.yaml import YAML
 
 from . import utils
 from .database import Database
-from .tl_cache import CustomTelegramClient
+from .tl_cache import CustomClient
 from .types import Module
 
 logger = logging.getLogger(__name__)
@@ -130,7 +130,7 @@ class BaseTranslator:
 
 
 class Translator(BaseTranslator):
-    def __init__(self, client: CustomTelegramClient, db: Database):
+    def __init__(self, client: CustomClient, db: Database):
         self._client = client
         self.db = db
         self._data = {}

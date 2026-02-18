@@ -24,10 +24,12 @@ import typing
 import aiohttp
 import git
 from git import GitCommandError, Repo
-from herokutl.extensions.html import CUSTOM_EMOJIS
-from herokutl.tl.functions.messages import (GetDialogFiltersRequest,
-                                            UpdateDialogFilterRequest)
-from herokutl.tl.types import DialogFilter, Message, TextWithEntities
+from pyrogram.extensions.html import CUSTOM_EMOJIS
+from pyrogram.raw.functions.messages import (
+    GetDialogFilters,
+    UpdateDialogFilter,
+)
+from pyrogram.raw.types import DialogFilter, TextWithEntities, Message
 
 from .. import loader, main, utils, version
 from .._internal import restart
@@ -557,7 +559,7 @@ class UpdaterMod(loader.Module):
             )
 
     async def _add_folder(self):
-        folders = await self._client(GetDialogFiltersRequest())
+        folders = await self._client.invoke(GetDialogFilters())
 
         try:
             folder_id = (
@@ -569,8 +571,8 @@ class UpdaterMod(loader.Module):
             )
         except ValueError:
             folder_id = 2
-
-        folders = await self._client(GetDialogFiltersRequest())
+        
+        folders = await self._client.invoke(GetDialogFilters())
         filters = getattr(folders, 'filters', folders)
         heroku_f = False
 
@@ -589,8 +591,8 @@ class UpdaterMod(loader.Module):
             return
         else:
             try:
-                await self._client(
-                    UpdateDialogFilterRequest(
+                await self._client.invoke(
+                    UpdateDialogFilter(
                         folder_id,
                         DialogFilter(
                             folder_id,

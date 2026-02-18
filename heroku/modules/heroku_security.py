@@ -15,9 +15,9 @@ import datetime
 import time
 import typing
 
-from herokutl.hints import EntityLike
-from herokutl.tl.types import Message, PeerUser, User
-from herokutl.utils import get_display_name
+from pyrogram.types import Message
+from pyrogram.raw.types import PeerUser, User
+from ..utils import get_display_name
 
 from .. import loader, main, security, utils
 from ..inline.types import InlineCall, InlineMessage
@@ -37,6 +37,9 @@ from ..security import (
     SecurityGroup,
 )
 
+if typing.TYPE_CHECKING:
+    from ..types import EntityLike
+
 
 @loader.tds
 class HerokuSecurityMod(loader.Module):
@@ -51,7 +54,7 @@ class HerokuSecurityMod(loader.Module):
         self._reload_sgroups()
 
     def _reload_sgroups(self):
-        self._client.dispatcher.security.apply_sgroups(self._sgroups.todict())
+        self._client._heroku_dispatcher.security.apply_sgroups(self._sgroups.todict())
 
     async def inline__switch_perm(
         self,
@@ -247,7 +250,7 @@ class HerokuSecurityMod(loader.Module):
         return self._perms_map(
             self._db.get(security.__name__, "masks", {}).get(
                 f"{command.__module__}.{command.__name__}",
-                getattr(command, "security", self._client.dispatcher.security.default),
+                getattr(command, "security", self._client._heroku_dispatcher.security.default),
             ),
             is_inline,
         )
@@ -385,7 +388,7 @@ class HerokuSecurityMod(loader.Module):
                 await utils.answer(message, self.strings("no_args"))
                 return
 
-            group, user = args, await (await message.get_reply_message()).get_sender()
+            group, user = args, (await message.reply_to_message).get_sender()
 
         if not (group := self._sgroups.get(group)):
             await utils.answer(message, self.strings("sgroup_not_found").format(group))
@@ -435,7 +438,7 @@ class HerokuSecurityMod(loader.Module):
                 await utils.answer(message, self.strings("no_args"))
                 return
 
-            group, user = args, await (await message.get_reply_message()).get_sender()
+            group, user = args, (await message.reply_to_message).get_sender()
 
         if not (group := self._sgroups.get(group)):
             await utils.answer(message, self.strings("sgroup_not_found").format(group))
@@ -527,7 +530,7 @@ class HerokuSecurityMod(loader.Module):
 
     async def _resolve_user(self, message: Message):
         if not (args := utils.get_args_raw(message).replace("@", "")) and not (
-            reply := await message.get_reply_message()
+            reply := message.reply_to_message
         ):
             await utils.answer(message, self.strings("no_user"))
             return
@@ -543,7 +546,7 @@ class HerokuSecurityMod(loader.Module):
 
         if user is None:
             try:
-                user = await self._client.get_entity(reply.sender_id, exp=0)
+                user = await self._client.get_entity(reply.from_user.id, exp=0)
             except ValueError:
                 user = await reply.get_sender()
 
@@ -593,8 +596,8 @@ class HerokuSecurityMod(loader.Module):
             )
             return
 
-        if user.id not in getattr(self._client.dispatcher.security, group):
-            getattr(self._client.dispatcher.security, group).append(user.id)
+        if user.id not in getattr(self._client._heroku_dispatcher.security, group):
+            getattr(self._client._heroku_dispatcher.security, group).append(user.id)
 
         await message.edit(
             (
@@ -643,8 +646,8 @@ class HerokuSecurityMod(loader.Module):
         if not (user := await self._resolve_user(message)):
             return
 
-        if user.id in self._client.dispatcher.security.owner:
-            self._client.dispatcher.security.owner.remove(user.id)
+        if user.id in self._client._heroku_dispatcher.security.owner:
+            self._client._heroku_dispatcher.security.owner.remove(user.id)
 
         await utils.answer(
             message,
@@ -658,7 +661,7 @@ class HerokuSecurityMod(loader.Module):
     async def ownerlist(self, message: Message):
         _resolved_users = []
         _and_prefixes = []
-        for user in set(self._client.dispatcher.security.owner + [self.tg_id]):
+        for user in set(self._client._heroku_dispatcher.security.owner + [self.tg_id]):
             with contextlib.suppress(Exception):
                 _resolved_users += [await self._client.get_entity(user, exp=0)]
 
@@ -782,7 +785,7 @@ class HerokuSecurityMod(loader.Module):
         self,
         call: InlineCall,
         target_type: str,
-        target: typing.Union[EntityLike, str],
+        target: typing.Union['EntityLike', str],
         rule: str,
         duration: int,
     ):
@@ -804,7 +807,7 @@ class HerokuSecurityMod(loader.Module):
             )
             self._reload_sgroups()
         else:
-            self._client.dispatcher.security.add_rule(
+            self._client._heroku_dispatcher.security.add_rule(
                 target_type,
                 target,
                 rule,
@@ -839,7 +842,7 @@ class HerokuSecurityMod(loader.Module):
         self,
         obj: typing.Union[Message, InlineMessage],
         target_type: str,
-        target: typing.Union[EntityLike, str],
+        target: typing.Union['EntityLike', str],
         rule: str,
         duration: int,
     ):
@@ -1007,14 +1010,14 @@ class HerokuSecurityMod(loader.Module):
                         target = await self._client.get_entity(message.peer_id, exp=0)
                     elif message.is_reply:
                         target = await self._client.get_entity(
-                            (await message.get_reply_message()).sender_id,
+                            (message.reply_to_message).from_user.id,
                             exp=0,
                         )
                     else:
                         await utils.answer(message, self.strings("no_target"))
                         return
 
-        if target.id in self._client.dispatcher.security.owner:
+        if target.id in self._client._heroku_dispatcher.security.owner:
             await utils.answer(message, self.strings("owner_target"))
             return
 
@@ -1077,11 +1080,11 @@ class HerokuSecurityMod(loader.Module):
                 target = await self._client.get_entity(message.peer_id, exp=0)
             elif message.is_reply:
                 target = await self._client.get_entity(
-                    (await message.get_reply_message()).sender_id,
+                    (message.reply_to_message).from_user.id,
                     exp=0,
                 )
 
-            if not self._client.dispatcher.security.remove_rule(
+            if not self._client._heroku_dispatcher.security.remove_rule(
                 "user",
                 target.id,
                 args[1],
@@ -1134,7 +1137,7 @@ class HerokuSecurityMod(loader.Module):
 
         target = await self._client.get_entity(message.peer_id, exp=0)
 
-        if not self._client.dispatcher.security.remove_rule("chat", target.id, args[1]):
+        if not self._client._heroku_dispatcher.security.remove_rule("chat", target.id, args[1]):
             await utils.answer(message, self.strings("no_rules"))
             return
 
@@ -1167,11 +1170,11 @@ class HerokuSecurityMod(loader.Module):
                 target = await self._client.get_entity(message.peer_id, exp=0)
             elif message.is_reply:
                 target = await self._client.get_entity(
-                    (await message.get_reply_message()).sender_id,
+                    (message.reply_to_message).from_user.id,
                     exp=0,
                 )
 
-            if not self._client.dispatcher.security.remove_rules("user", target.id):
+            if not self._client._heroku_dispatcher.security.remove_rules("user", target.id):
                 await utils.answer(message, self.strings("no_rules"))
                 return
 
@@ -1209,7 +1212,7 @@ class HerokuSecurityMod(loader.Module):
 
         target = await self._client.get_entity(message.peer_id, exp=0)
 
-        if not self._client.dispatcher.security.remove_rules("chat", target.id):
+        if not self._client._heroku_dispatcher.security.remove_rules("chat", target.id):
             await utils.answer(message, self.strings("no_rules"))
             return
 
@@ -1239,7 +1242,7 @@ class HerokuSecurityMod(loader.Module):
                                 self.strings(rule["rule_type"]),
                                 rule["rule"],
                             )
-                            for rule in self._client.dispatcher.security.tsec_chat
+                            for rule in self._client._heroku_dispatcher.security.tsec_chat
                         ]
                         + [
                             "<tg-emoji emoji-id=6037122016849432064>👤</tg-emoji> <b><a"
@@ -1251,7 +1254,7 @@ class HerokuSecurityMod(loader.Module):
                                 self.strings(rule["rule_type"]),
                                 rule["rule"],
                             )
-                            for rule in self._client.dispatcher.security.tsec_user
+                            for rule in self._client._heroku_dispatcher.security.tsec_user
                         ]
                         + [
                             "\n".join(
