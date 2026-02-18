@@ -14,6 +14,7 @@ import asyncio
 import difflib
 import inspect
 import logging
+import re
 
 from pyrogram.extensions.html import CUSTOM_EMOJIS
 from pyrogram.types import Message
@@ -62,7 +63,7 @@ class Help(loader.Module):
                 "banner_url",
                 None,
                 lambda: "Banner for .help",
-                validator=loader.validators.Link(),
+                validator=loader.validators.RandomLink(),
             ),
             loader.ConfigValue(
                 "media_quote",
@@ -237,30 +238,25 @@ class Help(loader.Module):
                 )
             )
         cmds = "\n".join(lines)
-
-        placeholders = utils.help_placeholders(module.__class__.__name__).replace("No docs", self.strings('undoc'))
-        if placeholders != "":
-            await utils.answer(
-                message,
-                f"{reply}<blockquote expandable>{cmds}{inline_cmd}</blockquote>\n<blockquote expandable>{self.strings('custom_placeholders')}\n{placeholders}</blockquote>"
-                + (f"\n\n{self.strings('not_exact')}" if not exact else "")
-                + (
-                    f"\n\n{self.strings('core_notice')}"
-                    if module.__origin__.startswith("<core")
-                    else ""
-                ),
+        developer = re.search(r"# ?meta developer: ?(.+)", getattr(module, "__source__", None))
+        dev_text = developer.group(1) if developer else None
+        placeholders = "\n".join(utils.help_placeholders(module.__class__.__name__, self))
+        await utils.answer(
+            message,
+            f"{reply}<blockquote expandable>{cmds}{inline_cmd}</blockquote>\n<blockquote expandable>" 
+            + (f"{placeholders}</blockquote>" if placeholders else "")
+            + (
+                f"\n\n{self.strings('developer')}".format(dev_text)
+                if dev_text
+                else ""
             )
-        else:
-            await utils.answer(
-                message,
-                f'{reply}<blockquote expandable>{cmds}{inline_cmd}</blockquote>'
-                + (f"\n\n{self.strings('not_exact')}" if not exact else "")
-                + (
-                    f"\n\n{self.strings('core_notice')}"
-                    if module.__origin__.startswith("<core")
-                    else ""
-                ),
-            )
+            + (f"\n\n{self.strings('not_exact')}" if not exact else "")
+            + (
+                f"\n{self.strings('core_notice')}"
+                if module.__origin__.startswith("<core")
+                else ""
+            ),
+        )
 
     @loader.command(ru_doc="[args] | Помощь с вашими модулями!", ua_doc="[args] | допоможіть з вашими модулями!", de_doc="[args] | Hilfe mit deinen Modulen!")
     async def help(self, message: Message):
@@ -268,10 +264,13 @@ class Help(loader.Module):
 
         args = utils.get_args_raw(message)
 
-        banner = self.config["banner_url"]
+        banner = str(self.config["banner_url"])
 
         if self.config["banner_url"] and self.config["media_quote"] is True:
-            banner = InputMediaWebPage(self.config["banner_url"])
+            banner = InputMediaWebPage(str(self.config["banner_url"]))
+
+        if not self.config["banner_url"]:
+            banner = None
 
         force = False
         if "-f" in args:
@@ -339,6 +338,7 @@ class Help(loader.Module):
                 continue
 
             core = mod.__origin__.startswith("<core")
+
             tmp += "\n{} <code>{}</code>".format(
                 self.config["core_emoji"] if core else self.config["plain_emoji"], name
             )

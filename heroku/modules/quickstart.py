@@ -14,21 +14,10 @@ import logging
 import os
 from random import choice
 
-from .. import loader, translations, utils, main
+from .. import loader, main, translations, utils
 from ..inline.types import BotInlineCall
 
 logger = logging.getLogger(__name__)
-
-imgs = [
-    "https://i.gifer.com/GmUB.gif",
-    "https://i.gifer.com/Afdn.gif",
-    "https://i.gifer.com/3uvT.gif",
-    "https://i.gifer.com/2qQQ.gif",
-    "https://i.gifer.com/Lym6.gif",
-    "https://i.gifer.com/IjT4.gif",
-    "https://i.gifer.com/A9H.gif",
-]
-
 
 @loader.tds
 class Quickstart(loader.Module):
@@ -69,25 +58,77 @@ class Quickstart(loader.Module):
                 )
             ).rstrip()
         )
+        
+        try:
+            content_channel = None
+            existing_channel_id = db.get("heroku.forums", "channel_id", None)
+            
+            if existing_channel_id:
+                try:
+                    content_channel = await client.get_entity(existing_channel_id)
+                    logger.debug(f"Found existing content channel with ID {existing_channel_id}")
+                except Exception as e:
+                    logger.warning(f"Saved channel ID {existing_channel_id} not found or inaccessible: {e}")
+                    content_channel = None
+            
+            if not content_channel:
+                async for dialog in client.iter_dialogs():
+                    if dialog.title and 'heroku-userbot' in dialog.title.lower():
+                        content_channel = dialog.entity
+                        logger.debug(f"Found existing channel '{dialog.title}' with ID {dialog.entity.id}")
+                        db.set("heroku.forums", "channel_id", int(dialog.entity.id))
+                        break
 
-        content_channel, _ = await utils.asset_channel(
-            client=client,
-            title='heroku-userbot',
-            description='🪐 Content related to Heroku will be here',
-            silent=True,
-            invite_bot=True,
-            avatar="https://raw.githubusercontent.com/coddrago/assets/main/heroku/heroku.png",
-            forum=True,
-            hide_general=True,
-            _folder='heroku',
-        )
+            if not content_channel:
+                content_channel, _ = await utils.asset_channel(
+                    client=client,
+                    title='heroku-userbot',
+                    description='🪐 Content related to Heroku will be here',
+                    silent=True,
+                    invite_bot=True,
+                    avatar="https://raw.githubusercontent.com/coddrago/assets/main/heroku/heroku.png",
+                    forum=True,
+                    hide_general=True,
+                    _folder='heroku',
+                )
+                logger.info(f"Created new content channel with ID {content_channel.id}")
+                db.set("heroku.forums", "channel_id", int(content_channel.id))
+            
+            if not content_channel:
+                raise RuntimeError("Failed to get or create content channel!")
 
-        db.set("heroku.forums", "channel_id", int(content_channel.id))
+            required_topics = [
+                ("Assets", "🌆 Your Heroku assets will be stored here", 5877307202888273539),
+                ("Logs", "📊 Inline logs and error reports will be stored here", 5877307202888273539),
+                ("Backups", "💾 Your Heroku backups will be stored here", 5877307202888273539),
+            ]
+            
+            for topic_title, topic_desc, emoji_id in required_topics:
+                try:
+                    await utils.asset_forum_topic(
+                        client=self._client,
+                        db=db,
+                        peer=content_channel.id,
+                        title=topic_title,
+                        description=topic_desc,
+                        icon_emoji_id=emoji_id,
+                    )
+                    logger.debug(f"Created or verified topic '{topic_title}'")
+                except Exception:
+                    logger.exception(f"Failed to create/verify topic '{topic_title}'")
+
+        except Exception:
+            logger.exception(
+                "Can't find and/or create content channel\n"
+                "This may cause several consequences, such as:\n"
+                "- Non working inline-logs, backups, assets features\n"
+                "- This error will occur every restart\n\n"
+                "You can try solving this by leaving some channels/groups"
+            )
 
         if self.get("no_msg"):
             return
 
-        await self.inline.bot.send_animation(self._client.tg_id, animation=choice(imgs))
         await self.inline.bot.send_message(
             self._client.tg_id,
             self.text(),

@@ -15,24 +15,28 @@ __version__ = (2, 0, 0)
 
 import os
 
-import git
-from ._internal import (
-    get_branch_name,
-    check_commit_ancestor,
-    reset_to_master,
-    restore_worktree,
-    restart,
-)
+NO_GIT = os.environ.get("HEROKU_NO_GIT") == "1"
+if not NO_GIT:
+    import git
+else:
+    git = None
+from ._internal import (check_commit_ancestor, get_branch_name,
+                        reset_to_master, restart, restore_worktree)
 
-try:
-    branch = git.Repo(
-        path=os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-    ).active_branch.name
-except Exception:
+if NO_GIT:
     branch = "master"
+else:
+    try:
+        branch = git.Repo(
+            path=os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+        ).active_branch.name
+    except Exception:
+        branch = "master"
 
 
 async def check_branch(me_id: int, allowed_ids: list, self):
+    if NO_GIT:
+        return
     repo_path = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 
     try:

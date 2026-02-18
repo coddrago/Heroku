@@ -1004,7 +1004,11 @@ class LoaderMod(loader.Module):
                         ),
                     )
                 )
-
+        placeholders = utils.help_placeholders(
+            getattr(getattr(instance, "__class__"), "__name__"), 
+            self
+        )
+        
         depends_from = (
             self.strings("depends_from").format("\n".join(depends_from))
             if depends_from
@@ -1017,25 +1021,23 @@ class LoaderMod(loader.Module):
                 version, \
                 mod_doc, \
                 modhelp, \
+                placeholders, \
                 developer, \
                 origin, \
                 subscribe, \
                 blob_link, \
                 depends_from
-            placeholders = utils.help_placeholders(modname.strip()).replace("No docs", self.strings('undoc'))
-            if placeholders != "":
-                placeholders_info = f"<blockquote expandable>{self.strings('custom_placeholders')}\n{placeholders}</blockquote>"
-            else: 
-                placeholders_info = ""
             return self.strings("loaded").format(
                 modname.strip(),
                 version,
                 utils.ascii_face(),
-                mod_doc, 
+                mod_doc if mod_doc else "",
                 "<blockquote expandable>{}</blockquote>".format(
                     '\n'.join(modhelp)
                 ),
-                placeholders_info,
+                "<blockquote expandable>{}</blockquote>".format(
+                    '\n'.join(placeholders)
+                ),
                 developer if not subscribe or not use_subscribe else "",
                 depends_from,
                 (
@@ -1082,8 +1084,6 @@ class LoaderMod(loader.Module):
 
             developer = self.strings("developer").format(
                 utils.escape_html(developer)
-                if isinstance(developer_entity, Channel)
-                else f"<code>{utils.escape_html(developer)}</code>"
             )
         else:
             developer = ""
@@ -1152,15 +1152,31 @@ class LoaderMod(loader.Module):
 
     @loader.command(alias="ulm")
     async def unloadmod(self, message: Message):
-        if not (args := utils.get_args_raw(message)):
+        if not (raw_args := utils.get_args_raw(message)):
             await utils.answer(message, self.strings("no_class"))
             return
 
-        if len(args.split("\n")) == 1:
-            msg = await self.unload_module(args)
+        args = raw_args
+        force = False
+        first_line = args.split("\n", 1)[0].strip()
+        if first_line == "-f":
+            force = True
+            rest = args.split("\n", 1)
+            args = rest[1].strip() if len(rest) > 1 else ""
+        elif args.startswith("-f "):
+            force = True
+            args = args[3:].strip()
 
+        if not args:
+            await utils.answer(message, self.strings("no_class"))
+            return
+
+        raw_list = re.split(r"[,\n]", args)
+        modules = [m.strip() for m in raw_list if m.strip()]
+
+        if len(modules) == 1:
+            msg = await self.unload_module(modules[0], force=force)
         else:
-            modules = [m for m in args.split("\n") if m]
             success = []
             errors = []
             msg = ""
@@ -1188,7 +1204,7 @@ class LoaderMod(loader.Module):
 
         await utils.answer(message, msg)
 
-    async def unload_module(self, module: str) -> str:
+    async def unload_module(self, module: str, force: bool = False) -> str:
         instance = self.lookup(module)
 
         if issubclass(instance.__class__, loader.Library):
@@ -1221,6 +1237,29 @@ class LoaderMod(loader.Module):
         )
         for mod_name in worked:
             utils.unregister_placeholders(mod_name)
+
+        if force and worked:
+            try:
+                for key in list(self._db.keys()):
+                    if not isinstance(key, str):
+                        continue
+                    low = key.lower()
+                    for mod_name in worked:
+                        base = mod_name[:-3] if mod_name.endswith("Mod") else mod_name
+                        candidates = {mod_name.lower(), base.lower()}
+                        if any(low == c or low.startswith(c + ".") or low.startswith(c + "_") or c in low for c in candidates):
+                            try:
+                                del self._db[key]
+                            except Exception:
+                                pass
+
+                try:
+                    self._db.save()
+                except Exception:
+                    logger.debug("Failed to save DB after force-unload cleanup", exc_info=True)
+            except Exception:
+                logger.exception("Failed to cleanup DB for force unload")
+
         return msg
 
 

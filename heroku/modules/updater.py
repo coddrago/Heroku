@@ -11,7 +11,6 @@
 # 🔑 https://www.gnu.org/licenses/agpl-3.0.html
 
 
-import aiohttp
 import ast
 import asyncio
 import contextlib
@@ -22,6 +21,7 @@ import sys
 import time
 import typing
 
+import aiohttp
 import git
 from git import GitCommandError, Repo
 from pyrogram.extensions.html import CUSTOM_EMOJIS
@@ -33,9 +33,10 @@ from pyrogram.raw.types import DialogFilter, TextWithEntities, Message
 
 from .. import loader, main, utils, version
 from .._internal import restart
-from ..inline.types import InlineCall, BotInlineCall
+from ..inline.types import BotInlineCall, InlineCall
 
 logger = logging.getLogger(__name__)
+NO_GIT = os.environ.get("HEROKU_NO_GIT") == "1"
 
 
 @loader.tds
@@ -72,41 +73,45 @@ class UpdaterMod(loader.Module):
             self.config["autoupdate"] = False
             await self.inline.bot(call.answer(self.strings("autoupdate_off").format(prefix=self.get_prefix())))
             return
-        
+
         self.config["autoupdate"] = True
 
         await self.inline.bot(call.answer(self.strings("autoupdate_on")))
 
     def get_changelog(self) -> str:
+        if NO_GIT:
+            return False
         try:
-            repo = git.Repo()
+            with git.Repo() as repo:
+                for remote in repo.remotes:
+                    remote.fetch()
 
-            for remote in repo.remotes:
-                remote.fetch()
-
-            if not (
-                diff := repo.git.log([f"HEAD..origin/{version.branch}", "--oneline"])
-            ):
-                return False
+                if not (
+                    diff := [*repo.iter_commits(f"HEAD..origin/{version.branch}")]
+                ):
+                    return False
         except Exception:
             return False
 
         res = "\n".join(
-            f"<b>{commit.split()[0]}</b>:"
-            f" <i>{utils.escape_html(' '.join(commit.split()[1:]))}</i>"
-            for commit in diff.splitlines()[:10]
+            f"<b>{commit.hexsha[:7]}</b>:"
+            f" <i>{utils.escape_html(commit.message.splitlines()[0])}</i>"
+            for commit in diff[:10]
         )
 
         if diff.count("\n") >= 10:
-            res += self.strings("more").format(len(diff.splitlines()) - 10)
+            res += self.strings("more").format(len(diff) - 10)
 
         return res
 
     def get_latest(self) -> str:
+        if NO_GIT:
+            return ""
         try:
-            return next(
-                git.Repo().iter_commits(f"origin/{version.branch}", max_count=1)
-            ).hexsha
+            with git.Repo() as repo:
+                return next(
+                    repo.iter_commits(f"origin/{version.branch}", max_count=1)
+                ).hexsha
         except Exception:
             return ""
 
@@ -135,10 +140,12 @@ class UpdaterMod(loader.Module):
                         pass
             except Exception:
                 pass
-            
+
 
     @loader.loop(interval=60, autostart=True)
     async def poller(self):
+        if NO_GIT:
+            return
         if (self.config["disable_notifications"] and not self.config["autoupdate"]) or not self.get_changelog():
             return
 
@@ -161,7 +168,7 @@ class UpdaterMod(loader.Module):
                             headers={"Accept": "application/vnd.github.v3.raw"}
                         )
                         text = await r.text()
-                    
+
                     new_version = ""
                     for line in text.splitlines():
                         if line.strip().startswith("__version__"):
@@ -225,6 +232,9 @@ class UpdaterMod(loader.Module):
     @loader.callback_handler()
     async def update_call(self, call: InlineCall):
         """Process update buttons clicks"""
+        if NO_GIT:
+            await call.answer("Git disabled via --no-git.", show_alert=True)
+            return
         if call.data not in {"heroku/update", "heroku/ignore_upd"}:
             return
 
@@ -268,8 +278,9 @@ class UpdaterMod(loader.Module):
                             "text": self.strings("btn_restart"),
                             "callback": self.inline_restart,
                             "args": (secure_boot,),
+                            "style": "primary",
                         },
-                        {"text": self.strings("cancel"), "action": "close"},
+                        {"text": self.strings("cancel"), "action": "close", "style": "danger"},
                     ],
                 )
             ):
@@ -314,8 +325,6 @@ class UpdaterMod(loader.Module):
             self.strings("restarting_caption").format(
                 utils.get_platform_emoji()
                 if self._client.heroku_me.premium
-                and CUSTOM_EMOJIS
-                and isinstance(msg_obj, Message)
                 else "Heroku"
             ),
         )
@@ -347,23 +356,24 @@ class UpdaterMod(loader.Module):
 
     async def download_common(self):
         try:
-            repo = Repo(os.path.dirname(utils.get_base_dir()))
-            origin = repo.remote("origin")
-            r = origin.pull()
-            new_commit = repo.head.commit
-            for info in r:
-                if info.old_commit:
-                    for d in new_commit.diff(info.old_commit):
-                        if d.b_path == "requirements.txt":
-                            return True
+            with Repo(os.path.dirname(utils.get_base_dir())) as repo:
+                origin = repo.remote("origin")
+                r = origin.pull()
+                new_commit = repo.head.commit
+                for info in r:
+                    if info.old_commit:
+                        for d in new_commit.diff(info.old_commit):
+                            if d.b_path == "requirements.txt":
+                                return True
             return False
         except git.exc.InvalidGitRepositoryError:
             repo = Repo.init(os.path.dirname(utils.get_base_dir()))
-            origin = repo.create_remote("origin", self.config["GIT_ORIGIN_URL"])
-            origin.fetch()
-            repo.create_head("master", origin.refs.master)
-            repo.heads.master.set_tracking_branch(origin.refs.master)
-            repo.heads.master.checkout(True)
+            with repo:
+                origin = repo.create_remote("origin", self.config["GIT_ORIGIN_URL"])
+                origin.fetch()
+                repo.create_head("master", origin.refs.master)
+                repo.heads.master.set_tracking_branch(origin.refs.master)
+                repo.heads.master.checkout(True)
             return False
 
     @staticmethod
@@ -385,18 +395,27 @@ class UpdaterMod(loader.Module):
                     "--user",
                 ],
                 check=True,
+                timeout=600,
+                capture_output=True,
             )
-        except subprocess.CalledProcessError:
+        except (subprocess.CalledProcessError, subprocess.TimeoutExpired):
             logger.exception("Req install failed")
 
     @loader.command()
     async def update(self, message: Message):
+        if NO_GIT:
+            await utils.answer(
+                message,
+                "<b>Git disabled via --no-git.</b>",
+            )
+            return
         try:
             args = utils.get_args_raw(message)
             current = utils.get_git_hash()
-            upcoming = next(
-                git.Repo().iter_commits(f"origin/{version.branch}", max_count=1)
-            ).hexsha
+            with git.Repo() as repo:
+                upcoming = next(
+                    repo.iter_commits(f"origin/{version.branch}", max_count=1)
+                ).hexsha
             if (
                 "-f" in args
                 or not self.inline.init_complete
@@ -413,8 +432,9 @@ class UpdaterMod(loader.Module):
                         {
                             "text": self.strings("btn_update"),
                             "callback": self.inline_update,
+                            "style": "primary",
                         },
-                        {"text": self.strings("cancel"), "action": "close"},
+                        {"text": self.strings("cancel"), "action": "close", "style": "danger"},
                     ],
                 )
             ):
@@ -430,7 +450,7 @@ class UpdaterMod(loader.Module):
             await utils.answer(message, self.strings["autoupdate_on"])
         else:
             await utils.answer(message, self.strings["autoupdate_off"].format(prefix=self.get_prefix()))
-            
+
     async def inline_update(
         self,
         msg_obj: typing.Union[InlineCall, Message],
@@ -447,8 +467,6 @@ class UpdaterMod(loader.Module):
                     self.strings("restarting_caption").format(
                         utils.get_platform_emoji()
                         if self._client.heroku_me.premium
-                        and CUSTOM_EMOJIS
-                        and isinstance(msg_obj, Message)
                         else "Heroku"
                     ),
                 )
@@ -485,14 +503,15 @@ class UpdaterMod(loader.Module):
 
     async def client_ready(self):
         try:
-            git.Repo()
+            with git.Repo():
+                pass
         except Exception as e:
             raise loader.LoadError("Can't load due to repo init error") from e
 
         self._markup = lambda: self.inline.generate_markup(
             [
-                {"text": self.strings("update"), "data": "heroku/update"},
-                {"text": self.strings("ignore"), "data": "heroku/ignore_upd"},
+                {"text": self.strings("update"), "data": "heroku/update", "style": "primary",},
+                {"text": self.strings("ignore"), "data": "heroku/ignore_upd", "style": "danger"},
             ]
         )
 
@@ -524,6 +543,7 @@ class UpdaterMod(loader.Module):
                                 "text": f"✅ Turn on",
                                 "callback": self._set_autoupdate_state,
                                 "args": (True,),
+                                "style": "success",
                             }
                         ],
                         [
@@ -531,6 +551,7 @@ class UpdaterMod(loader.Module):
                                 "text": "🚫 Turn off",
                                 "callback": self._set_autoupdate_state,
                                 "args": (False,),
+                                "style": "danger",
                             }
                         ]
                     ]
@@ -559,10 +580,10 @@ class UpdaterMod(loader.Module):
 
             for folder in filters:
                 title = getattr(folder, "title", None)
-        
+
                 if title:
                     raw_title = getattr(title, "text", title)
-                    
+
                     if str(raw_title).strip() == "Heroku":
                         heroku_f = True
 
@@ -714,12 +735,14 @@ class UpdaterMod(loader.Module):
                         "text": "✅",
                         "callback": self.rollback_confirm,
                         "args": [args],
+                        "style": "success",
                     }
                 ],
                 [
                     {
                         "text": "❌",
                         "action": "close",
+                        "style": "danger",
                     }
                 ]
             ]

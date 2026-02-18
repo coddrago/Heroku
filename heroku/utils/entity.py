@@ -5,16 +5,15 @@
 # You can redistribute it and/or modify it under the terms of the GNU AGPLv3
 # 🔑 https://www.gnu.org/licenses/agpl-3.0.html
 
+import asyncio
 import inspect
 import logging
 import random
-import asyncio
 import re
 import string
 import time
 import typing
 from urllib.parse import urlparse
-import emoji
 
 import pyrogram
 import requests
@@ -30,6 +29,7 @@ from pyrogram.raw.functions.messages import (
     SetHistoryTTL,
     UpdateDialogFilter,
     CreateForumTopic,
+    GetForumTopics,
     GetForumTopicsByID,
     EditForumTopic,
 )
@@ -69,6 +69,7 @@ from .other import invite_inline_bot, run_sync
 from .._internal import fw_protect
 from ..tl_cache import CustomClient
 from ..types import Module
+from .other import invite_inline_bot, run_sync
 
 FormattingEntity = typing.Union[
     MessageEntityUnknown,
@@ -97,6 +98,22 @@ if typing.TYPE_CHECKING:
 
 # parser = pyrogram.utils.sanitize_parse_mode("html")
 logger = logging.getLogger(__name__)
+
+TAG_RE = re.compile(r"</?([a-zA-Z][a-zA-Z0-9\-]*)(?:\s[^<>]*)?>")
+
+TELEGRAM_HTML_TAGS = {
+    "strong", "b",
+    "em", "i",
+    "tg-spoiler",
+    "u",
+    "del", "s",
+    "blockquote",
+    "code",
+    "pre",
+    "a",
+    "tg-emoji",
+    "emoji",
+}
 
 def get_lang_flag(countrycode: str) -> str:
     """
@@ -372,7 +389,22 @@ async def asset_forum_topic(
 
     forums_cache = db.get("heroku.forums", "forums_cache", {})
 
-    if (topic_id := forums_cache.get(entity.title, {}).get(title)):
+    async def _search_topic(topic_title: str) -> int | None:
+        result = await client.invoke(GetForumTopics(
+            peer=entity,
+            offset_date=None,
+            offset_id=0,
+            offset_topic=0,
+            limit=100,
+        ))
+        await fw_protect()
+        for found_topic in result.topics:
+            if found_topic.title == topic_title:
+                forums_cache.setdefault(entity.title, {})[topic_title] = found_topic.id
+                return found_topic.id
+        return None
+
+    if topic_id := forums_cache.get(entity.title, {}).get(title) or await _search_topic(title):
         await fw_protect()
         topic = await client.invoke(GetForumTopicsByID(peer=entity, topics=[topic_id]))
         topic = topic.topics[0]
@@ -414,6 +446,19 @@ async def wait_for_content_channel(db: 'Database', delay: float = 10) -> int:
         cid = db.get("heroku.forums", "channel_id", None)
 
     return cid
+
+async def get_topic_id(db: 'Database', topic_name: str) -> typing.Optional[int]:
+    """
+    Get forum topic ID from database
+    :param db: Database instance
+    :param topic_name: Topic name (e.g., "Assets", "Logs", "Backups")
+    :return: Topic ID or None if not found
+    """
+    try:
+        forums_cache = db.get("heroku.forums", "forums_cache", {})
+        return forums_cache.get("heroku-userbot", {}).get(topic_name)
+    except Exception:
+        return None
 
 async def set_avatar(
     client: CustomClient,
@@ -570,6 +615,24 @@ def escape_html(text: str, /) -> str:  # sourcery skip
     :return: Escaped text
     """
     return str(text).replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+
+
+def escape_non_html(text: str) -> str:
+    """
+    Escape all characters that can be parsed as HTML tags, but are not supported by Telegram
+    :param text: Text to escape
+    :return: Escaped text
+    """
+    out = []
+    last = 0
+    for m in TAG_RE.finditer(text):
+        out.append(escape_html(text[last:m.start()]))
+        out.append(m.group(0) if m.group(1).lower() in TELEGRAM_HTML_TAGS else escape_html(m.group(0)))
+        last = m.end()
+
+    out.append(escape_html(text[last:]))
+
+    return "".join(out)
 
 
 def escape_quotes(text: str, /) -> str:

@@ -24,8 +24,8 @@ from pyrogram.errors import (
     PhoneNumberInvalid,
     SessionPasswordNeeded,
 )
-from pyrogram.sessions import MemorySession
-from pyrogram.utils import parse_phone
+# from pyrogram.sessions import MemorySession
+# from pyrogram.utils import parse_phone
 from pyrogram.types import Message, User
 
 from .. import loader, main, utils
@@ -48,7 +48,7 @@ class HerokuWebMod(loader.Module):
     @loader.command()
     async def weburl(self, message: Message, force: bool = False):
 
-        if "OTHERHOST" in os.environ or "JAMHOST" in os.environ:
+        if "JAMHOST" in os.environ:
             await utils.answer(message, self.strings["host_denied"])
         else:
         
@@ -139,7 +139,7 @@ class HerokuWebMod(loader.Module):
     @loader.command()
     async def addacc(self, message: Message):
 
-        if "JAMHOST" in os.environ or "LAVHOST" in os.environ or "OTHERHOST" in os.environ:
+        if "JAMHOST" in os.environ or "LAVHOST" in os.environ:
             await utils.answer(message, self.strings["host_denied"])
         else:
 
@@ -169,14 +169,10 @@ class HerokuWebMod(loader.Module):
                 )
                 return
         
-            if user.id == self._client.tg_id:
-                await utils.answer(
-                    message,
-                    self.strings("cant_add_self")
-                )
-                return
-        
-            if "force_insecure" in message.text.html.lower():
+            if user.id == self.tg_id:
+                await self._inline_login(message, user)
+
+            if "force_insecure" in message.text.lower():
                 await self._inline_login(message, user)
         
             try:

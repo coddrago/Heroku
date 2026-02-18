@@ -79,6 +79,23 @@
 - fully remove save to fs
 - optimize username handling & fix logic
 - protection for session files
+- add premium emoji in some cases with inline
+- add developer in help
+- add folder for config
+- remove pyproject.toml
+- add more session protection
+- add custom presets
+- add message about no query answer
+- add ulm -f
+- fix permission denied in info 
+- add hsearch 
+- add hiding the phone in htl
+- add more protection for official telegram account (777000)
+- add button styles support for aiogram 3.25.0+ (danger, primary, success)
+- add premium emoji support in buttons via icon_custom_emoji_id (aiogram 3.25.0+)
+- add aliases export/import
+- add folders
+- restrict inline queries for not allowed users
 
 ## 🪐 Heroku 1.7.2
 - added autoupdate

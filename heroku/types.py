@@ -38,18 +38,21 @@ from pyrogram.storage.sqlite_storage import (
     TEST,
     PROD
 )
+from pyrogram.types import (
+    Message,
+)
 from pyrogram.raw.types import (
     Channel,
     ChannelForbidden,
     ChannelFull,
-    Message,
     UserFull,
 )
 
 from . import version
 from ._reference_finder import replace_all_refs
-from .inline.types import (BotInlineCall, BotInlineMessage, BotMessage, HerokuReplyMarkup,
-                           InlineCall, InlineMessage, InlineQuery, InlineUnit)
+from .inline.types import (BotInlineCall, BotInlineMessage, BotMessage,
+                           HerokuReplyMarkup, InlineCall, InlineMessage,
+                           InlineQuery, InlineUnit)
 from .pointers import PointerDict, PointerList
 
 if typing.TYPE_CHECKING:
@@ -74,6 +77,10 @@ __all__ = [
     "BotInlineMessage",
     "PointerDict",
     "PointerList",
+    "SafeClientProxy",
+    "SafeDatabaseProxy",
+    "SafeInlineProxy",
+    "SafeAllModulesProxy",
 ]
 
 logger = logging.getLogger(__name__)
@@ -156,47 +163,257 @@ def _make_safe_client_proxy():
 SafeClientProxy = _make_safe_client_proxy()
 
 
-class SafeAllModulesProxy:
-    __slots__ = ("__allmodules", "__safe_client", "__safe_allclients")
+def _make_safe_db_proxy():
+    import weakref
 
-    def __init__(self, allmodules, safe_client, safe_allclients):
-        object.__setattr__(self, "_SafeAllModulesProxy__allmodules", allmodules)
-        object.__setattr__(self, "_SafeAllModulesProxy__safe_client", safe_client)
-        object.__setattr__(self, "_SafeAllModulesProxy__safe_allclients", safe_allclients)
+    _db_map = weakref.WeakKeyDictionary()
+    _origin_map = weakref.WeakKeyDictionary()
 
-    @property
-    def client(self):
-        return object.__getattribute__(self, "_SafeAllModulesProxy__safe_client")
+    class SafeDatabaseProxy:
+        __slots__ = ("__weakref__",)
 
-    @property
-    def allclients(self):
-        return object.__getattribute__(self, "_SafeAllModulesProxy__safe_allclients")
+        _BLOCKED_ATTRS = {
+            "_client",
+            "_redis",
+            "_content_channel_id",
+            "_assets_topic",
+            "_me",
+            "_db_file",
+            "_saving_task",
+            "_revisions",
+            "_next_revision_call",
+            "redis_init",
+            "remote_force_save",
+            "_redis_save",
+            "_redis_save_sync",
+        }
 
-    def __setattr__(self, name: str, value):
-        if name in (
-            "_SafeAllModulesProxy__allmodules",
-            "_SafeAllModulesProxy__safe_client",
-            "_SafeAllModulesProxy__safe_allclients",
-        ):
-            object.__setattr__(self, name, value)
-        else:
-            setattr(object.__getattribute__(self, "_SafeAllModulesProxy__allmodules"), name, value)
+        _BLOCKED_MAGIC = {
+            "__class__",
+            "__dict__",
+            "__getattribute__",
+            "__setattr__",
+            "__weakref__",
+            "__reduce__",
+            "__reduce_ex__",
+            "__getstate__",
+            "__setstate__",
+        }
 
-    def __delattr__(self, name: str):
-        if name in (
-            "_SafeAllModulesProxy__allmodules",
-            "_SafeAllModulesProxy__safe_client",
-            "_SafeAllModulesProxy__safe_allclients",
-        ):
-            object.__delattr__(self, name)
-        else:
-            delattr(object.__getattribute__(self, "_SafeAllModulesProxy__allmodules"), name)
+        def __init__(self, db, origin: str):
+            _db_map[self] = db
+            _origin_map[self] = origin
 
-    def __getattr__(self, name: str):
-        return getattr(object.__getattribute__(self, "_SafeAllModulesProxy__allmodules"), name)
+        def __getattribute__(self, name: str):
+            if name in SafeDatabaseProxy._BLOCKED_MAGIC:
+                raise AttributeError("Access denied")
+            if name in SafeDatabaseProxy._BLOCKED_ATTRS:
+                logger.warning(
+                    "Blocked access to db.%s from %s",
+                    name,
+                    _origin_map.get(self, "<unknown>"),
+                )
+                raise AttributeError("Access to db attribute is blocked")
+            return getattr(_db_map[self], name)
 
-    def __repr__(self) -> str:
-        return "<SafeAllModulesProxy>"
+        def __setattr__(self, name: str, value):
+            if name in SafeDatabaseProxy._BLOCKED_MAGIC or name in SafeDatabaseProxy._BLOCKED_ATTRS:
+                logger.warning(
+                    "Blocked write to db.%s from %s",
+                    name,
+                    _origin_map.get(self, "<unknown>"),
+                )
+                raise AttributeError("Write to db attribute is blocked")
+            setattr(_db_map[self], name, value)
+
+        def __getitem__(self, key):
+            return _db_map[self][key]
+
+        def __setitem__(self, key, value):
+            _db_map[self][key] = value
+
+        def __delitem__(self, key):
+            del _db_map[self][key]
+
+        def __contains__(self, key):
+            return key in _db_map[self]
+
+        def __repr__(self) -> str:
+            return "<SafeDatabaseProxy>"
+
+    return SafeDatabaseProxy
+
+
+SafeDatabaseProxy = _make_safe_db_proxy()
+
+def _make_safe_inline_proxy():
+    import weakref
+
+    _inline_map = weakref.WeakKeyDictionary()
+    _origin_map = weakref.WeakKeyDictionary()
+
+    class SafeInlineProxy:
+        __slots__ = ("__weakref__",)
+
+        _BLOCKED_ATTRS = {
+            "_client",
+            "_db",
+            "_allmodules",
+            "_token",
+            "_bot",
+            "_dp",
+        }
+
+        _BLOCKED_MAGIC = {
+            "__class__",
+            "__dict__",
+            "__getattribute__",
+            "__setattr__",
+            "__weakref__",
+            "__reduce__",
+            "__reduce_ex__",
+            "__getstate__",
+            "__setstate__",
+        }
+
+        def __init__(self, inline, origin: str):
+            _inline_map[self] = inline
+            _origin_map[self] = origin
+
+        def __getattribute__(self, name: str):
+            if name in SafeInlineProxy._BLOCKED_MAGIC:
+                raise AttributeError("Access denied")
+            if name in SafeInlineProxy._BLOCKED_ATTRS:
+                logger.warning(
+                    "Blocked access to inline.%s from %s",
+                    name,
+                    _origin_map.get(self, "<unknown>"),
+                )
+                raise AttributeError("Access to inline attribute is blocked")
+            return getattr(_inline_map[self], name)
+
+        def __setattr__(self, name: str, value):
+            if name in SafeInlineProxy._BLOCKED_MAGIC or name in SafeInlineProxy._BLOCKED_ATTRS:
+                logger.warning(
+                    "Blocked write to inline.%s from %s",
+                    name,
+                    _origin_map.get(self, "<unknown>"),
+                )
+                raise AttributeError("Write to inline attribute is blocked")
+            setattr(_inline_map[self], name, value)
+
+        def __repr__(self) -> str:
+            return "<SafeInlineProxy>"
+
+    return SafeInlineProxy
+
+
+SafeInlineProxy = _make_safe_inline_proxy()
+
+
+def _make_safe_allmodules_proxy():
+    import weakref
+
+    _allmodules_map = weakref.WeakKeyDictionary()
+    _safe_client_map = weakref.WeakKeyDictionary()
+    _safe_allclients_map = weakref.WeakKeyDictionary()
+    _safe_db_map = weakref.WeakKeyDictionary()
+    _safe_inline_map = weakref.WeakKeyDictionary()
+
+    class SafeAllModulesProxy:
+        __slots__ = ("__weakref__",)
+
+        _BLOCKED_ATTRS = {
+            "modules",
+            "watchers",
+            "inline",
+            "client",
+            "allclients",
+            "db",
+            "_db",
+            "_client",
+        }
+
+        _BLOCKED_MAGIC = {
+            "__class__",
+            "__dict__",
+            "__getattribute__",
+            "__setattr__",
+            "__weakref__",
+            "__reduce__",
+            "__reduce_ex__",
+            "__getstate__",
+            "__setstate__",
+        }
+
+        def __init__(self, allmodules, safe_client, safe_allclients, safe_db, safe_inline):
+            _allmodules_map[self] = allmodules
+            _safe_client_map[self] = safe_client
+            _safe_allclients_map[self] = safe_allclients
+            _safe_db_map[self] = safe_db
+            _safe_inline_map[self] = safe_inline
+
+        @property
+        def client(self):
+            return _safe_client_map[self]
+
+        @property
+        def allclients(self):
+            return _safe_allclients_map[self]
+
+        @property
+        def db(self):
+            return _safe_db_map[self]
+
+        @property
+        def _db(self):
+            return _safe_db_map[self]
+
+        @property
+        def inline(self):
+            return _safe_inline_map[self]
+
+        def __getattribute__(self, name: str):
+            if name in SafeAllModulesProxy._BLOCKED_MAGIC:
+                raise AttributeError("Access denied")
+            return object.__getattribute__(self, name)
+
+        def __getattr__(self, name: str):
+            if name in SafeAllModulesProxy._BLOCKED_ATTRS:
+                raise AttributeError("Access to allmodules attribute is blocked")
+            return getattr(_allmodules_map[self], name)
+
+        def __setattr__(self, name: str, value):
+            if name in SafeAllModulesProxy._BLOCKED_MAGIC or name in SafeAllModulesProxy._BLOCKED_ATTRS:
+                raise AttributeError("Write to allmodules attribute is blocked")
+            setattr(_allmodules_map[self], name, value)
+
+        def __delattr__(self, name: str):
+            if name in SafeAllModulesProxy._BLOCKED_MAGIC or name in SafeAllModulesProxy._BLOCKED_ATTRS:
+                raise AttributeError("Delete of allmodules attribute is blocked")
+            delattr(_allmodules_map[self], name)
+
+        def __repr__(self) -> str:
+            return "<SafeAllModulesProxy>"
+
+        def _get_real_allmodules(self):
+            for frame_info in inspect.stack():
+                mod = frame_info.frame.f_globals.get("__name__", None)
+                if not mod or mod == __name__:
+                    continue
+                spec = frame_info.frame.f_globals.get("__spec__", None)
+                origin = getattr(spec, "origin", None) if spec else None
+                if not origin:
+                    origin = frame_info.frame.f_globals.get("__file__", "")
+                if origin and _is_external_origin(origin):
+                    raise AttributeError("Access denied")
+                break
+            return _allmodules_map[self]
+
+    return SafeAllModulesProxy
+
+
+SafeAllModulesProxy = _make_safe_allmodules_proxy()
 
 
 JSONSerializable = typing.Union[str, int, float, bool, list, dict, None]
@@ -250,6 +467,8 @@ class Module:
 
         origin = getattr(self, "__origin__", "")
         is_external = _is_external_origin(origin)
+        if getattr(self, "__force_internal__", False):
+            is_external = False
 
         self.db = self.allmodules.db
         self._db = self.allmodules.db
@@ -258,10 +477,20 @@ class Module:
         if is_external:
             safe_client = SafeClientProxy(self.allmodules.client, origin)
             safe_allclients = [SafeClientProxy(c, origin) for c in self.allmodules.allclients]
-            self.allmodules = SafeAllModulesProxy(self.allmodules, safe_client, safe_allclients)
+            safe_db = SafeDatabaseProxy(self.allmodules.db, origin)
+            safe_inline = SafeInlineProxy(self.allmodules.inline, origin)
+            self.allmodules = SafeAllModulesProxy(
+                self.allmodules,
+                safe_client,
+                safe_allclients,
+                safe_db,
+                safe_inline,
+            )
             self.client = safe_client
             self._client = safe_client
             self.allclients = safe_allclients
+            self.db = safe_db
+            self._db = safe_db
         else:
             self.client = self.allmodules.client
             self._client = self.allmodules.client
@@ -317,7 +546,7 @@ class Module:
         message = (
             (await self._client.send_message(peer, cmd))
             if peer
-            else (await (message.edit if edit else message.respond)(cmd))
+            else (await (message.edit if edit else message.answer)(cmd))
         )
         await self.allmodules.commands[command](message)
         return message
@@ -505,7 +734,7 @@ class Module:
         from . import utils
 
         channel = await self.client.get_entity(peer)
-        
+
         match channel:
             case ChannelForbidden():
                 if assure_joined:
@@ -524,7 +753,7 @@ class Module:
 
             case Channel():
                 pass
-            
+
             case _:
                 raise TypeError("`peer` field must be a channel")
 
@@ -533,7 +762,7 @@ class Module:
 
         if not getattr(channel, "left", True):
             return True
-        
+
         event = asyncio.Event()
         await self.client.update_chat_notifications(
             chat_id=self.inline.bot_username,

@@ -28,7 +28,7 @@ from aiogram.types import (
 )
 from aiogram.types import Message as AiogramMessage
 
-from .. import loader, utils
+from .. import loader, utils, security
 from .types import BotInlineCall, InlineCall, InlineQuery, InlineUnit
 
 if typing.TYPE_CHECKING:
@@ -59,6 +59,12 @@ class Events(InlineUnit):
 
     async def _inline_handler(self: "InlineManager", inline_query: AiogramInlineQuery):
         """Inline query handler (forms' calls)"""
+        if (
+            not self._db.get(security.__name__, "allow_inline_query", False)
+            and inline_query.from_user.id not in self._client.dispatcher.security.all_users
+        ):
+            return
+
         if not (query := inline_query.query):
             await self._query_help(inline_query)
             return

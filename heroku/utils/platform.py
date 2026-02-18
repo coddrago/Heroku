@@ -20,7 +20,6 @@ IS_LAVHOST = "LAVHOST" in os.environ
 IS_HIKKAHOST = "HIKKAHOST" in os.environ
 IS_MACOS = "com.apple" in os.environ.get("PATH", "")
 IS_USERLAND = "userland" in os.environ.get("USER", "")
-IS_PTERODACTYL = "PTERODACTYL" in os.environ
 IS_JAMHOST = "JAMHOST" in os.environ
 IS_WSL = False
 IS_WINDOWS = False
@@ -57,8 +56,6 @@ def get_named_platform() -> str:
             return "JamHost"
         case _ if IS_USERLAND:
             return "UserLand"
-        case _ if IS_PTERODACTYL:
-            return "Pterodactyl"
         case _ if IS_HIKKAHOST:
             return "HikkaHost"
         case _ if IS_DOCKER:
@@ -96,8 +93,6 @@ def get_named_platform_emoji() -> str:
             return "🧃 "
         case _ if IS_USERLAND:
             return "🐧 "
-        case _ if IS_PTERODACTYL:
-            return "🦅 "
         case _ if IS_HIKKAHOST:
             return "🌼 "
         case _ if IS_DOCKER:
@@ -115,10 +110,10 @@ def get_platform_emoji() -> str:
 
     BASE = "".join(
         (
-            "<tg-emoji emoji-id=\"{}\">🪐</tg-emoji>",
-            "<tg-emoji emoji-id=\"5352934134618549768\">🪐</tg-emoji>",
-            "<tg-emoji emoji-id=\"5352663371290271790\">🪐</tg-emoji>",
-            "<tg-emoji emoji-id=\"5350822883314655367\">🪐</tg-emoji>",
+            "<tg-emoji emoji-id={}>🪐</tg-emoji>",
+            "<tg-emoji emoji-id=5352934134618549768>🪐</tg-emoji>",
+            "<tg-emoji emoji-id=5352663371290271790>🪐</tg-emoji>",
+            "<tg-emoji emoji-id=5350822883314655367>🪐</tg-emoji>",
         )
     )
 
@@ -129,8 +124,6 @@ def get_platform_emoji() -> str:
             return BASE.format(5242536621659678947)
         case _ if IS_USERLAND:
             return BASE.format(5458877818031077824)
-        case _ if IS_PTERODACTYL:
-            return BASE.format(5427286516797831670)
         case _ if IS_LAVHOST:
             return BASE.format(5352753797531721191)
         case _ if IS_DOCKER:
@@ -172,32 +165,22 @@ def get_ram_usage() -> float:
     except Exception:
         return 0
 
-run_first_time = True # workaround 0.00% cpu usage
 def get_cpu_usage():
+    """
+    Get CPU usage percentage using system-wide metrics
+    Falls back to psutil.cpu_percent() to avoid /proc/stat permission issues
+    """
     import psutil
-    global run_first_time
-
-    if run_first_time:
-        try:
-            psutil.cpu_count(logical=True)
-            for proc in psutil.process_iter():
-                try:
-                    proc.cpu_percent()
-                except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
-                    pass
-        except Exception: pass
-        run_first_time = False
-
+    
     try:
-        num_cores = psutil.cpu_count(logical=True)
-        cpu = 0.0
-        for proc in psutil.process_iter():
-            try:
-                cpu += proc.cpu_percent()
-            except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
-                pass
-        normalized_cpu = cpu / num_cores
-        return f"{normalized_cpu:.2f}"
+        cpu_percent = psutil.cpu_percent(interval=0.1)
+        return f"{cpu_percent:.2f}"
+    except PermissionError:
+        try:
+            cpu_percent = psutil.cpu_percent(interval=0)
+            return f"{cpu_percent:.2f}" if cpu_percent != 0 else "0.00"
+        except Exception:
+            return "0.00"
     except Exception:
         return "0.00"
 

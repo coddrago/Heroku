@@ -14,6 +14,8 @@
 
 import argparse
 import asyncio
+import base64
+import binascii
 import collections
 import contextlib
 import importlib
@@ -24,13 +26,10 @@ import random
 import signal
 import socket
 import sqlite3
+import string
 import sys
 import typing
-import string
 import zlib
-import base64
-import binascii
-
 from getpass import getpass
 from pathlib import Path
 
@@ -58,8 +57,8 @@ from pyrogram.raw.functions.contacts import Unblock
 from . import database, loader, utils, version
 from ._internal import print_banner, restart
 from .dispatcher import CommandDispatcher
-from .inline.utils import Utils as inutils
 from .inline.token_obtainment import TokenObtainment
+from .inline.utils import Utils as inutils
 from .qr import QRCode
 from .types import SQLiteStringStorage
 from .tl_cache import CustomClient
@@ -112,7 +111,7 @@ LATIN_MOCK = [
     "Unitas", "Universus", "Uterque", "Valde", "Vates",
     "Veritas", "Verus", "Vester", "Via", "Victoria",
     "Vita", "Vox", "Vultus", "Zephyrus", "Bimbalas", "Nywuctuu",
-    "Anyone", "Draher", "Hackimo", "Silvyr", 
+    "Anyone", "Draher", "Hackimo", "Silvyr",
 
 ]
 # fmt: on
@@ -442,6 +441,12 @@ def parse_arguments():
         default=True,
         help="Do not print colorful output using ANSI escapes",
     )
+    parser.add_argument(
+        "--no-git",
+        dest="no_git",
+        action="store_true",
+        help="Disable git checks and updates",
+    )
     arguments = parser.parse_args()
     logging.debug(arguments)
     return arguments
@@ -488,13 +493,15 @@ class Heroku:
         global BASE_DIR, BASE_PATH, CONFIG_PATH
         self.omit_log = False
         self.arguments = parse_arguments()
+        if self.arguments.no_git:
+            os.environ["HEROKU_NO_GIT"] = "1"
         if self.arguments.data_root:
             BASE_DIR = self.arguments.data_root
             BASE_PATH = Path(BASE_DIR)
             CONFIG_PATH = BASE_PATH / "config.json"
         try:
             self.loop = asyncio.get_running_loop()
-            
+
         except RuntimeError:
             self.loop = asyncio.new_event_loop()
             asyncio.set_event_loop(self.loop)
@@ -1006,13 +1013,17 @@ class Heroku:
     async def _badge(self, client: CustomClient):
         """Call the badge in shell"""
         try:
-            import git
+            if os.environ.get("HEROKU_NO_GIT") == "1":
+                build = "unknown"
+                upd = "Git disabled"
+            else:
+                import git
 
-            repo = git.Repo()
+                repo = git.Repo()
 
-            build = utils.get_git_hash()
-            diff = repo.git.log([f"HEAD..origin/{version.branch}", "--oneline"])
-            upd = "Update required" if diff else "Up-to-date"
+                build = utils.get_git_hash()
+                diff = repo.git.log([f"HEAD..origin/{version.branch}", "--oneline"])
+                upd = "Update required" if diff else "Up-to-date"
             pref = client.heroku_db.get("heroku.main", "command_prefix", None)
 
             logo = (
@@ -1045,10 +1056,11 @@ class Heroku:
                 logging.getLogger().handlers[0].get_logid_by_client(client.tg_id),
                 "https://raw.githubusercontent.com/coddrago/assets/refs/heads/main/heroku/heroku_started.png",
                 caption=(
-                    "🪐 <b>Heroku {} started!</b>\n\n <tg-emoji emoji-id=5303382121967001310>💻</tg-emoji> <b>GitHub commit SHA: <a"
-                    ' href="https://github.com/coddrago/Heroku/commit/{}">{}</a></b>\n<tg-emoji emoji-id=5188311512791393083>🔎</tg-emoji>'
-                    " <b>Update status: {}</b>\n<b>{}</b>\n🕶 <b>Prefix:</b> <code>{}</code>"
+                    "{} <b>{} started!</b>\n\n<tg-emoji emoji-id=5231065262228250587>⚙</tg-emoji> <b>GitHub commit SHA: <a"
+                    ' href="https://github.com/coddrago/Heroku/commit/{}">{}</a></b>\n<tg-emoji emoji-id=5873225338984599714>🔎</tg-emoji>'
+                    " <b>Update status: {}</b>\n<b>{}</b>\n<tg-emoji emoji-id=5870903672937911120>🕶</tg-emoji> <b>Prefix:</b> <code>{}</code>"
                 ).format(
+                    utils.get_platform_emoji() if client.heroku_me.premium is True else "🪐 Heroku",
                     ".".join(list(map(str, list(__version__)))),
                     build,
                     build[:7],
@@ -1056,7 +1068,7 @@ class Heroku:
                     web_url,
                     "." if pref is None else pref,
                 ),
-                message_thread_id=logging.getLogger().handlers[0].get_logs_topic_id_by_client(client.tg_id),
+                message_thread_id=await logging.getLogger().handlers[0].get_logs_topic_id_by_client(client.tg_id),
             )
             logging.debug(
                 "· Started for %s · Prefix: «%s» ·",

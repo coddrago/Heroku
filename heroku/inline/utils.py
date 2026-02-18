@@ -35,6 +35,9 @@ from aiogram.types import (
     InputMediaPhoto,
     InputMediaVideo,
 )
+ 
+from aiogram.enums import ButtonStyle
+
 from aiogram.exceptions import (
     TelegramBadRequest,
     TelegramAPIError,
@@ -67,8 +70,26 @@ BOT_ID_PATTERN = (
 )
 BOT_BASE_PATTERN = re.compile(BOT_ID_PATTERN.format(r"\w*_[0-9a-zA-Z]{6}_bot"))
 
+VALID_BUTTON_STYLES = {"danger", "primary", "success"}
+
 
 class Utils(InlineUnit):
+    def _get_button_style(self, button: dict) -> typing.Optional[str]:
+        """Extract and validate button style from button dict"""
+        style = button.get("style")
+        if style and style in VALID_BUTTON_STYLES:
+            return style
+        return None
+    
+    def _get_button_emoji_id(self, button: dict) -> typing.Optional[str]:
+        """Extract button custom emoji ID (for premium emoji support)"""
+
+        emoji_id = button.get("emoji_id")
+
+        if emoji_id:
+            return str(emoji_id).strip()
+        return None
+    
     def _generate_markup(
         self: "InlineManager",
         markup_obj: typing.Optional[typing.Union[HerokuReplyMarkup, str]],
@@ -134,6 +155,14 @@ class Utils(InlineUnit):
             line = []
             for button in row:
                 try:
+                    btn_kwargs = {"text": str(button["text"])}
+
+                    if style := self._get_button_style(button):
+                        btn_kwargs["style"] = style
+                    
+                    if emoji_id := self._get_button_emoji_id(button):
+                        btn_kwargs["icon_custom_emoji_id"] = emoji_id
+
                     match True:
                         case _ if "url" in button:
                             if not utils.check_url(button["url"]):
@@ -142,105 +171,41 @@ class Utils(InlineUnit):
                                     "because its url is invalid"
                                 )
                                 continue
-
-                            line += [
-                                InlineKeyboardButton(
-                                    text=str(button["text"]),
-                                    url=button["url"],
-                                )
-                            ]
+                            btn_kwargs["url"] = button["url"]
 
                         case _ if "callback" in button:
-                            line += [
-                                InlineKeyboardButton(
-                                    text=str(button["text"]),
-                                    callback_data=button["_callback_data"],
-                                )
-                            ]
+                            btn_kwargs["callback_data"] = button["_callback_data"]
+                            
                             if setup_callbacks:
                                 self._custom_map[button["_callback_data"]] = {
                                     "handler": button["callback"],
-                                    **(
-                                        {"always_allow": button["always_allow"]}
-                                        if button.get("always_allow", False)
-                                        else {}
-                                    ),
-                                    **(
-                                        {"args": button["args"]}
-                                        if button.get("args", False)
-                                        else {}
-                                    ),
-                                    **(
-                                        {"kwargs": button["kwargs"]}
-                                        if button.get("kwargs", False)
-                                        else {}
-                                    ),
-                                    **(
-                                        {"force_me": True}
-                                        if button.get("force_me", False)
-                                        else {}
-                                    ),
-                                    **(
-                                        {"disable_security": True}
-                                        if button.get("disable_security", False)
-                                        else {}
-                                    ),
+                                    "always_allow": button.get("always_allow", False),
+                                    "args": button.get("args", {}),
+                                    "kwargs": button.get("kwargs", {}),
+                                    "force_me": button.get("force_me", False),
+                                    "disable_security": button.get("disable_security", False),
                                 }
 
                         case _ if "input" in button:
-                            line += [
-                                InlineKeyboardButton(
-                                    text=str(button["text"]),
-                                    switch_inline_query_current_chat=button["_switch_query"]
-                                    + " ",
-                                )
-                            ]
+                            btn_kwargs["switch_inline_query_current_chat"] = button["_switch_query"] + " "
 
                         case _ if "data" in button:
-                            line += [
-                                InlineKeyboardButton(
-                                    text=str(button["text"]),
-                                    callback_data=button["data"],
-                                )
-                            ]
+                            btn_kwargs["callback_data"] = button["data"]
 
                         case _ if "web_app" in button:
-                            line += [
-                                InlineKeyboardButton(
-                                    text=str(button["text"]),
-                                    web_app=WebAppInfo(button["data"]),
-                                )
-                            ]
+                            if isinstance(button["data"], str):
+                                btn_kwargs["web_app"] = WebAppInfo(url=button["data"])
+                            else:
+                                btn_kwargs["web_app"] = WebAppInfo(**button["data"])
 
                         case _ if "copy" in button:
-                            line += [
-                                InlineKeyboardButton(
-                                    text=str(button["text"]),
-                                    copy_text=CopyTextButton(
-                                        text=button["copy"]
-                                    )
-                                )
-                            ]
+                            btn_kwargs["copy_text"] = CopyTextButton(text=button["copy"])
 
                         case _ if "switch_inline_query_current_chat" in button:
-                            line += [
-                                InlineKeyboardButton(
-                                    text=str(button["text"]),
-                                    switch_inline_query_current_chat=button[
-                                        "switch_inline_query_current_chat"
-                                    ],
-                                )
-                            ]
+                            btn_kwargs["switch_inline_query_current_chat"] = button["switch_inline_query_current_chat"]
 
                         case _ if "switch_inline_query" in button:
-                            line += [
-                                InlineKeyboardButton(
-                                    text=str(button["text"]),
-                                    switch_inline_query_current_chat=button[
-                                        "switch_inline_query"
-                                    ],
-                                )
-                            ]
+                            btn_kwargs["switch_inline_query"] = button["switch_inline_query"]
 
                         case _:
                             logger.warning(
@@ -251,13 +216,20 @@ class Utils(InlineUnit):
                                 ),
                                 button,
                             )
+                            continue
+
+                    line.append(InlineKeyboardButton(**btn_kwargs))
+
                 except KeyError:
                     logger.exception(
                         "Error while forming markup! Probably, you "
                         "passed wrong type combination for button. "
                         "Contact developer of module."
                     )
-                    return False
+                    return None
+                except Exception as e:
+                    logger.exception(f"Unexpected error creating button: {e}")
+                    return None
 
             markup.inline_keyboard.append(line)
 

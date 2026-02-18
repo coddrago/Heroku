@@ -299,6 +299,33 @@ class TerminalMod(loader.Module):
 
     strings = {"name": "Terminal"}
 
+    DANGEROUS_COMMANDS = [
+        r'rm\s+.*\s+\/\s*\*?',
+        r'rm\s+.*\s+\/etc\/',
+        r'rm\s+.*\s+\/dev\/',
+        r'rm\s+.*\s+\/boot\/',
+        r'rm\s+.*\s+\/root\/',
+        r'rm\s+.*\s+\/sys\/',
+        r'rm\s+.*\s+\/proc\/',
+        r'dd\s+.*if=.*of=/dev/',
+        r'mkfs\.',
+        r'fdisk\s+\/dev/',
+        r'\\x72\\x6d\\x20\\x2d\\x72\\x66\\x20\\x2f',
+        r'which\s+rm',
+        r'chmod\s+.*000\s+.*\/',
+        r':\(\)\s*\{\s*:\|:&\s*\}\s*;\s*:',
+        r'cat\s+.*\/dev\/urandom\s+>\s+\/dev\/[hsv]d[a-z]',
+        r'ln\s+.*-s\s+\/\s+\/dev\/null',
+    ]
+
+    def _is_dangerous(self, cmd: str) -> bool:
+        """Return True if the command matches any banned pattern."""
+        for pattern in self.DANGEROUS_COMMANDS:
+            if re.search(pattern, cmd, re.IGNORECASE):
+                return True
+        return False
+
+
     def __init__(self):
         self.config = loader.ModuleConfig(
             loader.ConfigValue(
@@ -314,35 +341,10 @@ class TerminalMod(loader.Module):
     async def terminalcmd(self, message):
         user_command = utils.get_args_raw(message)
 
-        dangerous_commands = [
-            r'rm\s+.*\s+\/\s*\*?',
-            r'rm\s+.*\s+\/etc\/',
-            r'rm\s+.*\s+\/dev\/',
-            r'rm\s+.*\s+\/boot\/',
-            r'rm\s+.*\s+\/root\/',
-            r'rm\s+.*\s+\/sys\/',
-            r'rm\s+.*\s+\/proc\/',
-            r'dd\s+.*if=.*of=/dev/',
-            r'mkfs\.',
-            r'fdisk\s+/dev/',
-            r'\\x72\\x6d\\x20\\x2d\\x72\\x66\\x20\\x2f', 
-            r'which\s+rm',
-            r'chmod\s+.*000\s+.*\/',
-            r':\(\)\s*\{\s*:\|:&\s*\}\s*;\s*:',
-            r'cat\s+.*\/dev\/urandom\s+>\s+\/dev\/[hsv]d[a-z]',
-            r'ln\s+.*-s\s+\/\s+\/dev\/null',
-        ]
-        dangerous = False
-        for pattern in dangerous_commands:
-            if re.search(pattern, user_command, re.IGNORECASE):
-                dangerous = True
-                break
-        if dangerous:
+        if self._is_dangerous(user_command):
             await utils.answer(
                 message,
-                self.strings("dangerous_command").format(
-                    utils.escape_html(user_command)
-                ),
+                self.strings("dangerous_command").format(utils.escape_html(user_command)),
             )
             return
 
@@ -355,6 +357,13 @@ class TerminalMod(loader.Module):
         cmd: str,
         editor: typing.Optional[MessageEditor] = None,
     ):
+
+        if self._is_dangerous(cmd):
+            await utils.answer(
+                message,
+                self.strings("dangerous_command").format(utils.escape_html(cmd)),
+            )
+            return
 
         shell = os.environ.get("SHELL", "/bin/sh")
 

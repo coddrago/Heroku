@@ -18,14 +18,14 @@ import sys
 import tempfile
 import time
 import typing
+from io import StringIO
 from types import ModuleType
 
 import pyrogram
 from pyrogram.errors import MessageIdInvalid
-from pyrogram.sessions import StringSession
+# from pyrogram.sessions import StringSession
 from pyrogram.types import Message
 from meval import meval
-from io import StringIO
 
 from .. import loader, main, utils
 from ..log import HerokuException
@@ -86,9 +86,9 @@ class Evaluator(loader.Module):
                 self.strings("err").format(
                     "4985626654563894116",
                     "python",
-                    utils.escape_html(args),
+                    args,
                     "error",
-                    self.censor(
+                    await self.censor(
                         (
                             "\n".join(item.full_stack.splitlines()[:-1])
                             + "\n\n"
@@ -109,7 +109,7 @@ class Evaluator(loader.Module):
         
         exec_time = time.time() - start_time
 
-        with contextlib.suppress(MessageIdInvalidError):
+        with contextlib.suppress(MessageIdInvalid):
             await utils.answer(
                 message,
                 self.strings("eval_py").format(
@@ -118,12 +118,12 @@ class Evaluator(loader.Module):
                     utils.escape_html(args),
                 ) + (self.strings["eval_result"].format(
                     "python",
-                     utils.escape_html(self.censor(str(result)))
+                     utils.escape_html(await self.censor(str(result)))
                     ) if result or not print_output else ""
                 ) + (self.strings["print_outp"].format(
                     "python",
                     print_output,
-                    utils.escape_html(self.censor(print_output))
+                    utils.escape_html(await self.censor(print_output))
                     ) if print_output else ""
                 ) + (self.strings["time_exec"].format(round(exec_time, 2)))
             )
@@ -134,7 +134,17 @@ class Evaluator(loader.Module):
             subprocess.check_output(
                 ["gcc" if c else "g++", "--version"],
                 stderr=subprocess.STDOUT,
+                timeout=10,
             )
+        except subprocess.TimeoutExpired:
+            await utils.answer(
+                message,
+                self.strings("no_compiler").format(
+                    "4986046904228905931" if c else "4985844035743646190",
+                    "C (gcc)" if c else "C++ (g++)",
+                ),
+            )
+            return
         except Exception:
             await utils.answer(
                 message,
@@ -158,9 +168,13 @@ class Evaluator(loader.Module):
                     ["gcc" if c else "g++", "-o", "code", "code.cpp"],
                     cwd=tmpdir,
                     stderr=subprocess.STDOUT,
+                    timeout=30,
                 ).decode()
             except subprocess.CalledProcessError as e:
                 result = e.output.decode()
+                error = True
+            except subprocess.TimeoutExpired:
+                result = "Compilation timeout"
                 error = True
 
             if not result:
@@ -169,12 +183,16 @@ class Evaluator(loader.Module):
                         ["./code"],
                         cwd=tmpdir,
                         stderr=subprocess.STDOUT,
+                        timeout=10,
                     ).decode()
                 except subprocess.CalledProcessError as e:
                     result = e.output.decode()
                     error = True
+                except subprocess.TimeoutExpired:
+                    result = "Execution timeout"
+                    error = True
 
-        with contextlib.suppress(MessageIdInvalidError):
+        with contextlib.suppress(MessageIdInvalid):
             await utils.answer(
                 message,
                 self.strings("err" if error else "eval").format(
@@ -196,7 +214,17 @@ class Evaluator(loader.Module):
             subprocess.check_output(
                 ["node", "--version"],
                 stderr=subprocess.STDOUT,
+                timeout=10,
             )
+        except subprocess.TimeoutExpired:
+            await utils.answer(
+                message,
+                self.strings("no_compiler").format(
+                    "4985643941807260310",
+                    "Node.js",
+                ),
+            )
+            return
         except Exception:
             await utils.answer(
                 message,
@@ -219,12 +247,16 @@ class Evaluator(loader.Module):
                     ["node", "code.js"],
                     cwd=tmpdir,
                     stderr=subprocess.STDOUT,
+                    timeout=10,
                 ).decode()
             except subprocess.CalledProcessError as e:
                 result = e.output.decode()
                 error = True
+            except subprocess.TimeoutExpired:
+                result = "Execution timeout"
+                error = True
 
-        with contextlib.suppress(MessageIdInvalidError):
+        with contextlib.suppress(MessageIdInvalid):
             await utils.answer(
                 message,
                 self.strings("err" if error else "eval").format(
@@ -237,8 +269,8 @@ class Evaluator(loader.Module):
             )
 
 
-    def censor(self, ret: str) -> str:
-        ret = ret.replace(str(self._client.heroku_me.phone), "&lt;phone&gt;")
+    async def censor(self, ret: str) -> str:
+        ret = ret.replace(str(self._client.heroku_me.phone_number), "&lt;phone&gt;")
 
         if redis := os.environ.get("REDIS_URL") or main.get_config_key("redis_uri"):
             ret = ret.replace(redis, f'redis://{"*" * 26}')
@@ -256,8 +288,8 @@ class Evaluator(loader.Module):
             ret = ret.replace(htoken, f'eugeo_{"*" * 26}')
 
         ret = ret.replace(
-            StringSession.save(self._client.session),
-            "StringSession(**************************)",
+            await self._client.export_session_string(),
+            "**************************",
         )
 
         return ret
@@ -270,7 +302,7 @@ class Evaluator(loader.Module):
             "reply": reply,
             "r": reply,
             "event": message,
-            "chat": message.to_id,
+            "chat": message.chat.id,
             "pyrogram": pyrogram,
             "utils": utils,
             "main": main,

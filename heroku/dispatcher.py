@@ -209,7 +209,7 @@ class CommandDispatcher:
 
         old_edit = message.edit
         old_reply = message.reply
-        old_respond = message.respond
+        old_respond = message.answer
 
         def process_text(text: str) -> str:
             nonlocal grep, ungrep
@@ -261,7 +261,7 @@ class CommandDispatcher:
 
         message.edit = my_edit
         message.reply = my_reply
-        message.respond = my_respond
+        message.answer = my_respond
         message.heroku_grepped = True
 
         return message

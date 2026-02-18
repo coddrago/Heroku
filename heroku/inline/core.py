@@ -19,6 +19,7 @@ import time
 import typing
 
 from aiogram import Bot, Dispatcher
+from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
 from aiogram.exceptions import TelegramConflictError, TelegramUnauthorizedError
 from aiogram.client.default import DefaultBotProperties
@@ -271,7 +272,7 @@ class InlineManager(
         async def result_getter():
             nonlocal unit_id, q
             with contextlib.suppress(Exception):
-                q = await self._client.inline_query(self.bot_username, unit_id)
+                q = await self._client.get_inline_bot_results(self.bot_username, unit_id)
 
         async def event_poller():
             nonlocal exception

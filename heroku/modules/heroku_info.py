@@ -18,6 +18,7 @@ import os
 import glob
 import requests
 import re
+import logging
 import emoji
 import herokutl
 
@@ -33,6 +34,8 @@ from ..utils import get_display_name
 from .. import loader, utils, version
 import platform as lib_platform
 import getpass
+
+logger = logging.getLogger(__name__)
 
 @loader.tds
 class HerokuInfoMod(loader.Module):
@@ -122,12 +125,11 @@ class HerokuInfoMod(loader.Module):
 
     async def _render_info(self, start: float) -> str:
         try:
-            repo = git.Repo(search_parent_directories=True)
-            diff = repo.git.log([f"HEAD..origin/{version.branch}", "--oneline"])
-            if diff:
-                upd = (self.strings("update_required").format(prefix=self.get_prefix()))
-            else:
+            up_to_date = utils.is_up_to_date()
+            if up_to_date:
                 upd = self.strings["up-to-date"]
+            else:
+                upd = self.strings["update_required"].format(prefix=self.get_prefix())
         except Exception:
             upd = ""
 
@@ -188,13 +190,19 @@ class HerokuInfoMod(loader.Module):
             'git_status': utils.get_git_status(),
         }
         data = await utils.get_placeholders(data, self.config["custom_message"])
+        if self.config["custom_message"]:
+            try:
+                placeholders_msg = self.config["custom_message"].format(**data)
+            except KeyError:
+                logger.exception("Missing placeholder in custom_message")
+                placeholders_msg = "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji>"
         return (
             (
                 "🪐 Heroku\n"
                 if self.config["show_heroku"]
                 else ""
             )
-            + self.config["custom_message"].format(**data)
+            + placeholders_msg
             if self.config["custom_message"]
             else self.strings["info_message"].format(
                 (
@@ -221,7 +229,7 @@ class HerokuInfoMod(loader.Module):
         imgform = str(self.config['banner_url']).split('.')[-1]
         imgset = self.config['imgSettings']
         if imgform in ['jpg', 'jpeg', 'png', 'bmp', 'webp']:
-            response = requests.get(self.config['banner_url'] if not self.config['banner_url'].startswith('https://imgur') else self.imgur(self.config['banner_url']), stream=True, headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"})
+            response = requests.get(str(self.config['banner_url']) if not str(self.config['banner_url']).startswith('https://imgur') else self.imgur(str(self.config['banner_url'])), stream=True, headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"})
             img = Image.open(BytesIO(response.content))
             font = ImageFont.truetype(
                 glob.glob(f'{os.getcwd()}/assets/font.*')[0], 

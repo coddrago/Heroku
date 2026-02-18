@@ -277,7 +277,7 @@ class Form(InlineUnit):
         if isinstance(message, Message) and not silent:
             try:
                 status_message = await (
-                    message.edit if message.out else message.respond
+                    message.edit if message.out else message.answer
                 )(
                     (
                         utils.get_platform_emoji()
@@ -344,7 +344,7 @@ class Form(InlineUnit):
         async def answer(msg: str):
             nonlocal message
             if isinstance(message, Message):
-                await (message.edit if message.out else message.respond)(
+                await (message.edit if message.out else message.answer)(
                     msg,
                     **({} if message.out else {"reply_to": utils.get_topic(message)}),
                 )
@@ -355,7 +355,16 @@ class Form(InlineUnit):
             m = await self._invoke_unit(unit_id, message)
         except ChatSendInlineForbidden:
             await answer(self.translator.getkey("inline.inline403"))
-        except Exception:
+        except Exception as e:
+            if "No query results" in str(e):
+                await answer(
+                    self.translator.getkey("inline.no_query_results").format(
+                        prefix=getattr(self._client, "command_prefix", "."),
+                        ),
+                    )
+            if unit_id in self._units:
+                del self._units[unit_id]
+                return False
             logger.exception("Can't send form")
 
             del self._units[unit_id]

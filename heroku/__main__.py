@@ -13,12 +13,15 @@
 # 🔑 https://www.gnu.org/licenses/agpl-3.0.html
 
 import getpass
+import hashlib
 import os
 import subprocess
 import sys
-import hashlib
 
 from ._internal import restart
+
+if "--no-git" in sys.argv:
+    os.environ["HEROKU_NO_GIT"] = "1"
 
 def get_file_hash(filename):
     hasher = hashlib.sha256()
@@ -44,6 +47,8 @@ def deps():
             "requirements.txt",
         ],
         check=True,
+        timeout=600,
+        capture_output=True,
     )
     with open(".requirements_hash", "w") as f:
         f.write(get_file_hash("requirements.txt"))
@@ -111,5 +116,5 @@ else:
         print("\U0001F504 Detected changes in requirements.txt, updating dependencies...")
         deps()
         restart()
-    
+
     main.heroku.main()

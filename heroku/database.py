@@ -12,6 +12,7 @@
 
 import asyncio
 import collections
+import inspect
 import json
 import logging
 import os
@@ -53,10 +54,15 @@ __all__ = [
 ]
 
 logger = logging.getLogger(__name__)
+_DB_PROTECTED_OWNERS = {"HerokuPluginSecurity"}
+_DB_ALLOWED_WRITERS = {f"{__package__}.modules.heroku_plugin_security"}
 
 
 class NoAssetsChannel(Exception):
     """Raised when trying to read/store asset with no asset channel present"""
+
+class NoContentChannel(Exception):
+    """Raised when trying to read/store asset with no content channel present"""
 
 
 class Database(dict):
@@ -65,7 +71,6 @@ class Database(dict):
         self._client: CustomClient = client
         self._next_revision_call: int = 0
         self._revisions: typing.List[dict] = []
-        self._assets_topic: typing.Optional[ForumTopic] = None
         self._me: User = None
         self._redis: redis.Redis = None
         self._saving_task: asyncio.Future = None
@@ -119,42 +124,41 @@ class Database(dict):
         self._db_file = main.BASE_PATH / f"config-{self._client.tg_id}.json"
         self.read()
 
-        async def _create_topic():
-            nonlocal self
-            try:
-                self._content_channel_id = await utils.wait_for_content_channel(self)
+        try:
+            self._content_channel_id = self.get("heroku.forums", "channel_id", None)
 
-                self._assets_topic = await utils.asset_forum_topic(
-                    client=self._client,
-                    db=self,
-                    peer=self._content_channel_id,
-                    title="Assets",
-                    description="🌆 Your Heroku assets will be stored here",
-                    icon_emoji_id=5877307202888273539,
-                )
+            if not self._content_channel_id:
+                raise KeyError("Heroku content channel not found in database")
 
-            except Exception:
-                self._assets_topic = None
-                logger.exception(
-                    "Can't find and/or create assets topic\n"
-                    "This may cause several consequences, such as:\n"
-                    "- Non working assets feature (e.g. notes)\n"
-                    "- This error will occur every restart\n\n"
-                    "You can solve this by leaving some channels/groups"
-                )
-        
-        asyncio.create_task(_create_topic())
+            self._assets_topic = await utils.asset_forum_topic(
+                client=self._client,
+                db=self,
+                peer=self._content_channel_id,
+                title="Assets",
+                description="🌆 Your Heroku assets will be stored here",
+                icon_emoji_id=5877307202888273539,
+            )
+
+        except Exception:
+            self._assets_topic = None
+            logger.exception(
+                "Can't find and/or create assets topic\n"
+                "This may cause several consequences, such as:\n"
+                "- Non working assets feature (e.g. notes)\n"
+                "- This error will occur every restart\n\n"
+                "You can solve this by leaving some channels/groups"
+            )
 
     def read(self):
         """Read database and stores it in self"""
         if self._redis:
             try:
-                self.update(
-                    **json.loads(
+                self._update_from_read(
+                    json.loads(
                         self._redis.get(
                             str(self._client.tg_id),
                         ).decode(),
-                    )
+                    ),
                 )
             except Exception:
                 logger.exception("Error reading redis database")
@@ -168,11 +172,15 @@ class Database(dict):
             if re.search(r'"(legacy\.)(\S+\":)', db):
                 logging.warning("Converting db after update")
                 db = re.sub(r'(legacy\.)(\S+\":)', lambda m: 'heroku.' + m.group(2), db)
-            self.update(**json.loads(db))
+            self._update_from_read(json.loads(db))
         except json.decoder.JSONDecodeError:
             logger.warning("Database read failed! Creating new one...")
         except FileNotFoundError:
             logger.debug("Database file not found, creating new one...")
+
+    def _update_from_read(self, items: dict) -> None:
+        """Update DB from persisted storage without write-protection checks."""
+        super().update(items)
 
     def process_db_autofix(self, db: dict) -> bool:
         if not utils.is_serializable(db):
@@ -258,32 +266,42 @@ class Database(dict):
         Save assets
         returns asset_id as integer
         """
-        if not self._assets_topic:
-            raise NoAssetsChannel("Tried to save asset to non-existing asset topic")
+
+        try:
+            _assets_topic_id = self.get("heroku.forums", "forums_cache", {})["heroku-userbot"]["Assets"]
+        except (TypeError, KeyError):
+            raise NoAssetsChannel("Tried to save asset to non-existing asset topic.")
+
+        if not (_content_channel_id := self.get("heroku.forums", "channel_id", None)):
+            raise NoContentChannel("Tried to save asset with non-existing content channel.")
 
         return (
-            (await self._client.send_message(self._content_channel_id, message, reply_to=self._assets_topic.id)).id
+            (await self._client.send_message(_content_channel_id, message, reply_to=_assets_topic_id)).id
             if isinstance(message, Message)
             else (
                 await self._client.send_message(
-                    self._content_channel_id,
+                    _content_channel_id,
                     file=message,
                     force_document=True,
-                    message_thread_id=self._assets_topic.id
+                    message_thread_id=_assets_topic_id
                 )
             ).id
         )
 
     async def fetch_asset(self, asset_id: int) -> typing.Optional[Message]:
         """Fetch previously saved asset by its asset_id"""
-        if not self._assets_topic:
-            raise NoAssetsChannel(
-                "Tried to fetch asset from non-existing asset topic"
-            )
 
-        asset = await self._client.get_messages(self._content_channel_id, ids=[asset_id])
+        if not (_content_channel_id := self.get("heroku.forums", "channel_id", None)):
+            raise NoContentChannel("Tried to save asset with non-existing content channel.")
 
-        return asset[0] if asset else None
+        try:
+            _assets_topic_id = self.get("heroku.forums", "forums_cache", {})["heroku-userbot"]["Assets"]
+        except (TypeError, KeyError):
+            raise NoAssetsChannel("Tried to save asset to non-existing asset topic.")
+
+        asset = await self._client.get_messages(_content_channel_id, message_ids=asset_id)
+
+        return asset or None
 
     def get(
         self,
@@ -299,6 +317,11 @@ class Database(dict):
 
     def set(self, owner: str, key: str, value: JSONSerializable) -> bool:
         """Set database key"""
+        if owner in _DB_PROTECTED_OWNERS:
+            caller = self._get_write_caller()
+            if caller not in _DB_ALLOWED_WRITERS:
+                self._reject_write(owner, key, caller)
+
         if not utils.is_serializable(owner):
             raise RuntimeError(
                 "Attempted to write object to "
@@ -322,6 +345,56 @@ class Database(dict):
 
         super().setdefault(owner, {})[key] = value
         return self.save()
+
+    def __setitem__(self, owner: str, value: JSONSerializable) -> None:
+        if owner in _DB_PROTECTED_OWNERS:
+            caller = self._get_write_caller()
+            if caller not in _DB_ALLOWED_WRITERS:
+                self._reject_write(owner, "<dict>", caller)
+
+        if not utils.is_serializable(owner):
+            raise RuntimeError(
+                "Attempted to write object to "
+                f"{owner=} ({type(owner)=}) of database. It is not "
+                "JSON-serializable key which will cause errors"
+            )
+
+        if not utils.is_serializable(value):
+            raise RuntimeError(
+                "Attempted to write object of "
+                f"{owner=} ({type(value)=}) to database. It is not "
+                "JSON-serializable value which will cause errors"
+            )
+
+        super().__setitem__(owner, value)
+
+    def update(self, *args, **kwargs) -> None:
+        items = dict(*args, **kwargs)
+        for owner in items.keys():
+            if owner in _DB_PROTECTED_OWNERS:
+                caller = self._get_write_caller()
+                if caller not in _DB_ALLOWED_WRITERS:
+                    self._reject_write(owner, "<dict>", caller)
+        return super().update(items)
+
+    @staticmethod
+    def _get_write_caller() -> typing.Optional[str]:
+        for frame_info in inspect.stack():
+            mod = frame_info.frame.f_globals.get("__name__", None)
+            if not mod or mod == __name__ or mod == f"{__package__}.pointers":
+                continue
+            return mod
+        return None
+
+    @staticmethod
+    def _reject_write(owner: str, key: str, caller: typing.Optional[str]):
+        logger.warning(
+            "Blocked db write to protected owner=%s key=%s from %s",
+            owner,
+            key,
+            caller or "<unknown>",
+        )
+        raise PermissionError("Database write to protected owner is restricted")
 
     def pointer(
         self,

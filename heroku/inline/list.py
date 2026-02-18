@@ -192,7 +192,7 @@ class List(InlineUnit):
         if isinstance(message, Message) and not silent:
             try:
                 status_message = await (
-                    message.edit if message.out else message.respond
+                    message.edit if message.out else message.answer
                 )(
                     (
                         utils.get_platform_emoji()
@@ -210,7 +210,7 @@ class List(InlineUnit):
         async def answer(msg: str):
             nonlocal message
             if isinstance(message, Message):
-                await (message.edit if message.out else message.respond)(
+                await (message.edit if message.out else message.answer)(
                     msg,
                     **({} if message.out else {"reply_to": utils.get_topic(message)}),
                 )

@@ -11,10 +11,10 @@
 # 🔑 https://www.gnu.org/licenses/agpl-3.0.html
 
 import getpass
-import platform as lib_platform
 import inspect
 import logging
 import os
+import platform as lib_platform
 import random
 import time
 import typing
@@ -369,9 +369,14 @@ class TestMod(loader.Module):
             "platform": utils.get_platform_name(),
         }
         data = await utils.get_placeholders(data, self.config["custom_message"])
+        try:
+            placeholders_msg = self.config["custom_message"].format(**data)
+        except KeyError:
+            logger.exception("Missing placeholder in custom_message")
+            placeholders_msg = "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji>"
         await utils.answer(
             message,
-            self.config["custom_message"].format(**data),
+            placeholders_msg,
             file = banner,
             invert_media = self.config["invert_media"]
         )
@@ -379,18 +384,7 @@ class TestMod(loader.Module):
 
     async def client_ready(self):
         self._content_channel_id = await utils.wait_for_content_channel(self._db)
-
-        self._logs_topic = await utils.asset_forum_topic(
-            client=self._client,
-            db=self._db,
-            peer=self._content_channel_id,
-            title="Logs",
-            description="🪐 Your Heroku logs will appear in this topic",
-            icon_emoji_id=5256230583717079814,
-        )
-
         self.logchat = int(f"-100{self._content_channel_id}")
-
         logging.getLogger().handlers[0].install_tg_log(self)
         logger.debug("Bot logging installed for %s", self.logchat)
 

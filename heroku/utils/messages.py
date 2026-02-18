@@ -136,7 +136,6 @@ def smart_split(
     """
 
     # Authored by @bsolute
-    # https://t.me/LonamiWebs/27777
 
     encoded = text.encode("utf-16le")
     pending_entities = entities
@@ -383,7 +382,7 @@ async def answer(
 
                 return result
 
-        result = await (message.edit if edit else message.respond)(
+        result = await (message.edit if edit else message.answer)(
             text,
             parse_mode=lambda t: (t, entities),
             **kwargs,
@@ -399,7 +398,7 @@ async def answer(
                 link_preview=isinstance(response.media, MessageMediaWebPage),
             )
         else:
-            result = await message.respond(response, **kwargs)
+            result = await message.answer(response, **kwargs)
     else:
         if isinstance(response, bytes):
             response = io.BytesIO(response)
