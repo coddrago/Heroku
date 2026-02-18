@@ -96,6 +96,10 @@
 - add aliases export/import
 - add folders
 - restrict inline queries for not allowed users
+- add new styles button in some cases
+- add some "icons" in buttons
+- remove utils.html_escape from eval
+- 
 
 ## 🪐 Heroku 1.7.2
 - added autoupdate

@@ -12,8 +12,8 @@
 
 import asyncio
 import functools
-import logging
 import io
+import logging
 from math import ceil
 
 import orjson
