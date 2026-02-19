@@ -70,6 +70,10 @@ BOT_ID_PATTERN = (
     r"<div class=\"tm-row-description\">@{}</div> </div></a>"
 )
 BOT_BASE_PATTERN = re.compile(BOT_ID_PATTERN.format(r"\w*_[0-9a-zA-Z]{6}_bot"))
+BOT_COMMANDS_PATTERN = re.compile(
+    r'<li[^>]*\bdata-command=["\']([^"\']+)["\'][^>]*>.*?'
+    r'<span[^>]*class=["\']tm-row-desc[^"\']*["\'][^>]*>\s*([^<]+?)\s*</span>'
+)
 
 VALID_BUTTON_STYLES = {"danger", "primary", "success"}
 
@@ -826,7 +830,8 @@ class Utils(InlineUnit):
         revoke_token: bool = False,
         create_new_if_needed: bool = True,
         already_initialised: bool = True,
-        username: str = ""
+        username: str = "",
+        commands: dict[str, str] = dict(),
     ) -> bool | None:
         url: str = (
             await self._client(RequestWebViewRequest(
@@ -878,6 +883,13 @@ class Utils(InlineUnit):
                         main_url,
                         _hash,
                         username=username,
+                    )
+                case 6:
+                    return await self._set_commands(
+                        session,
+                        main_url,
+                        _hash,
+                        commands=commands
                     )
         finally:
             await session.close()

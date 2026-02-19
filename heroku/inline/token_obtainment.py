@@ -204,6 +204,31 @@ class TokenObtainment(InlineUnit):
                     if resp.status != 200:
                         logger.error("Error while changing bot inline settings: resp%s", resp.status)
                         return False
+            
+            commands = {
+                "start": "Welcome message",
+                "profile": "Get main information about bot",
+            }
+            def get_cmds(x) -> dict[str, str]:
+                return dict(inutils.BOT_COMMANDS_PATTERN.findall(x))
+            
+            async with session.get(url + f"/bot/{bot_id}/commands", headers=hdrs) as resp:
+                if resp.status != 200:
+                    logger.warning("Unable to get bot commands list")
+                
+                else:
+                    _cmds = get_cmds(
+                        (await resp.json())["h"]
+                    )
+                    has_commands = False
+
+                    for cmd in _cmds:
+                        if cmd in commands:
+                            has_commands = True
+                            break
+
+                    if not has_commands:
+                        await self._set_commands(session, url, _hash, commands)
 
             return True
 
@@ -266,6 +291,35 @@ class TokenObtainment(InlineUnit):
             result = content.get("ok", False)
         return result
 
+    async def _set_commands(
+        self: "InlineManager",
+        session: aiohttp.ClientSession,
+        url: str,
+        _hash: str,
+        commands: dict[str, str]
+    ):
+        bid = self.bot_id
+        if not bid:
+            raise RuntimeError("Bot is not initialized")
+
+        for command, desc in commands.items():
+            data = {
+                "bid": bid,
+                "lang_code": "",
+                "scopes[]": ["users", "chats", "chatadmins"],
+                "command": command,
+                "description": desc,
+                "replace": "",
+                "method": "setCommand"
+            }
+
+            async with session.get(url + f"/api?hash={_hash}", data=data, headers=inutils.headers) as resp:
+                if resp.status != 200:
+                    logger.error("Error while setting command: resp%s: %s", resp.status, await resp.json())
+                    continue
+
+            await asyncio.sleep(random.randint(1, 3))
+
     async def assert_token(
         self: "InlineManager",
         create_new_if_needed: bool = True,
@@ -288,3 +342,11 @@ class TokenObtainment(InlineUnit):
     
     async def check_bot(self: "InlineManager", username: str):
         return await self._main_token_manager(5, username=username)
+    
+    async def set_commands(self: "InlineManager", commands: dict[str, str]):
+        """
+        Sets bot's commands in the menu
+        
+        :param commands: dict of commands and their descriptions
+        """
+        return await self._main_token_manager(6, commands=commands)
