@@ -274,7 +274,7 @@ class CustomTelegramClient(TelegramClient):
         else:
             hashable_entity = entity
 
-        if str(hashable_entity).isdigit() and int(hashable_entity) < 0:
+        if str(hashable_entity).startswith("-100"):
             hashable_entity = int(str(hashable_entity)[4:])
 
         if (
