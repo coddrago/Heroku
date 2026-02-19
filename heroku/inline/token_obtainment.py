@@ -313,7 +313,7 @@ class TokenObtainment(InlineUnit):
                 "method": "setCommand"
             }
 
-            async with session.get(url + f"/api?hash={_hash}", data=data, headers=inutils.headers) as resp:
+            async with session.post(url + f"/api?hash={_hash}", data=data, headers=inutils.headers) as resp:
                 if resp.status != 200:
                     logger.error("Error while setting command: resp%s: %s", resp.status, await resp.json())
                     continue
