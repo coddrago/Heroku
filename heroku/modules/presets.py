@@ -17,6 +17,7 @@ import io
 from math import ceil
 
 import orjson
+from pyrogram.types import ReplyParameters
 
 from .. import loader, utils
 from ..inline.types import BotInlineMessage, InlineCall
@@ -423,7 +424,7 @@ class Presets(loader.Module):
             message,
             self.strings("folder").format(folder_name, prefix=self.get_prefix()),
             file=file,
-            reply_to=getattr(message, "reply_to_msg_id", None),
+            reply_parameters=ReplyParameters(message_id=getattr(message, "reply_to_msg_id", None)),
         )
     @loader.command(alias="la")
     async def loadaliases(self, message: Message):
@@ -468,7 +469,7 @@ class Presets(loader.Module):
             await utils.answer(
                 message,
                 self.lookup("settings").strings("aliases_list").format("\n".join(f"{alias}" for alias, cmd in self.allmodules.aliases.items())),
-                reply_to=getattr(message, "reply_to_msg_id", None),
+                reply_parameters=ReplyParameters(message_id=getattr(message, "reply_to_msg_id", None)),
             )
     @loader.command(alias="al")
     async def aliasload(self, message: Message):
@@ -483,6 +484,6 @@ class Presets(loader.Module):
             message,
             self.lookup("settings").strings("aliases_file").format(prefix=self.get_prefix()),
             file=file,
-            reply_to=getattr(message, "reply_to_msg_id", None),
+            reply_parameters=ReplyParameters(message_id=getattr(message, "reply_to_msg_id", None)),
         )
         

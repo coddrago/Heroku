@@ -19,7 +19,8 @@ import pyrogram
 import requests
 from aiogram.types import Message as AiogramMessage
 from pyrogram import types
-from pyrogram.types import Message
+from pyrogram.enums import ChatType
+from pyrogram.types import Message, Chat
 from pyrogram.raw.functions.channels import (
     CreateChannel,
     EditPhoto,
@@ -137,7 +138,7 @@ def get_lang_flag(countrycode: str) -> str:
 
 
 def get_entity_url(
-    entity: typing.Union[User, Channel],
+    entity: Chat,
     openmessage: bool = False,
 ) -> str:
     """
@@ -152,7 +153,7 @@ def get_entity_url(
             if openmessage
             else f"tg://user?id={entity.id}"
         )
-        if isinstance(entity, User)
+        if entity.type in (ChatType.BOT, ChatType.PRIVATE)
         else (
             f"tg://resolve?domain={entity.username}"
             if getattr(entity, "username", None)
@@ -203,7 +204,7 @@ def check_url(url: str) -> bool:
     except Exception:
         return False
 
-def get_link(user: typing.Union[User, Channel], /) -> str:
+def get_link(user: Chat, /) -> str:
     """
     Get telegram permalink to entity
     :param user: User or channel
@@ -211,7 +212,7 @@ def get_link(user: typing.Union[User, Channel], /) -> str:
     """
     return (
         f"tg://user?id={user.id}"
-        if isinstance(user, User)
+        if user.type in (ChatType.BOT, ChatType.PRIVATE)
         else (
             f"tg://resolve?domain={user.username}"
             if getattr(user, "username", None)
@@ -268,33 +269,27 @@ async def asset_channel(
     if title.startswith("legacy-"):
         title = title.replace("legacy-", "heroku-")
 
-    async for d in client.iter_dialogs():
-        if d.title == title:
-            client._channels_cache[title] = {"peer": d.entity, "exp": int(time.time())}
+    async for d in client.get_dialogs():
+        if d.chat.title == title:
+            client._channels_cache[title] = {"peer": d.chat, "exp": int(time.time())}
             if invite_bot:
                 if all(
                     participant.id != client.loader.inline.bot_id
                     for participant in await client.get_participants(
-                        d.entity, limit=100
+                        d.chat.id, limit=100
                     )
                 ):
                     await fw_protect()
-                    await invite_inline_bot(client, d.entity)
+                    await invite_inline_bot(client, d.chat)
 
-            return d.entity, False
+            return d.chat, False
 
     await fw_protect()
 
-    peer = (
-        await client.invoke(
-            CreateChannel(
-                title,
-                description,
-                megagroup=not channel,
-                forum=forum,
-            )
-        )
-    ).chats[0]
+    if channel:
+        peer = await client.create_channel(title, description)
+    else:
+        peer = await client.create_supergroup(title, description, is_forum=forum)
 
     if invite_bot:
         await fw_protect()
@@ -367,7 +362,7 @@ async def asset_forum_topic(
 ) -> ForumTopic:
     entity = await client.get_entity(peer)
 
-    if not isinstance(entity, Channel):
+    if not isinstance(entity, Chat) or entity.type in (ChatType.BOT, ChatType.PRIVATE):
         raise TypeError(f"Expected entity to be 'Channel', but got '{type(entity).__name__}'")
 
     async def create_topic() -> ForumTopic:
@@ -539,7 +534,7 @@ async def get_target(message: Message, arg_no: int = 0) -> typing.Optional[int]:
         return None
 
     try:
-        entity = await message.client.get_entity(user)
+        entity = await message._client.get_entity(user)
     except ValueError:
         return None
     else:
@@ -558,11 +553,11 @@ async def get_user(message: Message) -> typing.Optional[User]:
         logger.debug("User not in session cache. Searching...")
 
     if isinstance(message.peer_id, PeerUser):
-        await message.client.get_dialogs()
+        await message._client.get_dialogs()
         return await message.get_sender()
 
     if isinstance(message.peer_id, (PeerChannel, PeerChat)):
-        async for user in message.client.iter_participants(
+        async for user in message._client.iter_participants(
             message.peer_id,
             aggressive=True,
         ):

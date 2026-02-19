@@ -25,7 +25,7 @@ class Quickstart(loader.Module):
 
     strings = {"name": "Quickstart"}
 
-    async def client_ready(self, client, db):
+    async def client_ready(self):
         await self.request_join(
             "heroku_talks", 
             "Heroku help is only available in this chat. By agreeing to join the chat, you agree to the Heroku federation rules and if you violate them, you will be permanently banned."
@@ -61,27 +61,27 @@ class Quickstart(loader.Module):
         
         try:
             content_channel = None
-            existing_channel_id = db.get("heroku.forums", "channel_id", None)
+            existing_channel_id = self.db.get("heroku.forums", "channel_id", None)
             
             if existing_channel_id:
                 try:
-                    content_channel = await client.get_entity(existing_channel_id)
+                    content_channel = await self.client.get_entity(existing_channel_id)
                     logger.debug(f"Found existing content channel with ID {existing_channel_id}")
                 except Exception as e:
                     logger.warning(f"Saved channel ID {existing_channel_id} not found or inaccessible: {e}")
                     content_channel = None
             
             if not content_channel:
-                async for dialog in client.iter_dialogs():
-                    if dialog.title and 'heroku-userbot' in dialog.title.lower():
-                        content_channel = dialog.entity
-                        logger.debug(f"Found existing channel '{dialog.title}' with ID {dialog.entity.id}")
-                        db.set("heroku.forums", "channel_id", int(dialog.entity.id))
+                async for dialog in self.client.get_dialogs():
+                    if dialog.chat.title and 'heroku-userbot' in dialog.chat.title.lower():
+                        content_channel = dialog.chat
+                        logger.debug(f"Found existing channel '{dialog.chat.title}' with ID {dialog.chat.id}")
+                        self.db.set("heroku.forums", "channel_id", int(str(dialog.chat.id).replace("-100", "")))
                         break
 
             if not content_channel:
                 content_channel, _ = await utils.asset_channel(
-                    client=client,
+                    client=self.client,
                     title='heroku-userbot',
                     description='🪐 Content related to Heroku will be here',
                     silent=True,
@@ -92,7 +92,7 @@ class Quickstart(loader.Module):
                     _folder='heroku',
                 )
                 logger.info(f"Created new content channel with ID {content_channel.id}")
-                db.set("heroku.forums", "channel_id", int(content_channel.id))
+                self.db.set("heroku.forums", "channel_id", int(content_channel.id))
             
             if not content_channel:
                 raise RuntimeError("Failed to get or create content channel!")
@@ -107,7 +107,7 @@ class Quickstart(loader.Module):
                 try:
                     await utils.asset_forum_topic(
                         client=self._client,
-                        db=db,
+                        db=self.db,
                         peer=content_channel.id,
                         title=topic_title,
                         description=topic_desc,

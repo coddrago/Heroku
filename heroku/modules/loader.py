@@ -35,8 +35,9 @@ from urllib.parse import urlparse
 import requests
 # from pyrogram.errors.common import ScamDetectionError
 from pyrogram.errors import MediaCaptionTooLong
+from pyrogram.types import Message, ReplyParameters
 from pyrogram.raw.functions.channels import JoinChannel
-from pyrogram.raw.types import Channel, Message
+from pyrogram.raw.types import Channel
 
 from .. import loader, main, utils
 from .._local_storage import RemoteStorage
@@ -1504,7 +1505,7 @@ class LoaderMod(loader.Module):
             message,
             text,
             file=file,
-            reply_to=getattr(message, "reply_to_msg_id", None),
+            reply_parameters=ReplyParameters(message_id=getattr(message, "reply_to_msg_id", None)),
         )
 
     def _format_result(

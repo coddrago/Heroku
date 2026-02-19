@@ -33,6 +33,7 @@ from importlib.abc import SourceLoader
 import requests
 from pyrogram import raw
 from pyrogram.client import Client
+from pyrogram.enums import ChatType
 from pyrogram.storage.sqlite_storage import (
     SQLiteStorage,
     TEST,
@@ -714,7 +715,7 @@ class Module:
 
     async def request_join(
         self,
-        peer: 'EntityLike',
+        peer: int | str,
         reason: str,
         assure_joined: typing.Optional[bool] = False,
     ) -> bool:
@@ -735,32 +736,31 @@ class Module:
 
         channel = await self.client.get_entity(peer)
 
-        match channel:
-            case ChannelForbidden():
-                if assure_joined:
-                    raise LoadError(
-                        f"You need to join {channel.title} (@{peer}) in order to use this module, "
-                        "but you have been banned there"
-                    )
-                return False
+        if channel.is_banned:
+            if assure_joined:
+                raise LoadError(
+                    f"You need to join {channel.title} (@{peer}) in order to use this module, "
+                    "but you have been banned there"
+                )
+            return False
 
-            case _ if channel.id in self._db.get("heroku.main", "declined_joins", []):
-                if assure_joined:
-                    raise LoadError(
-                        f"You need to join @{channel.username} in order to use this module"
-                    )
-                return False
+        elif channel.id in self._db.get("heroku.main", "declined_joins", []):
+            if assure_joined:
+                raise LoadError(
+                    f"You need to join @{channel.username} in order to use this module"
+                )
+            return False
 
-            case Channel():
-                pass
+        elif channel.type not in (ChatType.BOT, ChatType.DIRECT, ChatType.PRIVATE):
+            pass
 
-            case _:
-                raise TypeError("`peer` field must be a channel")
+        else:
+            raise TypeError("`peer` field must be a channel")
 
-        if getattr(channel, "left", True):
+        if getattr(channel.raw, "left", True):
             channel = await self.client.force_get_entity(peer)
 
-        if not getattr(channel, "left", True):
+        if not getattr(channel.raw, "left", True):
             return True
 
         event = asyncio.Event()

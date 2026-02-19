@@ -28,8 +28,8 @@ from pathlib import Path
 from PIL import Image, ImageDraw, ImageFont
 from io import BytesIO
 from pyrogram.errors import WebpageMediaEmpty
+from pyrogram.types import Message, ReplyParameters
 from pyrogram.raw.types import InputMediaWebPage
-from pyrogram.types import Message
 from ..utils import get_display_name
 from .. import loader, utils, version
 import platform as lib_platform
@@ -207,7 +207,7 @@ class HerokuInfoMod(loader.Module):
             else self.strings["info_message"].format(
                 (
                     utils.get_platform_emoji()
-                    if self._client.heroku_me.premium and self.config["show_heroku"]
+                    if self._client.heroku_me.is_premium and self.config["show_heroku"]
                     else ""
                 ),
                 me = me,
@@ -325,14 +325,14 @@ class HerokuInfoMod(loader.Module):
                     message,
                     "",
                     file = self._get_info_photo(start),
-                    reply_to=getattr(message, "reply_to_msg_id", None),
+                    reply_parameters=ReplyParameters(message_id=getattr(message, "reply_to_msg_id", None)),
                 )
             elif self.config["custom_message"] is None:
                 await utils.answer(
                     message,
                     await self._render_info(start),
                     file = media,
-                    reply_to=getattr(message, "reply_to_msg_id", None),
+                    reply_parameters=ReplyParameters(message_id=getattr(message, "reply_to_msg_id", None)),
                     invert_media = self.config["invert_media"],
                 )
             else:
@@ -342,7 +342,7 @@ class HerokuInfoMod(loader.Module):
                     message,
                     await self._render_info(start),
                     file = media,
-                    reply_to=getattr(message, "reply_to_msg_id", None),
+                    reply_parameters=ReplyParameters(message_id=getattr(message, "reply_to_msg_id", None)),
                     invert_media = self.config["invert_media"],
                 )
         except WebpageMediaEmpty:
@@ -351,7 +351,7 @@ class HerokuInfoMod(loader.Module):
                 self.strings["no_banner"].format(
                     link = self.config["banner_url"], 
                 ),
-                reply_to=getattr(message, "reply_to_msg_id", None),
+                reply_parameters=ReplyParameters(message_id=getattr(message, "reply_to_msg_id", None)),
             )
 
     @loader.command()

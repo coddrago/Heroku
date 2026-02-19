@@ -34,9 +34,8 @@ from getpass import getpass
 from pathlib import Path
 
 import aiohttp
-import pyrogram
 from herokutl import events
-from pyrogram import Client, filters, handlers
+from pyrogram import filters, handlers, idle
 from pyrogram.qrlogin import QRLogin
 from pyrogram.errors import (
     ApiIdInvalid,
@@ -45,14 +44,9 @@ from pyrogram.errors import (
     FloodWait,
     PhoneNumberInvalid,
     SessionPasswordNeeded,
-    YouBlockedUser,
 )
-from herokutl.sessions import MemorySession, SQLiteSession
 from pyrogram.enums import ParseMode
-from pyrogram.methods.utilities import idle
 from pyrogram.raw.functions.account import GetPassword
-from pyrogram.raw.functions.auth import CheckPassword
-from pyrogram.raw.functions.contacts import Unblock
 
 from . import database, loader, utils, version
 from ._internal import print_banner, restart
@@ -1060,7 +1054,7 @@ class Heroku:
                     ' href="https://github.com/coddrago/Heroku/commit/{}">{}</a></b>\n<tg-emoji emoji-id=5873225338984599714>🔎</tg-emoji>'
                     " <b>Update status: {}</b>\n<b>{}</b>\n<tg-emoji emoji-id=5870903672937911120>🕶</tg-emoji> <b>Prefix:</b> <code>{}</code>"
                 ).format(
-                    utils.get_platform_emoji() if client.heroku_me.premium is True else "🪐 Heroku",
+                    utils.get_platform_emoji() if client.heroku_me.is_premium is True else "🪐 Heroku",
                     ".".join(list(map(str, list(__version__)))),
                     build,
                     build[:7],
@@ -1115,7 +1109,7 @@ class Heroku:
 
     async def amain(self, first: bool, client: CustomClient):
         """Entrypoint for async init, run once for each user"""
-        client.parse_mode = ParseMode.HTML
+        client.set_parse_mode(ParseMode.HTML)
         if not client.is_connected:
             await client.start()
 
@@ -1149,7 +1143,7 @@ class Heroku:
         if first:
             await self._badge(client)
 
-        await idle.idle()
+        await idle()
 
     async def _main(self):
         """Main entrypoint"""

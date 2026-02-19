@@ -582,7 +582,7 @@ class SecurityManager:
                 ):
                     participant = self._cache[cache_obj]["user"]
                 else:
-                    participant = await message.client.get_permissions(
+                    participant = await message._client.get_permissions(
                         message.peer_id,
                         user_id,
                     )

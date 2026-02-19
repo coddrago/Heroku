@@ -20,8 +20,8 @@ import time
 import typing
 from io import BytesIO
 
-from pyrogram.types import Message
-from pyrogram.types import InputMediaWebPage
+from pyrogram.types import Message, ReplyParameters
+from pyrogram.raw.types import InputMediaWebPage
 
 from .. import loader, main, utils
 from ..inline.types import InlineCall
@@ -263,7 +263,7 @@ class TestMod(loader.Module):
             and not force
             and (
                 not isinstance(message, Message)
-                or "force_insecure" not in message.raw_text.lower()
+                or "force_insecure" not in message.text.lower()
             )
         ):
             try:
@@ -326,11 +326,11 @@ class TestMod(loader.Module):
                 caption=self.strings("logs_caption").format(named_lvl, *other),
             )
         else:
-            await self._client.send_file(
+            await self._client.send_document(
                 message.form["chat"],
                 logs,
                 caption=self.strings("logs_caption").format(named_lvl, *other),
-                reply_to=message.form["top_msg_id"],
+                reply_parameters=ReplyParameters(message_id=message.form["top_msg_id"]),
             )
 
     @loader.command()

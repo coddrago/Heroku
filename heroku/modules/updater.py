@@ -25,11 +25,12 @@ import aiohttp
 import git
 from git import GitCommandError, Repo
 from pyrogram.extensions.html import CUSTOM_EMOJIS
+from pyrogram.types import Message
 from pyrogram.raw.functions.messages import (
     GetDialogFilters,
     UpdateDialogFilter,
 )
-from pyrogram.raw.types import DialogFilter, TextWithEntities, Message
+from pyrogram.raw.types import DialogFilter, TextWithEntities
 
 from .. import loader, main, utils, version
 from .._internal import restart
@@ -255,7 +256,7 @@ class UpdaterMod(loader.Module):
         """Shows the changelog of the last major update"""
         with open('CHANGELOG.md', mode='r', encoding='utf-8') as f:
             changelog = f.read().split('##')[1].strip()
-        if (await self._client.get_me()).premium:
+        if (await self._client.get_me()).is_premium:
             changelog.replace('🌑 Heroku', '<tg-emoji emoji-id=5192765204898783881>🌘</tg-emoji><tg-emoji emoji-id=5195311729663286630>🌘</tg-emoji><tg-emoji emoji-id=5195045669324201904>🌘</tg-emoji>')
 
         await utils.answer(message, self.strings('changelog').format(changelog))
@@ -324,7 +325,7 @@ class UpdaterMod(loader.Module):
             msg_obj,
             self.strings("restarting_caption").format(
                 utils.get_platform_emoji()
-                if self._client.heroku_me.premium
+                if self._client.heroku_me.is_premium
                 else "Heroku"
             ),
         )
@@ -344,14 +345,14 @@ class UpdaterMod(loader.Module):
         for client in self.allclients:
             # Terminate main loop of all running clients
             # Won't work if not all clients are ready
-            if client is not message.client:
+            if client is not message._client:
                 await client.disconnect()
 
         if "LAVHOST" in os.environ:
             await self.client.send_message("lavhostbot", "🔄 Restart")
             return
 
-        await message.client.disconnect()
+        await message._client.disconnect()
         restart()
 
     async def download_common(self):
@@ -466,7 +467,7 @@ class UpdaterMod(loader.Module):
                     msg_obj,
                     self.strings("restarting_caption").format(
                         utils.get_platform_emoji()
-                        if self._client.heroku_me.premium
+                        if self._client.heroku_me.is_premium
                         else "Heroku"
                     ),
                 )

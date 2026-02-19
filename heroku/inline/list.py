@@ -196,7 +196,7 @@ class List(InlineUnit):
                 )(
                     (
                         utils.get_platform_emoji()
-                        if self._client.heroku_me.premium and CUSTOM_EMOJIS
+                        if self._client.heroku_me.is_premium and CUSTOM_EMOJIS
                         else "🪐"
                     )
                     + self.translator.getkey("inline.opening_list"),

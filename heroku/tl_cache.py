@@ -23,7 +23,7 @@ from pathlib import Path
 import pyrogram
 from pyrogram.client import Client as TelegramClient
 # from herokutl.client import TelegramClient
-from pyrogram import __name__ as __base_name__
+from pyrogram import __name__ as __base_name__, errors, types
 # from pyrogram._updates import ChannelState, Entity, EntityType, SessionState
 from pyrogram.errors import RPCError
 from pyrogram.errors import TopicDeleted
@@ -85,7 +85,7 @@ def get_running_loop():
         return asyncio.get_event_loop()
 
 
-class CustomClient(TelegramClient): # TODO: rewrite the cache specifically for Kurigram
+class CustomClient(TelegramClient): # TODO: rewrite the cache specially for Kurigram
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -207,51 +207,52 @@ class CustomClient(TelegramClient): # TODO: rewrite the cache specifically for K
     #     self._updates_handle = self.loop.create_task(self._update_loop())
     #     self._keepalive_handle = self.loop.create_task(self._keepalive_loop())
 
-    # @property
-    # def raw_updates_processor(self) -> typing.Optional[callable]:
-    #     return self._raw_updates_processor
+    @property
+    def raw_updates_processor(self) -> typing.Optional[callable]:
+        return self._raw_updates_processor
 
-    # @raw_updates_processor.setter
-    # def raw_updates_processor(self, value: callable):
-    #     if self._raw_updates_processor is not None:
-    #         raise ValueError("raw_updates_processor is already set")
+    @raw_updates_processor.setter
+    def raw_updates_processor(self, value: callable):
+        if self._raw_updates_processor is not None:
+            raise ValueError("raw_updates_processor is already set")
 
-    #     if not callable(value):
-    #         raise ValueError("raw_updates_processor must be callable")
+        if not callable(value):
+            raise ValueError("raw_updates_processor must be callable")
 
-    #     self._raw_updates_processor = value
+        self._raw_updates_processor = value
 
-    # @property
-    # def heroku_entity_cache(self) -> typing.Dict[int, CacheRecordEntity]:
-    #     return self._heroku_entity_cache
+    @property
+    def heroku_entity_cache(self) -> typing.Dict[int, CacheRecordEntity]:
+        return self._heroku_entity_cache
 
-    # @property
-    # def heroku_perms_cache(self) -> typing.Dict[int, CacheRecordPerms]:
-    #     return self._heroku_perms_cache
+    @property
+    def heroku_perms_cache(self) -> typing.Dict[int, CacheRecordPerms]:
+        return self._heroku_perms_cache
 
-    # @property
-    # def heroku_fullchannel_cache(self) -> typing.Dict[int, CacheRecordFullChannel]:
-    #     return self._heroku_fullchannel_cache
+    @property
+    def heroku_fullchannel_cache(self) -> typing.Dict[int, CacheRecordFullChannel]:
+        return self._heroku_fullchannel_cache
 
-    # @property
-    # def heroku_fulluser_cache(self) -> typing.Dict[int, CacheRecordFullUser]:
-    #     return self._heroku_fulluser_cache
+    @property
+    def heroku_fulluser_cache(self) -> typing.Dict[int, CacheRecordFullUser]:
+        return self._heroku_fulluser_cache
 
-    # @property
-    # def forbidden_constructors(self) -> typing.List[str]:
-    #     return self._forbidden_constructors
+    @property
+    def forbidden_constructors(self) -> typing.List[str]:
+        return self._forbidden_constructors
 
-    # async def force_get_entity(self, *args, **kwargs):
-    #     """Forcefully makes a request to Telegram to get the entity."""
+    async def force_get_entity(self, *args, **kwargs):
+        """Forcefully makes a request to Telegram to get the entity."""
 
-    #     return await self.get_entity(*args, force=True, **kwargs)
+        return await self.get_entity(*args, force=True, **kwargs)
 
     async def get_chat(
         self,
         chat_id: int | str,
-        force_full: bool = False
+        force_full: bool = False,
+        force_fetch: bool = False
     ) -> "Chat":
-        """Get up to date information about a chat.
+        """Get information about a chat.
 
         Information include current name of the user for one-on-one conversations, current username of a user, group or
         channel, etc.
@@ -267,6 +268,10 @@ class CustomClient(TelegramClient): # TODO: rewrite the cache specifically for K
             force_full (``bool``, *optional*):
                 Pass True, if you need to fetch full chat information.
                 Defaults to False.
+            
+            force_fetch (``bool``, *optional*):
+                Pass True, if you need to exactly fetch up to date information about a chat.
+                Defaults to False.
 
         Returns:
             :obj:`~pyrogram.types.Chat`: On success, if you've already joined the chat, a chat object is returned,
@@ -281,82 +286,85 @@ class CustomClient(TelegramClient): # TODO: rewrite the cache specifically for K
                 chat = await app.get_chat("pyrogram")
                 print(chat)
         """
-        return await super().get_chat(chat_id=chat_id, force_full=force_full)
+        if force_fetch:
+            return await super().get_chat(chat_id=chat_id, force_full=force_full)
 
-    # async def get_entity(
-    #     self,
-    #     entity: 'EntityLike',
-    #     exp: int = 5 * 60,
-    #     force: bool = False,
-    # ):
-    #     """
-    #     Gets the entity and cache it
+        return await self.get_entity(chat_id)
 
-    #     :param entity: Entity to fetch
-    #     :param exp: Expiration time of the cache record and maximum time of already cached record
-    #     :param force: Whether to force refresh the cache (make API request)
-    #     :return: :obj:`Entity`
-    #     """
+    async def get_entity(
+        self,
+        entity: int | str,
+        exp: int = 5 * 60,
+        force: bool = False,
+    ) -> "Chat":
+        """
+        Gets the entity and cache it
 
-    #     # Will be used to determine, which client caused logging messages
-    #     # parsed via inspect.stack()
-    #     _heroku_client_id_logging_tag = copy.copy(self.tg_id)  # noqa: F841
+        :param entity: Entity to fetch
+        :param exp: Expiration time of the cache record and maximum time of already cached record
+        :param force: Whether to force refresh the cache (make API request)
+        :return: :obj:`Entity`
+        """
 
-    #     if not hashable(entity):
-    #         try:
-    #             hashable_entity = next(
-    #                 getattr(entity, attr)
-    #                 for attr in {"user_id", "channel_id", "chat_id", "id"}
-    #                 if getattr(entity, attr, None)
-    #             )
-    #         except StopIteration:
-    #             logger.debug(
-    #                 "Can't parse hashable from entity %s, using legacy resolve",
-    #                 entity,
-    #             )
-    #             return await super().resolve_peer(entity)
-    #     else:
-    #         hashable_entity = entity
+        # Will be used to determine, which client caused logging messages
+        # parsed via inspect.stack()
+        _heroku_client_id_logging_tag = copy.copy(self.tg_id)  # noqa: F841
 
-    #     if str(hashable_entity).isdigit() and int(hashable_entity) < 0:
-    #         hashable_entity = int(str(hashable_entity)[4:])
+        if not hashable(entity):
+            try:
+                hashable_entity = next(
+                    getattr(entity, attr)
+                    for attr in {"user_id", "channel_id", "chat_id", "id"}
+                    if getattr(entity, attr, None)
+                )
+            except StopIteration:
+                logger.debug(
+                    "Can't parse hashable from entity %s, using legacy resolve",
+                    entity,
+                )
+                return await self.get_chat(entity, force_full=force, force_fetch=True)
+        else:
+            hashable_entity = entity
 
-    #     if (
-    #         not force
-    #         and hashable_entity
-    #         and hashable_entity in self._heroku_entity_cache
-    #         and (
-    #             not exp
-    #             or self._heroku_entity_cache[hashable_entity].ts + exp > time.time()
-    #         )
-    #     ):
-    #         logger.debug(
-    #             "Using cached entity %s (%s)",
-    #             entity,
-    #             type(self._heroku_entity_cache[hashable_entity].entity).__name__,
-    #         )
-    #         return copy.deepcopy(self._heroku_entity_cache[hashable_entity].entity)
+        if str(hashable_entity).startswith("-100"):
+            hashable_entity = int(str(hashable_entity)[4:])
 
-    #     resolved_entity = await super().get_chat(entity)
+        if (
+            not force
+            and hashable_entity
+            and hashable_entity in self._heroku_entity_cache
+            and (
+                not exp
+                or self._heroku_entity_cache[hashable_entity].ts + exp > time.time()
+            )
+        ):
+            logger.debug(
+                "Using cached entity %s (%s)",
+                entity,
+                type(self._heroku_entity_cache[hashable_entity].entity).__name__,
+            )
+            return copy.deepcopy(self._heroku_entity_cache[hashable_entity].entity)
 
-    #     if resolved_entity:
-    #         cache_record = CacheRecordEntity(hashable_entity, resolved_entity, exp)
-    #         self._heroku_entity_cache[hashable_entity] = cache_record
-    #         logger.debug("Saved hashable_entity %s to cache", hashable_entity)
+        resolved_entity: Chat = await self.get_chat(entity, force_full=force, force_fetch=True)
 
-    #         if getattr(resolved_entity, "id", None):
-    #             logger.debug("Saved resolved_entity id %s to cache", resolved_entity.id)
-    #             self._heroku_entity_cache[resolved_entity.id] = cache_record
+        if resolved_entity:
+            cache_record = CacheRecordEntity(hashable_entity, resolved_entity, exp)
+            self._heroku_entity_cache[hashable_entity] = cache_record
+            logger.debug("Saved hashable_entity %s to cache", hashable_entity)
 
-    #         if getattr(resolved_entity, "username", None):
-    #             logger.debug(
-    #                 "Saved resolved_entity username @%s to cache",
-    #                 resolved_entity.username,
-    #             )
-    #             self._heroku_entity_cache[f"@{resolved_entity.username}"] = cache_record
-    #             self._heroku_entity_cache[resolved_entity.username] = cache_record
+            if getattr(resolved_entity, "id", None):
+                logger.debug("Saved resolved_entity id %s to cache", resolved_entity.id)
+                self._heroku_entity_cache[resolved_entity.id] = cache_record
 
-    #     return copy.deepcopy(resolved_entity)
+            if getattr(resolved_entity, "username", None):
+                logger.debug(
+                    "Saved resolved_entity username @%s to cache",
+                    resolved_entity.username,
+                )
+                self._heroku_entity_cache[f"@{resolved_entity.username}"] = cache_record
+                self._heroku_entity_cache[resolved_entity.username] = cache_record
+
+        return copy.deepcopy(resolved_entity)
 
     # async def get_perms_cached(
     #     self,
@@ -660,9 +668,9 @@ class CustomClient(TelegramClient): # TODO: rewrite the cache specifically for K
     #         kwargs["_topic_no_retry"] = True
     #         return await self._topic_guesser(native_method, stack, *args, **kwargs)
 
-    # async def send_file(self, *args, **kwargs) -> Message:
+    # async def send_document(self, *args, **kwargs) -> Message:
     #     return await self._topic_guesser(
-    #         super().send_file,
+    #         super().send_document,
     #         inspect.stack(),
     #         *args,
     #         **kwargs,
@@ -675,6 +683,92 @@ class CustomClient(TelegramClient): # TODO: rewrite the cache specifically for K
     #         *args,
     #         **kwargs,
     #     )
+
+    async def promote_chat_member(
+        self: "pyrogram.Client",
+        chat_id: int | str,
+        user_id: int | str,
+        privileges: "types.ChatAdministratorRights" = None,
+        title: str = None
+    ) -> bool:
+        """Promote or demote a user in a supergroup or a channel.
+
+        You must be an administrator in the chat for this to work and must have the appropriate admin rights.
+        Pass False for all boolean parameters to demote a user.
+
+        .. include:: /_includes/usable-by/users-bots.rst
+
+        Parameters:
+            chat_id (``int`` | ``str``):
+                Unique identifier (int) or username (str) of the target chat.
+
+            user_id (``int`` | ``str``):
+                Unique identifier (int) or username (str) of the target user.
+                For a contact that exists in your Telegram address book you can use his phone number (str).
+
+            privileges (:obj:`~pyrogram.types.ChatAdministratorRights`, *optional*):
+                New user privileges.
+            
+            title (``str``, *optional*):
+                A custom title that will be shown to all members instead of "Owner" or "Admin".
+                Pass None or "" (empty string) to remove the custom title.
+
+        Returns:
+            ``bool``: True on success.
+
+        Example:
+            .. code-block:: python
+
+                # Promote chat member to admin
+                await app.promote_chat_member(chat_id, user_id)
+        """
+        chat_id = await self.resolve_peer(chat_id)
+        user_id = await self.resolve_peer(user_id)
+
+        # See Chat.promote_member for the reason of this (instead of setting types.ChatAdministratorRights() as default arg).
+        if privileges is None:
+            privileges = types.ChatAdministratorRights()
+
+        try:
+            raw_chat_member = (await self.invoke(
+                functions.channels.GetParticipant(
+                    channel=chat_id,
+                    participant=user_id
+                )
+            )).participant
+        except errors.RPCError:
+            raw_chat_member = None
+
+        rank = title
+        if not rank and isinstance(raw_chat_member, pyrogram.raw.types.ChannelParticipantAdmin):
+            rank = raw_chat_member.rank
+
+        await self.invoke(
+            functions.channels.EditAdmin(
+                channel=chat_id,
+                user_id=user_id,
+                admin_rights=pyrogram.raw.types.ChatAdminRights(
+                    anonymous=privileges.is_anonymous,
+                    change_info=privileges.can_change_info,
+                    post_messages=privileges.can_post_messages,
+                    post_stories=privileges.can_post_stories,
+                    edit_messages=privileges.can_edit_messages,
+                    edit_stories=privileges.can_edit_stories,
+                    delete_messages=privileges.can_delete_messages,
+                    delete_stories=privileges.can_delete_stories,
+                    ban_users=privileges.can_restrict_members,
+                    invite_users=privileges.can_invite_users,
+                    pin_messages=privileges.can_pin_messages,
+                    add_admins=privileges.can_promote_members,
+                    manage_call=privileges.can_manage_video_chats,
+                    manage_topics=privileges.can_manage_topics,
+                    other=privileges.can_manage_chat
+                ),
+                rank=rank or ""
+            )
+        )
+
+        return True
 
     # async def _call(
     #     self,
