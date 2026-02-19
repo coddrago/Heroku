@@ -24,7 +24,7 @@
 # from pyrogram.utils import is_list_like
 # from aiogram.types import BufferedInputFile
 
-# from .. import loader, utils
+from .. import loader, utils
 # from ..inline.types import InlineCall
 
 # logger = logging.getLogger(__name__)
@@ -60,11 +60,11 @@
 # }
 
 
-# @loader.tds
-# class APIRatelimiterMod(loader.Module):
-#     """Helps userbot avoid spamming Telegram API"""
+@loader.tds
+class APIRatelimiterMod(loader.Module):
+    """Helps userbot avoid spamming Telegram API"""
 
-#     strings = {"name": "APILimiter"}
+    strings = {"name": "APILimiter"}
 
 #     def __init__(self):
 #         self._ratelimiter: typing.List[tuple] = []

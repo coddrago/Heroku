@@ -384,7 +384,7 @@ class TestMod(loader.Module):
 
     async def client_ready(self):
         self._content_channel_id = await utils.wait_for_content_channel(self._db)
-        self.logchat = int(f"-100{self._content_channel_id}")
+        self.logchat = int(f"-100{str(self._content_channel_id).replace('-100', '')}")
         logging.getLogger().handlers[0].install_tg_log(self)
         logger.debug("Bot logging installed for %s", self.logchat)
 

@@ -397,10 +397,10 @@ class LoaderMod(loader.Module):
         )
 
         path_ = None
-        doc = await msg.download_media(bytes)
+        doc = await msg.download(in_memory=True)
 
         try:
-            doc = doc.decode()
+            doc = bytes(doc.getbuffer()).decode()
         except UnicodeDecodeError:
             await utils.answer(message, self.strings("bad_unicode"))
             return

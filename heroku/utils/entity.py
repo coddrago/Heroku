@@ -15,6 +15,7 @@ import time
 import typing
 from urllib.parse import urlparse
 
+import emoji
 import pyrogram
 import requests
 from aiogram.types import Message as AiogramMessage
@@ -275,7 +276,7 @@ async def asset_channel(
             if invite_bot:
                 if all(
                     participant.id != client.loader.inline.bot_id
-                    for participant in await client.get_participants(
+                    for participant in await client.get_chat_members(
                         d.chat.id, limit=100
                     )
                 ):
@@ -308,7 +309,7 @@ async def asset_channel(
 
     if hide_general and forum:
         await fw_protect()
-        await client.invoke(EditForumTopic(peer=peer, topic_id=1, hidden=True))
+        await client.edit_forum_topic(peer.id, 1, hidden=True)
 
     if ttl:
         await fw_protect()
@@ -317,33 +318,19 @@ async def asset_channel(
     if _folder:
         if _folder != "Heroku":
             raise NotImplementedError
-
-        folders = (await client.invoke(GetDialogFilters())).filters
+        
+        folders = await client.get_folders()
 
         try:
             folder = next(
-                folder
-                for folder in folders
-                if not isinstance(folder, pyrogram.raw.types.DialogFilterDefault)
-                and folder.title.text.lower() == _folder.lower()
+                folder for folder in folders if folder.name.lower() == _folder.lower()
             )
-        except Exception:
+        except StopIteration:
             folder = None
-
-        if folder and not any(
-            peer.id == getattr(folder_peer, "channel_id", None)
-            for folder_peer in folder.include_peers
-        ):
-            print(len(folder.include_peers))
-            folder.include_peers.append(await client.get_input_entity(peer))
-            print(len(folder.include_peers))
-
-            await client.invoke(
-                UpdateDialogFilter(
-                    folder.id,
-                    folder,
-                )
-            )
+        
+        if folder:
+            await fw_protect()
+            await folder.include_chat(peer.id)
 
     client._channels_cache[title] = {"peer": peer, "exp": int(time.time())}
     return peer, True
@@ -354,7 +341,7 @@ if typing.TYPE_CHECKING:
 async def asset_forum_topic(
     client: CustomClient,
     db: 'Database',
-    peer: 'hints.Entity',
+    peer: int,
     title: str,
     description: typing.Optional[str] = None,
     icon_emoji_id: typing.Optional[int] = None,
@@ -366,45 +353,37 @@ async def asset_forum_topic(
         raise TypeError(f"Expected entity to be 'Channel', but got '{type(entity).__name__}'")
 
     async def create_topic() -> ForumTopic:
-        result = await client.invoke(CreateForumTopic(
-            peer=entity,
+        result = await client.create_forum_topic(
+            entity.id,
             title=title,
             icon_emoji_id=(icon_emoji_id if client.heroku_me.is_premium else None)
-        ))
+        )
 
         await fw_protect()
 
-        await client.send_message(entity=entity, message=(description if description else f"<tg-emoji emoji-id=\"5258503720928288433\">ℹ️</tg-emoji> <b>Content related to <i>'{title}'</i> will be here</b>"), reply_to=result.updates[0].id)
+        await client.send_message(entity.id, message=(description if description else f"<tg-emoji emoji-id=\"5258503720928288433\">ℹ️</tg-emoji> <b>Content related to <i>'{title}'</i> will be here</b>"), reply_to=result.id)
 
         await fw_protect()
 
-        result = await client.invoke(GetForumTopicsByID(peer=entity, topics=[result.updates[0].id]))
+        result = await client.get_forum_topics_by_id(entity.id, result.id)
 
-        return result.topics[0]
+        return result
 
     forums_cache = db.get("heroku.forums", "forums_cache", {})
 
     async def _search_topic(topic_title: str) -> int | None:
-        result = await client.invoke(GetForumTopics(
-            peer=entity,
-            offset_date=None,
-            offset_id=0,
-            offset_topic=0,
-            limit=100,
-        ))
-        await fw_protect()
-        for found_topic in result.topics:
+        async for found_topic in client.get_forum_topics(entity.id):
             if found_topic.title == topic_title:
                 forums_cache.setdefault(entity.title, {})[topic_title] = found_topic.id
+                await fw_protect()
                 return found_topic.id
         return None
 
     if topic_id := forums_cache.get(entity.title, {}).get(title) or await _search_topic(title):
         await fw_protect()
-        topic = await client.invoke(GetForumTopicsByID(peer=entity, topics=[topic_id]))
-        topic = topic.topics[0]
+        topic = await client.get_forum_topics_by_id(entity.id, topic_id)
 
-        if not isinstance(topic, ForumTopicDeleted):
+        if not topic.is_deleted:
             return topic
         else:
             logger.warning(f"Topic: '{title}' was found in the database but does not exist in the channel and will be recreated")
@@ -423,7 +402,7 @@ async def asset_forum_topic(
         await fw_protect()
         if all(
             p.id != client.loader.inline.bot_id
-            for p in await client.get_participants(
+            async for p in await client.get_chat_members(
                 entity, limit=20
             )
         ):
@@ -526,12 +505,10 @@ async def get_target(message: Message, arg_no: int = 0) -> typing.Optional[int]:
 
     if len(get_args(message)) > arg_no:
         user = get_args(message)[arg_no]
-    elif message.is_reply:
+    elif message.reply_to_message:
         return (message.reply_to_message).from_user.id
-    elif hasattr(message.peer_id, "user_id"):
-        user = message.peer_id.user_id
     else:
-        return None
+        user = message.from_user.id
 
     try:
         entity = await message._client.get_entity(user)
@@ -548,20 +525,19 @@ async def get_user(message: Message) -> typing.Optional[User]:
     :return: User who sent message
     """
     try:
-        return await message.get_sender()
+        return await message.from_user
     except ValueError:  # Not in database. Lets go looking for them.
         logger.debug("User not in session cache. Searching...")
 
-    if isinstance(message.peer_id, PeerUser):
+    if message.chat.type == ChatType.PRIVATE:
         await message._client.get_dialogs()
-        return await message.get_sender()
+        return message.from_user
 
-    if isinstance(message.peer_id, (PeerChannel, PeerChat)):
-        async for user in message._client.iter_participants(
-            message.peer_id,
-            aggressive=True,
+    if message.chat.type in (ChatType.GROUP, ChatType.SUPERGROUP, ChatType.CHANNEL, ChatType.FORUM):
+        async for user in message._client.get_chat_members(
+            message.chat.id
         ):
-            if user.id == message.from_user.id:
+            if user.user.id == message.from_user.id:
                 return user
 
         logger.error("User isn't in the group where they sent the message")

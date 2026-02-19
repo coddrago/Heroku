@@ -156,7 +156,7 @@ class HerokuBackupMod(loader.Module):
                 return
 
             await self.inline.bot.send_document(
-                int(f"-100{self._content_channel_id}"),
+                int(f"{self._content_channel_id}"),
                 BufferedInputFile(archive.getvalue(), filename=archive.name),
                 reply_markup=self.inline.generate_markup(
                     [
@@ -287,7 +287,7 @@ class HerokuBackupMod(loader.Module):
             return
 
         backup_msg = await self.inline.bot.send_document(
-            int(f"-100{self._content_channel_id}"),
+            int(f"{self._content_channel_id}"),
             BufferedInputFile(txt.getvalue(), filename=txt.name),
             caption=self.strings("backup_caption").format(
                 prefix=utils.escape_html(self.get_prefix())
@@ -298,7 +298,7 @@ class HerokuBackupMod(loader.Module):
         await utils.answer(
             message,
             self.strings("backup_sent").format(
-                f"https://t.me/c/{self._content_channel_id}/{backup_topic_id}/{backup_msg.message_id}"
+                f"https://t.me/c/{str(self._content_channel_id).replace('-100', '')}/{backup_topic_id}/{backup_msg.message_id}"
             ),
         )
 
@@ -394,7 +394,7 @@ class HerokuBackupMod(loader.Module):
             return
 
         backup_msg = await self.inline.bot.send_document(
-            int(f"-100{self._content_channel_id}"),
+            int(f"{self._content_channel_id}"),
             BufferedInputFile(archive.getvalue(), filename=archive.name),
             caption=self.strings("modules_backup").format(
                 mods_quantity,
@@ -406,7 +406,7 @@ class HerokuBackupMod(loader.Module):
         await utils.answer(
             message,
             self.strings("backup_sent").format(
-                f"https://t.me/c/{self._content_channel_id}/{backup_topic_id}/{backup_msg.message_id}"
+                f"https://t.me/c/{str(self._content_channel_id).replace('-100', '')}/{backup_topic_id}/{backup_msg.message_id}"
             ),
         )
 
@@ -416,9 +416,9 @@ class HerokuBackupMod(loader.Module):
             await utils.answer(message, self.strings("reply_to_file"))
             return
 
-        file = await reply.download_media(bytes)
+        file = await reply.download(in_memory=True)
         try:
-            decoded_text = orjson.loads(file.decode())
+            decoded_text = orjson.loads(bytes(file.getbuffer()).decode())
         except Exception:
             try:
                 file = io.BytesIO(file)
@@ -497,7 +497,7 @@ class HerokuBackupMod(loader.Module):
             return
 
         backup_msg = await self.inline.bot.send_document(
-            int(f"-100{self._content_channel_id}"),
+            int(f"{self._content_channel_id}"),
             BufferedInputFile(archive.getvalue(), filename=archive.name),
             caption=self.strings["backupall_info"].format(
                 prefix=utils.escape_html(self.get_prefix()),
@@ -518,7 +518,7 @@ class HerokuBackupMod(loader.Module):
         await utils.answer(
             message,
             self.strings["backupall_sent"].format(
-                f"https://t.me/c/{self._content_channel_id}/{backup_topic_id}/{backup_msg.message_id}"
+                f"https://t.me/c/{str(self._content_channel_id).replace('-100', '')}/{backup_topic_id}/{backup_msg.message_id}"
             ),
         )
         

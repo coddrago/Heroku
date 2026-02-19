@@ -545,7 +545,6 @@ class Heroku:
                 os.listdir(BASE_DIR),
             )
         ]
-        print(self.sessions, os.listdir(BASE_DIR))
 
     def _get_api_token(self):
         """Get API Token from disk or environment"""
@@ -1088,8 +1087,10 @@ class Heroku:
         )
 
         client.add_handler(
-            dispatcher.handle_incoming,
-            events.ChatAction,
+            handlers.MessageHandler(
+                dispatcher.handle_incoming,
+                filters=filters.service
+            )
         )
 
         client.add_handler(
