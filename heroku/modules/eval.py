@@ -64,6 +64,8 @@ class Evaluator(loader.Module):
         if not args and reply and reply.text:
             args = utils.remove_html(reply.text)
         
+        args = args.replace("\xa0", "\x20")
+        
         real_db = self.db
         self.db = self._SecureDB(real_db)
 
