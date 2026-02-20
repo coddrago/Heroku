@@ -23,7 +23,7 @@ logger = logging.getLogger(__name__)
 
 @loader.tds
 class Translator(loader.Module):
-    """Translates text with free providers (No API keys needed)"""
+    """Translates text"""
 
     strings = {
         "name": "Translator",
