@@ -369,7 +369,7 @@ async def asset_forum_topic(
 
         return result
 
-    forums_cache = db.get("heroku.forums", "forums_cache", {})
+    forums_cache = db.pointer("heroku.forums", "forums_cache", {})
 
     async def _search_topic(topic_title: str) -> int | None:
         async for found_topic in client.get_forum_topics(entity.id):
@@ -383,9 +383,7 @@ async def asset_forum_topic(
         await fw_protect()
         topic = await client.get_forum_topics_by_id(entity.id, topic_id)
 
-        if not topic.is_deleted:
-            return topic
-        else:
+        if topic.is_deleted:
             logger.warning(f"Topic: '{title}' was found in the database but does not exist in the channel and will be recreated")
             await fw_protect()
             new_topic = await create_topic()
@@ -393,21 +391,16 @@ async def asset_forum_topic(
 
     else:
         await fw_protect()
-        new_topic = await create_topic()
-        forums_cache.setdefault(entity.title, {})[title] = new_topic.id
-
-    db.set("heroku.forums", "forums_cache", forums_cache)
+        topic = await create_topic()
+        forums_cache.setdefault(entity.title, {})[title] = topic.id
 
     if invite_bot:
         await fw_protect()
-        if all(
-            p.id != client.loader.inline.bot_id
-            for p in entity.members
-        ):
+        if all([p.user.id != client.loader.inline.bot_id async for p in client.get_chat_members(entity.id, limit=20)]):
             await fw_protect()
             await invite_inline_bot(client, entity)
 
-    return new_topic
+    return topic
     
 async def wait_for_content_channel(db: 'Database', delay: float = 10) -> int:
     cid = db.get("heroku.forums", "channel_id", None)

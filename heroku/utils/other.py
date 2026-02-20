@@ -58,7 +58,7 @@ async def invite_inline_bot(
     """
 
     try:
-        await peer.add_members(client.loader.inline.bot_username)
+        await client.add_chat_members(peer.id, client.loader.inline.bot_username)
     except Exception as e:
         raise RuntimeError(
             "Can't invite inline bot to old asset chat, which is required by module"

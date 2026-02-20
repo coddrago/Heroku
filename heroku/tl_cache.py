@@ -345,7 +345,7 @@ class CustomClient(TelegramClient): # TODO: rewrite the cache specially for Kuri
             )
             return copy.deepcopy(self._heroku_entity_cache[hashable_entity].entity)
 
-        resolved_entity: Chat = await self.get_chat(entity, force_full=force, force_fetch=True)
+        resolved_entity = await self.get_chat(entity, force_full=force, force_fetch=True)
 
         if resolved_entity:
             cache_record = CacheRecordEntity(hashable_entity, resolved_entity, exp)
