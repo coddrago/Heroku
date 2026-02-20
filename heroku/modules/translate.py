@@ -11,8 +11,10 @@
 # 🔑 https://www.gnu.org/licenses/agpl-3.0.html
 
 import logging
+import asyncio
 
 from herokutl.tl.types import Message
+from deep_translator import GoogleTranslator, MyMemoryTranslator
 
 from .. import loader, utils
 
@@ -21,9 +23,11 @@ logger = logging.getLogger(__name__)
 
 @loader.tds
 class Translator(loader.Module):
-    """Translates text (obviously)"""
+    """Translates text with free providers (No API keys needed)"""
 
-    strings = {"name": "Translator"}
+    strings = {
+        "name": "Translator",
+    }
 
     def __init__(self):
         self.config = loader.ModuleConfig(
@@ -32,10 +36,31 @@ class Translator(loader.Module):
                 False,
                 "only translated text in .tr",
                 validator=loader.validators.Boolean(),
-            ))
+            ),
+            loader.ConfigValue(
+                "provider",
+                "telegram",
+                "Translation provider to use",
+                validator=loader.validators.Choice(["telegram", "google"]),
+            )
+        )
+
+    async def _translate_external(self, text: str, target_lang: str) -> str:
+
+        provider = self.config["provider"]
+        
+        def do_translate():
+            if provider == "google":
+                return GoogleTranslator(source='auto', target=target_lang).translate(text)
+            
+            return text
+        
+        loop = asyncio.get_event_loop()
+        return await loop.run_in_executor(None, do_translate)
 
     @loader.command()
     async def tr(self, message: Message):
+        """[lang] <text> - Translate text or reply to a message"""
         if not (args := utils.get_args_raw(message)):
             text = None
             lang = self.strings("language")
@@ -60,26 +85,24 @@ class Translator(loader.Module):
         else:
             entities = []
 
-        if self.config["only_text"]:
-            try:
-                tr_text = await self._client.translate(message.peer_id, message, lang, raw_text=text, entities=entities)
+        provider = self.config["provider"]
+
+        try:
+            if provider == "telegram":
+                tr_text = await self._client.translate(
+                    message.peer_id, message, lang, raw_text=text, entities=entities
+                )
+            else:
+                tr_text = await self._translate_external(text, lang)
+
+            if self.config["only_text"]:
+                await utils.answer(message, tr_text)
+            else:
                 await utils.answer(
                     message,
-                    tr_text,
-                )
-            except Exception:
-                logger.exception("Unable to translate text")
-                await utils.answer(message, self.strings("error"))
-
-        else:
-            try:
-                tr_text = await self._client.translate(message.peer_id, message, lang, raw_text=text, entities=entities)
-                await utils.answer(
-                    message,
-                    self.strings["translated_text"].format(tr_text = tr_text)
+                    self.strings("translated_text").format(tr_text=tr_text)
                 )
 
-            except Exception:
-                logger.exception("Unable to translate text")
-                await utils.answer(message, self.strings("error"))
-
+        except Exception:
+            logger.exception("Unable to translate text")
+            await utils.answer(message, self.strings("error"))
