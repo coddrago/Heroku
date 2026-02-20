@@ -75,8 +75,8 @@ class Quickstart(loader.Module):
                 async for dialog in self.client.get_dialogs():
                     if dialog.chat.title and 'heroku-userbot' in dialog.chat.title.lower():
                         content_channel = dialog.chat
-                        logger.debug(f"Found existing channel '{dialog.chat.title}' with ID {dialog.chat.id}")
-                        self.db.set("heroku.forums", "channel_id", int(str(dialog.chat.id).replace("-100", "")))
+                        logger.debug(f"Found existing channel '{content_channel.title}' with ID {content_channel.id}")
+                        self.db.set("heroku.forums", "channel_id", int(str(content_channel.id).replace("-100", "")))
                         break
 
             if not content_channel:
@@ -112,6 +112,7 @@ class Quickstart(loader.Module):
                         title=topic_title,
                         description=topic_desc,
                         icon_emoji_id=emoji_id,
+                        invite_bot=True,
                     )
                     logger.debug(f"Created or verified topic '{topic_title}'")
                 except Exception:

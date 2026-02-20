@@ -402,9 +402,7 @@ async def asset_forum_topic(
         await fw_protect()
         if all(
             p.id != client.loader.inline.bot_id
-            async for p in await client.get_chat_members(
-                entity, limit=20
-            )
+            for p in entity.members
         ):
             await fw_protect()
             await invite_inline_bot(client, entity)
