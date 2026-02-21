@@ -508,6 +508,7 @@ HSearch:
   success: "{emoji} pip install: Successfully installed!"
   error: "{emoji} pip install: ERROR — setup.py failed!"
   overwrite: "{emoji} PermissionError: Cannot overwrite built-in module!"
+  code: "src"
   requirements: "{emoji} pip install: ERROR — requirements failed!"
   requirements_deps: "{emoji} pip install: ERROR — requirements failed ({deps})!"
   _cfg_doc_theme: "Theme for emojis."

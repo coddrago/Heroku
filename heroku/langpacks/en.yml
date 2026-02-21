@@ -541,6 +541,7 @@ HSearch:
   success: "{emoji} Module successfully installed!"
   error: "{emoji} Error, perhaps the module is broken!"
   overwrite: "{emoji} Error, module tried to overwrite built-in module!"
+  code: "Code"
   requirements: "{emoji} Dependencies installation error!"
   requirements_deps: "{emoji} Dependencies installation error ({deps})!"
   _cfg_doc_theme: "Theme for emojis."

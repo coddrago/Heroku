@@ -509,6 +509,7 @@ HSearch:
   success: "{emoji} モジュールが正常にインストールされました!"
   error: "{emoji} エラー、モジュールが壊れている可能性があります!"
   overwrite: "{emoji} エラー、モジュールが組み込みモジュールを上書きしようとしました!"
+  code: "コード"
   requirements: "{emoji} 依存関係のインストールエラー!"
   requirements_deps: "{emoji} 依存関係のインストールエラー ({deps})!"
   _cfg_doc_theme: "絵文字のテーマ。"
