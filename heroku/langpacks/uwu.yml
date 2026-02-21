@@ -507,6 +507,7 @@ HSearch:
   success: "{emoji} Moduwe successfuwwy instawwed! ^_^"
   error: "{emoji} Ewwow, maybe da moduwe is bwoken ;w;"
   overwrite: "{emoji} Ewwow, moduwe twied to ovewwwite buiwt-in moduwe! o_O"
+  code: "sowce >w<"
   requirements: "{emoji} Deps instaww ewwow >w<"
   requirements_deps: "{emoji} Deps instaww ewwow ({deps}) >w<"
   _cfg_doc_theme: "Theme fow emojis :3"
