@@ -450,24 +450,33 @@ class Presets(loader.Module):
             parts = cmd_str.split(maxsplit=1)
             cmd = parts[0]
             rest = parts[1] if len(parts) > 1 else None
+            loaded = []
             if self.allmodules.add_alias(alias, cmd, rest):
-                self.set(
+                self.lookup("Presets").set(
                     "aliases",
                     {
-                        **self.get("aliases", {}),
+                        **self.lookup("Presets").get("aliases", {}),
                         alias: f"{cmd} {rest}" if rest else cmd,
                     },
                 )
+                loaded.append(alias)
+
             else:
-                await utils.answer(
-                    message,
-                    self.lookup("settings").strings("no_command").format(utils.escape_html(cmd)),
-                )
+                if len(loaded) >= 1:
+                    await utils.answer(
+                        message,
+                        self.strings("no_command_loaded").format(utils.escape_html(cmd), "\n".join(f"{alias}" for alias in loaded)),
+                    )
+                else:
+                    await utils.answer(
+                        message,
+                        self.lookup("settings").strings("no_command").format(utils.escape_html(cmd)),
+                    )
                 fail = True
         if not fail:
             await utils.answer(
                 message,
-                self.lookup("settings").strings("aliases_list").format("\n".join(f"{alias}" for alias, cmd in self.allmodules.aliases.items())),
+                self.lookup("settings").strings("aliases_list").format("\n".join(f"{alias}" for alias in loaded)),
                 reply_to=getattr(message, "reply_to_msg_id", None),
             )
     @loader.command(alias="al")
