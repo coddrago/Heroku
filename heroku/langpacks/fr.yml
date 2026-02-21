@@ -508,6 +508,7 @@ HSearch:
   success: "{emoji} Module installé avec succès!"
   error: "{emoji} Erreur, le module est peut-être cassé!"
   overwrite: "{emoji} Erreur, le module a tenté d'écraser le module intégré!"
+  code: "Code"
   requirements: "{emoji} Erreur d'installation des dépendances!"
   requirements_deps: "{emoji} Erreur d'installation des dépendances ({deps})!"
   _cfg_doc_theme: "Thème pour les emojis."
