@@ -901,9 +901,12 @@ class HerokuConfigMod(loader.Module):
         obj_type: typing.Union[bool, str] = False,
         folder: typing.Optional[str] = None,
     ):
+
+        module = self.lookup(mod)
+
         direct = []
-        for param in self.lookup(mod).config:
-            config_value = self.lookup(mod).config._config.get(param)
+        for param in module.config:
+            config_value = module.config._config.get(param)
             if folder is None:
                 if not config_value or not hasattr(config_value, 'folder') or not config_value.folder:
                     direct.append(param)
@@ -1190,13 +1193,13 @@ class HerokuConfigMod(loader.Module):
         args_s = args.split()
         if len(args_s) == 1 and self.lookup(args_s[0]) and hasattr(self.lookup(args_s[0]), 'config'):
             form = await self.inline.form(self.config["cfg_emoji"], message, silent=True)
-            mod = self.lookup(args)
+            mod = self.lookup(args_s[0])
             if isinstance(mod, loader.Library):
                 type_ = "library"
             else:
                 type_ = mod.__origin__.startswith("<core")
 
-            await self.inline__configure(form, args, obj_type=type_)
+            await self.inline__configure(form, args_s[0], obj_type=type_)
             return
 
         if len(args_s) == 2 and self.lookup(args_s[0]) and hasattr(self.lookup(args_s[0]), 'config'):
@@ -1208,9 +1211,11 @@ class HerokuConfigMod(loader.Module):
                 type_ = mod.__origin__.startswith("<core")
 
             if args_s[1] in mod.config.keys():
-                await self.inline__configure_option(form, mod=args_s[0], config_opt=args_s[1], obj_type=type_)
+                await self.inline__configure_option(
+                    form, mod=args_s[0], config_opt=args_s[1], obj_type=type_
+                )
             else:
-                await self.inline__configure(form, args, obj_type=type_)
+                await self.inline__choose_category(message)
             return
 
         await self.inline__choose_category(message)
