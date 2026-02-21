@@ -154,6 +154,7 @@ class HSearch(loader.Module):
         
         self.uid = (await client.get_me()).id
         self.token = db.get("HSearch", "token")
+        self._asession = aiohttp.ClientSession()
         
         if self.token:
             result = await self._api_get("validatetkn", user_id=str(self.uid))
@@ -174,56 +175,43 @@ class HSearch(loader.Module):
 
     async def _sync_loop(self):
         ll = None
-
-        async with aiohttp.ClientSession(timeout=aiohttp.ClientTimeout(total=5)) as session:
-            while True:
-                try:
-                    cl = self.strings["lang"]
-                    if cl != ll:
-                        async with session.post(
-                            "https://api.fixyres.com/dataset",
-                            params={
-                                "user_id": self.uid,
-                                "lang": cl
-                            },
-                            headers={"Authorization": self.token}
-                        ) as response:
-                            await response.release()
-                        ll = cl
-                except:
-                    pass
-
-                await asyncio.sleep(60)
+        while True:
+            try:
+                cl = self.strings["lang"]
+                if cl != ll:
+                    await self._api_post("dataset", params={"user_id": self.uid, "lang": cl})
+                    ll = cl
+            except Exception:
+                pass
+            await asyncio.sleep(1)
 
     async def _api_get(self, endpoint: str, **params):
         try:
-            async with aiohttp.ClientSession() as session:
-                async with session.get(
-                    f"https://api.fixyres.com/{endpoint}",
-                    params=params,
-                    headers={"Authorization": self.token},
-                    timeout=aiohttp.ClientTimeout(total=180)
-                ) as response:
-                    if response.status == 200:
-                        return await response.json()
-                    return {}
-        except:
+            async with self._asession.get(
+                f"https://api.fixyres.com/{endpoint}",
+                params=params,
+                headers={"Authorization": self.token},
+                timeout=aiohttp.ClientTimeout(total=180)
+            ) as response:
+                if response.status == 200:
+                    return await response.json()
+                return {}
+        except Exception:
             return {}
 
     async def _api_post(self, endpoint: str, json: Dict = None, **params):
         try:
-            async with aiohttp.ClientSession() as session:
-                async with session.post(
-                    f"https://api.fixyres.com/{endpoint}",
-                    json=json,
-                    params=params,
-                    headers={"Authorization": self.token},
-                    timeout=aiohttp.ClientTimeout(total=180)
-                ) as response:
-                    if response.status == 200:
-                        return await response.json()
-                    return {}
-        except:
+            async with self._asession.post(
+                f"https://api.fixyres.com/{endpoint}",
+                json=json,
+                params=params,
+                headers={"Authorization": self.token},
+                timeout=aiohttp.ClientTimeout(total=180)
+            ) as response:
+                if response.status == 200:
+                    return await response.json()
+                return {}
+        except Exception:
             return {}
 
     def _get_emoji(self, key: str) -> str:
