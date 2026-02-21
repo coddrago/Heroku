@@ -508,6 +508,7 @@ HSearch:
   success: "{emoji} Modul muvaffaqiyatli o'rnatildi!"
   error: "{emoji} Xatolik, ehtimol modul buzilgan!"
   overwrite: "{emoji} Xatolik, modul o'rnatilgan modulni qayta yozishga harakat qildi!"
+  code: "Kod"
   requirements: "{emoji} Bog'liqliklarni o'rnatish xatosi!"
   requirements_deps: "{emoji} Bog'liqliklarni o'rnatish xatosi ({deps})!"
   _cfg_doc_theme: "Emojilar uchun mavzu."
