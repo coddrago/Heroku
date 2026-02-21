@@ -62,7 +62,7 @@ async def sleep_for_task(func: callable, data: bytes, delay: float):
 class MessageEditor:
     def __init__(
         self,
-        message: pyrogram.tl.types.Message,
+        message: pyrogram.types.Message,
         command: str,
         config,
         strings,
@@ -162,7 +162,7 @@ class SudoMessageEditor(MessageEditor):
 
         if any(lastlines[0] == i for i in self.PASS_REQ) and self.state == 0:
             logger.debug("Success to find sudo log!")
-            text = self.strings("auth_needed").format(self.message.client.heroku_me.id)
+            text = self.strings("auth_needed").format(self.message._client.heroku_me.id)
 
             try:
                 await utils.answer(self.message, text)
@@ -173,14 +173,14 @@ class SudoMessageEditor(MessageEditor):
             command = "<code>" + utils.escape_html(self.command) + "</code>"
             user = utils.escape_html(lastlines[1][:-1])
 
-            self.authmsg = await self.message.client.send_message(
+            self.authmsg = await self.message._client.send_message(
                 "me",
                 self.strings("auth_msg").format(command, user),
             )
             logger.debug("sent message to self")
 
-            self.message.client.remove_event_handler(self.on_message_edited)
-            self.message.client.add_event_handler(
+            self.message._client.remove_event_handler(self.on_message_edited)
+            self.message._client.add_event_handler(
                 self.on_message_edited,
                 pyrogram.events.messageedited.MessageEdited(chats=["me"]),
             )
@@ -353,7 +353,7 @@ class TerminalMod(loader.Module):
 
     async def run_command(
         self,
-        message: pyrogram.tl.types.Message,
+        message: pyrogram.types.Message,
         cmd: str,
         editor: typing.Optional[MessageEditor] = None,
     ):

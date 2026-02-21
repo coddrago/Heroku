@@ -17,6 +17,7 @@ import io
 from math import ceil
 
 import orjson
+from pyrogram.types import ReplyParameters
 
 from .. import loader, utils
 from ..inline.types import BotInlineMessage, InlineCall
@@ -326,12 +327,12 @@ class Presets(loader.Module):
     @loader.command(alias="lp")
     async def loadpreset(self, message: Message):
         """Custom preset loader. Reply to a file or send a file with the command."""
-        msg = message if message.file else (await message.get_reply_message())
-        if not msg or not msg.file:
+        msg = message if message.document else message.reply_to_message
+        if not msg or not msg.document:
             await message.edit(self.lookup("loader").strings['no_file'])
             return
         try:
-            data = orjson.loads(await msg.download_media(bytes))
+            data = orjson.loads((await msg.download(in_memory=True)).getbuffer())
         except Exception:
             await message.edit(self.lookup("loader").strings['load_failed'])
             logger.exception("Failed to load preset from file")
@@ -342,7 +343,7 @@ class Presets(loader.Module):
             logger.error("Invalid preset format")
             return
         
-        chat = message.chat_id
+        chat = message.chat.id
         await message.delete()
         try: 
             description = data["description"]
@@ -423,7 +424,7 @@ class Presets(loader.Module):
             message,
             self.strings("folder").format(folder_name, prefix=self.get_prefix()),
             file=file,
-            reply_to=getattr(message, "reply_to_msg_id", None),
+            reply_parameters=ReplyParameters(message_id=getattr(message, "reply_to_msg_id", None)),
         )
     @loader.command(alias="la")
     async def loadaliases(self, message: Message):
@@ -433,7 +434,7 @@ class Presets(loader.Module):
             await message.edit(self.lookup("loader").strings['no_file'])
             return
         try:
-            data = orjson.loads(await msg.download_media(bytes))
+            data = orjson.loads((await msg.download(in_memory=True)).getbuffer())
         except Exception:
             await message.edit(self.lookup("loader").strings['load_failed'])
             logger.exception("Failed to load aliases from file")
@@ -468,7 +469,7 @@ class Presets(loader.Module):
             await utils.answer(
                 message,
                 self.lookup("settings").strings("aliases_list").format("\n".join(f"{alias}" for alias, cmd in self.allmodules.aliases.items())),
-                reply_to=getattr(message, "reply_to_msg_id", None),
+                reply_parameters=ReplyParameters(message_id=getattr(message, "reply_to_msg_id", None)),
             )
     @loader.command(alias="al")
     async def aliasload(self, message: Message):
@@ -483,6 +484,6 @@ class Presets(loader.Module):
             message,
             self.lookup("settings").strings("aliases_file").format(prefix=self.get_prefix()),
             file=file,
-            reply_to=getattr(message, "reply_to_msg_id", None),
+            reply_parameters=ReplyParameters(message_id=getattr(message, "reply_to_msg_id", None)),
         )
         

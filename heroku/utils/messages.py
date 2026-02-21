@@ -14,11 +14,11 @@ import typing
 
 import grapheme
 import pyrogram
+from pyrogram.types import Message, ReplyParameters
 from pyrogram.raw.types import (
     Channel,
     Chat,
     InputDocument,
-    Message,
     MessageMediaPhoto,
     MessageMediaDocument,
     MessageMediaWebPage,
@@ -310,8 +310,8 @@ async def answer(
                 await message.edit(response, reply_markup, **kwargs)
                 return
 
-            reply_markup = message.client.loader.inline._normalize_markup(reply_markup)
-            result = await message.client.loader.inline.form(
+            reply_markup = message._client.loader.inline._normalize_markup(reply_markup)
+            result = await message._client.loader.inline.form(
                 response,
                 message=message if message.out else get_chat_id(message),
                 reply_markup=reply_markup,
@@ -338,7 +338,7 @@ async def answer(
     parse_mode = pyrogram.utils.sanitize_parse_mode(
         kwargs.pop(
             "parse_mode",
-            message.client.parse_mode,
+            message._client.parse_mode,
         )
     )
 
@@ -347,7 +347,7 @@ async def answer(
 
         if len(text) >= 4096 and not hasattr(message, "heroku_grepped"):
             try:
-                if not message.client.loader.inline.init_complete:
+                if not message._client.loader.inline.init_complete:
                     raise
 
                 strings = list(smart_split(text, entities, 4096))
@@ -355,7 +355,7 @@ async def answer(
                 if len(strings) > 10:
                     raise
 
-                list_ = await message.client.loader.inline.list(
+                list_ = await message._client.loader.inline.list(
                     message=message,
                     strings=strings,
                 )
@@ -368,13 +368,13 @@ async def answer(
                 file = io.BytesIO(text.encode("utf-8"))
                 file.name = "command_result.txt"
 
-                result = await message.client.send_file(
+                result = await message._client.send_document(
                     message.peer_id,
                     file,
-                    caption=message.client.loader.lookup("translations").strings(
+                    caption=message._client.loader.lookup("translations").strings(
                         "too_long"
                     ),
-                    reply_to=kwargs.get("reply_to") or get_topic(message),
+                    reply_parameters=ReplyParameters(message_id=kwargs.get("reply_to") or get_topic(message)),
                 )
 
                 if message.out:
@@ -415,7 +415,7 @@ async def answer(
                 "reply_to",
                 getattr(message, "reply_to_msg_id", get_topic(message)),
             )
-            result = await message.client.send_file(message.peer_id, response, **kwargs)
+            result = await message._client.send_document(message.peer_id, response, **kwargs)
             if message.out:
                 await message.delete()
 
@@ -433,7 +433,7 @@ async def answer_file(
     :param message: Message to answer
     :param file: File to send - url, path or bytes
     :param caption: Caption to send
-    :param kwargs: Extra kwargs to pass to `send_file`
+    :param kwargs: Extra kwargs to pass to `send_document`
     :return: Sent message
 
     :example:
@@ -451,7 +451,7 @@ async def answer_file(
         kwargs.setdefault("reply_to", topic)
 
     try:
-        response = await message.client.send_file(
+        response = await message._client.send_document(
             message.peer_id,
             file,
             caption=caption,

@@ -13,7 +13,7 @@
 import contextlib
 import pyrogram
 from pyrogram.extensions.html import CUSTOM_EMOJIS
-from pyrogram.types import Message, User
+from pyrogram.types import Message, User, ReplyParameters
 
 from .. import loader, main, utils, version
 from ..inline.types import InlineCall
@@ -87,12 +87,12 @@ class CoreMod(loader.Module):
             self.strings("heroku").format(
                 (
                     utils.get_platform_emoji()
-                    if self._client.heroku_me.premium and CUSTOM_EMOJIS
+                    if self._client.heroku_me.is_premium and CUSTOM_EMOJIS
                     else "🪐 <b>Heroku userbot</b>"
                 ),
                 *version.__version__,
                 utils.get_commit_url(),
-                f"{pyrogram.__version__} #{pyrogram.tl.alltlobjects.LAYER}",
+                f"{pyrogram.__version__} #{pyrogram.raw.all.layer}",
             )
             + (
                 ""
@@ -100,7 +100,7 @@ class CoreMod(loader.Module):
                 else self.strings("unstable").format(version.branch)
             ),
             file= "https://raw.githubusercontent.com/coddrago/assets/refs/heads/main/heroku/heroku_cmd.png",
-            reply_to=getattr(message, "reply_to_msg_id", None),
+            reply_parameters=ReplyParameters(message_id=getattr(message, "reply_to_msg_id", None)),
         )
 
     @loader.command()
@@ -477,10 +477,10 @@ class CoreMod(loader.Module):
         )
             ):
 
-            await self.client.send_file(
-                message.peer_id,
+            await self.client.send_document(
+                message.chat.id,
                 "https://raw.githubusercontent.com/coddrago/assets/refs/heads/main/heroku/heroku_installation.png",
-                caption=self.strings("vds_install"), reply_to=getattr(message, "reply_to_msg_id", None),)
+                caption=self.strings("vds_install"), reply_parameters=ReplyParameters(message_id=getattr(message, "reply_to_msg_id", None)),)
         match True:
             case _ if "-vds" in args:
                 await utils.answer(message, self.strings("vds_install"))

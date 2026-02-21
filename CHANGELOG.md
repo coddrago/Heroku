@@ -346,7 +346,7 @@
 - Add ability to decorate aliases with `@loader.command` decorator
 - Add credits to developers and translators
 - Add support for multiple usernames
-- Add topic guesser in `send_message`, `send_file` in order for old modules to work properly
+- Add topic guesser in `send_message`, `send_document` in order for old modules to work properly
 - Add local storage fallback in case remote end is not available
 - Add `self.invoke` method for modules
 - Fresh Christmas web design

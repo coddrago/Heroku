@@ -14,12 +14,13 @@ import re
 import string
 import random
 
+from aiogram.types import Message as AioMessage
 from pyrogram.errors import YouBlockedUser
 from pyrogram.raw.functions.contacts import Unblock
 from pyrogram.types import Message
 
 from .. import loader, utils
-from ..inline.types import BotInlineMessage, InlineCall
+from ..inline.types import InlineCall
 
 @loader.tds
 class InlineStuff(loader.Module):
@@ -33,15 +34,15 @@ class InlineStuff(loader.Module):
         contains="This message will be deleted automatically",
     )
     async def watcher(self, message: Message):
-        if message.via_bot_id == self.inline.bot_id:
+        if message.via_bot.id == self.inline.bot_id:
             await message.delete()
 
     @loader.watcher("out", "only_inline", contains="Opening gallery...")
     async def gallery_watcher(self, message: Message):
-        if message.via_bot_id != self.inline.bot_id:
+        if message.via_bot.id != self.inline.bot_id:
             return
 
-        id_ = re.search(r"#id: ([a-zA-Z0-9]+)", message.raw_text)[1]
+        id_ = re.search(r"#id: ([a-zA-Z0-9]+)", message.text)[1]
 
         await message.delete()
 
@@ -111,12 +112,12 @@ class InlineStuff(loader.Module):
         self._db.set("heroku.inline", "bot_token", args)
         await utils.answer(message, self.strings("bot_updated"))
 
-    async def aiogram_watcher(self, message: BotInlineMessage):
+    async def aiogram_watcher(self, message: AioMessage):
         match message.text:
             case "/start":
                 await message.answer_photo(
                     "https://raw.githubusercontent.com/coddrago/assets/refs/heads/main/heroku/start_cmd.png",
-                    caption=self.strings("this_is_heroku").format("<tg-emoji emoji-id=5463379725441341739>🪐</tg-emoji>" if self._client.heroku_me.premium else "🪐", utils.get_platform_emoji() if self._client else "Heroku"),
+                    caption=self.strings("this_is_heroku").format("<tg-emoji emoji-id=5463379725441341739>🪐</tg-emoji>" if self._client.heroku_me.is_premium else "🪐", utils.get_platform_emoji() if self._client else "Heroku"),
                 )
             case "/profile":
                 if message.from_user.id != self.client.tg_id:
@@ -147,10 +148,10 @@ class InlineStuff(loader.Module):
             case _:
                 return
 
-    async def restart(self, call: InlineCall, message):
+    async def restart(self, call: InlineCall, message: AioMessage):
         await call.edit(self.strings["restart"])
         await self.invoke("restart", "-f", message=message, peer=self.inline.bot.id)
 
-    async def reset_prefix(self, call: InlineCall, message):
+    async def reset_prefix(self, call: InlineCall, message: AioMessage):
         await message.answer(self.strings["prefix_reset"])
         self.db.set("heroku.main", "command_prefix", ".")

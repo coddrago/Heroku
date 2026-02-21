@@ -15,6 +15,7 @@ import typing
 import inspect
 
 import pyrogram
+from pyrogram.types import Chat, ChatAdministratorRights
 from pyrogram.raw.functions.channels import (
     EditAdmin,
     InviteToChannel,
@@ -46,7 +47,7 @@ def rand(size: int, /) -> str:
 
 async def invite_inline_bot(
     client: CustomClient,
-    peer: 'EntityLike',
+    peer: Chat,
 ) -> None:
     """
     Invites inline bot to a chat
@@ -57,7 +58,7 @@ async def invite_inline_bot(
     """
 
     try:
-        await client.invoke(InviteToChannel(peer, [client.loader.inline.bot_username]))
+        await client.add_chat_members(peer.id, client.loader.inline.bot_username)
     except Exception as e:
         raise RuntimeError(
             "Can't invite inline bot to old asset chat, which is required by module"
@@ -71,6 +72,14 @@ async def invite_inline_bot(
                 admin_rights=ChatAdminRights(ban_users=True),
                 rank="Heroku",
             )
+        )
+        await client.promote_chat_member(
+            peer.id,
+            client.loader.inline.bot_username,
+            ChatAdministratorRights(
+                can_restrict_members=True,
+            ),
+            "Heroku",
         )
 
 def run_sync(func, *args, **kwargs):
