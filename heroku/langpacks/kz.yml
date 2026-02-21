@@ -308,6 +308,7 @@ settings:
   aliases_file: "<tg-emoji emoji-id=5256113064821926998>📁</tg-emoji> <b>Сіздің алиастарыңыз</b>\n\n<tg-emoji emoji-id=5134452506935427991>🪐</tg-emoji> <b>{prefix}la осы хабарламаға жауап ретінде алиастарды импорттау үшін</b>"
   aliases: "<b>🔗 Псевдонимдер:</b>\n"
   no_command: "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>Пәрмен</b> <code>{}</code> <b>бар емес</b>"
+  no_command_loaded: "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>Пәрмен</b> <code>{}</code> <b>бар емес</b>\n\n<b>Жүктелген псевдонимдер:</b> <blockquote expandable>{}</blockquote>"
   alias_args: "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>Сіз пәрмен мен оның псевдонимін ұсынуыңыз керек</b>"
   unstable: "\n\n<tg-emoji emoji-id=5355133243773435190>❕</tg-emoji> <b>Сіз тұрақсыз</b> <code>{}</code> <b>тармағын қолданып жатырсыз!</b>"
   delalias_args: "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>Сіз псевдоним атауын ұсынуыңыз керек</b>"

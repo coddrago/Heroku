@@ -308,6 +308,7 @@ settings:
   aliases_file: "<tg-emoji emoji-id=5256113064821926998>📁</tg-emoji> <b>Sizning aliaslaringiz</b>\n\n<tg-emoji emoji-id=5134452506935427991>🪐</tg-emoji> <b>{prefix}la bu xabarga javob sifatida aliaslarni import qilish uchun</b>"
   aliases: "<b>🔗 Aliaslar:</b>\n"
   no_command: "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>Buyruq</b> <code>{}</code> <b>mavjud emas</b>"
+  no_command_loaded: "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>Buyruq</b> <code>{}</code> <b>mavjud emas</b>\n\n<b>Yuklangan aliaslar:</b> <blockquote expandable>{}</blockquote>"
   alias_args: "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>Siz buyruq va uning aliasini taqdim etishingiz kerak</b>"
   unstable: "\n\n<tg-emoji emoji-id=5355133243773435190>❕</tg-emoji> <b>Siz beqaror filialdan</b> <code>{}</code> <b>foydalanmoqdasiz!</b>"
   delalias_args: "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>Siz alias nomini taqdim etishingiz kerak</b>"
