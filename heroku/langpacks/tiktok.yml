@@ -475,6 +475,7 @@ HSearch:
   success: "{emoji} Модуль поставился, гг!"
   error: "{emoji} Краш, модуль сломан видимо!"
   overwrite: "{emoji} Краш, модуль пытался снести встроенный!"
+  code: "Код"
   requirements: "{emoji} Зависимости не поставились, gg wp!"
   requirements_deps: "{emoji} Зависимости не поставились ({deps}), gg wp!"
   _cfg_doc_theme: "Тема для эмодзи."
