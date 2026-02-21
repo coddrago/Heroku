@@ -507,6 +507,7 @@ HSearch:
   success: "{emoji} M0dul3 5ucc355fully 1n574ll3d!"
   error: "{emoji} 3rr0r, p3rh4p5 7h3 m0dul3 15 br0k3n!"
   overwrite: "{emoji} 3rr0r, m0dul3 7r13d 70 0v3rwr173 bu1l7-1n m0dul3!"
+  code: "C0d5"
   requirements: "{emoji} D3p5 1n574ll 3rr0r!"
   requirements_deps: "{emoji} D3p5 1n574ll 3rr0r ({deps})!"
   _cfg_doc_theme: "7h3m3 f0r 3m0j15."
