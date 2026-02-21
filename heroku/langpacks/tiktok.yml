@@ -286,6 +286,7 @@ settings:
   aliases_file: "<tg-emoji emoji-id=5256113064821926998>📁</tg-emoji> <b>Твои алиасы</b>\n\n<tg-emoji emoji-id=5134452506935427991>🪐</tg-emoji> <b>{prefix}la в ответ на это сообщение для импорта</b>"
   aliases: "<b>🔗 Твои алиасы:</b>\n"
   no_command: "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>Нет такой команды</b> <code>{}</code>"
+  no_command_loaded: "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>Нет такой команды</b> <code>{}</code>\n\n<b>Загруженные алиасы:</b> <blockquote expandable>{}</blockquote>"
   unstable: "\n\n<tg-emoji emoji-id=5355133243773435190>❕</tg-emoji> <b>Ты на ветке</b> <code>{}</code> <b>сидишь, бро</b>"
   alias_args: "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>Пиши команду и алиас к ней</b>"
   delalias_args: "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>Имя алиаса давай</b>"

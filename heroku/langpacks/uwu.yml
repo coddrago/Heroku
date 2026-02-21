@@ -308,6 +308,7 @@ settings:
   aliases_file: "<tg-emoji emoji-id=5256113064821926998>📁</tg-emoji> <b>Yow awias</b>\n\n<tg-emoji emoji-id=5134452506935427991>🪐</tg-emoji> <b>{prefix}la in weply to this message to impowt awias</b>"
   aliases: "<b>🔗 Awiases:</b>\n"
   no_command: "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>Command</b> <code>{}</code> <b>does nyot exist</b>"
+  no_command_loaded: "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>Command</b> <code>{}</code> <b>does nyot exist</b>\n\n<b>Loaded awias:</b> <blockquote expandable>{}</blockquote>"
   alias_args: "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>You must pwovide a command and da awias fow it</b>"
   unstable: "\n\n<tg-emoji emoji-id=5355133243773435190>❕</tg-emoji> <b>You awe using an unstabwe bwanch</b> <code>{}</code><b>!</b>"
   delalias_args: "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>You must pwovide da awias nyame</b>"

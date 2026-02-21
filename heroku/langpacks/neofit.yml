@@ -308,6 +308,7 @@ settings:
   aliases_file: "<tg-emoji emoji-id=5256113064821926998>📁</tg-emoji> <b>Your aliases</b>\n\n<tg-emoji emoji-id=5134452506935427991>🪐</tg-emoji> <b>{prefix}la in reply to this message to import aliases</b>"
   aliases: "<b>🔗 Active Aliases:</b>\n"
   no_command: "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>Command</b> <code>{}</code> <b>not found</b>"
+  no_command_loaded: "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>Command</b> <code>{}</code> <b>not found</b>\n\n<b>Loaded aliases:</b> <blockquote expandable>{}</blockquote>"
   alias_args: "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>Usage: cmd alias_name</b>"
   unstable: "\n\n<tg-emoji emoji-id=5355133243773435190>❕</tg-emoji> <b>Warning: Unstable branch</b> <code>{}</code><b>!</b>"
   delalias_args: "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>Usage: delalias alias_name</b>"
