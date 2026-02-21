@@ -293,7 +293,7 @@ class HSearch(loader.Module):
             buttons.append([
                 {"text": self.strings["query_label"], "copy": query},
                 {"text": self.strings["install_btn"], "callback": self._install_cb, "args": (install_url, idx, mods, query)},
-                {"text": "URL", "copy": install_url}
+                {"text": self.strings["code"], "url": install_url}
             ])
         
         buttons.append([
