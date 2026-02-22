@@ -430,6 +430,7 @@ class CommandDispatcher:
 
     async def handle_raw(self, _: CustomClient, event: "types.Update", users: list[types.User], chats: list[types.Chat]):
         """Handle raw events."""
+        print(type(event))
         for handler in self.raw_handlers:
             if isinstance(event, tuple(handler.updates)):
                 try:
@@ -443,6 +444,7 @@ class CommandDispatcher:
         event: "types.Message",
     ):
         """Handle all commands"""
+        print(type(event), event.text, event.id)
         message = await self._handle_command(event)
         if not message:
             return
@@ -631,6 +633,7 @@ class CommandDispatcher:
         event: "Message",
     ):
         """Handle all incoming messages"""
+        print(type(event), event.text, event.id)
         message = utils.msg_censor(event)
 
         blacklist_chats = self._db.get(main.__name__, "blacklist_chats", [])

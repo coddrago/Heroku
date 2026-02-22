@@ -17,7 +17,7 @@ import typing
 from math import ceil
 
 from pyrogram.types import Message
-from pyrogram.extensions import html
+# from pyrogram.extensions import html
 
 from .. import loader, translations, utils
 from ..inline.types import InlineCall

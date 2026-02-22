@@ -12,7 +12,7 @@
 
 import contextlib
 import pyrogram
-from pyrogram.extensions.html import CUSTOM_EMOJIS
+# from pyrogram.extensions.html import CUSTOM_EMOJIS
 from pyrogram.types import Message, User, ReplyParameters
 
 from .. import loader, main, utils, version

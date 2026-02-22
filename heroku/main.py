@@ -1179,17 +1179,6 @@ class Heroku:
 
         await asyncio.gather(*[self.amain_wrapper(client) for client in self.clients])
 
-        async with aiohttp.ClientSession() as session:
-                async with session.get("https://raw.githubusercontent.com/coddrago/modules-web/main/mods/ids/allowed_ids.txt") as response:
-                    if response.status == 200:
-                        content = await response.text()
-                        allowed_ids = [int(line.strip()) for line in content.split('\n') if line.strip()]
-                    else:
-                        logging.error(f"Exception on loading allowed beta testers ids: {response.status}")
-                        return []
-
-        await asyncio.gather(*[version.check_branch((await client.get_me()).id, allowed_ids) for client in self.clients])
-
     async def _shutdown_handler(self):
         for client in self.clients:
             inline = getattr(

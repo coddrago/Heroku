@@ -24,7 +24,7 @@ import typing
 import aiohttp
 import git
 from git import GitCommandError, Repo
-from pyrogram.extensions.html import CUSTOM_EMOJIS
+# from pyrogram.extensions.html import CUSTOM_EMOJIS
 from pyrogram.types import Message
 from pyrogram.raw.functions.messages import (
     GetDialogFilters,

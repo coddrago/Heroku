@@ -16,7 +16,7 @@ import inspect
 import logging
 import re
 
-from pyrogram.extensions.html import CUSTOM_EMOJIS
+# from pyrogram.extensions.html import CUSTOM_EMOJIS
 from pyrogram.types import Message
 from pyrogram.raw.types import InputMediaWebPage
 

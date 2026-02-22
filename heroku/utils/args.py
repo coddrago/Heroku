@@ -10,6 +10,8 @@ import shlex
 import typing
 
 import pyrogram
+from pyrogram.parser import utils
+from pyrogram.parser.html import Parser, HTML
 # import pyrogram.extensions
 # import pyrogram.extensions.html
 from pyrogram.types import Message
@@ -74,18 +76,20 @@ def get_args_raw(message: typing.Union[Message, str]) -> str:
     :param message: Message or string to get arguments from
     :return: Raw string of arguments
     """
-    if not (message := getattr(message, "message", message)):
+    if not (message := getattr(message, "text", message)):
         return False
 
     return args[1] if len(args := message.split(maxsplit=1)) > 1 else ""
 
 
-def get_args_html(message: Message) -> str:
+async def get_args_html(message: Message) -> str:
     """
     Get the parameters to the command as string with HTML (not split)
     :param message: Message to get arguments from
     :return: String with HTML arguments
     """
+    parser = HTML(message._client)
+
     prefix = message._client.loader.get_prefix()
 
     if not (message := message.text.html):
@@ -94,9 +98,9 @@ def get_args_html(message: Message) -> str:
     if prefix not in message:
         return message
 
-    raw_text, entities = parser.parse(message)
+    raw_text, entities = next(iter((await parser.parse(message)).keys()))
 
-    raw_text = parser._add_surrogate(raw_text)
+    raw_text = utils.add_surrogates(raw_text)
 
     try:
         command = raw_text[
@@ -108,7 +112,7 @@ def get_args_html(message: Message) -> str:
     command_len = len(command) + 1
 
     return parser.unparse(
-        parser._del_surrogate(raw_text[command_len:]),
+        utils.remove_surrogates(raw_text[command_len:]),
         relocate_entities(entities, -command_len, raw_text[command_len:]),
     )
 
