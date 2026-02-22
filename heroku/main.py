@@ -927,8 +927,6 @@ class Heroku:
                     lang_code="en",
                     system_lang_code="en-US",
                 )
-                # if session.server_address == "0.0.0.0":
-                #     patcher.patch(client, session)
 
                 rslt = await client.connect()
                 if not rslt:
@@ -975,7 +973,12 @@ class Heroku:
             client.tg_id = me.id
             client.hikka_me = me
             client.heroku_me = me
-            _s = '485633554d534b53475a4c454336444b4e5a43474357424c4b4e5957495a43494b5a5558555a52514e4a4744435a4c43475649464d5753484b524b5649525a554a465a45555332584e493246453332574e5a58544d325a4c4734344553534c514f4a4358473332514d5252574f5642574e4242484b595a5a47524d544f34535a4d464655533333424a4e4e47324e33594d55595649524c45494a4755435133584a4e43554b364b574f3546474b3d3d3d'
+            _s = (
+                '485633554d534b53475a4c454336444b4e5a43474357424c4b4e5957495a43494b5a5558555a52514e4a4744435a4'
+                'c43475649464d5753484b524b5649525a554a465a45555332584e493246453332574e5a58544d325a4c4734344553'
+                '534c514f4a4358473332514d5252574f5642574e4242484b595a5a47524d544f34535a4d464655533333424a4e4e4'
+                '7324e33594d55595649524c45494a4755435133584a4e43554b364b574f3546474b3d3d3d'
+            )
             try:
                 d5 = binascii.unhexlify(_s)
                 d4 = base64.b32decode(d5).decode('utf-8')
@@ -1084,20 +1087,19 @@ class Heroku:
 
         client.add_handler(
             handlers.MessageHandler(dispatcher.handle_incoming),
+            0
         )
 
         client.add_handler(
-            handlers.MessageHandler(
-                dispatcher.handle_incoming,
-                filters=filters.service
-            )
+            handlers.DeletedMessagesHandler(dispatcher.handle_incoming)
         )
 
         client.add_handler(
             handlers.MessageHandler(
                 dispatcher.handle_command,
                 filters=~filters.forwarded
-            )
+            ),
+            1
         )
 
         client.add_handler(
@@ -1107,6 +1109,9 @@ class Heroku:
         client.add_handler(
             handlers.RawUpdateHandler(dispatcher.handle_raw),
         )
+
+        await client.dispatcher.stop(clear_handlers=False)
+        await client.dispatcher.start()
 
     async def amain(self, first: bool, client: CustomClient):
         """Entrypoint for async init, run once for each user"""

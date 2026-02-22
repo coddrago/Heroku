@@ -13,11 +13,7 @@
 import logging
 import random
 
-import pyrogram
-from pyrogram.raw.functions.messages import (
-    GetDialogFilters,
-    UpdateDialogFilter,
-)
+from pyrogram.enums import ChatType
 from pyrogram.types import Message
 from ..utils import get_display_name
 
@@ -85,7 +81,7 @@ class HerokuSettingsMod(loader.Module):
         ]
         current_bl = current_bl[0] if current_bl else []
 
-        chat = utils.get_chat_id(message)
+        chat = message.chat.id
         if chat not in current_bl:
             if args in disabled_watchers:
                 for k in disabled_watchers:
@@ -197,11 +193,11 @@ class HerokuSettingsMod(loader.Module):
 
     @loader.command()
     async def nonickchat(self, message: Message):
-        if message.is_private:
+        if message.chat.type == ChatType.PRIVATE:
             await utils.answer(message, self.strings("private_not_allowed"))
             return
 
-        chat = utils.get_chat_id(message)
+        chat = message.chat.id
 
         nn = self._db.get(main.__name__, "nonickchats", [])
         if chat not in nn:

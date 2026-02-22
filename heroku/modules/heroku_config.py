@@ -1247,7 +1247,7 @@ class HerokuConfigMod(loader.Module):
             mod, option, value = first
         elif len(first) == 2 and reply:
             mod, option = first
-            value = reply.raw_text
+            value = reply.text
             if not value:
                 await utils.answer(message, self.strings("args"))
                 return

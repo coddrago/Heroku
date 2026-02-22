@@ -14,7 +14,8 @@ import typing
 
 import grapheme
 import pyrogram
-from pyrogram.types import Message, ReplyParameters
+from pyrogram.parser.html import HTML
+from pyrogram.types import Message, ReplyParameters, MessageEntity
 from pyrogram.raw.types import (
     Channel,
     Chat,
@@ -42,7 +43,7 @@ emoji_pattern = re.compile(
     flags=re.UNICODE,
 )
 
-# parser = pyrogram.utils.sanitize_parse_mode("html")
+parser = HTML(None)
 logger = logging.getLogger(__name__)
 
 def get_topic(message: Message) -> typing.Optional[int]:
@@ -73,8 +74,9 @@ def mime_type(message: Message) -> str:
     """
     return (
         ""
-        if not isinstance(message, Message) or not getattr(message, "media", False)
-        else getattr(getattr(message, "media", False), "mime_type", False) or ""
+        if not isinstance(message, Message) or not message.document
+        else getattr(getattr(message, "document", False), "mime_type", False) or ""
+
     )
 
 async def get_message_link(
@@ -87,7 +89,7 @@ async def get_message_link(
     :param chat: Chat, where message was sent
     :return: Link to message
     """
-    if message.is_private:
+    if message.chat.type == ChatType.PRIVATE:
         return (
             f"tg://openmessage?user_id={get_chat_id(message)}&message_id={message.id}"
         )
@@ -109,8 +111,9 @@ async def get_message_link(
 
 
 def smart_split(
-    text: str,
-    entities: typing.List[FormattingEntity],
+    text: str = None,
+    message: str = None,
+    entities: typing.List[FormattingEntity] = None,
     length: int = 4096,
     split_on: ListLike = ("\n", " "),
     min_length: int = 1,
@@ -120,6 +123,7 @@ def smart_split(
     A grapheme will never be broken. Entities will be displaced to match the right location. No inputs will be mutated.
     The end of each message except the last one is stripped of characters from [split_on]
     :param text: the plain text input
+    :param message: the plain text input (for backwards compatibility, will be ignored if `text` is provided)
     :param entities: the entities
     :param length: the maximum length of a single message
     :param split_on: characters (or strings) which are preferred for a message break
@@ -136,6 +140,15 @@ def smart_split(
     """
 
     # Authored by @bsolute
+
+    if not text:
+        text = message
+
+    _ent = entities.copy()
+    entities = []
+    for ent in _ent:
+        if not isinstance(ent, MessageEntity):
+            entities.append(MessageEntity._parse(None, ent, {}))
 
     encoded = text.encode("utf-16le")
     pending_entities = entities
@@ -313,7 +326,7 @@ async def answer(
             reply_markup = message._client.loader.inline._normalize_markup(reply_markup)
             result = await message._client.loader.inline.form(
                 response,
-                message=message if message.out else get_chat_id(message),
+                message=message if message.outgoing else get_chat_id(message),
                 reply_markup=reply_markup,
                 **kwargs,
             )
@@ -325,7 +338,7 @@ async def answer(
 
     kwargs.setdefault("link_preview", False)
 
-    edit = (message.out and not message.via_bot_id and not message.fwd_from)
+    edit = (message.outgoing and not message.via_bot_id and not message.forward_from)
     match True:
         case _ if not edit:
             kwargs.setdefault(
@@ -377,7 +390,7 @@ async def answer(
                     reply_parameters=ReplyParameters(message_id=kwargs.get("reply_to") or get_topic(message)),
                 )
 
-                if message.out:
+                if message.outgoing:
                     await message.delete()
 
                 return result
@@ -416,7 +429,7 @@ async def answer(
                 getattr(message, "reply_to_msg_id", get_topic(message)),
             )
             result = await message._client.send_document(message.peer_id, response, **kwargs)
-            if message.out:
+            if message.outgoing:
                 await message.delete()
 
     return result
@@ -492,6 +505,17 @@ def censor(
         elif k[0] != "_" and hasattr(v, "__dict__"):
             setattr(obj, k, censor(v, to_censor, replace_with))
 
+    return obj
+
+def msg_censor(
+    obj: Message,
+):
+    """Replace message user's phone"""
+    if obj.from_user:
+        user_raw = obj.from_user.raw
+        user_raw.phone = "&lt;phone&gt;"
+        obj.from_user = obj.from_user._parse(obj._client, user_raw)
+    
     return obj
 
 def is_serializable(x: typing.Any, /) -> bool:

@@ -248,7 +248,7 @@ class TelegramLogsHandler(logging.Handler):
         self.buffer = []
         self.handledbuffer = []
         self._queue = []
-        self._mods = {}
+        self._mods: dict[int, Module] = {}
         self.tg_buff = []
         self.force_send_all = False
         self.tg_level = 20
@@ -300,7 +300,7 @@ class TelegramLogsHandler(logging.Handler):
     ):
         chunks = item.message + "\n\n<b>🪐 Full traceback:</b>\n" + f"<pre><code class=\"language-python\">{item.full_stack}</code></pre>"
 
-        chunks = list(utils.smart_split(*pyrogram.extensions.html.parse(chunks), 4096))
+        chunks = list(utils.smart_split(**(await next(iter(self._mods.values())).client.parser.html.parse(chunks)), length=4096))
 
         await call.edit(
             chunks[0]
@@ -597,7 +597,7 @@ def init():
         TelegramLogsHandler((handler, rotating_handler), 7000)
     )
     logging.getLogger().setLevel(logging.NOTSET)
-    logging.getLogger("pyrogram").setLevel(logging.WARNING)
+    logging.getLogger("pyrogram").setLevel(logging.DEBUG)
     logging.getLogger("matplotlib").setLevel(logging.WARNING)
     logging.getLogger("aiohttp").setLevel(logging.WARNING)
     logging.getLogger("aiogram").setLevel(logging.WARNING)

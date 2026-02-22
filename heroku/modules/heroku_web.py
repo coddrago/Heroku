@@ -16,6 +16,7 @@ import os
 import string
 import typing
 
+from pyrogram.enums import ChatType
 from pyrogram.errors import (
     FloodWait,
     PasswordHashInvalid,
@@ -66,8 +67,8 @@ class HerokuWebMod(loader.Module):
 
             if (
                 not force
-                and not message.is_private
-                and "force_insecure" not in message.raw_text.lower()
+                and not message.chat.type == ChatType.PRIVATE
+                and "force_insecure" not in message.text.lower()
             ):
                 try:
                     if not await self.inline.form(
