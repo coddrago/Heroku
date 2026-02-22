@@ -76,7 +76,7 @@ class HerokuSettingsMod(loader.Module):
             await utils.answer(message, self.strings("mod404").format(args))
             return
 
-        args = next((x.lower() == args.lower() for x in watchers), False)
+        args = next((x for x in watchers if x.lower() == args.lower()), args)
 
         current_bl = [
             v for k, v in disabled_watchers.items() if k.lower() == args.lower()

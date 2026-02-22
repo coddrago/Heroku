@@ -132,9 +132,6 @@ class CommandDispatcher:
         self._cached_usernames.add(str(self._client.heroku_me.id))
 
         self.raw_handlers = []
-        self._external_bl: typing.List[int] = []
-
-        asyncio.ensure_future(self._external_bl_reload_loop())
 
     async def _handle_ratelimit(self, message: Message, func: callable) -> bool:
         if await self.security.check(message, security.OWNER):
@@ -332,20 +329,6 @@ class CommandDispatcher:
         blacklist_chats = self._db.get(main.__name__, "blacklist_chats", [])
         whitelist_chats = self._db.get(main.__name__, "whitelist_chats", [])
         whitelist_modules = self._db.get(main.__name__, "whitelist_modules", [])
-
-        # ⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️
-        # It's not recommended to remove the security check below (external_bl)
-        # If you attempt to bypass this protection, you will be banned from the chat
-        # The protection from using userbots is multi-layer and this is one of the layers
-        # If you bypass it, the next (external) layer will trigger and you will be banned
-        # ⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️
-
-        if (
-            (chat_id := utils.get_chat_id(message)) in self._external_bl
-            or chat_id in blacklist_chats
-            or (whitelist_chats and chat_id not in whitelist_chats)
-        ):
-            return False
 
         if not message.message or len(message.message.strip()) == len(prefix):
             return False  # Message is just the prefix
@@ -637,20 +620,6 @@ class CommandDispatcher:
         whitelist_chats = self._db.get(main.__name__, "whitelist_chats", [])
         whitelist_modules = self._db.get(main.__name__, "whitelist_modules", [])
 
-        # ⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️
-        # It's not recommended to remove the security check below (external_bl)
-        # If you attempt to bypass this protection, you will be banned from the chat
-        # The protection from using userbots is multi-layer and this is one of the layers
-        # If you bypass it, the next (external) layer will trigger and you will be banned
-        # ⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️
-
-        if (
-            (chat_id := utils.get_chat_id(message)) in self._external_bl
-            or chat_id in blacklist_chats
-            or (whitelist_chats and chat_id not in whitelist_chats)
-        ):
-            logger.debug("Message is blacklisted")
-            return
 
         for func in self._modules.watchers:
             bl = self._db.get(main.__name__, "disabled_watchers", {})
@@ -713,14 +682,3 @@ class CommandDispatcher:
         except Exception as e:
             await exception_handler(e, message, *args)
 
-    async def _external_bl_reload_loop(self):
-        while True:
-            with contextlib.suppress(Exception):
-                self._external_bl = (
-                    await utils.run_sync(
-                        requests.get,
-                        "https://ubguard.codrago.life/blacklist.json",
-                    )
-                ).json()["blacklist"]
-
-            await asyncio.sleep(60)
