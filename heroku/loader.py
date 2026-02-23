@@ -817,10 +817,10 @@ class Modules:
         _install_session_audit_hook()
         _install_external_guards()
         self._initial_registration = True
-        self.commands = {}
+        self.commands: dict[str, Command] = {}
         self.inline_handlers = {}
         self.callback_handlers = {}
-        self.aliases = {}
+        self.aliases: dict[str, str] = {}
         self.modules: typing.List[typing.Optional["Module"]] = []  # skipcq: PTC-W0052
         self.libraries = []
         self.watchers = []
@@ -1353,7 +1353,7 @@ class Modules:
 
         return None
 
-    def dispatch(self, _command: str) -> typing.Tuple[str, typing.Optional[str]]:
+    def dispatch(self, _command: str) -> typing.Tuple[str, typing.Optional[Command]]:
         """Dispatch command to appropriate module"""
 
         resolved = next(

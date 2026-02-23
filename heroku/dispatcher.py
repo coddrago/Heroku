@@ -24,9 +24,11 @@ import traceback
 import typing
 
 import requests
-# from pyrogram import events
+from pyrogram import raw, types
 from pyrogram.errors import FloodWait, RPCError
+from pyrogram.enums import ChatType, MessageMediaType
 from pyrogram.types import ChatEvent, ChatEventFilter, Message
+from pyrogram.types.messages_and_media.message import Str
 
 from . import loader, main, security, utils
 from .database import Database
@@ -34,6 +36,9 @@ from .loader import Modules
 from .tl_cache import CustomClient
 
 logger = logging.getLogger(__name__)
+
+if typing.TYPE_CHECKING:
+    from .types import Command
 
 # Keys for layout switch
 _LAYOUT_TRANSLATION = str.maketrans(
@@ -131,7 +136,7 @@ class CommandDispatcher:
 
         self._cached_usernames.add(str(self._client.heroku_me.id))
 
-        self.raw_handlers = []
+        self.raw_handlers: list[Command] = []
         self._external_bl: typing.List[int] = []
 
         asyncio.ensure_future(self._external_bl_reload_loop())
@@ -268,13 +273,13 @@ class CommandDispatcher:
 
     async def _handle_command(
         self,
-        event: "typing.Union[events.NewMessage, events.MessageDeleted]",
+        _message: "Message",
         watcher: bool = False,
     ) -> typing.Union[bool, typing.Tuple[Message, str, str, callable]]:
-        if not hasattr(event, "message") or not hasattr(event.message, "message"):
+        if not hasattr(_message, "text"):
             return False
 
-        initiator = getattr(event, "from_user.id", 0)
+        initiator = getattr(getattr(_message, "from_user", {}), "id", 0)
 
         main_prefix = self._db.get(main.__name__, "command_prefix", ".")
         if initiator == self._client.tg_id:
@@ -283,49 +288,43 @@ class CommandDispatcher:
             prefix = self._db.get(main.__name__, "command_prefixes", {})
             prefix = prefix.get(str(initiator), main_prefix)
             
-        message = utils.censor(event.message)
+        message = utils.msg_censor(_message)
 
-        if not event.message.message:
+        if not message.text:
             return False
 
         if (
-            message.out
-            and len(message.message) > len(prefix) * 2
+            message.outgoing
+            and len(message.text) > len(prefix) * 2
             and (
-                message.message.startswith(prefix * 2)
-                and any(s != prefix for s in message.message)
-                or message.message.startswith(str.translate(prefix * 2, _LAYOUT_TRANSLATION))
-                and any(s != str.translate(prefix, _LAYOUT_TRANSLATION) for s in message.message)
+                message.text.startswith(prefix * 2)
+                and any(s != prefix for s in message.text)
+                or message.text.startswith(str.translate(prefix * 2, _LAYOUT_TRANSLATION))
+                and any(s != str.translate(prefix, _LAYOUT_TRANSLATION) for s in message.text)
             )
         ):
             # Allow escaping commands using .'s
             if not watcher:
                 await message.edit(
-                    message.message[len(prefix):],
-                    parse_mode=lambda s: (
-                        s,
-                        utils.relocate_entities(message.entities, -1, message.message)
-                        or (),
-                    ),
+                    message.html_text[len(prefix):],
                 )
             return False
 
         match True:
             case _ if (
-                event.message.message.startswith(str.translate(prefix, _LAYOUT_TRANSLATION))
+                message.text.startswith(str.translate(prefix, _LAYOUT_TRANSLATION))
                 and str.translate(prefix, _LAYOUT_TRANSLATION) != prefix
             ):
-                message.message = str.translate(message.message, _LAYOUT_TRANSLATION)
-                message.text = str.translate(message.text, _LAYOUT_TRANSLATION)
-            case _ if not event.message.message.startswith(prefix):
+                message.text = Str(str.translate(message.text, _LAYOUT_TRANSLATION)).init(message.entities)
+            case _ if not message.text.startswith(prefix):
                 return False
 
         if (
-            event.sticker
-            or event.dice
-            or event.audio
-            or event.via_bot_id
-            or getattr(event, "reactions", False)
+            message.sticker
+            or message.dice
+            or message.audio
+            or message.via_bot.id
+            or getattr(_message, "reactions", False)
         ):
             return False
 
@@ -341,17 +340,17 @@ class CommandDispatcher:
         # ⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️
 
         if (
-            (chat_id := utils.get_chat_id(message)) in self._external_bl
+            (chat_id := message.chat.id) in self._external_bl
             or chat_id in blacklist_chats
             or (whitelist_chats and chat_id not in whitelist_chats)
         ):
             return False
 
-        if not message.message or len(message.message.strip()) == len(prefix):
+        if not message.text or len(message.text.strip()) == len(prefix):
             return False  # Message is just the prefix
 
 
-        command = message.message[len(prefix):].strip().split(maxsplit=1)[0]
+        command = message.text[len(prefix):].strip().split(maxsplit=1)[0]
         tag = command.split("@", maxsplit=1)
         #logger.info(f"Received command: {command}")
         tag = command.split("@", maxsplit=1)
@@ -359,15 +358,14 @@ class CommandDispatcher:
 
         if len(tag) == 2:
             if tag[1] == "me":
-                if not message.out:
+                if not message.outgoing:
                     return False
             elif tag[1].lower() not in self._cached_usernames:
                 return False
         elif (
-            event.out
-            or event.mentioned
-            and event.message is not None
-            and event.message.message is not None
+            message.outgoing
+            or message.mentioned
+            and message.text is not None
             and not any(
                 f"@{username}" in command.lower()
                 for username in self._cached_usernames
@@ -375,12 +373,12 @@ class CommandDispatcher:
         ):
             pass
         elif (
-            not event.is_private
+            not message.chat.type == ChatType.PRIVATE
             and not self._db.get(main.__name__, "no_nickname", False)
             and command not in self._db.get(main.__name__, "nonickcmds", [])
             and initiator not in self._db.get(main.__name__, "nonickusers", [])
             and not self.security.check_tsec(initiator, command)
-            and utils.get_chat_id(event)
+            and message.chat.id
             not in self._db.get(main.__name__, "nonickchats", [])
         ):
             return False
@@ -398,7 +396,7 @@ class CommandDispatcher:
         ):
             return False
 
-        if message.is_channel and message.edit_date and not message.is_group:
+        if message.chat.type == ChatType.CHANNEL and message.edit_date:
             async for event in self._client.get_chat_event_log(
                 chat_id,
                 limit=10,
@@ -413,7 +411,7 @@ class CommandDispatcher:
             
             return False
 
-        message.message = prefix + txt + message.message[len(prefix + command) :]
+        message.text = Str(prefix + txt + message.text[len(prefix + command) :])
 
         if (
             f"{str(chat_id)}.{func.__self__.__module__}" in blacklist_chats
@@ -422,7 +420,7 @@ class CommandDispatcher:
         ):
             return False
 
-        if await self._handle_tags(event, func):
+        if await self._handle_tags(_message, func):
             return False
 
         if self._db.get(main.__name__, "grep", False) and not watcher:
@@ -430,8 +428,9 @@ class CommandDispatcher:
 
         return message, prefix, txt, func
 
-    async def handle_raw(self, event: "events.Raw"):
+    async def handle_raw(self, _: CustomClient, event: "types.Update", users: list[types.User], chats: list[types.Chat]):
         """Handle raw events."""
+        print(type(event))
         for handler in self.raw_handlers:
             if isinstance(event, tuple(handler.updates)):
                 try:
@@ -441,9 +440,11 @@ class CommandDispatcher:
 
     async def handle_command(
         self,
-        event: "typing.Union[events.NewMessage, events.MessageDeleted]",
+        _: "CustomClient",
+        event: "types.Message",
     ):
         """Handle all commands"""
+        print(type(event), event.text, event.id)
         message = await self._handle_command(event)
         if not message:
             return
@@ -475,7 +476,7 @@ class CommandDispatcher:
                     self._client.loader.lookup("translations")
                     .strings("fw_error")
                     .format(
-                        utils.escape_html(message.message),
+                        utils.escape_html(message.text),
                         fw_time,
                         type(exc.request).__name__,
                     )
@@ -483,7 +484,7 @@ class CommandDispatcher:
             else:
                 txt = (
                     "<tg-emoji emoji-id=5877477244938489129>🚫</tg-emoji> <b>Call"
-                    f" </b><code>{utils.escape_html(message.message)}</code><b> failed"
+                    f" </b><code>{utils.escape_html(message.text)}</code><b> failed"
                     " due to RPC (Telegram) error:</b>"
                     f" <code>{utils.escape_html(str(exc))}</code>"
                 )
@@ -491,7 +492,7 @@ class CommandDispatcher:
                     self._client.loader.lookup("translations")
                     .strings("rpc_error")
                     .format(
-                        utils.escape_html(message.message),
+                        utils.escape_html(message.text),
                         utils.escape_html(str(exc)),
                     )
                 )
@@ -499,64 +500,64 @@ class CommandDispatcher:
             if not self._db.get(main.__name__, "inlinelogs", True):
                 txt = (
                     "<tg-emoji emoji-id=5877477244938489129>🚫</tg-emoji><b> Call</b>"
-                    f" <code>{utils.escape_html(message.message)}</code><b>"
+                    f" <code>{utils.escape_html(message.text)}</code><b>"
                     " failed!</b>"
                 )
             else:
                 exc = "\n".join(traceback.format_exc().splitlines()[1:])
                 txt = (
                     "<tg-emoji emoji-id=5877477244938489129>🚫</tg-emoji><b> Call</b>"
-                    f" <code>{utils.escape_html(message.message)}</code><b>"
+                    f" <code>{utils.escape_html(message.text)}</code><b>"
                     " failed!</b>\n\n<b>🧾 Logs:</b>\n<pre><code"
                     f' class="language-logs">{utils.escape_html(exc)}</code></pre>'
                 )
 
         with contextlib.suppress(Exception):
-            await (message.edit if message.out else message.reply)(txt)
+            await (message.edit if message.outgoing else message.reply)(txt)
 
     async def watcher_exc(self, *_):
         logger.exception("Error running watcher", extra={"stack": inspect.stack()})
 
     async def _handle_tags(
         self,
-        event: "typing.Union[events.NewMessage, events.MessageDeleted]",
+        event: "Message",
         func: callable,
     ) -> bool:
         return bool(await self._handle_tags_ext(event, func))
 
     async def _handle_tags_ext(
         self,
-        event: "typing.Union[events.NewMessage, events.MessageDeleted]",
+        event: "Message",
         func: callable,
     ) -> str:
         """
         Handle tags.
-        :param event: The event to handle.
+        :param event: The message to handle.
         :param func: The function to handle.
         :return: The reason for the tag to fail.
         """
         m = event if isinstance(event, Message) else getattr(event, "message", event)
 
         reverse_mapping = {
-            "out": lambda: getattr(m, "out", True),
-            "in": lambda: not getattr(m, "out", True),
+            "out": lambda: getattr(m, "outgoing", True),
+            "in": lambda: not getattr(m, "outgoing", True),
             "only_messages": lambda: isinstance(m, Message),
             "editable": (
-                lambda: not getattr(m, "out", False)
-                and not getattr(m, "fwd_from", False)
+                lambda: not getattr(m, "outgoing", False)
+                and not getattr(m, "forward_from", False)
                 and not getattr(m, "sticker", False)
-                and not getattr(m, "via_bot_id", False)
+                and not getattr(getattr(m, "via_bot", False), "id", False)
             ),
             "no_media": lambda: (
-                not isinstance(m, Message) or not getattr(m, "media", False)
+                not isinstance(m, Message) or not getattr(m, "document", False)
             ),
-            "only_media": lambda: isinstance(m, Message) and getattr(m, "media", False),
-            "only_photos": lambda: utils.mime_type(m).startswith("image/"),
-            "only_videos": lambda: utils.mime_type(m).startswith("video/"),
-            "only_audios": lambda: utils.mime_type(m).startswith("audio/"),
+            "only_media": lambda: isinstance(m, Message) and getattr(m, "document", False),
+            "only_photos": lambda: m.media == MessageMediaType.PHOTO,
+            "only_videos": lambda: m.media == MessageMediaType.VIDEO,
+            "only_audios": lambda: m.media == MessageMediaType.AUDIO,
             "only_stickers": lambda: getattr(m, "sticker", False),
-            "only_docs": lambda: getattr(m, "document", False),
-            "only_inline": lambda: getattr(m, "via_bot_id", False),
+            "only_docs": lambda: m.media == MessageMediaType.DOCUMENT,
+            "only_inline": lambda: getattr(getattr(m, "via_bot", False), "id", False),
             "only_channels": lambda: (
                 getattr(m, "is_channel", False) and not getattr(m, "is_group", False)
             ),
@@ -573,35 +574,35 @@ class CommandDispatcher:
             ),
             "no_pm": lambda: not getattr(m, "private", False),
             "only_pm": lambda: getattr(m, "private", False),
-            "no_inline": lambda: not getattr(m, "via_bot_id", False),
+            "no_inline": lambda: not getattr(getattr(m, "via_bot", False), "id", False),
             "no_stickers": lambda: not getattr(m, "sticker", False),
-            "no_docs": lambda: not getattr(m, "document", False),
-            "no_audios": lambda: not utils.mime_type(m).startswith("audio/"),
-            "no_videos": lambda: not utils.mime_type(m).startswith("video/"),
-            "no_photos": lambda: not utils.mime_type(m).startswith("image/"),
-            "no_forwards": lambda: not getattr(m, "fwd_from", False),
-            "no_reply": lambda: not getattr(m, "reply_to_msg_id", False),
-            "only_forwards": lambda: getattr(m, "fwd_from", False),
+            "no_docs": lambda: not m.media == MessageMediaType.DOCUMENT,
+            "no_audios": lambda: not m.media == MessageMediaType.PHOTO,
+            "no_videos": lambda: not m.media == MessageMediaType.VIDEO,
+            "no_photos": lambda: not m.media == MessageMediaType.AUDIO,
+            "no_forwards": lambda: not getattr(m, "forward_from", False),
+            "no_reply": lambda: not getattr(m, "reply_to_message_id", False),
+            "only_forwards": lambda: getattr(m, "forward_from", False),
             "only_reply": lambda: getattr(m, "reply_to_msg_id", False),
             "mention": lambda: getattr(m, "mentioned", False),
             "no_mention": lambda: not getattr(m, "mentioned", False),
             "startswith": lambda: (
-                isinstance(m, Message) and m.raw_text.startswith(func.startswith)
+                isinstance(m, Message) and m.text.startswith(func.startswith)
             ),
             "endswith": lambda: (
-                isinstance(m, Message) and m.raw_text.endswith(func.endswith)
+                isinstance(m, Message) and m.text.endswith(func.endswith)
             ),
-            "contains": lambda: isinstance(m, Message) and func.contains in m.raw_text,
+            "contains": lambda: isinstance(m, Message) and func.contains in m.text,
             "filter": lambda: callable(func.filter) and func.filter(m),
-            "from_id": lambda: getattr(m, "from_user.id", None) == func.from_id,
-            "chat_id": lambda: utils.get_chat_id(m)
+            "from_id": lambda: getattr(getattr(m, "from_user", None), "id", None) == func.from_id,
+            "chat_id": lambda: m.chat.id
             == (
                 func.chat.id
                 if not str(func.chat.id).startswith("-100")
                 else int(str(func.chat.id)[4:])
             ),
             "regex": lambda: (
-                isinstance(m, Message) and re.search(func.regex, m.raw_text)
+                isinstance(m, Message) and re.search(func.regex, m.text)
             ),
         }
 
@@ -628,10 +629,12 @@ class CommandDispatcher:
 
     async def handle_incoming(
         self,
-        event: "typing.Union[events.NewMessage, events.MessageDeleted]",
+        _: "CustomClient",
+        event: "Message",
     ):
         """Handle all incoming messages"""
-        message = utils.censor(getattr(event, "message", event))
+        print(type(event), event.text, event.id)
+        message = utils.msg_censor(event)
 
         blacklist_chats = self._db.get(main.__name__, "blacklist_chats", [])
         whitelist_chats = self._db.get(main.__name__, "whitelist_chats", [])
@@ -645,7 +648,7 @@ class CommandDispatcher:
         # ⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️
 
         if (
-            (chat_id := utils.get_chat_id(message)) in self._external_bl
+            (chat_id := message.chat.id) in self._external_bl
             or chat_id in blacklist_chats
             or (whitelist_chats and chat_id not in whitelist_chats)
         ):
@@ -663,13 +666,13 @@ class CommandDispatcher:
                     "*" in bl[modname]
                     or chat_id in bl[modname]
                     or "only_chats" in bl[modname]
-                    and message.is_private
+                    and message.chat.type == ChatType.PRIVATE
                     or "only_pm" in bl[modname]
-                    and not message.is_private
+                    and not message.chat.type == ChatType.PRIVATE
                     or "out" in bl[modname]
-                    and not message.out
+                    and not message.outgoing
                     or "in" in bl[modname]
-                    and message.out
+                    and message.outgoing
                 )
                 or f"{str(chat_id)}.{func.__self__.__module__}" in blacklist_chats
                 or whitelist_modules

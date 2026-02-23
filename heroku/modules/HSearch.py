@@ -680,7 +680,7 @@ class HSearch(loader.Module):
 
     @loader.watcher(chat_id=7575472403)
     async def _install_via_hsearch(self, message):
-        link = message.raw_text.strip()
+        link = message.text.strip()
         
         if not link.startswith("https://api.fixyres.com/module/"):
             return

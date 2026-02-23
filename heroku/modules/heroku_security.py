@@ -15,6 +15,7 @@ import datetime
 import time
 import typing
 
+from pyrogram.enums import ChatType
 from pyrogram.types import Message
 from pyrogram.raw.types import PeerUser, User
 from ..utils import get_display_name
@@ -880,7 +881,7 @@ class HerokuSecurityMod(loader.Module):
         )
 
     async def _tsec_chat(self, message: Message, args: list):
-        if len(args) == 1 and message.is_private:
+        if len(args) == 1 and message.chat.type == ChatType.PRIVATE:
             await utils.answer(message, self.strings("no_target"))
             return
 
@@ -894,7 +895,7 @@ class HerokuSecurityMod(loader.Module):
                     exp=0,
                 )
             except (ValueError, TypeError):
-                if not message.is_private:
+                if not message.chat.type == ChatType.PRIVATE:
                     target = await self._client.get_entity(message.peer_id, exp=0)
                 else:
                     await utils.answer(message, self.strings("no_target"))
@@ -991,7 +992,7 @@ class HerokuSecurityMod(loader.Module):
 
         match args:
             case [single]:
-                if not message.is_private and not message.is_reply:
+                if not message.chat.type == ChatType.PRIVATE and not message.is_reply:
                     await utils.answer(message, self.strings("no_target"))
                     return
                 await utils.answer(message, self.strings("no_rule"))
@@ -1006,7 +1007,7 @@ class HerokuSecurityMod(loader.Module):
                         exp=0,
                     )
                 except (ValueError, TypeError):
-                    if message.is_private:
+                    if message.chat.type == ChatType.PRIVATE:
                         target = await self._client.get_entity(message.peer_id, exp=0)
                     elif message.is_reply:
                         target = await self._client.get_entity(
@@ -1072,11 +1073,11 @@ class HerokuSecurityMod(loader.Module):
             return
 
         if args[0] == "user":
-            if not message.is_private and not message.is_reply:
+            if not message.chat.type == ChatType.PRIVATE and not message.is_reply:
                 await utils.answer(message, self.strings("no_target"))
                 return
 
-            if message.is_private:
+            if message.chat.type == ChatType.PRIVATE:
                 target = await self._client.get_entity(message.peer_id, exp=0)
             elif message.is_reply:
                 target = await self._client.get_entity(
@@ -1131,7 +1132,7 @@ class HerokuSecurityMod(loader.Module):
             )
             return
 
-        if message.is_private:
+        if message.chat.type == ChatType.PRIVATE:
             await utils.answer(message, self.strings("no_target"))
             return
 
@@ -1162,11 +1163,11 @@ class HerokuSecurityMod(loader.Module):
             return
 
         if args == "user":
-            if not message.is_private and not message.is_reply:
+            if not message.chat.type == ChatType.PRIVATE and not message.is_reply:
                 await utils.answer(message, self.strings("no_target"))
                 return
 
-            if message.is_private:
+            if message.chat.type == ChatType.PRIVATE:
                 target = await self._client.get_entity(message.peer_id, exp=0)
             elif message.is_reply:
                 target = await self._client.get_entity(
@@ -1206,7 +1207,7 @@ class HerokuSecurityMod(loader.Module):
             )
             return
 
-        if message.is_private:
+        if message.chat.type == ChatType.PRIVATE:
             await utils.answer(message, self.strings("no_target"))
             return
 

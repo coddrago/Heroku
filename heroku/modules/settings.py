@@ -12,7 +12,7 @@
 
 import contextlib
 import pyrogram
-from pyrogram.extensions.html import CUSTOM_EMOJIS
+# from pyrogram.extensions.html import CUSTOM_EMOJIS
 from pyrogram.types import Message, User, ReplyParameters
 
 from .. import loader, main, utils, version
@@ -75,7 +75,7 @@ class CoreMod(loader.Module):
             module = args[1]
 
         if chatid is None:
-            chatid = utils.get_chat_id(message)
+            chatid = message.chat.id
 
         module = self.allmodules.get_classname(module)
         return f"{str(chatid)}.{module}" if module else chatid
@@ -134,7 +134,7 @@ class CoreMod(loader.Module):
             if reply := message.reply_to_message:
                 return reply.from_user.id
 
-            return message.to_id.user_id if message.is_private else False
+            return message.to_id.user_id if message.chat.type == ChatType.PRIVATE else False
 
     @loader.command()
     async def blacklistuser(self, message: Message):

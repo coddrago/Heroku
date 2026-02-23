@@ -55,7 +55,7 @@ class Translator(loader.Module):
                 await utils.answer(message, self.strings("no_args"))
                 return
 
-            text = reply.raw_text
+            text = reply.text
             entities = reply.entities
         else:
             entities = []

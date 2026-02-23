@@ -29,7 +29,7 @@ logger = logging.getLogger(__name__)
 
 
 def hash_msg(message):
-    return f"{str(utils.get_chat_id(message))}/{str(message.id)}"
+    return f"{str(message.chat.id)}/{str(message.id)}"
 
 async def read_stream(func: callable, stream, delay: float):
     last_task = None

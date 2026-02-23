@@ -277,7 +277,7 @@ class Form(InlineUnit):
         if isinstance(message, Message) and not silent:
             try:
                 status_message = await (
-                    message.edit if message.out else message.answer
+                    message.edit if message.outgoing else message.answer
                 )(
                     (
                         utils.get_platform_emoji()
@@ -285,7 +285,7 @@ class Form(InlineUnit):
                         else "🪐"
                     )
                     + self.translator.getkey("inline.opening_form"),
-                    **({"reply_to": utils.get_topic(message)} if message.out else {}),
+                    **({"reply_to": utils.get_topic(message)} if message.outgoing else {}),
                 )
             except Exception:
                 status_message = None
@@ -344,9 +344,9 @@ class Form(InlineUnit):
         async def answer(msg: str):
             nonlocal message
             if isinstance(message, Message):
-                await (message.edit if message.out else message.answer)(
+                await (message.edit if message.outgoing else message.answer)(
                     msg,
-                    **({} if message.out else {"reply_to": utils.get_topic(message)}),
+                    **({} if message.outgoing else {"reply_to": utils.get_topic(message)}),
                 )
             else:
                 await self._client.send_message(message, msg)
@@ -383,13 +383,13 @@ class Form(InlineUnit):
         await self._units[unit_id]["future"].wait()
         del self._units[unit_id]["future"]
 
-        self._units[unit_id]["chat"] = utils.get_chat_id(m)
+        self._units[unit_id]["chat"] = m.chat.id
         self._units[unit_id]["message_id"] = m.id
 
-        if isinstance(message, Message) and message.out:
+        if isinstance(message, Message) and message.outgoing:
             await message.delete()
 
-        if status_message and not message.out:
+        if status_message and not message.outgoing:
             await status_message.delete()
 
         inline_message_id = self._units[unit_id]["inline_message_id"]

@@ -24,7 +24,7 @@ import typing
 import aiohttp
 import git
 from git import GitCommandError, Repo
-from pyrogram.extensions.html import CUSTOM_EMOJIS
+# from pyrogram.extensions.html import CUSTOM_EMOJIS
 from pyrogram.types import Message
 from pyrogram.raw.functions.messages import (
     GetDialogFilters,
@@ -298,7 +298,7 @@ class UpdaterMod(loader.Module):
             (
                 msg_obj.inline_message_id
                 if hasattr(msg_obj, "inline_message_id")
-                else f"{utils.get_chat_id(msg_obj)}:{msg_obj.id}"
+                else f"{msg_obj.chat.id}:{msg_obj.id}"
             ),
         )
 

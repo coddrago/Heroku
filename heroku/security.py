@@ -418,7 +418,7 @@ class SecurityManager:
             and message.edit_date
         ):
             async for event in self._client.iter_admin_log(
-                utils.get_chat_id(message),
+                message.chat.id,
                 limit=10,
                 edit=True,
             ):
@@ -481,12 +481,12 @@ class SecurityManager:
             )
 
         try:
-            chat = utils.get_chat_id(message)
+            chat = message.chat.id
         except Exception:
             chat = None
 
         try:
-            cmd = message.raw_text[1:].split()[0].strip()
+            cmd = message.text[1:].split()[0].strip()
             if usernames:
                 for username in usernames:
                     cmd = cmd.replace(f"@{username}", "")
@@ -548,12 +548,12 @@ class SecurityManager:
                             )
                             return True
 
-        if f_group_member and message.is_group or f_pm and message.is_private:
+        if f_group_member and message.is_group or f_pm and message.chat.type == ChatType.PRIVATE:
             return True
 
         if message.is_channel:
             if not message.is_group:
-                chat_id = utils.get_chat_id(message)
+                chat_id = message.chat.id
                 if (
                     chat_id in self._cache
                     and self._cache[chat_id]["exp"] >= time.time()
@@ -574,7 +574,7 @@ class SecurityManager:
                 if self._any_admin and f_group_admin_any or f_group_admin:
                     return True
             elif f_group_admin_any or f_group_owner:
-                chat_id = utils.get_chat_id(message)
+                chat_id = message.chat.id
                 cache_obj = f"{chat_id}/{user_id}"
                 if (
                     cache_obj in self._cache
@@ -616,7 +616,7 @@ class SecurityManager:
             return False
 
         if message.is_group and (f_group_admin_any or f_group_owner):
-            chat_id = utils.get_chat_id(message)
+            chat_id = message.chat.id
             cache_obj = f"{chat_id}/{user_id}"
 
             if (

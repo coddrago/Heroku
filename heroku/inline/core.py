@@ -300,7 +300,7 @@ class InlineManager(
             raise Exception("No query results")
 
         return await q[0].click(
-            utils.get_chat_id(message) if isinstance(message, Message) else message,
+            message.chat.id if isinstance(message, Message) else message,
             reply_to=(
                 message.reply_to_msg_id if isinstance(message, Message) else None
             ),
