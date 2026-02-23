@@ -122,7 +122,7 @@ class HerokuBackupMod(loader.Module):
                 self.get("last_backup") + self.get("period") - time.time()
             )
 
-            db = io.BytesIO(orjson.dumps(self._db, option=orjson.OPT_INDENT_2))
+            db = io.BytesIO(orjson.dumps(self._db, option=orjson.OPT_INDENT_2 | orjson.OPT_NON_STR_KEYS))
             db.name = "db.json"
 
             mods = io.BytesIO()
@@ -136,7 +136,7 @@ class HerokuBackupMod(loader.Module):
                     "db_mods.json", 
                     orjson.dumps(
                         self.lookup("Loader").get("loaded_modules", {}), 
-                        option=orjson.OPT_INDENT_2
+                        option=orjson.OPT_INDENT_2 | orjson.OPT_NON_STR_KEYS
                     )
                 )
 
@@ -274,7 +274,7 @@ class HerokuBackupMod(loader.Module):
 
     @loader.command()
     async def backupdb(self, message: Message):
-        txt = io.BytesIO(orjson.dumps(self._db, option=orjson.OPT_INDENT_2))
+        txt = io.BytesIO(orjson.dumps(self._db, option=orjson.OPT_INDENT_2 | orjson.OPT_NON_STR_KEYS))
         txt.name = f"db-backup-{datetime.datetime.now():%d-%m-%Y-%H-%M}.json"
 
         if not getattr(self, "_content_channel_id", None):
@@ -303,7 +303,7 @@ class HerokuBackupMod(loader.Module):
         )
 
     @loader.command()
-    async def restoredb(self, message: Message):
+    async def restoreddb(self, message: Message):
         if not (reply := await message.get_reply_message()) or not reply.media:
             await utils.answer(
                 message,
@@ -361,7 +361,7 @@ class HerokuBackupMod(loader.Module):
 
         db_mods = orjson.dumps(
             self.lookup("Loader").get("loaded_modules", {}),
-            option=orjson.OPT_INDENT_2
+            option=orjson.OPT_INDENT_2 | orjson.OPT_NON_STR_KEYS
         )
 
         with zipfile.ZipFile(result, "w", zipfile.ZIP_DEFLATED) as zipf:
@@ -462,7 +462,7 @@ class HerokuBackupMod(loader.Module):
 
     @loader.command()
     async def backupall(self, message: Message):
-        db = io.BytesIO(orjson.dumps(self._db, option=orjson.OPT_INDENT_2))
+        db = io.BytesIO(orjson.dumps(self._db, option=orjson.OPT_INDENT_2 | orjson.OPT_NON_STR_KEYS))
         db.name = "db.json"
 
         mods = io.BytesIO()
@@ -476,7 +476,7 @@ class HerokuBackupMod(loader.Module):
                 "db_mods.json", 
                 orjson.dumps(
                     self.lookup("Loader").get("loaded_modules", {}), 
-                    option=orjson.OPT_INDENT_2
+                    option=orjson.OPT_INDENT_2 | orjson.OPT_NON_STR_KEYS
                 )
             )
 
