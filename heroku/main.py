@@ -644,8 +644,6 @@ class Heroku:
             **init_kwargs
         )
 
-        await client.disconnect()
-
         storage = SQLiteStringStorage(cli)
         await storage.import_session_string(session_str)
         cli.storage = storage
