@@ -429,12 +429,12 @@ class Presets(loader.Module):
     @loader.command(alias="la")
     async def loadaliases(self, message: Message):
         """Load aliases from file. Send a file with the command or reply to a file."""
-        msg = message if message.file else (await message.get_reply_message())
-        if not msg or not msg.file:
+        msg = message if message.media else message.reply_to_msg
+        if not msg or not msg.media:
             await message.edit(self.lookup("loader").strings['no_file'])
             return
         try:
-            data = orjson.loads((await msg.download(in_memory=True)).getbuffer())
+            data = orjson.loads(await msg.download_media())
         except Exception:
             await message.edit(self.lookup("loader").strings['load_failed'])
             logger.exception("Failed to load aliases from file")

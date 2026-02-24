@@ -647,6 +647,7 @@ class Heroku:
         cli.storage = storage
 
         await cli.connect()
+        await cli.start()
 
         if not delay_restart:
             logging.info("restart")

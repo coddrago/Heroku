@@ -433,10 +433,15 @@ class CommandDispatcher:
         print(type(event))
         for handler in self.raw_handlers:
             if isinstance(event, tuple(handler.updates)):
-                try:
-                    await loader._call_with_external_context(handler, event)
-                except Exception as e:
-                    logger.exception("Error in raw handler %s: %s", handler.id, e)
+                asyncio.ensure_future(
+                    self._call_raw_handler(handler, event)
+                )
+
+    async def _call_raw_handler(self, handler, event):
+        try:
+            await loader._call_with_external_context(handler, event)
+        except Exception as e:
+            logger.exception("Error in raw handler %s: %s", handler.id, e)
 
     async def handle_command(
         self,

@@ -386,7 +386,7 @@ class LoaderMod(loader.Module):
     async def loadmod(self, message: Message):
         args = utils.get_args_raw(message)
 
-        msg = message if message.file else (message.reply_to_message)
+        msg = message if message.media else message.reply_to_msg
 
         if msg is None or msg.media is None:
             await utils.answer(message, self.strings("provide_module"))
