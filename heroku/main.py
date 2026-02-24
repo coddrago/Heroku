@@ -825,16 +825,13 @@ class Heroku:
             print("\033[0;96mLoading QR code...\033[0m")
             qr_login = QRLogin(client)
 
-            async def print_qr():
-                await qr_login._request()
+            def print_qr():
                 qr = QRCode()
                 qr.add_data(qr_login.url)
                 print("\033[2J\033[3;1f")
                 qr.print_ascii(invert=True)
                 print("\033[0;96mScan the QR code above to log in.\033[0m")
                 print("\033[0;96mPress Ctrl+C to cancel.\033[0m")
-
-            await print_qr()
 
             async def qr_login_poll() -> bool:
                 logged_in = False
@@ -844,7 +841,7 @@ class Heroku:
                     except asyncio.TimeoutError:
                         try:
                             await qr_login.recreate()
-                            await print_qr()
+                            print_qr()
                         except SessionPasswordNeeded:
                             return True
                     except SessionPasswordNeeded:
@@ -893,13 +890,6 @@ class Heroku:
 
                 case False:
                     pass
-
-            me = await client.get_me()
-            telegram_id = me.id
-            client._tg_id = telegram_id
-            client.tg_id = telegram_id
-            client.hikka_me = me
-            client.heroku_me = me
 
             print_banner("success.txt")
             print("\033[0;92mLogged in successfully!\033[0m")
