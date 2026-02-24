@@ -818,7 +818,7 @@ class Heroku:
 
             match user_choice:
                 case "y":
-                    await client.connect()
+                    pass
                 case _:
                     return await self._phone_login(client)
 
