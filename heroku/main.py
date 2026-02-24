@@ -621,6 +621,7 @@ class Heroku:
     ):
         if hasattr(client, "tg_id"):
             telegram_id = client.tg_id
+            me = client.heroku_me
         else:
             if not (me := await client.get_me()):
                 raise RuntimeError("Attempted to save non-inited session")
@@ -650,6 +651,11 @@ class Heroku:
         cli.storage = storage
 
         await cli.start()
+
+        cli._tg_id = telegram_id
+        cli.tg_id = telegram_id
+        cli.hikka_me = me
+        cli.heroku_me = me
 
         # Set db attribute to this client in order to save
         # custom bot nickname from web
