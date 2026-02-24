@@ -891,6 +891,15 @@ class Heroku:
                 case False:
                     pass
 
+            await client.start()
+
+            me = await client.get_me()
+            telegram_id = me.id
+            client._tg_id = telegram_id
+            client.tg_id = telegram_id
+            client.hikka_me = me
+            client.heroku_me = me
+
             print_banner("success.txt")
             print("\033[0;92mLogged in successfully!\033[0m")
             cli = await self.save_client_session(client)
