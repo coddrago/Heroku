@@ -1,7 +1,7 @@
 __version__ = (2, 0, 0)
 
 # ©️ Fixyres, 2024-2030
-# 🌐 https://github.com/Fixyres/FHeta
+# 🌐 https://github.com/Fixyres/FModules
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -588,7 +588,7 @@ class HSearch(loader.Module):
                 "title": self.strings["inline_no_query"],
                 "description": self.strings["inline_desc"],
                 "message": self.strings["inline_no_query"].format(emoji=self._get_emoji("error")),
-                "thumb": "https://raw.githubusercontent.com/Fixyres/FHeta/refs/heads/main/assets/magnifying_glass.png",
+                "thumb": "https://raw.githubusercontent.com/Fixyres/FModules/refs/heads/main/assets/FHeta/magnifying_glass.png",
             }
 
         if len(query.args) > 168:
@@ -596,7 +596,7 @@ class HSearch(loader.Module):
                 "title": self.strings["inline_query_too_big"],
                 "description": self.strings["inline_no_results"],
                 "message": self.strings["query_too_big"].format(emoji=self._get_emoji("warn")),
-                "thumb": "https://raw.githubusercontent.com/Fixyres/FHeta/refs/heads/main/assets/try_other_query.png",
+                "thumb": "https://raw.githubusercontent.com/Fixyres/FModules/refs/heads/main/assets/FHeta/try_other_query.png",
             }
 
         mods = await self._api_get("search", query=query.args, inline="true", token=self.token, user_id=self.uid, ood="true")
@@ -606,7 +606,7 @@ class HSearch(loader.Module):
                 "title": self.strings["inline_no_results"],
                 "description": self.strings["inline_desc"],
                 "message": self.strings["inline_no_results"].format(emoji=self._get_emoji("error")),
-                "thumb": "https://raw.githubusercontent.com/Fixyres/FHeta/refs/heads/main/assets/try_other_query.png",
+                "thumb": "https://raw.githubusercontent.com/Fixyres/FModules/refs/heads/main/assets/FHeta/try_other_query.png",
             }
 
         results = []
@@ -624,7 +624,7 @@ class HSearch(loader.Module):
             results.append({
                 "title": utils.escape_html(mod.get("name", "")),
                 "description": utils.escape_html(str(desc)),
-                "thumb": mod.get("pic") or "https://raw.githubusercontent.com/Fixyres/FHeta/refs/heads/main/assets/empty_pic.png",
+                "thumb": mod.get("pic") or "https://raw.githubusercontent.com/Fixyres/FModules/refs/heads/main/assets/FHeta/empty_pic.png",
                 "message": self._fmt_mod(mod, query.args, inline=True),
                 "reply_markup": self._mk_btns(mod.get("install", ""), stats, 0, None, query.args),
             })
