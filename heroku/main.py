@@ -646,7 +646,6 @@ class Heroku:
         await storage.import_session_string(session_str)
         cli.storage = storage
 
-        await cli.connect()
         await cli.start()
 
         if not delay_restart:
