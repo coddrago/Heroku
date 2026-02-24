@@ -330,7 +330,8 @@ class CommandDispatcher:
         whitelist_chats = self._db.get(main.__name__, "whitelist_chats", [])
         whitelist_modules = self._db.get(main.__name__, "whitelist_modules", [])
 
-        chat_id = utils.get_chat_id(message)
+        if ((chat_id := utils.get_chat_id(message)) in blacklist_chats or (whitelist_chats and chat_id not in whitelist_chats)):
+            return False 
 
         if not message.message or len(message.message.strip()) == len(prefix):
             return False  # Message is just the prefix
@@ -622,7 +623,8 @@ class CommandDispatcher:
         whitelist_chats = self._db.get(main.__name__, "whitelist_chats", [])
         whitelist_modules = self._db.get(main.__name__, "whitelist_modules", [])
 
-        chat_id = utils.get_chat_id(message)
+        if ((chat_id := utils.get_chat_id(message)) in blacklist_chats or (whitelist_chats and chat_id not in whitelist_chats)):
+            logger.debug("Message is blocklisted")
 
         for func in self._modules.watchers:
             bl = self._db.get(main.__name__, "disabled_watchers", {})
