@@ -689,7 +689,6 @@ class Heroku:
                 except Exception:
                     print("Something went wrong")
 
-        await cli.disconnect()
 
         if not delay_restart:
             logging.info("restart")
