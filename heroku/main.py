@@ -633,6 +633,9 @@ class Heroku:
 
         session = f"heroku-{telegram_id}"
         init_kwargs = client._export_init_kwargs()
+        
+        init_kwargs["in_memory"] = False 
+        
         session_str = await client.export_session_string()
 
         cli = CustomClient(
@@ -647,10 +650,6 @@ class Heroku:
         cli.storage = storage
 
         await cli.start()
-
-        if not delay_restart:
-            logging.info("restart")
-            restart()
 
         # Set db attribute to this client in order to save
         # custom bot nickname from web
@@ -684,8 +683,12 @@ class Heroku:
                 except Exception:
                     print("Something went wrong")
 
-        if delay_restart:
-            await cli.disconnect()
+        await cli.disconnect()
+
+        if not delay_restart:
+            logging.info("restart")
+            restart()
+        else:
             await asyncio.sleep(3600)  # Will be restarted from web anyway
 
     async def _web_banner(self):
