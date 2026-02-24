@@ -818,7 +818,7 @@ class Heroku:
 
             match user_choice:
                 case "y":
-                    pass
+                    await client.connect()
                 case _:
                     return await self._phone_login(client)
 
@@ -890,8 +890,6 @@ class Heroku:
 
                 case False:
                     pass
-
-            await client.start()
 
             me = await client.get_me()
             telegram_id = me.id
