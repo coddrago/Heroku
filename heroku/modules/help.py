@@ -158,11 +158,9 @@ class Help(loader.Module):
             name = getattr(module, "name", "ERROR")
 
         _name = (
-            "{} (v{}.{}.{})".format(
+            "{} (v{})".format(
                 utils.escape_html(name),
-                module.__version__[0],
-                module.__version__[1],
-                module.__version__[2],
+                ".".join(map(str, module.__version__))
             )
             if hasattr(module, "__version__")
             else utils.escape_html(name)
