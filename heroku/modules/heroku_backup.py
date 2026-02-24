@@ -303,7 +303,7 @@ class HerokuBackupMod(loader.Module):
         )
 
     @loader.command()
-    async def restoreddb(self, message: Message):
+    async def restoredb(self, message: Message):
         if not (reply := await message.get_reply_message()) or not reply.media:
             await utils.answer(
                 message,
