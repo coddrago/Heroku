@@ -833,6 +833,8 @@ class Heroku:
                 print("\033[0;96mScan the QR code above to log in.\033[0m")
                 print("\033[0;96mPress Ctrl+C to cancel.\033[0m")
 
+            print_qr()
+
             async def qr_login_poll() -> bool:
                 logged_in = False
                 while not logged_in:
