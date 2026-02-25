@@ -106,26 +106,34 @@ class CoreMod(loader.Module):
     @loader.command()
     async def blacklist(self, message: Message):
         chatid = await self.blacklistcommon(message)
+        chatid_str = str(chatid)
+
+        if chatid_str.startswith("-100"):
+            chatid = (chatid_str[4:])
 
         self._db.set(
             main.__name__,
             "blacklist_chats",
-            self._db.get(main.__name__, "blacklist_chats", []) + [chatid.strip('-100')],
+            self._db.get(main.__name__, "blacklist_chats", []) + [chatid],
         )
 
-        await utils.answer(message, self.strings("blacklisted").format(chatid.strip('-100')))
+        await utils.answer(message, self.strings("blacklisted").format(chatid))
 
     @loader.command()
     async def unblacklist(self, message: Message):
         chatid = await self.blacklistcommon(message)
+        chatid_str = str(chatid)
+
+        if chatid_str.startswith("-100"):
+            chatid = (chatid_str[4:])
 
         self._db.set(
             main.__name__,
             "blacklist_chats",
-            list(set(self._db.get(main.__name__, "blacklist_chats", [])) - {chatid.strip('-100')}),
+            list(set(self._db.get(main.__name__, "blacklist_chats", [])) - {chatid}),
         )
 
-        await utils.answer(message, self.strings("unblacklisted").format(chatid.strip('-100')))
+        await utils.answer(message, self.strings("unblacklisted").format(chatid))
 
     async def getuser(self, message: Message):
         try:
