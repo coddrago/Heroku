@@ -342,18 +342,18 @@ class CoreMod(loader.Module):
         args = utils.get_args(message)
         if not args:
             await utils.answer(message, self.strings("wrong_usage_tcc"))
-        else: # костыль
-            if len(args) == 1:
-                cmd = args[0]
-                func = self.allmodules.commands.get(cmd.lower())
-                if not func:
-                    await utils.answer(message, self.strings("no_command"))
-                mod_inst = func.__self__
-            else:
-                mod_arg, cmd = args[0], args[1]
-                mod_inst = self.allmodules.lookup(mod_arg)
-                if not mod_inst:
-                    await utils.answer(message, self.strings("mod404").format(mod_arg))
+        
+        if len(args) == 1:
+            cmd = args[0]
+            func = self.allmodules.commands.get(cmd.lower())
+            if not func:
+                await utils.answer(message, self.strings("no_command"))
+            mod_inst = func.__self__
+        else:
+            mod_arg, cmd = args[0], args[1]
+            mod_inst = self.allmodules.lookup(mod_arg)
+            if not mod_inst:
+                await utils.answer(message, self.strings("mod404").format(mod_arg))
 
         module_key = mod_inst.__class__.__name__
 
@@ -399,11 +399,11 @@ class CoreMod(loader.Module):
         args = utils.get_args(message)
         if not args:
             await utils.answer(message, self.strings("wrong_usage_tmc"))
-        else:
-            mod_arg = args[0]
-            mod_inst = self.allmodules.lookup(mod_arg)
-            if not mod_inst:
-                await utils.answer(message, self.strings("mod404").format(mod_arg)) 
+
+        mod_arg = args[0]
+        mod_inst = self.allmodules.lookup(mod_arg)
+        if not mod_inst:
+            await utils.answer(message, self.strings("mod404").format(mod_arg)) 
 
         module_key = mod_inst.__class__.__name__
         disabled = self._db.get(main.__name__, "disabled_modules", [])
@@ -437,13 +437,13 @@ class CoreMod(loader.Module):
         args = utils.get_args(message)
         if not args:
             await utils.answer(message, self.strings("wrong_usage_cmc"))
+
+        mod_arg = args[0]
+        mod_inst = self.allmodules.lookup(mod_arg)
+        if mod_inst:
+            module_key = mod_inst.__class__.__name__
         else:
-            mod_arg = args[0]
-            mod_inst = self.allmodules.lookup(mod_arg)
-            if mod_inst:
-                module_key = mod_inst.__class__.__name__
-            else:
-                module_key = mod_arg
+            module_key = mod_arg
 
         if module_key in self._db:
             try:
