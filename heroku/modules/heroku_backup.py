@@ -230,7 +230,7 @@ class HerokuBackupMod(loader.Module):
                             with modzip.open(name, "r") as module:
                                 path.write_bytes(module.read())
 
-            await self.inline.bot(call.answer(self.strings("all_restored"), show_alert=True))
+            await self.inline.bot(call.answer(self.strings("all_restored_bot"), show_alert=True))
             await self.invoke("restart", "-f", peer=call.message.peer_id)
         except Exception:
             logger.exception("Restore from backupall failed")
