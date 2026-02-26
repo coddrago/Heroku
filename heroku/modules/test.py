@@ -301,7 +301,7 @@ class TestMod(loader.Module):
 
         logs = self.lookup("evaluator").censor(logs)
 
-        logs = BytesIO(logs.encode("utf-16"))
+        logs = BytesIO(logs.encode("utf-8"))
         logs.name = "heroku-logs.txt"
 
         ghash = utils.get_git_hash()
