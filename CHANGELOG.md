@@ -99,7 +99,16 @@
 - add new styles button in some cases
 - add some "icons" in buttons
 - remove utils.html_escape from eval
-- 
+- fix watcherbl
+- remove blacklist from ubguard.codrago.life
+- fix config mod args when args is wrong
+- add some translation providers to translator
+- fix: replace all no-break spaces with regular ones in Evaluator
+- add premium icon to /start and /profile
+- fix critical bug with inline
+- fix: update hashable_entity check to handle negative channel ID's
+- add bot command adding
+- improve error handling and add debug logging for bot command settings 
 
 ## 🪐 Heroku 1.7.2
 - added autoupdate
