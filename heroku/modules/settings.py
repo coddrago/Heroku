@@ -351,13 +351,7 @@ class CoreMod(loader.Module):
         if not args:
             await utils.answer(message, self.strings("wrong_usage_tcc"))
         
-        if len(args) == 1:
-            cmd = args[0]
-            func = self.allmodules.commands.get(cmd.lower())
-            if not func:
-                await utils.answer(message, self.strings("no_command"))
-            mod_inst = func.__self__
-        else:
+        if args and len(args) >= 2:
             mod_arg, cmd = args[0], args[1]
             mod_inst = self.allmodules.lookup(mod_arg)
             if not mod_inst:
