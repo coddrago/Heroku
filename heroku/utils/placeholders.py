@@ -23,7 +23,7 @@ def register_placeholder(placeholder: str, callback: typing.Callable, descriptio
     }
     return True
 
-async def get_placeholder(placeholder: str, data=None):
+async def get_placeholder(placeholder: str, data: dict | None = None):
     """
     Returns placeholder data
     """
