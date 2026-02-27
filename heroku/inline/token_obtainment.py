@@ -204,7 +204,9 @@ class TokenObtainment(InlineUnit):
                     if resp.status != 200:
                         logger.error("Error while changing bot inline settings: resp%s", resp.status)
                         return False
-            
+
+            self.bot_id = bot_id
+
             commands = {
                 "start": "Welcome message",
                 "profile": "Get main information about bot",
