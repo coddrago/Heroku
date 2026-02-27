@@ -23,15 +23,15 @@ def register_placeholder(placeholder: str, callback: typing.Callable, descriptio
     }
     return True
 
-async def get_placeholder(placeholder: str):
+async def get_placeholder(placeholder: str, data=None):
     """
     Returns placeholder data
     """
     callback = custom_placeholders[placeholder]["callback"]
     try:
-        callback_data = str(await callback())
+        callback_data = str(await callback(data))
     except:
-        callback_data = str(callback())
+        callback_data = str(await callback())
     return callback_data
 
 async def get_placeholders(data, custom_message):
@@ -42,7 +42,7 @@ async def get_placeholders(data, custom_message):
         return data
     for placeholder in custom_placeholders.values():
         if f"{{{placeholder['placeholder_name']}}}" in custom_message:
-            data[placeholder["placeholder_name"]] = await get_placeholder(placeholder["placeholder_name"])
+            data[placeholder["placeholder_name"]] = await get_placeholder(placeholder["placeholder_name"], data)
     return data
 
 def unregister_placeholders(module_name: str) -> int:

@@ -261,6 +261,9 @@ presets:
   folder_not_found: "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>Папка {} не найдена</b>"
   no_modules_in_folder: "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>В папке {} нет модулей</b>"
   folder: "<tg-emoji emoji-id=5256113064821926998>📁</tg-emoji> <b>Папка</b> {}\n\n<tg-emoji emoji-id=5134452506935427991>🪐</tg-emoji> <b>{prefix}lp в ответ на это сообщение для установки</b>"
+  remove_from_folder_usage: "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>Укажи папку и модуль для удаления. </b> <code>{prefix}removefromfolder <папка> <модуль></code>"
+  removed_from_folder: "<tg-emoji emoji-id=5436040291507247633>🎉</tg-emoji> <b>Модуль {} удален из папки</b> <code>{}</code>"
+  module_not_in_folder: "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>Модуль {} не находится в папке {}</b>"
   _cls_doc: "Предлагает новым пользователям Heroku готовые сборки модулей для загрузки"
 
 settings:

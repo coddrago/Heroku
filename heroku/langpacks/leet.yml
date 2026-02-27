@@ -276,6 +276,9 @@ presets:
   folder_not_found: "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>F0ld3r {} n0t f0und</b>"
   no_modules_in_folder: "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>N0 m0dul3z 1n f0ld3r {}</b>"
   folder: "<tg-emoji emoji-id=5256113064821926998>📁</tg-emoji> <b>F0ld3r</b> {}\n\n<tg-emoji emoji-id=5134452506935427991>🪐</tg-emoji> <b>{prefix}lp 1n r3ply t0 7h1z m3zz4g3 t0 1nzt4ll</b>"
+  remove_from_folder_usage: "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>5p3c1fy f0ld3r 4nd m0dul3 t0 r3m0v3. </b> <code>{prefix}removefromfolder <f0ld3r> <m0dul3></code>"
+  removed_from_folder: "<tg-emoji emoji-id=5436040291507247633>🎉</tg-emoji> <b>Modul3 {} r3m0v3d fr0m f0ld3r</b> <code>{}</code>"
+  module_not_in_folder: "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>Modul3 {} 15 n07 1n f0ld3r {}</b>"
   _cls_doc: "Sugg3575 n3w H3r0ku u53rz 4 p4ck5 0f m0d5 2 l04d"
 
 settings:
