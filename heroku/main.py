@@ -1040,24 +1040,30 @@ class Heroku:
                     )
                     self.omit_log = True
 
-            await client.heroku_inline.bot.send_photo(
-                logging.getLogger().handlers[0].get_logid_by_client(client.tg_id),
-                "https://raw.githubusercontent.com/coddrago/assets/refs/heads/main/heroku/heroku_started.png",
-                caption=(
-                    "{} <b>{} started!</b>\n\n<tg-emoji emoji-id=5231065262228250587>⚙</tg-emoji> <b>GitHub commit SHA: <a"
-                    ' href="https://github.com/coddrago/Heroku/commit/{}">{}</a></b>\n<tg-emoji emoji-id=5873225338984599714>🔎</tg-emoji>'
-                    " <b>Update status: {}</b>\n<b>{}</b>\n<tg-emoji emoji-id=5870903672937911120>🕶</tg-emoji> <b>Prefix:</b> <code>{}</code>"
-                ).format(
-                    utils.get_platform_emoji() if client.heroku_me.premium is True else "🪐 Heroku",
-                    ".".join(list(map(str, list(__version__)))),
-                    build,
-                    build[:7],
-                    upd,
-                    web_url,
-                    "." if pref is None else pref,
-                ),
-                message_thread_id=await logging.getLogger().handlers[0].get_logs_topic_id_by_client(client.tg_id),
-            )
+            try:
+                log_chat_id = logging.getLogger().handlers[0].get_logid_by_client(client.tg_id)
+                message_thread_id = await logging.getLogger().handlers[0].get_logs_topic_id_by_client(client.tg_id)
+                
+                await client.heroku_inline.bot.send_photo(
+                    log_chat_id,
+                    "https://raw.githubusercontent.com/coddrago/assets/refs/heads/main/heroku/heroku_started.png",
+                    caption=(
+                        "{} <b>{} started!</b>\n\n<tg-emoji emoji-id=5231065262228250587>⚙</tg-emoji> <b>GitHub commit SHA: <a"
+                        ' href="https://github.com/coddrago/Heroku/commit/{}">{}</a></b>\n<tg-emoji emoji-id=5873225338984599714>🔎</tg-emoji>'
+                        " <b>Update status: {}</b>\n<b>{}</b>\n<tg-emoji emoji-id=5870903672937911120>🕶</tg-emoji> <b>Prefix:</b> <code>{}</code>"
+                    ).format(
+                        utils.get_platform_emoji() if client.heroku_me.premium is True else "🪐 Heroku",
+                        ".".join(list(map(str, list(__version__)))),
+                        build,
+                        build[:7],
+                        upd,
+                        web_url,
+                        "." if pref is None else pref,
+                    ),
+                    message_thread_id=message_thread_id,
+                )
+            except Exception as badge_error:
+                logging.debug(f"Failed to send badge photo: {badge_error}")
             logging.debug(
                 "· Started for %s · Prefix: «%s» ·",
                 client.tg_id,

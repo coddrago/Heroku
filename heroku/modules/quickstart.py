@@ -91,7 +91,6 @@ class Quickstart(loader.Module):
                     hide_general=True,
                     _folder='heroku',
                 )
-                logger.info(f"Created new content channel with ID {content_channel.id}")
                 db.set("heroku.forums", "channel_id", int(content_channel.id))
             
             if not content_channel:
@@ -103,9 +102,7 @@ class Quickstart(loader.Module):
             if existing_forum_id:
                 try:
                     forum_entity = await client.get_entity(existing_forum_id)
-                    logger.debug(f"Found existing forum with ID {existing_forum_id}")
                 except Exception as e:
-                    logger.warning(f"Saved forum ID {existing_forum_id} not found or inaccessible: {e}")
                     forum_entity = None
             
             if not forum_entity:
@@ -143,9 +140,7 @@ class Quickstart(loader.Module):
                     
                     forum_entity = content_channel
                     db.set("heroku.forums", "forum_id", int(content_channel.id))
-                    logger.info(f"Forum is ready with ID {content_channel.id}")
                 except Exception as e:
-                    logger.warning(f"Failed to setup forum: {e}")
                     forum_entity = content_channel
 
             required_topics = [
