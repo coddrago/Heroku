@@ -728,6 +728,11 @@ class Heroku:
 
         await client.stop()
 
+        # storage clearing bug workaround
+        is_bot = False
+        await client.storage.user_id(telegram_id)
+        await client.storage.is_bot(is_bot)
+
         res = await client.connect()
         print(f"""
             {client.storage.SESSION_STRING_FORMAT},

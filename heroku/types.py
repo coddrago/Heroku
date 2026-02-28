@@ -1361,7 +1361,7 @@ def _get_members(
 class SQLiteStringStorage(SQLiteStorage):
     def __init__(self, client: Client):
         name = client.name
-        workdir = client.WORKDIR
+        workdir = client.workdir
         super().__init__(name, workdir)
 
     async def import_session_string(self, session_string: str):
