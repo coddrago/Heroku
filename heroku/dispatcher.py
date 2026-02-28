@@ -638,7 +638,11 @@ class CommandDispatcher:
         event: "Message",
     ):
         """Handle all incoming messages"""
+        if isinstance(event, list): # deleted messages list
+            print(type(event), ", ".join(event))
+            return
         print(type(event), event.text, event.id)
+
         message = utils.msg_censor(event)
 
         blacklist_chats = self._db.get(main.__name__, "blacklist_chats", [])

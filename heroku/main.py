@@ -717,12 +717,6 @@ class Heroku:
         return False
 
     async def _phone_login(self, client: CustomClient) -> bool:
-        # phone = input(
-        #     "\033[0;96mEnter phone: \033[0m"
-        #     if self.arguments.tty
-        #     else "Enter phone: "
-        # )
-
         await client.start()
 
         me = await client.get_me()
@@ -731,6 +725,28 @@ class Heroku:
         client.tg_id = telegram_id
         client.hikka_me = me
         client.heroku_me = me
+
+        print(f"""
+            {client.storage.SESSION_STRING_FORMAT},
+            {await client.storage.dc_id()},
+            {await client.storage.user_id()},
+            {await client.storage.is_bot()}""")
+
+        await client.stop()
+
+        # storage clearing bug workaround
+        is_bot = False
+        await client.storage.user_id(telegram_id)
+        await client.storage.is_bot(is_bot)
+
+        res = await client.connect()
+        print(f"""
+            {client.storage.SESSION_STRING_FORMAT},
+            {await client.storage.dc_id()},
+            {await client.storage.user_id()},
+            {await client.storage.is_bot()}""")
+        if not res:
+            raise RuntimeError()
 
         db = database.Database(client)
         await db.init()
@@ -799,7 +815,7 @@ class Heroku:
                 self.api_token.HASH,
                 in_memory=True,
                 proxy = self.proxy,
-                workdir=BASE_PATH,
+                workdir=os.getcwd(),
                 device_model = get_app_name(),
                 system_version = generate_random_system_version(),
                 app_version = ".".join(map(str, __version__)) + " x64",
