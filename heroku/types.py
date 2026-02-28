@@ -78,11 +78,39 @@ def _is_external_origin(origin: str) -> bool:
 
 
 def _make_safe_client_proxy():
-    # Store client mapping in a closure to make direct extraction harder.
+    import random
     import weakref
+    from . import utils
 
     _client_map = weakref.WeakKeyDictionary()
     _origin_map = weakref.WeakKeyDictionary()
+    _module_map = weakref.WeakKeyDictionary()
+    _inline_map = weakref.WeakKeyDictionary()
+    _user_id_map = weakref.WeakKeyDictionary()
+    
+    _PROTECTED_REQUESTS = {
+        "GetStarGiftsRequest",
+        "GetSavedStarGiftRequest",
+        "GetResaleStarGiftsRequest",
+        "GetUniqueStarGiftRequest",
+        "GetUniqueStarGiftValueInfoRequest",
+        "GetStarGiftUpgradePreviewRequest",
+        "GetStarGiftWithdrawalUrlRequest",
+        "UpgradeStarGiftRequest",
+        "TransferStarGiftRequest",
+        "CreateStarGiftCollectionRequest",
+        "SendStarsFormRequest",
+        "GetStarsGiftOptionsRequest",
+        "GetStarsTransactionsRequest",
+        "RefundStarsChargeRequest",
+    }
+    
+    _PAID_REQUESTS = {
+        "SendMessageRequest",
+        "SendMediaRequest",
+        "ForwardMessagesRequest",
+        "SearchPostsRequest",
+    }
 
     class SafeClientProxy:
         __slots__ = ("__weakref__",)
@@ -137,8 +165,79 @@ def _make_safe_client_proxy():
                 raise AttributeError("Write to client attribute is blocked")
             setattr(_client_map[self], name, value)
 
+        def _set_module_info(self, module_object, inline_object, user_id: int):
+            _module_map[self] = module_object
+            _inline_map[self] = inline_object
+            _user_id_map[self] = user_id
+        
+        def _send_permission_request(self, request_name: str, module, star_count=None):
+            async def _async_send():
+                user_id = _user_id_map.get(self)
+                if not user_id:
+                    return
+                
+                star_text = f" with {star_count} stars" if star_count else ""
+                message_text = f"<b>{module.__class__.__name__}</b> wants to use <code>{request_name}</code>{star_text}, allow?"
+
+                yes_callback_id = utils.rand(24)
+                no_callback_id = utils.rand(24)
+
+                buttons = [
+                    [
+                        {
+                            "text": "✅",
+                            "callback": yes_callback_id,
+                        },
+                        {
+                            "text": "❌",
+                            "callback": no_callback_id,
+                        },
+                    ]
+                ]
+                
+                if random.choice([True, False]):
+                    buttons[0].reverse()
+
+                try:
+                    await _client_map[self].send_message(
+                        user_id,
+                        message_text,
+                        buttons=buttons,
+                    )
+                except Exception as e:
+                    logger.debug("Failed to send permission request: %s", e)
+
+            try:
+                loop = asyncio.get_event_loop()
+                if loop.is_running():
+                    asyncio.create_task(_async_send())
+                else:
+                    loop.run_until_complete(_async_send())
+            except Exception:
+                logger.debug("Failed to schedule permission request")
+
         def __call__(self, *args, **kwargs):
-            return _client_map[self](*args, **kwargs)
+            client = _client_map[self]
+            
+            if args and hasattr(args[0], '__class__'):
+                request_name = args[0].__class__.__name__
+                module = _module_map.get(self)
+
+                if request_name in _PROTECTED_REQUESTS and module:
+                    star_count = getattr(args[0], "stars", None)
+                    self._send_permission_request(request_name, module, star_count)
+
+                elif request_name in _PAID_REQUESTS and module:
+                    allow_paid = getattr(module, 'allow_paid_stars', None)
+                    if allow_paid is False:
+                        raise PermissionError(
+                            f"Module {module.__class__.__name__} denies paid requests like {request_name}"
+                        )
+                    
+                    if allow_paid is None:
+                        self._send_permission_request(request_name, module)
+
+            return client(*args, **kwargs)
 
         def __repr__(self) -> str:
             return "<SafeClientProxy>"
@@ -460,6 +559,15 @@ class Module:
             safe_allclients = [SafeClientProxy(c, origin) for c in self.allmodules.allclients]
             safe_db = SafeDatabaseProxy(self.allmodules.db, origin)
             safe_inline = SafeInlineProxy(self.allmodules.inline, origin)
+            
+            try:
+                user_id = self.allmodules.client.tg_id
+                safe_client._set_module_info(self, self.allmodules.inline, user_id)
+                for client in safe_allclients:
+                    client._set_module_info(self, self.allmodules.inline, user_id)
+            except Exception as e:
+                logger.debug("Failed to set module info for request checking: %s", e)
+            
             self.allmodules = SafeAllModulesProxy(
                 self.allmodules,
                 safe_client,
