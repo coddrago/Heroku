@@ -97,6 +97,57 @@ class Quickstart(loader.Module):
             if not content_channel:
                 raise RuntimeError("Failed to get or create content channel!")
 
+            forum_entity = None
+            existing_forum_id = db.get("heroku.forums", "forum_id", None)
+            
+            if existing_forum_id:
+                try:
+                    forum_entity = await client.get_entity(existing_forum_id)
+                    logger.debug(f"Found existing forum with ID {existing_forum_id}")
+                except Exception as e:
+                    logger.warning(f"Saved forum ID {existing_forum_id} not found or inaccessible: {e}")
+                    forum_entity = None
+            
+            if not forum_entity:
+                try:
+                    from herokutl.tl.types import Channel, Chat
+                    heroku_userbot_entity = None
+                    
+                    async for dialog in client.iter_dialogs():
+                        if dialog.title and 'heroku-userbot' in dialog.title.lower():
+                            heroku_userbot_entity = dialog.entity
+                            break
+                    
+                    if heroku_userbot_entity and isinstance(heroku_userbot_entity, Channel):
+                        try:
+                            channel_full = await client(client.get_messages(heroku_userbot_entity, limit=1))
+                            if hasattr(heroku_userbot_entity, 'forum') and heroku_userbot_entity.forum:
+                                forum_entity = heroku_userbot_entity
+                                db.set("heroku.forums", "forum_id", int(heroku_userbot_entity.id))
+                        except Exception:
+                            pass
+                except Exception:
+                    pass
+            
+            if not forum_entity:
+                try:
+                    if not (hasattr(content_channel, 'forum') and content_channel.forum):
+                        from herokutl.tl.functions.channels import EditForumRequest
+                        try:
+                            await client(EditForumRequest(
+                                channel=content_channel,
+                                enabled=True
+                            ))
+                        except Exception as e:
+                            logger.debug(f"Channel might already be a forum or conversion failed: {e}")
+                    
+                    forum_entity = content_channel
+                    db.set("heroku.forums", "forum_id", int(content_channel.id))
+                    logger.info(f"Forum is ready with ID {content_channel.id}")
+                except Exception as e:
+                    logger.warning(f"Failed to setup forum: {e}")
+                    forum_entity = content_channel
+
             required_topics = [
                 ("Assets", "🌆 Your Heroku assets will be stored here", 5877307202888273539),
                 ("Logs", "📊 Inline logs and error reports will be stored here", 5877307202888273539),
@@ -108,7 +159,7 @@ class Quickstart(loader.Module):
                     await utils.asset_forum_topic(
                         client=self._client,
                         db=db,
-                        peer=content_channel.id,
+                        peer=forum_entity.id if forum_entity else content_channel.id,
                         title=topic_title,
                         description=topic_desc,
                         icon_emoji_id=emoji_id,
