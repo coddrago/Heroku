@@ -276,6 +276,7 @@ class CommandDispatcher:
         _message: "Message",
         watcher: bool = False,
     ) -> typing.Union[bool, typing.Tuple[Message, str, str, callable]]:
+        logger.debug("handling command in message %s", _message)
         if not hasattr(_message, "text"):
             return False
 
@@ -287,10 +288,13 @@ class CommandDispatcher:
         else:
             prefix = self._db.get(main.__name__, "command_prefixes", {})
             prefix = prefix.get(str(initiator), main_prefix)
-            
+
+        logger.debug("using \"%s\" prefix for msg_id=%s", prefix, _message.id)
+
         message = utils.msg_censor(_message)
 
         if not message.text:
+            logger.debug("there is no text in message for chat_id=%s msg_id=%s", _message.chat.id, _message.id)
             return False
 
         if (
@@ -304,28 +308,30 @@ class CommandDispatcher:
             )
         ):
             # Allow escaping commands using .'s
+            logger.debug("it is an escape! made it for chat_id=%s msg_id=%s", _message.chat.id, _message.id)
             if not watcher:
                 await message.edit(
                     message.html_text[len(prefix):],
                 )
             return False
 
-        match True:
-            case _ if (
-                message.text.startswith(str.translate(prefix, _LAYOUT_TRANSLATION))
-                and str.translate(prefix, _LAYOUT_TRANSLATION) != prefix
-            ):
-                message.text = Str(str.translate(message.text, _LAYOUT_TRANSLATION)).init(message.entities)
-            case _ if not message.text.startswith(prefix):
-                return False
+        if (
+            message.text.startswith(str.translate(prefix, _LAYOUT_TRANSLATION))
+            and str.translate(prefix, _LAYOUT_TRANSLATION) != prefix
+        ):
+            logger.debug("it is keyboard switch for msg_id=%s", prefix, _message.id)
+            message.text = Str(str.translate(message.text, _LAYOUT_TRANSLATION)).init(message.entities)
+
+        elif not message.text.startswith(prefix):
+            return False
 
         if (
             message.sticker
             or message.dice
-            or message.audio
-            or message.via_bot.id
-            or getattr(_message, "reactions", False)
+            # or message.audio # is there really a reason for this?
+            or message.via_bot
         ):
+            logger.debug("it is a non-editable message. returning for chat_id=%s msg_id=%s", _message.chat.id, _message.id)
             return False
 
         blacklist_chats = self._db.get(main.__name__, "blacklist_chats", [])
@@ -347,21 +353,20 @@ class CommandDispatcher:
             return False
 
         if not message.text or len(message.text.strip()) == len(prefix):
+            logger.debug("message is just the prefix. returning for chat_id=%s msg_id=%s", _message.chat.id, _message.id)
             return False  # Message is just the prefix
 
 
         command = message.text[len(prefix):].strip().split(maxsplit=1)[0]
         tag = command.split("@", maxsplit=1)
-        #logger.info(f"Received command: {command}")
+        logger.debug(f"Received command: {command}")
         tag = command.split("@", maxsplit=1)
-        #logger.info(f"Command tag: {tag}")
+        logger.debug(f"Command tag: {tag}")
 
         if len(tag) == 2:
             if tag[1] == "me":
                 if not message.outgoing:
                     return False
-            elif tag[1].lower() not in self._cached_usernames:
-                return False
         elif (
             message.outgoing
             or message.mentioned
@@ -383,6 +388,7 @@ class CommandDispatcher:
         ):
             return False
 
+        logger.debug("dispatching da command for chat_id=%s msg_id=%s", _message.chat.id, _message.id)
         txt, func = self._modules.dispatch(tag[0])
 
         if (
@@ -394,6 +400,7 @@ class CommandDispatcher:
                 usernames=self._cached_usernames,
             )
         ):
+            logger.debug("not passed security check for chat_id=%s msg_id=%s", _message.chat.id, _message.id)
             return False
 
         if message.chat.type == ChatType.CHANNEL and message.edit_date:
@@ -421,6 +428,7 @@ class CommandDispatcher:
             return False
 
         if await self._handle_tags(_message, func):
+            logger.debug("returned because the team did not pass the function conditions for chat_id=%s msg_id=%s", _message.chat.id, _message.id)
             return False
 
         if self._db.get(main.__name__, "grep", False) and not watcher:
@@ -447,6 +455,7 @@ class CommandDispatcher:
         print(type(event), event.text, event.id)
         message = await self._handle_command(event)
         if not message:
+            logger.debug("not passed message for chat_id=%s msg_id=%s", event.chat.id, event.id)
             return
 
         message, _, _, func = message
