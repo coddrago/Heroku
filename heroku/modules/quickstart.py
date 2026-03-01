@@ -25,7 +25,7 @@ class Quickstart(loader.Module):
 
     strings = {"name": "Quickstart"}
 
-    async def client_ready(self, client, db):
+    async def client_ready(self):
         await self.request_join(
             "heroku_talks", 
             "Heroku help is only available in this chat. By agreeing to join the chat, you agree to the Heroku federation rules and if you violate them, you will be permanently banned."
@@ -58,30 +58,30 @@ class Quickstart(loader.Module):
                 )
             ).rstrip()
         )
-        
+
         try:
             content_channel = None
-            existing_channel_id = db.get("heroku.forums", "channel_id", None)
-            
+            existing_channel_id = self.db.get("heroku.forums", "channel_id", None)
+
             if existing_channel_id:
                 try:
-                    content_channel = await client.get_entity(existing_channel_id)
+                    content_channel = await self.client.get_entity(existing_channel_id)
                     logger.debug(f"Found existing content channel with ID {existing_channel_id}")
                 except Exception as e:
                     logger.warning(f"Saved channel ID {existing_channel_id} not found or inaccessible: {e}")
                     content_channel = None
-            
+
             if not content_channel:
-                async for dialog in client.iter_dialogs():
+                async for dialog in self.client.iter_dialogs():
                     if dialog.title and 'heroku-userbot' in dialog.title.lower():
                         content_channel = dialog.entity
                         logger.debug(f"Found existing channel '{dialog.title}' with ID {dialog.entity.id}")
-                        db.set("heroku.forums", "channel_id", int(dialog.entity.id))
+                        self.db.set("heroku.forums", "channel_id", int(dialog.entity.id))
                         break
 
             if not content_channel:
                 content_channel, _ = await utils.asset_channel(
-                    client=client,
+                    client=self.client,
                     title='heroku-userbot',
                     description='🪐 Content related to Heroku will be here',
                     silent=True,
@@ -91,55 +91,34 @@ class Quickstart(loader.Module):
                     hide_general=True,
                     _folder='heroku',
                 )
-                db.set("heroku.forums", "channel_id", int(content_channel.id))
+                self.db.set("heroku.forums", "channel_id", int(content_channel.id))
 
             if not content_channel:
                 raise RuntimeError("Failed to get or create content channel!")
 
             forum_entity = None
-            existing_forum_id = db.get("heroku.forums", "forum_id", None)
-            
+            existing_forum_id = self.db.get("heroku.forums", "forum_id", None)
+
             if existing_forum_id:
                 try:
-                    forum_entity = await client.get_entity(existing_forum_id)
+                    forum_entity = await self.client.get_entity(existing_forum_id)
                 except Exception as e:
                     forum_entity = None
-            
+
             if not forum_entity:
                 try:
-                    from herokutl.tl.types import Channel, Chat
-                    heroku_userbot_entity = None
-                    
-                    async for dialog in client.iter_dialogs():
-                        if dialog.title and 'heroku-userbot' in dialog.title.lower():
-                            heroku_userbot_entity = dialog.entity
-                            break
-                    
-                    if heroku_userbot_entity and isinstance(heroku_userbot_entity, Channel):
+                    if not (hasattr(content_channel, 'forum') or not content_channel.forum):
+                        from herokutl.tl.functions.channels import ToggleForumRequest
                         try:
-                            channel_full = await client(client.get_messages(heroku_userbot_entity, limit=1))
-                            if hasattr(heroku_userbot_entity, 'forum') and heroku_userbot_entity.forum:
-                                forum_entity = heroku_userbot_entity
-                                db.set("heroku.forums", "forum_id", int(heroku_userbot_entity.id))
-                        except Exception:
-                            pass
-                except Exception:
-                    pass
-            
-            if not forum_entity:
-                try:
-                    if not (hasattr(content_channel, 'forum') and content_channel.forum):
-                        from herokutl.tl.functions.channels import EditForumRequest
-                        try:
-                            await client(EditForumRequest(
+                            await self.client(ToggleForumRequest(
                                 channel=content_channel,
-                                enabled=True
+                                enabled=True,
                             ))
                         except Exception as e:
                             logger.debug(f"Channel might already be a forum or conversion failed: {e}")
                     
                     forum_entity = content_channel
-                    db.set("heroku.forums", "forum_id", int(content_channel.id))
+                    self.db.set("heroku.forums", "forum_id", int(content_channel.id))
                 except Exception as e:
                     forum_entity = content_channel
 
@@ -152,8 +131,8 @@ class Quickstart(loader.Module):
             for topic_title, topic_desc, emoji_id in required_topics:
                 try:
                     await utils.asset_forum_topic(
-                        client=self._client,
-                        db=db,
+                        client=self.client,
+                        db=self.db,
                         peer=forum_entity.id if forum_entity else content_channel.id,
                         title=topic_title,
                         description=topic_desc,
@@ -163,7 +142,7 @@ class Quickstart(loader.Module):
                 except Exception:
                     logger.exception(f"Failed to create/verify topic '{topic_title}'")
             
-            await utils.invite_inline_bot(client, content_channel)
+            await utils.invite_inline_bot(self.client, content_channel)
 
         except Exception:
             logger.exception(
