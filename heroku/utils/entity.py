@@ -382,7 +382,7 @@ async def asset_forum_topic(
         new_topic = await client(GetForumTopicsByIDRequest(peer=entity, topics=[topic_id]))
         new_topic = new_topic.topics[0]
 
-        if isinstance(topic, ForumTopicDeleted):
+        if isinstance(new_topic, ForumTopicDeleted):
             logger.warning(f"Topic: '{title}' was found in the database but does not exist in the channel and will be recreated")
             await fw_protect()
             new_topic = await create_topic()
