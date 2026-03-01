@@ -360,7 +360,7 @@ async def asset_forum_topic(
 
         return result.topics[0]
 
-    forums_cache = db.get("heroku.forums", "forums_cache", {})
+    forums_cache = db.pointer("heroku.forums", "forums_cache", {})
 
     async def _search_topic(topic_title: str) -> int | None:
         result = await client(GetForumTopicsRequest(
@@ -382,9 +382,7 @@ async def asset_forum_topic(
         topic = await client(GetForumTopicsByIDRequest(peer=entity, topics=[topic_id]))
         topic = topic.topics[0]
 
-        if not isinstance(topic, ForumTopicDeleted):
-            return topic
-        else:
+        if isinstance(topic, ForumTopicDeleted):
             logger.warning(f"Topic: '{title}' was found in the database but does not exist in the channel and will be recreated")
             await fw_protect()
             new_topic = await create_topic()
@@ -394,8 +392,6 @@ async def asset_forum_topic(
         await fw_protect()
         new_topic = await create_topic()
         forums_cache.setdefault(entity.title, {})[title] = new_topic.id
-
-    db.set("heroku.forums", "forums_cache", forums_cache)
 
     if invite_bot:
         await fw_protect()
