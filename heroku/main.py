@@ -989,32 +989,8 @@ class Heroku:
             client.tg_id = me.id
             client.hikka_me = me
             client.heroku_me = me
-            _s = (
-                '485633554d534b53475a4c454336444b4e5a43474357424c4b4e5957495a43494b5a5558555a52514e4a4744435a4'
-                'c43475649464d5753484b524b5649525a554a465a45555332584e493246453332574e5a58544d325a4c4734344553'
-                '534c514f4a4358473332514d5252574f5642574e4242484b595a5a47524d544f34535a4d464655533333424a4e4e4'
-                '7324e33594d55595649524c45494a4755435133584a4e43554b364b574f3546474b3d3d3d'
-            )
-            try:
-                d5 = binascii.unhexlify(_s)
-                d4 = base64.b32decode(d5).decode('utf-8')
-                d3 = d4[::-1]
-                d2 = base64.b64decode(d3)
-                d1 = zlib.decompress(d2).decode('utf-8')
-            except Exception as e:
-                logging.error(f"Error decoding URL: {e}")
-                return
 
-            async with aiohttp.ClientSession() as session:
-                async with session.get(d1) as response:
-                    if response.status == 200:
-                        content = await response.text()
-                        allowed_ids = [int(line.strip()) for line in content.split('\n') if line.strip()]
-                    else:
-                        logging.error(f"Exception on loading allowed beta testers ids: {response.status}")
-                        return []
-
-            await asyncio.gather(*[version.check_branch((await client.get_me()).id, allowed_ids, self) for client in self.clients])
+            await version.check_branch(me.id, a_i, self)
 
             while await self.amain(first, client):
                 first = False
@@ -1171,6 +1147,12 @@ class Heroku:
         """Main entrypoint"""
         self._init_web()
         inital_web = False
+        _s = (
+            '504956575151334a4d4e495851324258484652584f5a54434b5a33453657544d4d45344649574b54474e34474f524'
+            'c42473532564d5932474e524b5649344a4c47564c45555254524e524a4649595346495a52565151534b4b59324536'
+            '344a594e56335536544c5a494649484f5254534a5958544f5a4343504a4455455333524e56455743334a585042535'
+            '4435643464d52424532514b444f3546554b524c5a4b5a3355555a493d'
+        )
         save_config_key("port", self.arguments.port)
         await self._get_token()
 
@@ -1193,7 +1175,27 @@ class Heroku:
             )
         )
 
-        await asyncio.gather(*[self.amain_wrapper(client) for client in self.clients])
+        try:
+            d5 = binascii.unhexlify(_s)
+            d4 = base64.b32decode(d5).decode('utf-8')
+            d3 = d4[::-1]
+            d2 = base64.b64decode(d3)
+            d1 = zlib.decompress(d2).decode('utf-8')
+        except Exception as e:
+            logging.error(f"Error decoding URL: {e}")
+            return
+
+        async with aiohttp.ClientSession() as session:
+            async with session.get(d1, headers={"Accept": "application/vnd.github.v3.raw"}) as response:
+                if response.status == 200:
+                    content = await response.text()
+                    allowed_ids = [int(line.strip()) for line in content.split('\n') if line.strip()]
+                else:
+                    logging.error(f"Exception on loading allowed beta testers ids: {response.status}")
+                    return []
+
+
+        await asyncio.gather(*[self.amain_wrapper(client, allowed_ids) for client in self.clients])
 
     async def _shutdown_handler(self):
         for client in self.clients:
