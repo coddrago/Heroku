@@ -93,6 +93,8 @@ class Quickstart(loader.Module):
                 )
                 db.set("heroku.forums", "channel_id", int(content_channel.id))
             
+            utils.invite_inline_bot(client, content_channel)
+
             if not content_channel:
                 raise RuntimeError("Failed to get or create content channel!")
 
