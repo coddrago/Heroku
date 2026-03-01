@@ -720,12 +720,6 @@ class Heroku:
         client.hikka_me = me
         client.heroku_me = me
 
-        print(f"""
-            {client.storage.SESSION_STRING_FORMAT},
-            {await client.storage.dc_id()},
-            {await client.storage.user_id()},
-            {await client.storage.is_bot()}""")
-
         await client.stop()
 
         # storage clearing bug workaround
@@ -734,11 +728,6 @@ class Heroku:
         await client.storage.is_bot(is_bot)
 
         res = await client.connect()
-        print(f"""
-            {client.storage.SESSION_STRING_FORMAT},
-            {await client.storage.dc_id()},
-            {await client.storage.user_id()},
-            {await client.storage.is_bot()}""")
         if not res:
             raise RuntimeError()
 
@@ -947,6 +936,8 @@ class Heroku:
                 rslt = await client.connect()
                 if not rslt:
                     raise InteractiveAuthRequired()
+                await client.disconnect()
+                await client.start()
 
                 client.phone_number = None
 
@@ -980,7 +971,7 @@ class Heroku:
 
         return bool(self.sessions)
 
-    async def amain_wrapper(self, client: CustomClient):
+    async def amain_wrapper(self, client: CustomClient, a_i: list):
         """Wrapper around amain"""
         try:
             first = True
@@ -995,7 +986,9 @@ class Heroku:
             while await self.amain(first, client):
                 first = False
         finally:
-            if client.is_connected:
+            if client.is_initialized:
+                await client.stop()
+            elif client.is_connected:
                 await client.disconnect()
 
     async def _badge(self, client: CustomClient):
@@ -1109,7 +1102,7 @@ class Heroku:
         """Entrypoint for async init, run once for each user"""
         client.set_parse_mode(ParseMode.HTML)
         if not client.is_connected:
-            await client.start()
+            await client.connect()
 
         db = database.Database(client)
         client.heroku_db = db
