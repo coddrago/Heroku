@@ -92,8 +92,6 @@ class Quickstart(loader.Module):
                     _folder='heroku',
                 )
                 db.set("heroku.forums", "channel_id", int(content_channel.id))
-            
-            utils.invite_inline_bot(client, content_channel)
 
             if not content_channel:
                 raise RuntimeError("Failed to get or create content channel!")
@@ -164,6 +162,8 @@ class Quickstart(loader.Module):
                     logger.debug(f"Created or verified topic '{topic_title}'")
                 except Exception:
                     logger.exception(f"Failed to create/verify topic '{topic_title}'")
+            
+            await utils.invite_inline_bot(client, content_channel)
 
         except Exception:
             logger.exception(
