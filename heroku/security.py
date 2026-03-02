@@ -17,8 +17,7 @@ import time
 import typing
 
 from pyrogram.enums import ChatType, ChatMemberStatus
-from pyrogram.types import Message
-from pyrogram.raw.functions.messages import GetFullChat
+from pyrogram.types import Message, ChatEventFilter
 from pyrogram.raw.types import ChatParticipantAdmin, ChatParticipantCreator
 from .utils import get_display_name
 
@@ -163,7 +162,7 @@ class SecurityManager:
         self._client = client
         self._db = db
         self._cache: typing.Dict[int, dict] = {}
-        self._last_warning: int = 0
+        self._last_warning: int | float = 0
         self._sgroups: typing.Dict[str, SecurityGroup] = {}
 
         self._any_admin = self.any_admin = db.get(__name__, "any_admin", False)
@@ -409,7 +408,7 @@ class SecurityManager:
             user_id = message.chat.id
 
         if not user_id:
-            user_id = message.peer_id
+            user_id = message.from_user.id
 
         is_channel = False
 
@@ -418,18 +417,18 @@ class SecurityManager:
             and message.chat.type.name == 'CHANNEL'
             and message.edit_date
         ):
-            async for event in self._client.iter_admin_log(
+            async for event in self._client.get_chat_event_log(
                 message.chat.id,
                 limit=10,
-                edit=True,
+                filters=ChatEventFilter(edited_messages=True),
             ):
-                if event.action.prev_message.id == message.id:
-                    user_id = event.user_id
+                if event.old_message.id == message.id:
+                    user_id = event.user.id
                     is_channel = True
 
         if (
             user_id == self._client.tg_id
-            or getattr(message, "out", False)
+            or getattr(message, "outgoing", False)
             and not is_channel
         ):
             return True
@@ -568,7 +567,7 @@ class SecurityManager:
                     not chat.is_creator
                     and not chat.is_admin
                     or not chat.is_creator
-                    and not chat.raw.admin_rights
+                    and not getattr(getattr(chat, "channel_admin_rights", None), "can_post_messages", False)
                 ):
                     return False
 
