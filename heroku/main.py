@@ -1206,7 +1206,7 @@ class Heroku:
                     await inline.bot.session.close()
                 except: pass
         for c in self.clients:
-            await c.disconnect()
+            await c.stop()
         for task in asyncio.all_tasks():
             if task is not asyncio.current_task():
                 task.cancel()

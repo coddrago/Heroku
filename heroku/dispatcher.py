@@ -606,9 +606,9 @@ class CommandDispatcher:
             "from_id": lambda: getattr(getattr(m, "from_user", None), "id", None) == func.from_id,
             "chat_id": lambda: m.chat.id
             == (
-                func.chat.id
-                if not str(func.chat.id).startswith("-100")
-                else int(str(func.chat.id)[4:])
+                func.chat_id
+                if not str(func.chat_id).startswith("-100")
+                else int(str(func.chat_id)[4:])
             ),
             "regex": lambda: (
                 isinstance(m, Message) and re.search(func.regex, m.text)
@@ -642,10 +642,8 @@ class CommandDispatcher:
         event: "Message",
     ):
         """Handle all incoming messages"""
-        if isinstance(event, list): # deleted messages list
-            print(type(event), ", ".join(event))
+        if isinstance(event, list): # deleted messages list # for what reason do we need to catch it?
             return
-        print(type(event), event.text, event.id)
 
         message = utils.msg_censor(event)
 
