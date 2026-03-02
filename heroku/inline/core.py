@@ -25,10 +25,9 @@ from aiogram.exceptions import TelegramConflictError, TelegramUnauthorizedError
 from aiogram.client.default import DefaultBotProperties
 from pyrogram.enums import ChatType
 from pyrogram.errors import InputUserDeactivated, YouBlockedUser
-from pyrogram.types import Chat
+from pyrogram.types import Chat, Message
 from pyrogram.raw.functions.contacts.unblock import Unblock
 from pyrogram.raw.functions.messages import GetDialogFilters, UpdateDialogFilter
-from pyrogram.raw.types import Message
 from pyrogram.types.user_and_chats.folder import Folder
 from ..utils import get_display_name
 
@@ -304,4 +303,4 @@ class InlineManager(
             reply_to=(
                 message.reply_to_msg_id if isinstance(message, Message) else None
             ),
-        )
+        ) # TODO

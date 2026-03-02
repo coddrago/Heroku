@@ -16,6 +16,7 @@ import logging
 import time
 import typing
 
+from pyrogram.enums import ChatType, ChatMemberStatus
 from pyrogram.types import Message
 from pyrogram.raw.functions.messages import GetFullChat
 from pyrogram.raw.types import ChatParticipantAdmin, ChatParticipantCreator
@@ -548,11 +549,11 @@ class SecurityManager:
                             )
                             return True
 
-        if f_group_member and message.is_group or f_pm and message.chat.type == ChatType.PRIVATE:
+        if f_group_member and message.chat.type in (ChatType.GROUP, ChatType.SUPERGROUP) or f_pm and message.chat.type == ChatType.PRIVATE:
             return True
 
-        if message.is_channel:
-            if not message.is_group:
+        if message.chat.type == ChatType.CHANNEL:
+            if not message.chat.type in (ChatType.GROUP, ChatType.SUPERGROUP):
                 chat_id = message.chat.id
                 if (
                     chat_id in self._cache
@@ -560,14 +561,14 @@ class SecurityManager:
                 ):
                     chat = self._cache[chat_id]["chat"]
                 else:
-                    chat = await message.get_chat()
+                    chat = message.chat
                     self._cache[chat_id] = {"chat": chat, "exp": time.time() + 5 * 60}
 
                 if (
-                    not chat.creator
-                    and not chat.admin_rights
-                    or not chat.creator
-                    and not chat.admin_rights.post_messages
+                    not chat.is_creator
+                    and not chat.is_admin
+                    or not chat.is_creator
+                    and not chat.raw.admin_rights
                 ):
                     return False
 
@@ -582,40 +583,37 @@ class SecurityManager:
                 ):
                     participant = self._cache[cache_obj]["user"]
                 else:
-                    participant = await message._client.get_permissions(
-                        message.peer_id,
-                        user_id,
-                    )
+                    participant = await message.chat.get_member(user_id)
                     self._cache[cache_obj] = {
                         "user": participant,
                         "exp": time.time() + 5 * 60,
                     }
 
                 if (
-                    participant.is_creator
-                    or participant.is_admin
+                    participant.status == ChatMemberStatus.OWNER
+                    or participant.status == ChatMemberStatus.ADMINISTRATOR
                     and (
                         self._any_admin
                         and f_group_admin_any
                         or f_group_admin
                         or f_group_admin_add_admins
-                        and participant.add_admins
+                        and participant.privileges.can_promote_members
                         or f_group_admin_change_info
-                        and participant.change_info
+                        and participant.privileges.can_change_info
                         or f_group_admin_ban_users
-                        and participant.ban_users
+                        and participant.privileges.can_restrict_members
                         or f_group_admin_delete_messages
-                        and participant.delete_messages
+                        and participant.privileges.can_delete_messages
                         or f_group_admin_pin_messages
-                        and participant.pin_messages
+                        and participant.privileges.can_pin_messages
                         or f_group_admin_invite_users
-                        and participant.invite_users
+                        and participant.privileges.can_invite_users
                     )
                 ):
                     return True
             return False
 
-        if message.is_group and (f_group_admin_any or f_group_owner):
+        if message.chat.type in (ChatType.GROUP, ChatType.SUPERGROUP) and (f_group_admin_any or f_group_owner):
             chat_id = message.chat.id
             cache_obj = f"{chat_id}/{user_id}"
 
@@ -625,13 +623,13 @@ class SecurityManager:
             ):
                 participant = self._cache[cache_obj]["user"]
             else:
-                full_chat = await message._client.invoke(GetFullChat(message.chat.id))
-                participants = full_chat.full_chat.participants.participants
+                full_chat = await message._client.get_chat(message.chat.id, force_full=True)
+                participants = full_chat.members or []
                 participant = next(
                     (
                         possible_participant
                         for possible_participant in participants
-                        if possible_participant.user_id == message.chat.id
+                        if possible_participant.id == message.chat.id
                     ),
                     None,
                 )
