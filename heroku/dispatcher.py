@@ -186,7 +186,7 @@ class CommandDispatcher:
 
         return ret
 
-    def _handle_grep(self, message: Message) -> Message:
+    def _handle_grep(self, message: Message) -> Message: # TODO
         # Allow escaping grep with double stick
         if "||grep" in message.text.html or "|| grep" in message.text.html:
             message.raw_text = re.sub(r"\|\| ?grep", "| grep", message.raw_text)
@@ -319,7 +319,7 @@ class CommandDispatcher:
             message.text.startswith(str.translate(prefix, _LAYOUT_TRANSLATION))
             and str.translate(prefix, _LAYOUT_TRANSLATION) != prefix
         ):
-            logger.debug("it is keyboard switch for msg_id=%s", prefix, _message.id)
+            logger.debug("it is keyboard switch for chat_id=%s msg_id=%s", _message.chat.id, _message.id)
             message.text = Str(str.translate(message.text, _LAYOUT_TRANSLATION)).init(message.entities)
 
         elif not message.text.startswith(prefix):
@@ -438,7 +438,7 @@ class CommandDispatcher:
 
     async def handle_raw(self, _: CustomClient, event: "types.Update", users: list[types.User], chats: list[types.Chat]):
         """Handle raw events."""
-        print(type(event))
+        # print(type(event))
         for handler in self.raw_handlers:
             if isinstance(event, tuple(handler.updates)):
                 try:
@@ -452,7 +452,7 @@ class CommandDispatcher:
         event: "types.Message",
     ):
         """Handle all commands"""
-        print(type(event), event.text, event.id)
+        # print(type(event), event.text, event.id)
         message = await self._handle_command(event)
         if not message:
             logger.debug("not passed message for chat_id=%s msg_id=%s", event.chat.id, event.id)

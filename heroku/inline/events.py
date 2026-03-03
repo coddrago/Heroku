@@ -61,7 +61,7 @@ class Events(InlineUnit):
         """Inline query handler (forms' calls)"""
         if (
             not self._db.get(security.__name__, "allow_inline_query", False)
-            and inline_query.from_user.id not in self._client.dispatcher.security.all_users
+            and inline_query.from_user.id not in self._client._heroku_dispatcher.security.all_users
         ):
             return
 

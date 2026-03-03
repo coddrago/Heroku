@@ -362,10 +362,10 @@ class Form(InlineUnit):
                         prefix=getattr(self._client, "command_prefix", "."),
                         ),
                     )
+            logger.exception("Can't send form")
             if unit_id in self._units:
                 del self._units[unit_id]
                 return False
-            logger.exception("Can't send form")
 
             del self._units[unit_id]
             await answer(

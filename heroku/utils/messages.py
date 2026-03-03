@@ -14,7 +14,7 @@ import typing
 
 import grapheme
 import pyrogram
-from pyrogram.enums import MessageMediaType
+from pyrogram.enums import ChatType, MessageMediaType
 from pyrogram.parser.html import HTML
 from pyrogram.types import InputMedia, Message, MessageEntity, LinkPreviewOptions, ReplyParameters
 from pyrogram.raw.types import (
@@ -387,11 +387,18 @@ async def answer(
 
                 return result
 
-        result = await (message.edit if edit else message.answer)(
-            text,
-            entities=entities,
-            **kwargs,
-        )
+        if edit:
+            result = await (message.edit if edit else message.answer)(
+                text,
+                entities=entities,
+                **kwargs,
+            )
+        else:
+            result = await message.answer(
+                text,
+                entities=entities,
+                **kwargs
+            )
     elif isinstance(response, Message):
         if message.media is None and (
             response.media is None or response.media in (MessageMediaType.WEB_PAGE, MessageMediaType.PHOTO, MessageMediaType.DOCUMENT)

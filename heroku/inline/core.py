@@ -25,7 +25,7 @@ from aiogram.exceptions import TelegramConflictError, TelegramUnauthorizedError
 from aiogram.client.default import DefaultBotProperties
 from pyrogram.enums import ChatType
 from pyrogram.errors import InputUserDeactivated, YouBlockedUser
-from pyrogram.types import Chat, Message
+from pyrogram.types import Chat, Message, ReplyParameters
 from pyrogram.raw.functions.contacts.unblock import Unblock
 from pyrogram.raw.functions.messages import GetDialogFilters, UpdateDialogFilter
 from pyrogram.types.user_and_chats.folder import Folder
@@ -48,6 +48,7 @@ logger = logging.getLogger(__name__)
 
 if typing.TYPE_CHECKING:
     from ..loader import Modules
+    from ..types import InlineResult
 
 class InlineManager(
     Utils,
@@ -265,13 +266,14 @@ class InlineManager(
         event = asyncio.Event()
         self._error_events[unit_id] = event
 
-        q: "InlineResults" = None  # type: ignore  # noqa: F821
+        q: "list[InlineResult]"= None  # type: ignore  # noqa: F821
         exception: Exception = None
 
         async def result_getter():
             nonlocal unit_id, q
-            with contextlib.suppress(Exception):
-                q = await self._client.get_inline_bot_results(self.bot_username, unit_id)
+
+            q = await self._client.get_inline_bot_results(self.bot_username, unit_id)
+            logger.info("inline results: %s", q)
 
         async def event_poller():
             nonlocal exception
@@ -300,7 +302,7 @@ class InlineManager(
 
         return await q[0].click(
             message.chat.id if isinstance(message, Message) else message,
-            reply_to=(
-                message.reply_to_msg_id if isinstance(message, Message) else None
-            ),
-        ) # TODO
+            reply_parameters=ReplyParameters(
+                message_id=message.id if isinstance(message, Message) else None
+            )
+        )
