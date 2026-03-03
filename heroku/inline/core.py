@@ -271,9 +271,8 @@ class InlineManager(
 
         async def result_getter():
             nonlocal unit_id, q
-
-            q = await self._client.get_inline_bot_results(self.bot_username, unit_id)
-            logger.info("inline results: %s", q)
+            with contextlib.suppress(Exception):
+                q = await self._client.get_inline_bot_results(self.bot_username, unit_id)
 
         async def event_poller():
             nonlocal exception

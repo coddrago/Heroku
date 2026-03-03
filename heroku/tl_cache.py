@@ -689,7 +689,7 @@ class CustomClient(TelegramClient): # TODO: rewrite the cache specially for Kuri
     # region Modification of native methods (not cache-related)
 
 
-    async def get_inline_bot_results(self, bot, entity = None, query = "", offset = "", latitude = None, longitude = None):
+    async def get_inline_bot_results(self, bot, query = "", entity = None, offset = "", latitude = None, longitude = None):
         """Get bot results via inline queries.
         You can then send a result using :meth:`~pyrogram.Client.send_inline_bot_result`
         
@@ -699,6 +699,10 @@ class CustomClient(TelegramClient): # TODO: rewrite the cache specially for Kuri
             bot (``int`` | ``str``):
                 Unique identifier of the inline bot you want to get results from. You can specify
                 a @username (str) or a bot ID (int).
+
+            query (``str``, *optional*):
+                Text of the query (up to 512 characters).
+                Defaults to "" (empty string).
             
             entity (``int`` | ``str``, *optional*):
                 The entity where the inline query is being made from. Certain
@@ -708,10 +712,6 @@ class CustomClient(TelegramClient): # TODO: rewrite the cache specially for Kuri
                 If specified, it will also be the default entity where the
                 message will be sent after clicked. Otherwise, the "empty
                 peer" will be used, which some bots may not handle correctly.
-
-            query (``str``, *optional*):
-                Text of the query (up to 512 characters).
-                Defaults to "" (empty string).
 
             offset (``str``, *optional*):
                 Offset of the results to be returned.

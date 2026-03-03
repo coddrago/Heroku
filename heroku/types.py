@@ -1425,56 +1425,6 @@ class SQLiteStringStorage(SQLiteStorage):
         await self.is_bot(is_bot)
         await self.date(0)
 
-class InlineResults(list):
-    """List of inline results"""
-    def __init__(self,
-        query_id: int,
-        cache_time: int,
-        users: typing.List[User],
-        gallery: bool,
-        next_offset: str,
-        switch_pm: typing.Optional[str],
-        raw: "raw.types.messages.BotResults",
-        *args
-    ):
-        super().__init__(*args)
-    
-        self.raw = raw
-        self.query_id = query_id
-        self.cache_time = cache_time
-        self._valid_until = time.time() + self.cache_time
-        self.users = users
-        self.gallery = bool(gallery)
-        self.next_offset = next_offset
-        self.switch_pm = switch_pm
-
-    def results_valid(self):
-        """
-        Returns `True` if the cache time has not expired
-        yet and the results can still be considered valid.
-        """
-        return time.time() < self._valid_until
-    
-    @staticmethod
-    def _parse(client: "CustomClient", inline_results: "raw.types.messages.BotResults", entity: typing.Optional["raw.base.InputPeer"]):
-
-        query_id = inline_results.query_id
-        cache_time = inline_results.cache_time
-        users = [inline_results.users]
-        gallery = inline_results.gallery
-        next_offset = inline_results.next_offset
-
-        return InlineResults(
-            query_id=query_id,
-            cache_time=cache_time,
-            users=users,
-            gallery=gallery,
-            next_offset=next_offset,
-            switch_pm=inline_results.switch_pm,
-            raw=inline_results,
-            *[InlineResult._parse(client=client, inline_result=result, entity=entity) for result in inline_results.results]
-        )
-
 class InlineResult(Object):
     """Single inline result"""
     def __init__(
@@ -1501,18 +1451,19 @@ class InlineResult(Object):
         self.raw = raw
     
     @staticmethod
-    def _parse(client: "CustomClient", inline_result: "raw.types.BotInlineResult", query_id: typing.Optional[int], entity: typing.Optional["raw.base.InputPeer"]):
+    def _parse(client: "CustomClient", inline_result: "raw.base.BotInlineResult", query_id: typing.Optional[int], entity: typing.Optional["raw.base.InputPeer"]):
 
         result_id = inline_result.id
         title = inline_result.title
         description = inline_result.description
         send_message = inline_result.send_message
-        url = inline_result.url
+        url = getattr(inline_result, "url", None)
 
         return InlineResult(
             id=result_id,
             client=client,
             entity=entity,
+            query_id=query_id,
             title=title,
             description=description,
             send_message=send_message,
@@ -1570,7 +1521,7 @@ class InlineResult(Object):
 
         """
         if chat_id:
-            entity = await self._client.resolve_peer(entity)
+            entity = await self._client.resolve_peer(chat_id)
         elif self._entity:
             entity = self._entity
         else:
@@ -1592,11 +1543,73 @@ class InlineResult(Object):
                     message_thread_id,
                     direct_messages_topic_id,
                 ),
-                paid_message_star_count=paid_message_star_count,
+                allow_paid_stars=paid_message_star_count,
             )
         )
 
-        return res.updates[0].message
+        message = (await pyrogram.utils.parse_messages(self._client, res))[0]
+
+        return message
+
+class InlineResults(list):
+    """List of inline results"""
+    def __init__(self,
+        query_id: int,
+        cache_time: int,
+        users: typing.List[User],
+        gallery: bool,
+        next_offset: str,
+        switch_pm: typing.Optional[str],
+        results: typing.List[InlineResult],
+        raw: "raw.types.messages.BotResults",
+    ):
+        super().__init__(results)
+    
+        self.raw = raw
+        self.query_id = query_id
+        self.cache_time = cache_time
+        self._valid_until = time.time() + self.cache_time
+        self.users = users
+        self.gallery = bool(gallery)
+        self.next_offset = next_offset
+        self.switch_pm = switch_pm
+
+    def results_valid(self):
+        """
+        Returns `True` if the cache time has not expired
+        yet and the results can still be considered valid.
+        """
+        return time.time() < self._valid_until
+    
+    @staticmethod
+    def _parse(client: "CustomClient", inline_results: "raw.types.messages.BotResults", entity: typing.Optional["raw.base.InputPeer"]):
+
+        query_id = inline_results.query_id
+        cache_time = inline_results.cache_time
+        users = inline_results.users
+        gallery = inline_results.gallery
+        next_offset = inline_results.next_offset
+        switch_pm = inline_results.switch_pm
+
+        results = [
+            InlineResult._parse(
+                client=client,
+                inline_result=result,
+                query_id=query_id,
+                entity=entity
+            ) for result in inline_results.results
+        ]
+
+        return InlineResults(
+            query_id=query_id,
+            cache_time=cache_time,
+            users=users,
+            gallery=gallery,
+            next_offset=next_offset,
+            switch_pm=switch_pm,
+            results=results,
+            raw=inline_results,
+        )
 
 class CacheRecordEntity:
     def __init__(

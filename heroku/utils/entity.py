@@ -555,10 +555,10 @@ def get_chat_id(message: typing.Union[Message, AiogramMessage]) -> int:
     :param message: Message to get chat ID from
     :return: Chat ID
     """
-    return pyrogram.utils.resolve_id(
+    return (
         getattr(message, "chat_id", None)
         or getattr(getattr(message, "chat", None), "id", None)
-    )[0]
+    )
 
 
 def get_entity_id(entity: 'Entity') -> int:

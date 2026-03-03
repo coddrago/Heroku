@@ -476,6 +476,16 @@ class CommandDispatcher:
         logger.exception("Command failed", extra={"stack": inspect.stack()})
         if isinstance(exc, RPCError):
             if isinstance(exc, FloodWait):
+                re_method = re.search(
+                    r"\(caused by \"(\w+)\"\)",
+                    str(exc)
+                )
+
+                if not re_method:
+                    method = ""
+                else:
+                    method = re_method.group(1)
+
                 hours = exc.value // 3600
                 minutes = (exc.value % 3600) // 60
                 seconds = exc.value % 60
@@ -489,7 +499,7 @@ class CommandDispatcher:
                     .format(
                         utils.escape_html(message.content),
                         fw_time,
-                        type(exc.request).__name__,
+                        method or "Unknown",
                     )
                 )
             else:
