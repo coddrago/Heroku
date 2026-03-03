@@ -859,7 +859,7 @@ class Module:
 
         code = await utils.run_sync(requests.get, url)
         code.raise_for_status()
-        code = code.text
+        code = code.content
 
         if re.search(r"# ?scope: ?heroku_min", code):
             ver = tuple(

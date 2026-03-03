@@ -92,7 +92,7 @@ async def get_args_html(message: Message) -> str:
 
     prefix = message._client.loader.get_prefix()
 
-    if not (message := message.text.html):
+    if not (message := message.content.html):
         return False
 
     if prefix not in message:

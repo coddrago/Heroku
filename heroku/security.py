@@ -486,7 +486,7 @@ class SecurityManager:
             chat = None
 
         try:
-            cmd = message.text[1:].split()[0].strip()
+            cmd = message.content[1:].split()[0].strip()
             if usernames:
                 for username in usernames:
                     cmd = cmd.replace(f"@{username}", "")

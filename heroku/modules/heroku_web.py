@@ -68,7 +68,7 @@ class HerokuWebMod(loader.Module):
             if (
                 not force
                 and not message.chat.type == ChatType.PRIVATE
-                and "force_insecure" not in message.text.lower()
+                and "force_insecure" not in message.content.lower()
             ):
                 try:
                     if not await self.inline.form(
@@ -173,7 +173,7 @@ class HerokuWebMod(loader.Module):
             if user.id == self.tg_id:
                 await self._inline_login(message, user)
 
-            if "force_insecure" in message.text.lower():
+            if "force_insecure" in message.content.lower():
                 await self._inline_login(message, user)
         
             try:

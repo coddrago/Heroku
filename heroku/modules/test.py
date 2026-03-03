@@ -263,7 +263,7 @@ class TestMod(loader.Module):
             and not force
             and (
                 not isinstance(message, Message)
-                or "force_insecure" not in message.text.lower()
+                or "force_insecure" not in message.content.lower()
             )
         ):
             try:

@@ -407,7 +407,7 @@ async def answer(
                 result = await message.edit_media(
                     media=InputMedia( # TODO
                         response.document,
-                        response.text,
+                        response.content,
                         caption_entities=response.caption_entities
                     )
                 )
