@@ -341,11 +341,11 @@ async def answer(
     edit = (message.outgoing and not message.via_bot and not message.forward_from)
     if not edit:
             kwargs.setdefault(
-                "reply_to",
-                getattr(message, "reply_to_message_id", None),
+                "reply_parameters",
+                ReplyParameters(getattr(message, "reply_to_message_id", None)),
             )
-    elif "reply_to" in kwargs:
-            kwargs.pop("reply_to")
+    elif "reply_parameters" in kwargs:
+            kwargs.pop("reply_parameters")
 
     if isinstance(response, str) and not kwargs.pop("asfile", False):
         text, entities = (await parser.parse(response)).values()
@@ -379,7 +379,7 @@ async def answer(
                     caption=message._client.loader.lookup("translations").strings(
                         "too_long"
                     ),
-                    reply_parameters=ReplyParameters(message_id=kwargs.get("reply_to") or get_topic(message)),
+                    reply_parameters=kwargs.get("reply_parameters") or ReplyParameters(message_id=get_topic(message)),
                 )
 
                 if message.outgoing:
@@ -431,8 +431,8 @@ async def answer(
             await message.edit(file=response, **kwargs)
         else:
             kwargs.setdefault(
-                "reply_to",
-                getattr(message, "reply_to_message_id", get_topic(message)),
+                "reply_parameters",
+                ReplyParameters(message_id=getattr(message, "reply_to_message_id", get_topic(message))),
             )
             result = await message._client.send_document(message.chat.id, response, **kwargs)
             if message.outgoing:
@@ -467,7 +467,7 @@ async def answer_file(
         message = message.form["caller"]
 
     if topic := get_topic(message):
-        kwargs.setdefault("reply_to", topic)
+        kwargs.setdefault("reply_parameters", ReplyParameters(topic))
 
     try:
         response = await message._client.send_document(

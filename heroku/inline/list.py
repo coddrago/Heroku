@@ -29,7 +29,7 @@ from aiogram.types import (
 from aiogram.exceptions import TelegramRetryAfter
 from pyrogram.errors import ChatSendInlineForbidden
 # from pyrogram.extensions.html import CUSTOM_EMOJIS
-from pyrogram.types import Message
+from pyrogram.types import Message, ReplyParameters
 
 from .. import main, utils
 from ..types import HerokuReplyMarkup
@@ -200,7 +200,7 @@ class List(InlineUnit):
                         else "🪐"
                     )
                     + self.translator.getkey("inline.opening_list"),
-                    **({"reply_to": utils.get_topic(message)} if message.outgoing else {}),
+                    **({"reply_parameters": ReplyParameters(message_id=utils.get_topic(message))} if message.outgoing else {}),
                 )
             except Exception:
                 status_message = None
@@ -212,7 +212,7 @@ class List(InlineUnit):
             if isinstance(message, Message):
                 await (message.edit if message.outgoing else message.answer)(
                     msg,
-                    **({} if message.outgoing else {"reply_to": utils.get_topic(message)}),
+                    **({} if message.outgoing else {"reply_parameters": ReplyParameters(message_id=utils.get_topic(message))}),
                 )
             else:
                 await self._client.send_message(message, msg)

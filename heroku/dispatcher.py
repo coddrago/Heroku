@@ -27,7 +27,7 @@ import requests
 from pyrogram import raw, types
 from pyrogram.errors import FloodWait, RPCError
 from pyrogram.enums import ChatType, MessageMediaType
-from pyrogram.types import ChatEvent, ChatEventFilter, Message
+from pyrogram.types import ChatEvent, ChatEventFilter, Message, ReplyParameters
 from pyrogram.types.messages_and_media.message import Str
 
 from . import loader, main, security, utils
@@ -261,7 +261,7 @@ class CommandDispatcher:
         async def my_respond(text, *args, **kwargs):
             text = process_text(text)
             kwargs["parse_mode"] = "HTML"
-            kwargs.setdefault("reply_to", utils.get_topic(message))
+            kwargs.setdefault("reply_parameters", ReplyParameters(message_id=utils.get_topic(message)))
             return await old_respond(text, *args, **kwargs)
 
         message.edit = my_edit
