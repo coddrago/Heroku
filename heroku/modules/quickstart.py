@@ -50,7 +50,9 @@ class Quickstart(loader.Module):
         )
 
         self.text = (
-            lambda: self.strings("base")
+            lambda: self.strings("base").format(
+                utils.get_platform_emoji() if self.client.heroku_me.premium is True else "Heroku"
+            )
             + (
                 "\n"
                 + (
@@ -108,7 +110,8 @@ class Quickstart(loader.Module):
             if not forum_entity:
                 try:
                     if not (hasattr(content_channel, 'forum') or not content_channel.forum):
-                        from herokutl.tl.functions.channels import ToggleForumRequest
+                        from herokutl.tl.functions.channels import \
+                            ToggleForumRequest
                         try:
                             await self.client(ToggleForumRequest(
                                 channel=content_channel,

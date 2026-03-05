@@ -10,11 +10,11 @@
 # You can redistribute it and/or modify it under the terms of the GNU AGPLv3
 # 🔑 https://www.gnu.org/licenses/agpl-3.0.html
 
-import logging
 import asyncio
+import logging
 
-from herokutl.tl.types import Message
 from deep_translator import GoogleTranslator, MyMemoryTranslator
+from herokutl.tl.types import Message
 
 from .. import loader, utils
 
@@ -80,7 +80,7 @@ class Translator(loader.Module):
                 await utils.answer(message, self.strings("no_args"))
                 return
 
-            text = reply.raw_text
+            text = reply.text
             entities = reply.entities
         else:
             entities = []

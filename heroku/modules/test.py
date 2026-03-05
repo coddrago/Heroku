@@ -152,42 +152,6 @@ class TestMod(loader.Module):
 
         await utils.answer(message, self.strings("logs_cleared"))
 
-    @loader.loop(interval=1, autostart=True)
-    async def watchdog(self):
-        if not os.path.isdir(DEBUG_MODS_DIR):
-            return
-
-        try:
-            for module in os.scandir(DEBUG_MODS_DIR):
-                last_modified = os.stat(module.path).st_mtime
-                cls_ = module.path.split("/")[-1].split(".py")[0]
-
-                if cls_ not in self._memory:
-                    self._memory[cls_] = last_modified
-                    continue
-
-                if self._memory[cls_] == last_modified:
-                    continue
-
-                self._memory[cls_] = last_modified
-                logger.debug("Reloading debug module %s", cls_)
-                with open(module.path, "r") as f:
-                    try:
-                        await next(
-                            module
-                            for module in self.allmodules.modules
-                            if module.__class__.__name__ == "LoaderMod"
-                        ).load_module(
-                            f.read(),
-                            None,
-                            save_fs=False,
-                        )
-                    except Exception:
-                        logger.exception("Failed to reload module in watchdog")
-        except Exception:
-            logger.exception("Failed debugging watchdog")
-            return
-
     @loader.command()
     async def logs(
         self,
