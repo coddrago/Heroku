@@ -336,9 +336,14 @@ async def answer(
         await message.edit(response)
         return message
 
-    kwargs.setdefault("link_preview", False)
+    kwargs.setdefault("link_preview_options", LinkPreviewOptions(is_disabled=True))
 
     edit = (message.outgoing and not message.via_bot and not message.forward_origin)
+    has_file = (
+        isinstance(response, (bytes, io.IOBase, InputDocument))
+        or (isinstance(response, str) and kwargs.get("asfile", False))
+        or kwargs.get("file", None) is not None
+    )
     if not edit:
             kwargs.setdefault(
                 "reply_parameters",
@@ -348,7 +353,8 @@ async def answer(
             kwargs.pop("reply_parameters")
 
     if isinstance(response, str) and not kwargs.pop("asfile", False):
-        text, entities = (await parser.parse(response)).values()
+        text, entities = (await message._client.parser.parse(response)).values()
+        entities = [MessageEntity._parse(message._client, ent, {}) for ent in entities]
 
         if len(text) >= 4096 and not hasattr(message, "heroku_grepped"):
             try:
@@ -388,11 +394,23 @@ async def answer(
                 return result
 
         if edit:
-            result = await (message.edit if edit else message.answer)(
-                text,
-                entities=entities,
-                **kwargs,
-            )
+            if kwargs.get("file", False) and (
+                message.media is None or (
+                    message.media is None or message.media in (
+                        MessageMediaType.WEB_PAGE, MessageMediaType.PHOTO, MessageMediaType.DOCUMENT
+                    )
+                )
+            ): # TODO
+                result = await message.edit_media(
+                    media=kwargs.pop("file"),
+                    
+                )
+            else:
+                result = await (message.edit_text if edit else message.answer)(
+                    text,
+                    entities=entities,
+                    **kwargs,
+                )
         else:
             result = await message.answer(
                 text,
@@ -427,8 +445,8 @@ async def answer(
         if name := kwargs.pop("filename", None):
             response.name = name
 
-        if message.media is not None and edit:
-            await message.edit(file=response, **kwargs)
+        if message.media is not None and edit: # TODO
+            result = await message.edit_media(file=response, **kwargs)
         else:
             kwargs.setdefault(
                 "reply_parameters",
