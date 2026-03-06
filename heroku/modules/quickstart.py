@@ -76,7 +76,7 @@ class Quickstart(loader.Module):
                     if dialog.chat.title and 'heroku-userbot' in dialog.chat.title.lower():
                         content_channel = dialog.chat
                         logger.debug(f"Found existing channel '{content_channel.title}' with ID {content_channel.id}")
-                        self.db.set("heroku.forums", "channel_id", int(str(content_channel.id).replace("-100", "")))
+                        self.db.set("heroku.forums", "channel_id", content_channel.id)
                         break
 
             if not content_channel:

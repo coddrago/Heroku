@@ -35,7 +35,7 @@ from aiogram.types import (
 )
 from pyrogram.errors import ChatSendInlineForbidden
 # from pyrogram.extensions.html import CUSTOM_EMOJIS
-from pyrogram.types import Message
+from pyrogram.types import Message, ReplyParameters
 
 from .. import main, utils
 from ..types import HerokuReplyMarkup
@@ -281,11 +281,11 @@ class Form(InlineUnit):
                 )(
                     (
                         utils.get_platform_emoji()
-                        if self._client.heroku_me.is_premium and CUSTOM_EMOJIS
+                        if self._client.heroku_me.is_premium # and CUSTOM_EMOJIS
                         else "🪐"
                     )
                     + self.translator.getkey("inline.opening_form"),
-                    **({"reply_to": utils.get_topic(message)} if message.outgoing else {}),
+                    **({"reply_parameters": ReplyParameters(message_id=utils.get_topic(message))} if message.outgoing else {}),
                 )
             except Exception:
                 status_message = None
@@ -346,7 +346,7 @@ class Form(InlineUnit):
             if isinstance(message, Message):
                 await (message.edit if message.outgoing else message.answer)(
                     msg,
-                    **({} if message.outgoing else {"reply_to": utils.get_topic(message)}),
+                    **({} if message.outgoing else {"reply_parameters": ReplyParameters(message_id=utils.get_topic(message))}),
                 )
             else:
                 await self._client.send_message(message, msg)
@@ -362,10 +362,10 @@ class Form(InlineUnit):
                         prefix=getattr(self._client, "command_prefix", "."),
                         ),
                     )
+            logger.exception("Can't send form")
             if unit_id in self._units:
                 del self._units[unit_id]
                 return False
-            logger.exception("Can't send form")
 
             del self._units[unit_id]
             await answer(

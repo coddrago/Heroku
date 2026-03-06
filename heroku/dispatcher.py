@@ -27,7 +27,7 @@ import requests
 from pyrogram import raw, types
 from pyrogram.errors import FloodWait, RPCError
 from pyrogram.enums import ChatType, MessageMediaType
-from pyrogram.types import ChatEvent, ChatEventFilter, Message
+from pyrogram.types import ChatEvent, ChatEventFilter, Message, ReplyParameters
 from pyrogram.types.messages_and_media.message import Str
 
 from . import loader, main, security, utils
@@ -186,11 +186,11 @@ class CommandDispatcher:
 
         return ret
 
-    def _handle_grep(self, message: Message) -> Message:
+    def _handle_grep(self, message: Message) -> Message: # TODO
         # Allow escaping grep with double stick
-        if "||grep" in message.text.html or "|| grep" in message.text.html:
+        if "||grep" in message.content.html or "|| grep" in message.content.html:
             message.raw_text = re.sub(r"\|\| ?grep", "| grep", message.raw_text)
-            message.text = re.sub(r"\|\| ?grep", "| grep", message.text)
+            message.content = re.sub(r"\|\| ?grep", "| grep", message.content)
             message.message = re.sub(r"\|\| ?grep", "| grep", message.message)
             return message
 
@@ -199,7 +199,7 @@ class CommandDispatcher:
             return message
 
         grep = re.search(r".+\| ?grep (.+)", message.raw_text).group(1)
-        message.text = re.sub(r"\| ?grep.+", "", message.text)
+        message.content = re.sub(r"\| ?grep.+", "", message.content)
         message.raw_text = re.sub(r"\| ?grep.+", "", message.raw_text)
         message.message = re.sub(r"\| ?grep.+", "", message.message)
 
@@ -261,7 +261,7 @@ class CommandDispatcher:
         async def my_respond(text, *args, **kwargs):
             text = process_text(text)
             kwargs["parse_mode"] = "HTML"
-            kwargs.setdefault("reply_to", utils.get_topic(message))
+            kwargs.setdefault("reply_parameters", ReplyParameters(message_id=utils.get_topic(message)))
             return await old_respond(text, *args, **kwargs)
 
         message.edit = my_edit
@@ -293,9 +293,11 @@ class CommandDispatcher:
 
         message = utils.msg_censor(_message)
 
-        if not message.text:
+        if not message.content:
             logger.debug("there is no text in message for chat_id=%s msg_id=%s", _message.chat.id, _message.id)
             return False
+        
+        message.text = message.content # just for easiest text editing
 
         if (
             message.outgoing
@@ -319,7 +321,7 @@ class CommandDispatcher:
             message.text.startswith(str.translate(prefix, _LAYOUT_TRANSLATION))
             and str.translate(prefix, _LAYOUT_TRANSLATION) != prefix
         ):
-            logger.debug("it is keyboard switch for msg_id=%s", prefix, _message.id)
+            logger.debug("it is keyboard switch for chat_id=%s msg_id=%s", _message.chat.id, _message.id)
             message.text = Str(str.translate(message.text, _LAYOUT_TRANSLATION)).init(message.entities)
 
         elif not message.text.startswith(prefix):
@@ -438,7 +440,7 @@ class CommandDispatcher:
 
     async def handle_raw(self, _: CustomClient, event: "types.Update", users: list[types.User], chats: list[types.Chat]):
         """Handle raw events."""
-        print(type(event))
+        # print(type(event))
         for handler in self.raw_handlers:
             if isinstance(event, tuple(handler.updates)):
                 asyncio.ensure_future(
@@ -457,7 +459,7 @@ class CommandDispatcher:
         event: "types.Message",
     ):
         """Handle all commands"""
-        print(type(event), event.text, event.id)
+        # print(type(event), event.text, event.id)
         message = await self._handle_command(event)
         if not message:
             logger.debug("not passed message for chat_id=%s msg_id=%s", event.chat.id, event.id)
@@ -479,6 +481,16 @@ class CommandDispatcher:
         logger.exception("Command failed", extra={"stack": inspect.stack()})
         if isinstance(exc, RPCError):
             if isinstance(exc, FloodWait):
+                re_method = re.search(
+                    r"\(caused by \"(\w+)\"\)",
+                    str(exc)
+                )
+
+                if not re_method:
+                    method = ""
+                else:
+                    method = re_method.group(1)
+
                 hours = exc.value // 3600
                 minutes = (exc.value % 3600) // 60
                 seconds = exc.value % 60
@@ -490,15 +502,15 @@ class CommandDispatcher:
                     self._client.loader.lookup("translations")
                     .strings("fw_error")
                     .format(
-                        utils.escape_html(message.text),
+                        utils.escape_html(message.content),
                         fw_time,
-                        type(exc.request).__name__,
+                        method or "Unknown",
                     )
                 )
             else:
                 txt = (
                     "<tg-emoji emoji-id=5877477244938489129>🚫</tg-emoji> <b>Call"
-                    f" </b><code>{utils.escape_html(message.text)}</code><b> failed"
+                    f" </b><code>{utils.escape_html(message.content)}</code><b> failed"
                     " due to RPC (Telegram) error:</b>"
                     f" <code>{utils.escape_html(str(exc))}</code>"
                 )
@@ -506,7 +518,7 @@ class CommandDispatcher:
                     self._client.loader.lookup("translations")
                     .strings("rpc_error")
                     .format(
-                        utils.escape_html(message.text),
+                        utils.escape_html(message.content),
                         utils.escape_html(str(exc)),
                     )
                 )
@@ -514,14 +526,14 @@ class CommandDispatcher:
             if not self._db.get(main.__name__, "inlinelogs", True):
                 txt = (
                     "<tg-emoji emoji-id=5877477244938489129>🚫</tg-emoji><b> Call</b>"
-                    f" <code>{utils.escape_html(message.text)}</code><b>"
+                    f" <code>{utils.escape_html(message.content)}</code><b>"
                     " failed!</b>"
                 )
             else:
                 exc = "\n".join(traceback.format_exc().splitlines()[1:])
                 txt = (
                     "<tg-emoji emoji-id=5877477244938489129>🚫</tg-emoji><b> Call</b>"
-                    f" <code>{utils.escape_html(message.text)}</code><b>"
+                    f" <code>{utils.escape_html(message.content)}</code><b>"
                     " failed!</b>\n\n<b>🧾 Logs:</b>\n<pre><code"
                     f' class="language-logs">{utils.escape_html(exc)}</code></pre>'
                 )
@@ -558,7 +570,7 @@ class CommandDispatcher:
             "only_messages": lambda: isinstance(m, Message),
             "editable": (
                 lambda: not getattr(m, "outgoing", False)
-                and not getattr(m, "forward_from", False)
+                and not getattr(m, "forward_origin", False)
                 and not getattr(m, "sticker", False)
                 and not getattr(getattr(m, "via_bot", False), "id", False)
             ),
@@ -594,19 +606,19 @@ class CommandDispatcher:
             "no_audios": lambda: not m.media == MessageMediaType.PHOTO,
             "no_videos": lambda: not m.media == MessageMediaType.VIDEO,
             "no_photos": lambda: not m.media == MessageMediaType.AUDIO,
-            "no_forwards": lambda: not getattr(m, "forward_from", False),
+            "no_forwards": lambda: not getattr(m, "forward_origin", False),
             "no_reply": lambda: not getattr(m, "reply_to_message_id", False),
-            "only_forwards": lambda: getattr(m, "forward_from", False),
-            "only_reply": lambda: getattr(m, "reply_to_msg_id", False),
+            "only_forwards": lambda: getattr(m, "forward_origin", False),
+            "only_reply": lambda: getattr(m, "reply_to_message_id", False),
             "mention": lambda: getattr(m, "mentioned", False),
             "no_mention": lambda: not getattr(m, "mentioned", False),
             "startswith": lambda: (
-                isinstance(m, Message) and m.text.startswith(func.startswith)
+                isinstance(m, Message) and m.content.startswith(func.startswith)
             ),
             "endswith": lambda: (
-                isinstance(m, Message) and m.text.endswith(func.endswith)
+                isinstance(m, Message) and m.content.endswith(func.endswith)
             ),
-            "contains": lambda: isinstance(m, Message) and func.contains in m.text,
+            "contains": lambda: isinstance(m, Message) and func.contains in m.content,
             "filter": lambda: callable(func.filter) and func.filter(m),
             "from_id": lambda: getattr(getattr(m, "from_user", None), "id", None) == func.from_id,
             "chat_id": lambda: m.chat.id
@@ -616,7 +628,7 @@ class CommandDispatcher:
                 else int(str(func.chat_id)[4:])
             ),
             "regex": lambda: (
-                isinstance(m, Message) and re.search(func.regex, m.text)
+                isinstance(m, Message) and re.search(func.regex, m.content)
             ),
         }
 

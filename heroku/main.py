@@ -1174,25 +1174,30 @@ class Heroku:
             )
         )
 
-        try:
-            d5 = binascii.unhexlify(_s)
-            d4 = base64.b32decode(d5).decode('utf-8')
-            d3 = d4[::-1]
-            d2 = base64.b64decode(d3)
-            d1 = zlib.decompress(d2).decode('utf-8')
-        except Exception as e:
-            logging.error(f"Error decoding URL: {e}")
-            return
+        async def get_allowed_ids():
+            try:
+                d5 = binascii.unhexlify(_s)
+                d4 = base64.b32decode(d5).decode('utf-8')
+                d3 = d4[::-1]
+                d2 = base64.b64decode(d3)
+                d1 = zlib.decompress(d2).decode('utf-8')
+            except Exception as e:
+                logging.error(f"Error decoding URL: {e}")
+                return []
+            
 
-        async with aiohttp.ClientSession() as session:
-            async with session.get(d1, headers={"Accept": "application/vnd.github.v3.raw"}) as response:
-                if response.status == 200:
-                    content = await response.text()
-                    allowed_ids = [int(line.strip()) for line in content.split('\n') if line.strip()]
-                else:
-                    logging.error(f"Exception on loading allowed beta testers ids: {response.status}")
-                    return []
-
+            async with aiohttp.ClientSession() as session:
+                async with session.get(d1, headers={"Accept": "application/vnd.github.v3.raw"}) as response:
+                    if response.status == 200:
+                        content = await response.text()
+                        allowed_ids = [int(line.strip()) for line in content.split('\n') if line.strip()]
+                    else:
+                        logging.error(f"Exception on loading allowed beta testers ids: {response.status}, {await response.json()}")
+                        return []
+            
+            return allowed_ids
+        
+        allowed_ids = await get_allowed_ids()
 
         await asyncio.gather(*[self.amain_wrapper(client, allowed_ids) for client in self.clients])
 
@@ -1212,7 +1217,8 @@ class Heroku:
                     await inline.bot.session.close()
                 except: pass
         for c in self.clients:
-            await c.stop()
+            with contextlib.suppress(Exception):
+                await c.stop()
         for task in asyncio.all_tasks():
             if task is not asyncio.current_task():
                 task.cancel()

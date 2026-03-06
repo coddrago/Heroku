@@ -7,15 +7,16 @@
 
 import contextlib
 import io
-import json
+import orjson
 import logging
 import re
 import typing
 
 import grapheme
 import pyrogram
+from pyrogram.enums import ChatType, MessageMediaType
 from pyrogram.parser.html import HTML
-from pyrogram.types import Message, ReplyParameters, MessageEntity
+from pyrogram.types import InputMedia, Message, MessageEntity, LinkPreviewOptions, ReplyParameters
 from pyrogram.raw.types import (
     Channel,
     Chat,
@@ -53,11 +54,10 @@ def get_topic(message: Message) -> typing.Optional[int]:
     :return: int or None if not present
     """
     return (
-        (message.reply_to.reply_to_top_id or message.reply_to.reply_to_msg_id)
+        (message.reply_to_top_message_id or message.reply_to_message_id)
         if (
             isinstance(message, Message)
-            and message.reply_to
-            and message.reply_to.forum_topic
+            and message.reply_to_top_message_id
         )
         else (
             message.form["top_msg_id"]
@@ -94,12 +94,12 @@ async def get_message_link(
             f"tg://openmessage?user_id={get_chat_id(message)}&message_id={message.id}"
         )
 
-    if not chat and not (chat := message.chat):
-        chat = await message.get_chat()
+    # if not chat and not (chat := message.chat):
+        # chat = await message.get_chat()
 
     topic_affix = (
-        f"?topic={message.reply_to.reply_to_msg_id}"
-        if getattr(message.reply_to, "forum_topic", False)
+        f"?topic={message.reply_to_message_id}"
+        if getattr(message, "reply_to_top_message_id", False)
         else ""
     )
 
@@ -336,27 +336,25 @@ async def answer(
         await message.edit(response)
         return message
 
-    kwargs.setdefault("link_preview", False)
+    kwargs.setdefault("link_preview_options", LinkPreviewOptions(is_disabled=True))
 
-    edit = (message.outgoing and not message.via_bot_id and not message.forward_from)
-    match True:
-        case _ if not edit:
-            kwargs.setdefault(
-                "reply_to",
-                getattr(message, "reply_to_msg_id", None),
-            )
-        case _ if "reply_to" in kwargs:
-            kwargs.pop("reply_to")
-
-    parse_mode = pyrogram.utils.sanitize_parse_mode(
-        kwargs.pop(
-            "parse_mode",
-            message._client.parse_mode,
-        )
+    edit = (message.outgoing and not message.via_bot and not message.forward_origin)
+    has_file = (
+        isinstance(response, (bytes, io.IOBase, InputDocument))
+        or (isinstance(response, str) and kwargs.get("asfile", False))
+        or kwargs.get("file", None) is not None
     )
+    if not edit:
+            kwargs.setdefault(
+                "reply_parameters",
+                ReplyParameters(getattr(message, "reply_to_message_id", None)),
+            )
+    elif "reply_parameters" in kwargs:
+            kwargs.pop("reply_parameters")
 
     if isinstance(response, str) and not kwargs.pop("asfile", False):
-        text, entities = parse_mode.parse(response)
+        text, entities = (await message._client.parser.parse(response)).values()
+        entities = [MessageEntity._parse(message._client, ent, {}) for ent in entities]
 
         if len(text) >= 4096 and not hasattr(message, "heroku_grepped"):
             try:
@@ -382,12 +380,12 @@ async def answer(
                 file.name = "command_result.txt"
 
                 result = await message._client.send_document(
-                    message.peer_id,
+                    message.chat.id,
                     file,
                     caption=message._client.loader.lookup("translations").strings(
                         "too_long"
                     ),
-                    reply_parameters=ReplyParameters(message_id=kwargs.get("reply_to") or get_topic(message)),
+                    reply_parameters=kwargs.get("reply_parameters") or ReplyParameters(message_id=get_topic(message)),
                 )
 
                 if message.outgoing:
@@ -395,20 +393,46 @@ async def answer(
 
                 return result
 
-        result = await (message.edit if edit else message.answer)(
-            text,
-            parse_mode=lambda t: (t, entities),
-            **kwargs,
-        )
+        if edit:
+            if kwargs.get("file", False) and (
+                message.media is None or (
+                    message.media is None or message.media in (
+                        MessageMediaType.WEB_PAGE, MessageMediaType.PHOTO, MessageMediaType.DOCUMENT
+                    )
+                )
+            ): # TODO
+                result = await message.edit_media(
+                    media=kwargs.pop("file"),
+                    
+                )
+            else:
+                result = await (message.edit_text if edit else message.answer)(
+                    text,
+                    entities=entities,
+                    **kwargs,
+                )
+        else:
+            result = await message.answer(
+                text,
+                entities=entities,
+                **kwargs
+            )
     elif isinstance(response, Message):
         if message.media is None and (
-            response.media is None or isinstance(response.media, (MessageMediaWebPage, MessageMediaPhoto, MessageMediaDocument))
+            response.media is None or response.media in (MessageMediaType.WEB_PAGE, MessageMediaType.PHOTO, MessageMediaType.DOCUMENT)
         ):
+            if response.media:
+                result = await message.edit_media(
+                    media=InputMedia( # TODO
+                        response.document,
+                        response.content,
+                        caption_entities=response.caption_entities
+                    )
+                )
             result = await message.edit(
-                response.message,
-                file=response.media,
-                parse_mode=lambda t: (t, response.entities or []),
-                link_preview=isinstance(response.media, MessageMediaWebPage),
+                response.text,
+                entities=response.entities,
+                link_preview_options=LinkPreviewOptions(is_disabled=isinstance(response.media, MessageMediaWebPage)),
             )
         else:
             result = await message.answer(response, **kwargs)
@@ -421,14 +445,14 @@ async def answer(
         if name := kwargs.pop("filename", None):
             response.name = name
 
-        if message.media is not None and edit:
-            await message.edit(file=response, **kwargs)
+        if message.media is not None and edit: # TODO
+            result = await message.edit_media(file=response, **kwargs)
         else:
             kwargs.setdefault(
-                "reply_to",
-                getattr(message, "reply_to_msg_id", get_topic(message)),
+                "reply_parameters",
+                ReplyParameters(message_id=getattr(message, "reply_to_message_id", get_topic(message))),
             )
-            result = await message._client.send_document(message.peer_id, response, **kwargs)
+            result = await message._client.send_document(message.chat.id, response, **kwargs)
             if message.outgoing:
                 await message.delete()
 
@@ -461,11 +485,11 @@ async def answer_file(
         message = message.form["caller"]
 
     if topic := get_topic(message):
-        kwargs.setdefault("reply_to", topic)
+        kwargs.setdefault("reply_parameters", ReplyParameters(topic))
 
     try:
         response = await message._client.send_document(
-            message.peer_id,
+            message.chat.id,
             file,
             caption=caption,
             **kwargs,
@@ -525,7 +549,7 @@ def is_serializable(x: typing.Any, /) -> bool:
     :return: True if object is JSON-serializable, False otherwise
     """
     try:
-        json.dumps(x)
+        orjson.dumps(x)
         return True
     except Exception:
         return False

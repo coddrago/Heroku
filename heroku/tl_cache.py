@@ -28,6 +28,7 @@ from pyrogram import __name__ as __base_name__, errors, types
 from pyrogram.errors import RPCError
 from pyrogram.errors import TopicDeleted
 from pyrogram.types import User, Chat
+from pyrogram import raw
 from pyrogram.raw import functions
 from pyrogram.raw.all import layer as LAYER
 from pyrogram.raw.functions.channels import GetFullChannel
@@ -48,6 +49,7 @@ from .types import (
     CacheRecordFullChannel,
     CacheRecordFullUser,
     CacheRecordPerms,
+    InlineResults,
     Module,
 )
 
@@ -683,6 +685,73 @@ class CustomClient(TelegramClient): # TODO: rewrite the cache specially for Kuri
     #         *args,
     #         **kwargs,
     #     )
+
+    # region Modification of native methods (not cache-related)
+
+
+    async def get_inline_bot_results(self, bot, query = "", entity = None, offset = "", latitude = None, longitude = None):
+        """Get bot results via inline queries.
+        You can then send a result using :meth:`~pyrogram.Client.send_inline_bot_result`
+        
+        .. include:: /_includes/usable-by/users.rst
+        
+        Parameters:
+            bot (``int`` | ``str``):
+                Unique identifier of the inline bot you want to get results from. You can specify
+                a @username (str) or a bot ID (int).
+
+            query (``str``, *optional*):
+                Text of the query (up to 512 characters).
+                Defaults to "" (empty string).
+            
+            entity (``int`` | ``str``, *optional*):
+                The entity where the inline query is being made from. Certain
+                bots use this to display different results depending on where
+                it's used, such as private chats, groups or channels.
+
+                If specified, it will also be the default entity where the
+                message will be sent after clicked. Otherwise, the "empty
+                peer" will be used, which some bots may not handle correctly.
+
+            offset (``str``, *optional*):
+                Offset of the results to be returned.
+            
+            latitude (``float``, *optional*):
+                Latitude of the location.
+                Useful for location-based results only.
+            
+            longitude (``float``, *optional*):
+                Longitude of the location.
+                Useful for location-based results only.
+            
+        Returns:
+            :obj:`InlineResults <heroku.types.InlineResults>`: On Success.
+
+        Raises:
+            TimeoutError: In case the bot fails to answer within 10 seconds.
+
+        Example:
+            .. code-block:: python
+                results = await app.get_inline_bot_results("pyrogrambot")
+                print(results)
+        """
+        
+        entity = await self.resolve_peer(entity) if entity else None
+
+        result = await self.invoke(
+            functions.messages.GetInlineBotResults(
+                bot=await self.resolve_peer(bot),
+                peer=entity or raw.types.InputPeerEmpty(),
+                query=query,
+                offset=offset,
+                geo_point=raw.types.InputGeoPoint(
+                    lat=latitude,
+                    long=longitude
+                ) if (latitude is not None and longitude is not None) else None
+            )
+        )
+
+        return InlineResults._parse(self, result, entity)
 
     async def promote_chat_member(
         self: "pyrogram.Client",

@@ -21,7 +21,7 @@ import requests
 from aiogram.types import Message as AiogramMessage
 from pyrogram import types
 from pyrogram.enums import ChatType
-from pyrogram.types import Message, Chat
+from pyrogram.types import Message, Chat, ReplyParameters
 from pyrogram.raw.functions.channels import (
     CreateChannel,
     EditPhoto,
@@ -361,7 +361,7 @@ async def asset_forum_topic(
 
         await fw_protect()
 
-        await client.send_message(entity.id, message=(description if description else f"<tg-emoji emoji-id=\"5258503720928288433\">ℹ️</tg-emoji> <b>Content related to <i>'{title}'</i> will be here</b>"), reply_to=result.id)
+        await client.send_message(entity.id, message=(description if description else f"<tg-emoji emoji-id=\"5258503720928288433\">ℹ️</tg-emoji> <b>Content related to <i>'{title}'</i> will be here</b>"), reply_parameters=ReplyParameters(result.id))
 
         await fw_protect()
 
@@ -555,10 +555,10 @@ def get_chat_id(message: typing.Union[Message, AiogramMessage]) -> int:
     :param message: Message to get chat ID from
     :return: Chat ID
     """
-    return pyrogram.utils.resolve_id(
+    return (
         getattr(message, "chat_id", None)
         or getattr(getattr(message, "chat", None), "id", None)
-    )[0]
+    )
 
 
 def get_entity_id(entity: 'Entity') -> int:

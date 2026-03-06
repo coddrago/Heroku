@@ -20,7 +20,7 @@ import time
 import typing
 from io import BytesIO
 
-from pyrogram.types import Message, ReplyParameters
+from pyrogram.types import Message, ReplyParameters, LinkPreviewOptions
 from pyrogram.raw.types import InputMediaWebPage
 
 from .. import loader, main, utils
@@ -263,7 +263,7 @@ class TestMod(loader.Module):
             and not force
             and (
                 not isinstance(message, Message)
-                or "force_insecure" not in message.text.lower()
+                or "force_insecure" not in message.content.lower()
             )
         ):
             try:
@@ -353,7 +353,7 @@ class TestMod(loader.Module):
         banner = str(self.config["banner_url"])
         
         if self.config["banner_url"] and self.config["quote_media"] is True:
-            banner = InputMediaWebPage(str(self.config["banner_url"]), optional = True)
+            banner = LinkPreviewOptions(url=str(self.config["banner_url"]), is_disabled=False, show_above_text=not self.config["invert_media"])
 
         elif not self.config["banner_url"]:
             banner = None
@@ -377,8 +377,7 @@ class TestMod(loader.Module):
         await utils.answer(
             message,
             placeholders_msg,
-            file = banner,
-            invert_media = self.config["invert_media"]
+            file = banner
         )
 
 

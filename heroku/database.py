@@ -29,7 +29,8 @@ except ImportError as e:
 import typing
 
 from pyrogram.errors import ChannelsTooMuch
-from pyrogram.raw.types import Message, User, ForumTopic
+from pyrogram.types import Message, ReplyParameters
+from pyrogram.raw.types import User, ForumTopic
 
 from . import main, utils
 from .pointers import (
@@ -276,14 +277,14 @@ class Database(dict):
             raise NoContentChannel("Tried to save asset with non-existing content channel.")
 
         return (
-            (await self._client.send_message(_content_channel_id, message, reply_to=_assets_topic_id)).id
+            (await self._client.send_message(_content_channel_id, message, reply_parameters=ReplyParameters(message_id=_assets_topic_id))).id
             if isinstance(message, Message)
             else (
                 await self._client.send_message(
                     _content_channel_id,
                     file=message,
                     force_document=True,
-                    message_thread_id=_assets_topic_id
+                    reply_parameters=ReplyParameters(message_id=_assets_topic_id)
                 )
             ).id
         )

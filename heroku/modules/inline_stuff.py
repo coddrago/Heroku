@@ -17,7 +17,7 @@ import random
 from aiogram.types import Message as AioMessage
 from pyrogram.errors import YouBlockedUser
 from pyrogram.raw.functions.contacts import Unblock
-from pyrogram.types import Message
+from pyrogram.types import Message, ReplyParameters
 
 from .. import loader, utils
 from ..inline.types import InlineCall
@@ -42,11 +42,11 @@ class InlineStuff(loader.Module):
         if message.via_bot.id != self.inline.bot_id:
             return
 
-        id_ = re.search(r"#id: ([a-zA-Z0-9]+)", message.text)[1]
+        id_ = re.search(r"#id: ([a-zA-Z0-9]+)", message.content)[1]
 
         await message.delete()
 
-        m = await message.answer("🪐", reply_to=utils.get_topic(message))
+        m = await message.answer("🪐", reply_parameters=ReplyParameters(message_id=utils.get_topic(message)))
 
         await self.inline.gallery(
             message=m,

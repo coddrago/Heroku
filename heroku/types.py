@@ -30,10 +30,13 @@ import typing
 from dataclasses import dataclass, field
 from importlib.abc import SourceLoader
 
+import pyrogram
+import pyrogram.utils
 import requests
 from pyrogram import raw
 from pyrogram.client import Client
 from pyrogram.enums import ChatType
+from pyrogram.types import Object
 from pyrogram.storage.sqlite_storage import (
     SQLiteStorage,
     TEST,
@@ -41,6 +44,7 @@ from pyrogram.storage.sqlite_storage import (
 )
 from pyrogram.types import (
     Message,
+    User,
 )
 from pyrogram.raw.types import (
     Channel,
@@ -58,6 +62,7 @@ from .pointers import PointerDict, PointerList
 
 if typing.TYPE_CHECKING:
     from .loader import Modules
+    from .tl_cache import CustomClient
 
 __all__ = [
     "JSONSerializable",
@@ -73,6 +78,8 @@ __all__ = [
     "BotMessage",
     "InlineCall",
     "InlineMessage",
+    "InlineResults",
+    "InlineResult",
     "InlineQuery",
     "InlineUnit",
     "BotInlineMessage",
@@ -852,7 +859,7 @@ class Module:
 
         code = await utils.run_sync(requests.get, url)
         code.raise_for_status()
-        code = code.text
+        code = code.content
 
         if re.search(r"# ?scope: ?heroku_min", code):
             ver = tuple(
@@ -1418,6 +1425,191 @@ class SQLiteStringStorage(SQLiteStorage):
         await self.is_bot(is_bot)
         await self.date(0)
 
+class InlineResult(Object):
+    """Single inline result"""
+    def __init__(
+        self,
+        id: str,
+        client: "CustomClient",
+        entity: typing.Optional["raw.base.InputPeer"],
+        query_id: int,
+        title: str,
+        description: typing.Optional[str],
+        send_message: "raw.base.BotInlineMessage",
+        url: typing.Optional[str],
+        raw: "raw.types.BotInlineResult",
+    ):
+        super().__init__(client)
+
+        self.id = id
+        self._entity = entity
+        self._query_id = query_id
+        self.title = title
+        self.description = description
+        self.send_message = send_message
+        self.url = url
+        self.raw = raw
+    
+    @staticmethod
+    def _parse(client: "CustomClient", inline_result: "raw.base.BotInlineResult", query_id: typing.Optional[int], entity: typing.Optional["raw.base.InputPeer"]):
+
+        result_id = inline_result.id
+        title = inline_result.title
+        description = inline_result.description
+        send_message = inline_result.send_message
+        url = getattr(inline_result, "url", None)
+
+        return InlineResult(
+            id=result_id,
+            client=client,
+            entity=entity,
+            query_id=query_id,
+            title=title,
+            description=description,
+            send_message=send_message,
+            url=url,
+            raw=inline_result,
+        )
+    
+    async def click(
+        self,
+        chat_id: typing.Union[int, str] = None,
+        message_thread_id: typing.Optional[int] = None,
+        reply_parameters: typing.Optional[pyrogram.types.ReplyParameters] = None,
+        direct_messages_topic_id: typing.Optional[int] = None,
+        silent: typing.Optional[bool] = False,
+        clear_draft: typing.Optional[bool] = False,
+        hide_via: typing.Optional[bool] = False,
+        background: typing.Optional[bool] = None,
+        paid_message_star_count: typing.Optional[int] = None,
+    ):
+        """Clicks this result and sends the associated `message`.
+
+        Args:
+            chat_id ('int' | 'str', optional):
+                The chat id or username to which the message of this result should be sent.
+
+            message_thread_id (``int``, *optional*):
+                If the message is in a thread, ID of the original message.
+
+            reply_parameters (:obj:`~pyrogram.types.ReplyParameters`, *optional*):
+                Describes reply parameters for the message that is being sent.
+
+            direct_messages_topic_id (``int``, *optional*):
+                Unique identifier of the topic in a channel direct messages chat administered by the current user.
+                For directs only only.
+
+            silent (`bool`, optional):
+                Whether the message should notify people with sound or not.
+                Defaults to `False` (send with a notification sound unless
+                the person has the chat muted). Set it to `True` to alter
+                this behaviour.
+
+            clear_draft (`bool`, optional):
+                Whether the draft should be removed after sending the
+                message from this result or not. Defaults to `False`.
+
+            hide_via (`bool`, optional):
+                Whether the "via @bot" should be hidden or not.
+                Only works with certain bots (like @bing or @gif).
+
+            background (`bool`, optional):
+                Whether the message should be send in background.
+            
+            paid_message_star_count (``int``, *optional*):
+                The number of Telegram Stars the user agreed to pay to send the messages.
+
+        """
+        if chat_id:
+            entity = await self._client.resolve_peer(chat_id)
+        elif self._entity:
+            entity = self._entity
+        else:
+            raise ValueError('You must provide the chat_id where the result should be sent to')
+
+        res = await self._client.invoke(
+            raw.functions.messages.SendInlineBotResult(
+                peer=entity,
+                random_id=self._client.rnd_id(),
+                query_id=self._query_id,
+                id=self.id,
+                silent=silent,
+                background=background,
+                clear_draft=clear_draft,
+                hide_via=hide_via,
+                reply_to=await pyrogram.utils.get_reply_to(
+                    self._client,
+                    reply_parameters,
+                    message_thread_id,
+                    direct_messages_topic_id,
+                ),
+                allow_paid_stars=paid_message_star_count,
+            )
+        )
+
+        message = (await pyrogram.utils.parse_messages(self._client, res))[0]
+
+        return message
+
+class InlineResults(list):
+    """List of inline results"""
+    def __init__(self,
+        query_id: int,
+        cache_time: int,
+        users: typing.List[User],
+        gallery: bool,
+        next_offset: str,
+        switch_pm: typing.Optional[str],
+        results: typing.List[InlineResult],
+        raw: "raw.types.messages.BotResults",
+    ):
+        super().__init__(results)
+    
+        self.raw = raw
+        self.query_id = query_id
+        self.cache_time = cache_time
+        self._valid_until = time.time() + self.cache_time
+        self.users = users
+        self.gallery = bool(gallery)
+        self.next_offset = next_offset
+        self.switch_pm = switch_pm
+
+    def results_valid(self):
+        """
+        Returns `True` if the cache time has not expired
+        yet and the results can still be considered valid.
+        """
+        return time.time() < self._valid_until
+    
+    @staticmethod
+    def _parse(client: "CustomClient", inline_results: "raw.types.messages.BotResults", entity: typing.Optional["raw.base.InputPeer"]):
+
+        query_id = inline_results.query_id
+        cache_time = inline_results.cache_time
+        users = inline_results.users
+        gallery = inline_results.gallery
+        next_offset = inline_results.next_offset
+        switch_pm = inline_results.switch_pm
+
+        results = [
+            InlineResult._parse(
+                client=client,
+                inline_result=result,
+                query_id=query_id,
+                entity=entity
+            ) for result in inline_results.results
+        ]
+
+        return InlineResults(
+            query_id=query_id,
+            cache_time=cache_time,
+            users=users,
+            gallery=gallery,
+            next_offset=next_offset,
+            switch_pm=switch_pm,
+            results=results,
+            raw=inline_results,
+        )
 
 class CacheRecordEntity:
     def __init__(
