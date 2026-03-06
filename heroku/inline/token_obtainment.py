@@ -19,7 +19,7 @@ import random
 import re
 import typing
 
-from pyrogram.errors import YouBlockedUser
+from pyrogram.errors import YouBlockedUser, UsernameNotOccupied
 from pyrogram.raw.functions.contacts import Unblock
 
 
@@ -49,7 +49,7 @@ class TokenObtainment(InlineUnit):
             username = f"@{username.strip('@')}"
             try:
                 await self._client.get_chat(username)
-            except ValueError:
+            except UsernameNotOccupied:
                 pass
             else:
                 uid = utils.rand(6)
