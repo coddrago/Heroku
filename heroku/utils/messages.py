@@ -338,7 +338,7 @@ async def answer(
 
     kwargs.setdefault("link_preview", False)
 
-    edit = (message.outgoing and not message.via_bot and not message.forward_from)
+    edit = (message.outgoing and not message.via_bot and not message.forward_origin)
     if not edit:
             kwargs.setdefault(
                 "reply_parameters",

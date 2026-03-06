@@ -565,7 +565,7 @@ class CommandDispatcher:
             "only_messages": lambda: isinstance(m, Message),
             "editable": (
                 lambda: not getattr(m, "outgoing", False)
-                and not getattr(m, "forward_from", False)
+                and not getattr(m, "forward_origin", False)
                 and not getattr(m, "sticker", False)
                 and not getattr(getattr(m, "via_bot", False), "id", False)
             ),
@@ -601,9 +601,9 @@ class CommandDispatcher:
             "no_audios": lambda: not m.media == MessageMediaType.PHOTO,
             "no_videos": lambda: not m.media == MessageMediaType.VIDEO,
             "no_photos": lambda: not m.media == MessageMediaType.AUDIO,
-            "no_forwards": lambda: not getattr(m, "forward_from", False),
+            "no_forwards": lambda: not getattr(m, "forward_origin", False),
             "no_reply": lambda: not getattr(m, "reply_to_message_id", False),
-            "only_forwards": lambda: getattr(m, "forward_from", False),
+            "only_forwards": lambda: getattr(m, "forward_origin", False),
             "only_reply": lambda: getattr(m, "reply_to_message_id", False),
             "mention": lambda: getattr(m, "mentioned", False),
             "no_mention": lambda: not getattr(m, "mentioned", False),
