@@ -22,10 +22,8 @@ import logging
 import emoji
 import herokutl
 
-from bs4 import BeautifulSoup
 from typing import Optional
 from pathlib import Path
-from PIL import Image, ImageDraw, ImageFont
 from io import BytesIO
 from herokutl.errors import WebpageMediaEmptyError
 from herokutl.types import InputMediaWebPage
@@ -73,20 +71,6 @@ class HerokuInfoMod(loader.Module):
                 validator=loader.validators.String(),
             ),
             loader.ConfigValue(
-                "switchInfo",
-                False,
-                "Switch info to mode photo",
-                validator=loader.validators.Boolean(),
-            ),
-            loader.ConfigValue(
-                "imgSettings",
-                ["Лапокапканот", 30, '#000', '0|0', "mm", 0, '#000'],
-                "Image settings\n1. Дополнительный ник (если прежний ник не отображается)\n2. Размер шрифта\n3. Цвет шрифта в HEX формате '#000'\n4. Координаты текста '100|100', по умолчания в центре фотографии\n5. Якорь текста -> https://pillow.readthedocs.io/en/stable/_images/anchor_horizontal.svg\n6. Размер обводки, по умолчанию 0\n7. Цвет обводки в HEX формате '#000'",
-                validator=loader.validators.Series(
-                    fixed_len=7,
-                ),
-            ),
-            loader.ConfigValue(
                 "quote_media",
                 False,
                 "Switch preview media to quote",
@@ -108,20 +92,6 @@ class HerokuInfoMod(loader.Module):
                         return line.split("=")[1].strip().strip('"')
         except FileNotFoundError:
             return self.strings['non_detectable']
-        
-    def remove_emoji_and_html(self, text: str) -> str:
-        reg = r'<[^<]+?>'
-        text = f"{re.sub(reg, '', text)}"
-        allchars = [str for str in text]
-        emoji_list = [c for c in allchars if c in emoji.EMOJI_DATA]
-        clean_text = ''.join([str for str in text if not any(i in str for i in emoji_list)])
-        return clean_text
-    
-    def imgur(self, url: str) -> str:
-        page = requests.get(url, stream=True, headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"})
-        soup = BeautifulSoup(page.text, 'html.parser')
-        metatag = soup.find("meta", property="og:image")
-        return metatag['content']
 
     async def _render_info(self, start: float) -> str:
         try:
@@ -133,7 +103,7 @@ class HerokuInfoMod(loader.Module):
         except Exception:
             upd = ""
 
-        me = self.config['imgSettings'][0] if (self.config['imgSettings'][0] != "Лапокапканот") and self.config['switchInfo'] else '<b><a href="tg://user?id={}">{}</a></b>'.format(
+        me = '<b><a href="tg://user?id={}">{}</a></b>'.format(
             self._client.heroku_me.id,
             utils.escape_html(get_display_name(self._client.heroku_me)),
         ).replace('{', '').replace('}', '')
@@ -224,82 +194,6 @@ class HerokuInfoMod(loader.Module):
                 python_ver = lib_platform.python_version(),
             )
         )
-    
-    async def _get_info_photo(self, start: float) -> Optional[Path]:
-        imgform = str(self.config['banner_url']).split('.')[-1]
-        imgset = self.config['imgSettings']
-        if imgform in ['jpg', 'jpeg', 'png', 'bmp', 'webp']:
-            response = requests.get(str(self.config['banner_url']) if not str(self.config['banner_url']).startswith('https://imgur') else self.imgur(str(self.config['banner_url'])), stream=True, headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"})
-            img = Image.open(BytesIO(response.content))
-            font = ImageFont.truetype(
-                glob.glob(f'{os.getcwd()}/assets/font.*')[0], 
-                size=int(imgset[1]), 
-                encoding='unic'
-            )
-            w, h = img.size
-            draw = ImageDraw.Draw(img)
-            draw.text(
-                (int(w/2), int(h/2)) if imgset[3] == '0|0' else tuple([int(i) for i in imgset[3].split('|')]),
-                f'{utils.remove_html(await self._render_info(start))}', 
-                anchor=imgset[4],
-                font=font,
-                fill=imgset[2] if imgset[2].startswith('#') else '#000',
-                stroke_width=int(imgset[5]),
-                stroke_fill=imgset[6] if imgset[6].startswith('#') else '#000',
-                embedded_color=True
-            )
-            path = f'{os.getcwd()}/assets/imginfo.{imgform}'
-            img.save(path)
-            return Path(path).absolute()
-        return None
-    
-    @loader.command()
-    async def insfont(self, message: Message):
-        "<Url|Reply to font> - Install font"
-        match True:
-            case _ if message.is_reply:
-                reply = await message.get_reply_message()
-                fontform = reply.document.mime_type.split("/")[1]
-                if not fontform in ['ttf', 'otf']:
-                    await utils.answer(
-                        message,
-                        self.strings["incorrect_format_font"]
-                    )
-                    return
-                origpath = glob.glob(f'{os.getcwd()}/assets/font.*')[0]
-                ptf = f'{os.getcwd()}/font.{fontform}'
-                os.rename(origpath, ptf)
-                photo = await reply.download_media(origpath)
-                if photo is None:
-                    os.rename(ptf, origpath)
-                    await utils.answer(
-                        message,
-                        self.strings["no_font"]
-                    )
-                    return
-                os.remove(ptf)
-            case _ if utils.check_url(utils.get_args_raw(message)):
-                fontform = utils.get_args_raw(message).split('.')[-1]
-                if not fontform in ['ttf', 'otf']:
-                    await utils.answer(
-                        message,
-                        self.strings["incorrect_format_font"]
-                    )
-                    return
-                response = requests.get(utils.get_args_raw(message), stream=True)
-                os.remove(glob.glob(f'{os.getcwd()}/assets/font.*')[0])
-                with open(f'{os.getcwd()}/assets/font.{fontform}', 'wb') as file:
-                    file.write(response.content)
-            case _:
-                await utils.answer(
-                    message,
-                    self.strings["no_font"]
-                )
-                return
-        await utils.answer(
-            message,
-            self.strings["font_installed"]
-        )
 
     @loader.command()
     async def infocmd(self, message: Message):
@@ -314,20 +208,6 @@ class HerokuInfoMod(loader.Module):
 
         try:
             match True:
-                case _ if self.config['switchInfo']:
-                    if await self._get_info_photo(start) is None:
-                        await utils.answer(
-                            message, 
-                            self.strings["incorrect_img_format"]
-                        )
-                        return
-
-                    await utils.answer(
-                        message,
-                        "",
-                        file = self._get_info_photo(start),
-                        reply_to=getattr(message, "reply_to_msg_id", None),
-                    )
                 case _ if self.config["custom_message"] is None:
                     await utils.answer(
                         message,
@@ -359,12 +239,4 @@ class HerokuInfoMod(loader.Module):
     async def ubinfo(self, message: Message):
         await utils.answer(message, self.strings("desc"))
 
-    @loader.command()
-    async def switchinfo(self, message: Message):
-        """| switch Image info state"""
-        self.config["switchInfo"] = not self.config["switchInfo"]
-        if self.config["switchInfo"]:
-            await utils.answer(message, self.strings["switchinfo_on"])
-        else:
-            await utils.answer(message, self.strings["switchinfo_off"])
 
