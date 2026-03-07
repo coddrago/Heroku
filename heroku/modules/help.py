@@ -267,6 +267,9 @@ class Help(loader.Module):
         if self.config["banner_url"] and self.config["media_quote"] is True:
             banner = InputMediaWebPage(str(self.config["banner_url"]))
 
+        if self.config["banner_url"] and self.client.heroku_me.premium is False: # bcs non-premium users can add in caption only 1024 symbols
+            banner = InputMediaWebPage(str(self.config["banner_url"]))
+
         if not self.config["banner_url"]:
             banner = None
 

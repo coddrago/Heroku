@@ -108,6 +108,9 @@
 - fix: update hashable_entity check to handle negative channel ID's
 - add bot command adding
 - improve error handling and add debug logging for bot command settings 
+- remove watchdog func from tester
+- remove info in photo switch
+- remove show_heroku from info
 
 ## 🪐 Heroku 1.7.2
 - added autoupdate

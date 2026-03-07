@@ -58,12 +58,6 @@ class HerokuInfoMod(loader.Module):
                 lambda: self.strings("_cfg_banner"),
                 validator=loader.validators.RandomLink(),
             ),
-
-            loader.ConfigValue(
-                "show_heroku",
-                True,
-                validator=loader.validators.Boolean(),
-            ),
             loader.ConfigValue(
                 "ping_emoji",
                 "🪐",
@@ -167,12 +161,7 @@ class HerokuInfoMod(loader.Module):
                 logger.exception("Missing placeholder in custom_message")
                 placeholders_msg = "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji>"
         return (
-            (
-                "🪐 Heroku\n"
-                if self.config["show_heroku"]
-                else ""
-            )
-            + placeholders_msg
+            placeholders_msg
             if self.config["custom_message"]
             else self.strings["info_message"].format(
                 (
