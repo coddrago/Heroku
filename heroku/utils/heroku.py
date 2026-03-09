@@ -12,6 +12,7 @@ import herokutl
 parser = herokutl.utils.sanitize_parse_mode("html")
 logger = logging.getLogger(__name__)
 
+
 def get_version_raw() -> str:
     """
     Get the version of the userbot
@@ -36,6 +37,7 @@ def get_dir(mod: str) -> str:
     :param mod: Module's `__file__` to get directory of
     :return: Directory of given module
     """
-    return(os.getcwd() + "/heroku")
+    return os.getcwd() + "/heroku"
+
 
 version = get_version_raw

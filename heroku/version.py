@@ -1,4 +1,5 @@
 """Represents current userbot version"""
+
 # ©️ Dan Gazizullin, 2021-2023
 # This file is a part of Hikka Userbot
 # 🌐 https://github.com/hikariatama/Hikka
@@ -20,8 +21,13 @@ if not NO_GIT:
     import git
 else:
     git = None
-from ._internal import (check_commit_ancestor, get_branch_name,
-                        reset_to_master, restart, restore_worktree)
+from ._internal import (
+    check_commit_ancestor,
+    get_branch_name,
+    reset_to_master,
+    restart,
+    restore_worktree,
+)
 
 if NO_GIT:
     branch = "master"

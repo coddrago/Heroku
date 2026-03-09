@@ -65,6 +65,7 @@ def get_named_platform() -> str:
         case _:
             return "VDS"
 
+
 def get_named_platform_emoji() -> str:
     """
     Returns emoji for current platform
@@ -102,6 +103,7 @@ def get_named_platform_emoji() -> str:
         case _:
             return "💎 "
 
+
 def get_platform_emoji() -> str:
     """
     Returns custom emoji for current platform
@@ -130,6 +132,7 @@ def get_platform_emoji() -> str:
             return BASE.format(5352678227582152630)
         case _:
             return BASE.format(5393588431026674882)
+
 
 def uptime() -> int:
     """
@@ -165,13 +168,14 @@ def get_ram_usage() -> float:
     except Exception:
         return 0
 
+
 def get_cpu_usage():
     """
     Get CPU usage percentage using system-wide metrics
     Falls back to psutil.cpu_percent() to avoid /proc/stat permission issues
     """
     import psutil
-    
+
     try:
         cpu_percent = psutil.cpu_percent(interval=0.1)
         return f"{cpu_percent:.2f}"
@@ -184,9 +188,11 @@ def get_cpu_usage():
     except Exception:
         return "0.00"
 
+
 init_ts = time.perf_counter()
 
 get_platform_name = get_named_platform
+
 
 def get_ip_address() -> str:
     """
@@ -195,10 +201,12 @@ def get_ip_address() -> str:
     """
     try:
         import requests
-        response = requests.get('https://api.ipify.org?format=json', timeout=5)
-        return response.json()['ip']
+
+        response = requests.get("https://api.ipify.org?format=json", timeout=5)
+        return response.json()["ip"]
     except Exception:
         return "Unknown"
+
 
 def get_disk_usage() -> dict:
     """
@@ -207,12 +215,13 @@ def get_disk_usage() -> dict:
     """
     try:
         import psutil
-        disk = psutil.disk_usage('/')
+
+        disk = psutil.disk_usage("/")
         return {
-            'total': round(disk.total / (1024**3), 2),
-            'used': round(disk.used / (1024**3), 2),
-            'free': round(disk.free / (1024**3), 2),
-            'percent': disk.percent
+            "total": round(disk.total / (1024**3), 2),
+            "used": round(disk.used / (1024**3), 2),
+            "free": round(disk.free / (1024**3), 2),
+            "percent": disk.percent,
         }
     except Exception:
-        return {'total': 0, 'used': 0, 'free': 0, 'percent': 0}
+        return {"total": 0, "used": 0, "free": 0, "percent": 0}

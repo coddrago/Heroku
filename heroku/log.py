@@ -23,17 +23,14 @@ import sys
 import traceback
 import typing
 import os
-import git 
+import git
 from logging.handlers import RotatingFileHandler
 from collections.abc import Coroutine
 
 import herokutl
 from aiogram.exceptions import TelegramNetworkError, TelegramRetryAfter
 from herokutl.errors import PersistentTimestampOutdatedError
-from herokutl.errors.rpcbaseerrors import (
-    ServerError,
-    RPCError
-)
+from herokutl.errors.rpcbaseerrors import ServerError, RPCError
 
 from . import utils
 from ._internal import (
@@ -47,8 +44,10 @@ from .tl_cache import CustomTelegramClient
 from .types import BotInlineCall, Module, CoreOverwriteError
 
 INTERNET_ERRORS = (
-    TelegramNetworkError, asyncio.exceptions.TimeoutError,
-    ServerError, PersistentTimestampOutdatedError
+    TelegramNetworkError,
+    asyncio.exceptions.TimeoutError,
+    ServerError,
+    PersistentTimestampOutdatedError,
 )
 old = linecache.getlines
 
@@ -84,11 +83,13 @@ linecache.getlines = getlines
 
 def override_text(exception: Exception) -> typing.Optional[str]:
     """Returns error-specific description if available, else `None`"""
-    
+
     match exception:
         case TelegramNetworkError() | asyncio.exceptions.TimeoutError():
-            return "✈️ <b>You have problems with internet connection on your server.</b>"
-        
+            return (
+                "✈️ <b>You have problems with internet connection on your server.</b>"
+            )
+
         case PersistentTimestampOutdatedError():
             return "✈️ <b>Telegram has problems with their datacenters.</b>"
 
@@ -103,7 +104,7 @@ def override_text(exception: Exception) -> typing.Optional[str]:
 
         case ModuleNotFoundError():
             return f"📦 {traceback.format_exception_only(type(exception), exception)[0].split(':')[1].strip()}"
-        
+
         case TelegramRetryAfter():
             return f"✋ <b>Bot is hitting limits on {type(exception.method).__name__!r} method and got {exception.retry_after} seconds floodwait</b>"
 
@@ -140,7 +141,10 @@ class HerokuException:
                 match value:
                     case dict():
                         dictionary[key] = to_hashable(value)
-                    case _ if getattr(getattr(value, "__class__", None), "__name__", None) == "Database":
+                    case _ if (
+                        getattr(getattr(value, "__class__", None), "__name__", None)
+                        == "Database"
+                    ):
                         dictionary[key] = "<Database>"
                     case herokutl.TelegramClient() | CustomTelegramClient():
                         dictionary[key] = f"<{value.__class__.__name__}>"
@@ -196,7 +200,7 @@ class HerokuException:
             message=override_text(exc_value)
             or (
                 "{}<b>🎯 Source:</b> <code>{}:{}</code><b> in"
-                " </b><code>{}</code>\n<b>❓ Error:</b> <pre><code class=\"language-python\">{}</code></pre>{}"
+                ' </b><code>{}</code>\n<b>❓ Error:</b> <pre><code class="language-python">{}</code></pre>{}'
             ).format(
                 (
                     (
@@ -298,27 +302,26 @@ class TelegramLogsHandler(logging.Handler):
         bot: "aiogram.Bot",  # type: ignore  # noqa: F821
         item: HerokuException,
     ):
-        chunks = item.message + "\n\n<b>🪐 Full traceback:</b>\n" + f"<pre><code class=\"language-python\">{item.full_stack}</code></pre>"
+        chunks = (
+            item.message
+            + "\n\n<b>🪐 Full traceback:</b>\n"
+            + f'<pre><code class="language-python">{item.full_stack}</code></pre>'
+        )
 
         chunks = list(utils.smart_split(*herokutl.extensions.html.parse(chunks), 4096))
 
-        await call.edit(
-            chunks[0]
-        )
+        await call.edit(chunks[0])
 
         thread_id = call.message.message_thread_id
 
         for chunk in chunks[1:]:
             await bot.send_message(
-                chat_id=call.chat_id, 
-                text=chunk,
-                message_thread_id=thread_id
+                chat_id=call.chat_id, text=chunk, message_thread_id=thread_id
             )
-
 
     def get_logid_by_client(self, client_id: int) -> int:
         return self._mods[client_id].logchat
-        
+
     async def get_logs_topic_id_by_client(self, client_id: int) -> typing.Optional[int]:
         """Get logs topic ID from database"""
         try:
@@ -365,14 +368,9 @@ class TelegramLogsHandler(logging.Handler):
                         continue
                     if not (not item[1] or item[1] == client_id or self.force_send_all):
                         continue
-                    if (
-                        isinstance(item[0].sysinfo[1], INTERNET_ERRORS)
-                        and getattr(
-                            self._mods[client_id].lookup("tester"),
-                            "config",
-                            {}
-                        ).get("disable_internet_warn", False)
-                    ):
+                    if isinstance(item[0].sysinfo[1], INTERNET_ERRORS) and getattr(
+                        self._mods[client_id].lookup("tester"), "config", {}
+                    ).get("disable_internet_warn", False):
                         continue
 
                     coros.append(
@@ -399,10 +397,11 @@ class TelegramLogsHandler(logging.Handler):
                 self._exc_queue[client_id] = coros
 
             await asyncio.gather(
-                *(self._exc_sender(*exceptions)
-                for exceptions in self._exc_queue.values())
+                *(
+                    self._exc_sender(*exceptions)
+                    for exceptions in self._exc_queue.values()
+                )
             )
-
 
             self.tg_buff = []
 
@@ -423,7 +422,9 @@ class TelegramLogsHandler(logging.Handler):
                             "<b>🧳 Journals are too big to be sent as separate"
                             " messages</b>"
                         ),
-                        message_thread_id=await self.get_logs_topic_id_by_client(client_id),
+                        message_thread_id=await self.get_logs_topic_id_by_client(
+                            client_id
+                        ),
                     )
 
                     self._queue[client_id] = []
@@ -436,7 +437,9 @@ class TelegramLogsHandler(logging.Handler):
                                 self._mods[client_id].logchat,
                                 f"<code>{chunk}</code>",
                                 disable_notification=True,
-                                message_thread_id=await self.get_logs_topic_id_by_client(client_id),
+                                message_thread_id=await self.get_logs_topic_id_by_client(
+                                    client_id
+                                ),
                             )
                         )
 
@@ -529,7 +532,7 @@ class TelegramLogsHandler(logging.Handler):
                 self.buffer = []
             finally:
                 self.release()
-    
+
 
 async def check_branch(me_id: int, allowed_ids: list, self):
     if os.environ.get("HEROKU_NO_GIT") == "1":
@@ -588,7 +591,6 @@ def init():
             msg = record.getMessage()
             return "Failed to fetch updates" not in msg and "Sleep" not in msg
 
-    
     logging.getLogger("aiogram.dispatcher").addFilter(NoFetchUpdatesFilter())
     handler = logging.StreamHandler()
     handler.setLevel(logging.INFO)

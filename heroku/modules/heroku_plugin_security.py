@@ -75,7 +75,10 @@ class HerokuPluginSecurity(loader.Module):
         if not self._internalized:
             return
 
-        names = {self._get_module_name(m).lower(): self._get_module_name(m) for m in self.allmodules.modules}
+        names = {
+            self._get_module_name(m).lower(): self._get_module_name(m)
+            for m in self.allmodules.modules
+        }
         normalized = []
 
         for item in list(self._internalized):
@@ -117,9 +120,9 @@ class HerokuPluginSecurity(loader.Module):
             return mod, None
 
         names = [m.__class__.__name__ for m in self.allmodules.modules]
-        closest = (
-            difflib.get_close_matches(query, names, n=1, cutoff=0.3) or [None]
-        )[0]
+        closest = (difflib.get_close_matches(query, names, n=1, cutoff=0.3) or [None])[
+            0
+        ]
 
         return None, closest
 
@@ -151,7 +154,9 @@ class HerokuPluginSecurity(loader.Module):
         real_allmodules = self._real_allmodules(mod)
         origin = getattr(mod, "__origin__", "")
         safe_client = loader.SafeClientProxy(real_allmodules.client, origin)
-        safe_allclients = [loader.SafeClientProxy(c, origin) for c in real_allmodules.allclients]
+        safe_allclients = [
+            loader.SafeClientProxy(c, origin) for c in real_allmodules.allclients
+        ]
         safe_db = loader.SafeDatabaseProxy(real_allmodules.db, origin)
         safe_inline = loader.SafeInlineProxy(real_allmodules.inline, origin)
 

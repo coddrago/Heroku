@@ -16,7 +16,7 @@ import datetime
 import io
 import logging
 import os
-import re 
+import re
 import time
 import zipfile
 import orjson
@@ -30,6 +30,7 @@ from .. import loader, utils
 from ..inline.types import BotInlineCall
 
 logger = logging.getLogger(__name__)
+
 
 @loader.tds
 class HerokuBackupMod(loader.Module):
@@ -72,14 +73,24 @@ class HerokuBackupMod(loader.Module):
     async def _set_backup_period(self, call: BotInlineCall, value: int):
         if not value:
             self.set("period", "disabled")
-            await self.inline.bot(call.answer(self.strings("never_bot").format(prefix=self.get_prefix()), show_alert=True))
+            await self.inline.bot(
+                call.answer(
+                    self.strings("never_bot").format(prefix=self.get_prefix()),
+                    show_alert=True,
+                )
+            )
             await call.delete()
             return
 
         self.set("period", value * 60 * 60)
         self.set("last_backup", round(time.time()))
 
-        await self.inline.bot(call.answer(self.strings("saved_bot").format(prefix=self.get_prefix()), show_alert=True))
+        await self.inline.bot(
+            call.answer(
+                self.strings("saved_bot").format(prefix=self.get_prefix()),
+                show_alert=True,
+            )
+        )
         await call.delete()
 
     @loader.command()
@@ -95,13 +106,18 @@ class HerokuBackupMod(loader.Module):
 
         if not int(args):
             self.set("period", "disabled")
-            await utils.answer(message, f"<b>{self.strings('never').format(prefix=self.get_prefix())}</b>")
+            await utils.answer(
+                message,
+                f"<b>{self.strings('never').format(prefix=self.get_prefix())}</b>",
+            )
             return
 
         period = int(args) * 60 * 60
         self.set("period", period)
         self.set("last_backup", round(time.time()))
-        await utils.answer(message, f"<b>{self.strings('saved').format(prefix=self.get_prefix())}</b>")
+        await utils.answer(
+            message, f"<b>{self.strings('saved').format(prefix=self.get_prefix())}</b>"
+        )
 
     @loader.loop(interval=1, autostart=True)
     async def handler(self):
@@ -122,7 +138,11 @@ class HerokuBackupMod(loader.Module):
                 self.get("last_backup") + self.get("period") - time.time()
             )
 
-            db = io.BytesIO(orjson.dumps(self._db, option=orjson.OPT_INDENT_2 | orjson.OPT_NON_STR_KEYS))
+            db = io.BytesIO(
+                orjson.dumps(
+                    self._db, option=orjson.OPT_INDENT_2 | orjson.OPT_NON_STR_KEYS
+                )
+            )
             db.name = "db.json"
 
             mods = io.BytesIO()
@@ -133,11 +153,11 @@ class HerokuBackupMod(loader.Module):
                             with open(os.path.join(root, file), "rb") as f:
                                 zipf.writestr(file, f.read())
                 zipf.writestr(
-                    "db_mods.json", 
+                    "db_mods.json",
                     orjson.dumps(
-                        self.lookup("Loader").get("loaded_modules", {}), 
-                        option=orjson.OPT_INDENT_2 | orjson.OPT_NON_STR_KEYS
-                    )
+                        self.lookup("Loader").get("loaded_modules", {}),
+                        option=orjson.OPT_INDENT_2 | orjson.OPT_NON_STR_KEYS,
+                    ),
                 )
 
             mods.seek(0)
@@ -230,14 +250,18 @@ class HerokuBackupMod(loader.Module):
                             with modzip.open(name, "r") as module:
                                 path.write_bytes(module.read())
 
-            await self.inline.bot(call.answer(self.strings("all_restored_bot"), show_alert=True))
+            await self.inline.bot(
+                call.answer(self.strings("all_restored_bot"), show_alert=True)
+            )
             await self.invoke("restart", "-f", peer=call.message.peer_id)
         except Exception:
             logger.exception("Restore from backupall failed")
-            await self.inline.bot(call.answer(self.strings("reply_to_file"), show_alert=True))
+            await self.inline.bot(
+                call.answer(self.strings("reply_to_file"), show_alert=True)
+            )
 
     def _convert(self, backup):
-        fixed = re.sub(r'(hikka\.)(\S+\":)', lambda m: 'heroku.' + m.group(2), backup)
+        fixed = re.sub(r"(hikka\.)(\S+\":)", lambda m: "heroku." + m.group(2), backup)
         txt = io.BytesIO(fixed.encode())
         txt.name = f"db-converted-{datetime.datetime.now():%d-%m-%Y-%H-%M}.json"
         return txt
@@ -245,10 +269,7 @@ class HerokuBackupMod(loader.Module):
     async def convert(self, call: BotInlineCall, ans, file):
         match ans:
             case "y":
-                await utils.answer(
-                    call,
-                    self.strings["converting_db"]
-                )
+                await utils.answer(call, self.strings["converting_db"])
                 backup = self._convert(file)
                 await utils.answer_file(
                     call,
@@ -261,20 +282,14 @@ class HerokuBackupMod(loader.Module):
                 await utils.answer(
                     call,
                     self.strings["advice_converting"],
-                    reply_markup=
-                    [
-                        [
-                            {
-                                "text": "🔻 Close",
-                                "action": "close"
-                            }
-                        ]
-                    ]
+                    reply_markup=[[{"text": "🔻 Close", "action": "close"}]],
                 )
 
     @loader.command()
     async def backupdb(self, message: Message):
-        txt = io.BytesIO(orjson.dumps(self._db, option=orjson.OPT_INDENT_2 | orjson.OPT_NON_STR_KEYS))
+        txt = io.BytesIO(
+            orjson.dumps(self._db, option=orjson.OPT_INDENT_2 | orjson.OPT_NON_STR_KEYS)
+        )
         txt.name = f"db-backup-{datetime.datetime.now():%d-%m-%Y-%H-%M}.json"
 
         if not getattr(self, "_content_channel_id", None):
@@ -317,26 +332,33 @@ class HerokuBackupMod(loader.Module):
             decoded_text = orjson.loads(file.decode())
 
         except UnicodeDecodeError as e:
-            await utils.answer(message,
-                               self.strings("probably_zip").format(self.get_prefix()))
+            await utils.answer(
+                message, self.strings("probably_zip").format(self.get_prefix())
+            )
             return
         if re.search(r'"(hikka\.)(\S+\":)', file.decode()):
-            await utils.answer(message,
-                               self.strings["db_warning"],
-                               reply_markup=
-                                    [
-                                       {
-                                           "text": "❌",
-                                           "callback": self.convert,
-                                           "args": ("n", file.decode(),),
-                                       },
-                                       {
-                                           "text": "✅",
-                                           "callback": self.convert,
-                                           "args": ("y", file.decode(),),
-                                       }
-                                    ]
-                                )
+            await utils.answer(
+                message,
+                self.strings["db_warning"],
+                reply_markup=[
+                    {
+                        "text": "❌",
+                        "callback": self.convert,
+                        "args": (
+                            "n",
+                            file.decode(),
+                        ),
+                    },
+                    {
+                        "text": "✅",
+                        "callback": self.convert,
+                        "args": (
+                            "y",
+                            file.decode(),
+                        ),
+                    },
+                ],
+            )
             return
 
         with contextlib.suppress(KeyError):
@@ -361,7 +383,7 @@ class HerokuBackupMod(loader.Module):
 
         db_mods = orjson.dumps(
             self.lookup("Loader").get("loaded_modules", {}),
-            option=orjson.OPT_INDENT_2 | orjson.OPT_NON_STR_KEYS
+            option=orjson.OPT_INDENT_2 | orjson.OPT_NON_STR_KEYS,
         )
 
         with zipfile.ZipFile(result, "w", zipfile.ZIP_DEFLATED) as zipf:
@@ -462,7 +484,9 @@ class HerokuBackupMod(loader.Module):
 
     @loader.command()
     async def backupall(self, message: Message):
-        db = io.BytesIO(orjson.dumps(self._db, option=orjson.OPT_INDENT_2 | orjson.OPT_NON_STR_KEYS))
+        db = io.BytesIO(
+            orjson.dumps(self._db, option=orjson.OPT_INDENT_2 | orjson.OPT_NON_STR_KEYS)
+        )
         db.name = "db.json"
 
         mods = io.BytesIO()
@@ -473,11 +497,11 @@ class HerokuBackupMod(loader.Module):
                         with open(os.path.join(root, file), "rb") as f:
                             zipf.writestr(file, f.read())
             zipf.writestr(
-                "db_mods.json", 
+                "db_mods.json",
                 orjson.dumps(
-                    self.lookup("Loader").get("loaded_modules", {}), 
-                    option=orjson.OPT_INDENT_2 | orjson.OPT_NON_STR_KEYS
-                )
+                    self.lookup("Loader").get("loaded_modules", {}),
+                    option=orjson.OPT_INDENT_2 | orjson.OPT_NON_STR_KEYS,
+                ),
             )
 
         mods.seek(0)
@@ -493,7 +517,10 @@ class HerokuBackupMod(loader.Module):
         backup_topic_id = await utils.get_topic_id(self._db, "Backups")
         if not backup_topic_id:
             logger.error("Backups topic not found in database")
-            await utils.answer(message, "<b>Backups topic not found in database. Please run quickstart to create it.</b>")
+            await utils.answer(
+                message,
+                "<b>Backups topic not found in database. Please run quickstart to create it.</b>",
+            )
             return
 
         backup_msg = await self.inline.bot.send_document(
@@ -521,7 +548,7 @@ class HerokuBackupMod(loader.Module):
                 f"https://t.me/c/{self._content_channel_id}/{backup_topic_id}/{backup_msg.message_id}"
             ),
         )
-        
+
     @loader.command()
     async def restoreall(self, message: Message):
         if not (reply := await message.get_reply_message()) or not reply.media:

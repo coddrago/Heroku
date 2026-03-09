@@ -41,6 +41,7 @@ class Evaluator(loader.Module):
         """
         Proxy class to protect sensitive DB fields from eval
         """
+
         def __init__(self, original_db):
             self._db = original_db
 
@@ -52,8 +53,10 @@ class Evaluator(loader.Module):
 
         def set(self, *args, **kwargs):
             if len(args) >= 2 and args[0] == "heroku.security" and args[1] == "owner":
-                raise ValueError("⚠️ Security Protection: You cannot change the bot owner via evaluator.")
-            
+                raise ValueError(
+                    "⚠️ Security Protection: You cannot change the bot owner via evaluator."
+                )
+
             return self._db.set(*args, **kwargs)
 
     @loader.command(alias="eval")
@@ -63,9 +66,9 @@ class Evaluator(loader.Module):
 
         if not args and reply and reply.text:
             args = utils.remove_html(reply.text)
-        
+
         args = args.replace("\xa0", "\x20")
-        
+
         real_db = self.db
         self.db = self._SecureDB(real_db)
 
@@ -108,7 +111,7 @@ class Evaluator(loader.Module):
         if callable(getattr(result, "stringify", None)):
             with contextlib.suppress(Exception):
                 result = str(result.stringify())
-        
+
         exec_time = time.time() - start_time
 
         with contextlib.suppress(MessageIdInvalidError):
@@ -118,16 +121,24 @@ class Evaluator(loader.Module):
                     "4985626654563894116",
                     "python",
                     utils.escape_html(args),
-                ) + (self.strings["eval_result"].format(
-                    "python",
-                     utils.escape_html(self.censor(str(result)))
-                    ) if result or not print_output else ""
-                ) + (self.strings["print_outp"].format(
-                    "python",
-                    print_output,
-                    utils.escape_html(self.censor(print_output))
-                    ) if print_output else ""
-                ) + (self.strings["time_exec"].format(round(exec_time, 2)))
+                )
+                + (
+                    self.strings["eval_result"].format(
+                        "python", utils.escape_html(self.censor(str(result)))
+                    )
+                    if result or not print_output
+                    else ""
+                )
+                + (
+                    self.strings["print_outp"].format(
+                        "python",
+                        print_output,
+                        utils.escape_html(self.censor(print_output)),
+                    )
+                    if print_output
+                    else ""
+                )
+                + (self.strings["time_exec"].format(round(exec_time, 2))),
             )
 
     @loader.command()
@@ -270,7 +281,6 @@ class Evaluator(loader.Module):
                 ),
             )
 
-
     def censor(self, ret: str) -> str:
         ret = ret.replace(str(self._client.heroku_me.phone), "&lt;phone&gt;")
 
@@ -339,11 +349,11 @@ class Evaluator(loader.Module):
                             lambda x: x[0][0] != "_"
                             and isinstance(x[1], ModuleType)
                             and x[1] != obj
-                            and x[1].__package__.rsplit(".", _depth)[0] == "herokutl.tl",
+                            and x[1].__package__.rsplit(".", _depth)[0]
+                            == "herokutl.tl",
                             obj.__dict__.items(),
                         )
                     ]
                 )
             ),
         }
-        

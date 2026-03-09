@@ -32,10 +32,7 @@ logger = logging.getLogger(__name__)
 
 class TokenObtainment(InlineUnit):
     async def _create_bot(
-        self: "InlineManager",
-        session: aiohttp.ClientSession,
-        url: str,
-        _hash: str
+        self: "InlineManager", session: aiohttp.ClientSession, url: str, _hash: str
     ):
         logger.info("User doesn't have bot, attempting creating new one")
 
@@ -59,7 +56,9 @@ class TokenObtainment(InlineUnit):
             data = {"username": username, "method": "checkBotUsername"}
             await fw_protect()
 
-            async with session.post(url + f"/api?hash={_hash}", data=data, headers=inutils.headers) as resp:
+            async with session.post(
+                url + f"/api?hash={_hash}", data=data, headers=inutils.headers
+            ) as resp:
                 if resp.status != 200:
                     logger.error("Error while username check: resp%s", resp.status)
                     return False
@@ -76,41 +75,41 @@ class TokenObtainment(InlineUnit):
         else:
             logger.error("You've got reached limit of tries while checking username")
             return False
-        
+
         try:
             form = aiohttp.FormData()
             form.add_field(
                 "file",
                 open(f"{os.getcwd()}/assets/heroku.png", "rb"),
                 filename="heroku.png",
-                content_type="image/png"
+                content_type="image/png",
             )
-            form.add_field(
-                "method",
-                "uploadMedia"
-            )
-            form.add_field(
-                "target",
-                "bot_userpic"
-            )
-            async with session.post(url + f"/api?hash={_hash}", data=form, headers=inutils.headers) as resp:
+            form.add_field("method", "uploadMedia")
+            form.add_field("target", "bot_userpic")
+            async with session.post(
+                url + f"/api?hash={_hash}", data=form, headers=inutils.headers
+            ) as resp:
                 if resp.status != 200:
-                    logger.error("Error while uploading bot userpic: resp%s", resp.status)
+                    logger.error(
+                        "Error while uploading bot userpic: resp%s", resp.status
+                    )
                     raise RuntimeError("Upload failed")
                 content = await resp.json()
                 photo_id = content["media"]["photo_id"]
         except (RuntimeError, KeyError):
             photo_id = ""
-        
+
         data = {
             "title": f"🪐 Heroku {utils.get_version_raw()}"[:64],
             "username": username,
             "about": "",
             "userpic": photo_id,
-            "method": "createBot"
+            "method": "createBot",
         }
         await fw_protect()
-        async with session.post(url + f"/api?hash={_hash}", data=data, headers=inutils.headers) as resp:
+        async with session.post(
+            url + f"/api?hash={_hash}", data=data, headers=inutils.headers
+        ) as resp:
             if resp.status != 200:
                 logger.error("Error while creating the bot: resp%s", resp.status)
                 return False
@@ -119,7 +118,9 @@ class TokenObtainment(InlineUnit):
             if not content.get("ok", False):
                 logger.error(
                     "Error while creating the bot. "
-                    "Maybe you've been banned or exceeded the limit: %s", content)
+                    "Maybe you've been banned or exceeded the limit: %s",
+                    content,
+                )
                 return False
             # bot_id = content["bot_id"]
 
@@ -146,14 +147,14 @@ class TokenObtainment(InlineUnit):
 
         ids = None
         bot_id = None
-            
+
         username = self._db.get("heroku.inline", "custom_bot", False)
         if username:
             ids = re.search(inutils.BOT_ID_PATTERN.format(username.strip("@")), content)
-            
+
         else:
             ids = inutils.BOT_BASE_PATTERN.search(content)
-            
+
         if ids:
             bot_id = ids.group(1)
 
@@ -162,7 +163,7 @@ class TokenObtainment(InlineUnit):
                 async with session.post(
                     url + f"/api?hash={_hash}",
                     data={"bid": bot_id, "method": "revokeAccessToken"},
-                    headers=inutils.headers
+                    headers=inutils.headers,
                 ) as resp:
                     if resp.status != 200:
                         logger.error("Error while revoking token: resp%s", resp.status)
@@ -174,14 +175,14 @@ class TokenObtainment(InlineUnit):
                 hdrs.update(
                     {
                         "x-aj-referer": "https://webappinternal.telegram.org/botfather",
-                        "x-requested-with": "XMLHttpRequest"
+                        "x-requested-with": "XMLHttpRequest",
                     }
                 )
                 async with session.get(url + f"/bot/{bot_id}", headers=hdrs) as resp:
                     if resp.status != 200:
                         logger.error("Error while getting token: resp%s", resp.status)
                         return False
-                    
+
                     text = (await resp.json())["h"]
                     token = re.search(r"(\d+:[A-Za-z0-9\-_]{35})", text)
                     token = token.group(1)
@@ -192,17 +193,20 @@ class TokenObtainment(InlineUnit):
             for method, value in {
                 "settings[inline]": "true",
                 "settings[inph]": "user@heroku:~$",
-                "settings[infdb]": "1"
+                "settings[infdb]": "1",
             }.items():
                 await fw_protect()
 
                 async with session.post(
                     url + f"/api?hash={_hash}",
                     data={method: value, "bid": bot_id, "method": "changeSettings"},
-                    headers=inutils.headers
+                    headers=inutils.headers,
                 ) as resp:
                     if resp.status != 200:
-                        logger.error("Error while changing bot inline settings: resp%s", resp.status)
+                        logger.error(
+                            "Error while changing bot inline settings: resp%s",
+                            resp.status,
+                        )
                         return False
 
             self.bot_id = bot_id
@@ -211,17 +215,18 @@ class TokenObtainment(InlineUnit):
                 "start": "Welcome message",
                 "profile": "Get main information about bot",
             }
+
             def get_cmds(x) -> dict[str, str]:
                 return dict(inutils.BOT_COMMANDS_PATTERN.findall(x))
-            
-            async with session.get(url + f"/bot/{bot_id}/commands", headers=hdrs) as resp:
+
+            async with session.get(
+                url + f"/bot/{bot_id}/commands", headers=hdrs
+            ) as resp:
                 if resp.status != 200:
                     logger.warning("Unable to get bot commands list")
-                
+
                 else:
-                    _cmds = get_cmds(
-                        (await resp.json())["h"]
-                    )
+                    _cmds = get_cmds((await resp.json())["h"])
                     has_commands = False
 
                     for cmd in _cmds:
@@ -234,15 +239,18 @@ class TokenObtainment(InlineUnit):
 
             return True
 
-        return await self._create_bot(session, url, _hash) if create_new_if_needed else False
+        return (
+            await self._create_bot(session, url, _hash)
+            if create_new_if_needed
+            else False
+        )
 
     async def _reassert_token(
-        self: "InlineManager",
-        session: aiohttp.ClientSession,
-        url: str,
-        _hash: str
+        self: "InlineManager", session: aiohttp.ClientSession, url: str, _hash: str
     ):
-        is_token_asserted = await self._assert_token(session, url, _hash, revoke_token=True)
+        is_token_asserted = await self._assert_token(
+            session, url, _hash, revoke_token=True
+        )
         if not is_token_asserted:
             self.init_complete = False
         else:
@@ -253,7 +261,7 @@ class TokenObtainment(InlineUnit):
         session: aiohttp.ClientSession,
         url: str,
         _hash: str,
-        already_initialised: bool = True
+        already_initialised: bool = True,
     ):
         if already_initialised:
             await self._stop()
@@ -265,13 +273,13 @@ class TokenObtainment(InlineUnit):
             asyncio.ensure_future(self.reassert_token())
         else:
             return await self._reassert_token(session, url, _hash)
-    
+
     async def _check_bot(
         self: "InlineManager",
         session: aiohttp.ClientSession,
         url: str,
         _hash: str,
-        username: str
+        username: str,
     ):
         async with session.get(url, headers=inutils.headers) as resp:
             if resp.status != 200:
@@ -284,7 +292,9 @@ class TokenObtainment(InlineUnit):
             data = {"username": username, "method": "checkBotUsername"}
             await fw_protect()
 
-            async with session.post(url + f"/api?hash={_hash}", data=data, headers=inutils.headers) as resp:
+            async with session.post(
+                url + f"/api?hash={_hash}", data=data, headers=inutils.headers
+            ) as resp:
                 if resp.status != 200:
                     logger.error("Error while username check: resp%s", resp.status)
                     return False
@@ -298,7 +308,7 @@ class TokenObtainment(InlineUnit):
         session: aiohttp.ClientSession,
         url: str,
         _hash: str,
-        commands: dict[str, str]
+        commands: dict[str, str],
     ):
         bid = self.bot_id
         if not bid:
@@ -312,14 +322,20 @@ class TokenObtainment(InlineUnit):
                 "command": command,
                 "description": desc,
                 "replace": "",
-                "method": "setCommand"
+                "method": "setCommand",
             }
 
             logger.debug("Setting bot command %s: %s", command, desc)
 
-            async with session.post(url + f"/api?hash={_hash}", data=data, headers=inutils.headers) as resp:
+            async with session.post(
+                url + f"/api?hash={_hash}", data=data, headers=inutils.headers
+            ) as resp:
                 if resp.status != 200 or not (await resp.json()).get("ok", False):
-                    logger.error("Error while setting command: resp%s: %s", resp.status, await resp.json())
+                    logger.error(
+                        "Error while setting command: resp%s: %s",
+                        resp.status,
+                        await resp.json(),
+                    )
                     continue
 
             await asyncio.sleep(random.randint(1, 3))
@@ -327,30 +343,30 @@ class TokenObtainment(InlineUnit):
     async def assert_token(
         self: "InlineManager",
         create_new_if_needed: bool = True,
-        revoke_token: bool = False
+        revoke_token: bool = False,
     ):
         return await self._main_token_manager(
-            1,
-            create_new_if_needed=create_new_if_needed,
-            revoke_token=revoke_token
+            1, create_new_if_needed=create_new_if_needed, revoke_token=revoke_token
         )
-        
+
     async def create_bot(self: "InlineManager"):
         return await self._main_token_manager(2)
 
     async def dp_revoke_token(self: "InlineManager", already_initialised: bool = True):
-        return await self._main_token_manager(3, already_initialised=already_initialised)
+        return await self._main_token_manager(
+            3, already_initialised=already_initialised
+        )
 
     async def reassert_token(self: "InlineManager"):
         return await self._main_token_manager(4)
-    
+
     async def check_bot(self: "InlineManager", username: str):
         return await self._main_token_manager(5, username=username)
-    
+
     async def set_commands(self: "InlineManager", commands: dict[str, str]):
         """
         Sets bot's commands in the menu
-        
+
         :param commands: dict of commands and their descriptions
         """
         return await self._main_token_manager(6, commands=commands)

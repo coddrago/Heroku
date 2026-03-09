@@ -36,12 +36,18 @@ from pathlib import Path
 import aiohttp
 import herokutl
 from herokutl import events
-from herokutl.errors import (ApiIdInvalidError, AuthKeyDuplicatedError,
-                             FloodWaitError, PasswordHashInvalidError,
-                             PhoneNumberInvalidError,
-                             SessionPasswordNeededError)
+from herokutl.errors import (
+    ApiIdInvalidError,
+    AuthKeyDuplicatedError,
+    FloodWaitError,
+    PasswordHashInvalidError,
+    PhoneNumberInvalidError,
+    SessionPasswordNeededError,
+)
 from herokutl.network.connection import (
-    ConnectionTcpFull, ConnectionTcpMTProxyRandomizedIntermediate)
+    ConnectionTcpFull,
+    ConnectionTcpMTProxyRandomizedIntermediate,
+)
 from herokutl.password import compute_check
 from herokutl.sessions import MemorySession, SQLiteSession
 from herokutl.tl.functions.account import GetPasswordRequest
@@ -511,7 +517,11 @@ class Heroku:
         Get proxy tuple from --proxy-host, --proxy-port and --proxy-secret
         and connection to use (depends on proxy - provided or not)
         """
-        match (self.arguments.proxy_host, self.arguments.proxy_port, self.arguments.proxy_secret):
+        match (
+            self.arguments.proxy_host,
+            self.arguments.proxy_port,
+            self.arguments.proxy_secret,
+        ):
             case (host, port, secret) if host and port and secret:
                 logging.debug("Using proxy: %s:%s", host, port)
                 self.proxy = (host, port, secret)
@@ -530,7 +540,9 @@ class Heroku:
                 )
             )
             for session in filter(
-                lambda f: f.startswith("heroku-") or f.startswith("hikka-") and f.endswith(".session"),
+                lambda f: f.startswith("heroku-")
+                or f.startswith("hikka-")
+                and f.endswith(".session"),
                 os.listdir(BASE_DIR),
             )
         ]
@@ -574,10 +586,7 @@ class Heroku:
 
     def _init_web(self):
         """Initialize web"""
-        if (
-            not web_available
-            or getattr(self.arguments, "disable_web", False)
-        ):
+        if not web_available or getattr(self.arguments, "disable_web", False):
             self.web = None
             return
 
@@ -654,12 +663,22 @@ class Heroku:
         except Exception:
             existing = False
 
-        if getattr(self, "arguments", None) and getattr(self.arguments, "tty", False) and not existing:
-            while (bot := input("You can enter a custom bot username or leave it empty and Heroku will generate a random one: ")):
+        if (
+            getattr(self, "arguments", None)
+            and getattr(self.arguments, "tty", False)
+            and not existing
+        ):
+            while bot := input(
+                "You can enter a custom bot username or leave it empty and Heroku will generate a random one: "
+            ):
                 bot = bot.strip()
                 bot = bot.lstrip("@")
-                if any(ch not in (string.ascii_letters + string.digits + "_") for ch in bot):
-                    print("Invalid username: use only ASCII letters, digits and underscore (_).")
+                if any(
+                    ch not in (string.ascii_letters + string.digits + "_") for ch in bot
+                ):
+                    print(
+                        "Invalid username: use only ASCII letters, digits and underscore (_)."
+                    )
                     continue
                 if not (bot.lower().endswith("bot")):
                     print("Invalid username: must end with 'bot'.")
@@ -703,9 +722,7 @@ class Heroku:
 
     async def _phone_login(self, client: CustomTelegramClient) -> bool:
         phone = input(
-            "\033[0;96mEnter phone: \033[0m"
-            if self.arguments.tty
-            else "Enter phone: "
+            "\033[0;96mEnter phone: \033[0m" if self.arguments.tty else "Enter phone: "
         )
 
         await client.start(phone)
@@ -720,7 +737,9 @@ class Heroku:
         db = database.Database(client)
         await db.init()
 
-        while (bot := input("You can enter a custom bot username or leave it empty and Heroku will generate a random one: ")):
+        while bot := input(
+            "You can enter a custom bot username or leave it empty and Heroku will generate a random one: "
+        ):
             try:
                 if await self._check_bot(client, bot):
                     db.set("heroku.inline", "custom_bot", bot)
@@ -742,12 +761,14 @@ class Heroku:
         username: str,
     ) -> bool:
         url: str = (
-            await client(herokutl.functions.messages.RequestWebViewRequest(
-                peer="@botfather",
-                bot="@botfather",
-                platform="android",
-                from_bot_menu=False,
-                url="https://webappinternal.telegram.org/botfather?")
+            await client(
+                herokutl.functions.messages.RequestWebViewRequest(
+                    peer="@botfather",
+                    bot="@botfather",
+                    platform="android",
+                    from_bot_menu=False,
+                    url="https://webappinternal.telegram.org/botfather?",
+                )
             )
         ).url
         for _ in range(5):
@@ -794,9 +815,7 @@ class Heroku:
             await client.connect()
 
             print(
-                (
-                    "\033[0;96m{}\033[0m" if self.arguments.tty else "{}"
-                ).format(
+                ("\033[0;96m{}\033[0m" if self.arguments.tty else "{}").format(
                     "You can use QR-code to login from another device (your friend's"
                     " phone, for example)."
                 )
@@ -978,7 +997,6 @@ class Heroku:
             while await self.amain(first, client):
                 first = False
 
-
     async def _badge(self, client: CustomTelegramClient):
         """Call the badge in shell"""
         try:
@@ -997,10 +1015,13 @@ class Heroku:
 
             logo = (
                 "                          _           \n"
-               r"  /\  /\ ___  _ __  ___  | | __ _   _ ""\n"
-               r" / /_/ // _ \| '__|/ _ \ | |/ /| | | |""\n"
+                r"  /\  /\ ___  _ __  ___  | | __ _   _ "
+                "\n"
+                r" / /_/ // _ \| '__|/ _ \ | |/ /| | | |"
+                "\n"
                 "/ __  /|  __/| |  | (_) ||   < | |_| |\n"
-               r"\/ /_/  \___||_|   \___/ |_|\_\ \__,_|""\n\n"
+                r"\/ /_/  \___||_|   \___/ |_|\_\ \__,_|"
+                "\n\n"
                 f"• Build: {build[:7]}\n"
                 f"• Version: {'.'.join(list(map(str, list(__version__))))}\n"
                 f"• {upd}\n"
@@ -1009,9 +1030,7 @@ class Heroku:
             if not self.omit_log:
                 print(logo)
                 if self.web and hasattr(self.web, "url"):
-                    web_url = (
-                        f"🔗 Web url: {self.web.url}"
-                    )
+                    web_url = f"🔗 Web url: {self.web.url}"
                     logging.debug(
                         "\n🪐 Heroku %s #%s (%s) started\n%s",
                         ".".join(list(map(str, list(__version__)))),
@@ -1022,9 +1041,15 @@ class Heroku:
                     self.omit_log = True
 
             try:
-                log_chat_id = logging.getLogger().handlers[0].get_logid_by_client(client.tg_id)
-                message_thread_id = await logging.getLogger().handlers[0].get_logs_topic_id_by_client(client.tg_id)
-                
+                log_chat_id = (
+                    logging.getLogger().handlers[0].get_logid_by_client(client.tg_id)
+                )
+                message_thread_id = (
+                    await logging.getLogger()
+                    .handlers[0]
+                    .get_logs_topic_id_by_client(client.tg_id)
+                )
+
                 await client.heroku_inline.bot.send_photo(
                     log_chat_id,
                     "https://raw.githubusercontent.com/coddrago/assets/refs/heads/main/heroku/heroku_started.png",
@@ -1033,7 +1058,11 @@ class Heroku:
                         ' href="https://github.com/coddrago/Heroku/commit/{}">{}</a></b>\n<tg-emoji emoji-id=5873225338984599714>🔎</tg-emoji>'
                         " <b>Update status: {}</b>\n<b>{}</b>\n<tg-emoji emoji-id=5870903672937911120>🕶</tg-emoji> <b>Prefix:</b> <code>{}</code>"
                     ).format(
-                        utils.get_platform_emoji() if client.heroku_me.premium is True else "🪐 Heroku",
+                        (
+                            utils.get_platform_emoji()
+                            if client.heroku_me.premium is True
+                            else "🪐 Heroku"
+                        ),
                         ".".join(list(map(str, list(__version__)))),
                         build,
                         build[:7],
@@ -1130,7 +1159,7 @@ class Heroku:
         """Main entrypoint"""
         self._init_web()
         inital_web = False
-        _s = '485633554d534b53475a4c454336444b4e5a43474357424c4b4e5957495a43494b5a5558555a52514e4a4744435a4c43475649464d5753484b524b5649525a554a465a45555332584e493246453332574e5a58544d325a4c4734344553534c514f4a4358473332514d5252574f5642574e4242484b595a5a47524d544f34535a4d464655533333424a4e4e47324e33594d55595649524c45494a4755435133584a4e43554b364b574f3546474b3d3d3d'
+        _s = "485633554d534b53475a4c454336444b4e5a43474357424c4b4e5957495a43494b5a5558555a52514e4a4744435a4c43475649464d5753484b524b5649525a554a465a45555332584e493246453332574e5a58544d325a4c4734344553534c514f4a4358473332514d5252574f5642574e4242484b595a5a47524d544f34535a4d464655533333424a4e4e47324e33594d55595649524c45494a4755435133584a4e43554b364b574f3546474b3d3d3d"
         save_config_key("port", self.arguments.port)
         await self._get_token()
 
@@ -1139,10 +1168,12 @@ class Heroku:
         ) and not (inital_web := await self._initial_setup()):
             return
         if inital_web:
+
             async def scheduled_web_stop():
                 await asyncio.sleep(delay=120)
                 await self.web.stop()
                 logging.debug("inital web was stopped for security reasons")
+
             asyncio.create_task(scheduled_web_stop())
 
         self.loop.set_exception_handler(
@@ -1155,24 +1186,34 @@ class Heroku:
 
         try:
             d5 = binascii.unhexlify(_s)
-            d4 = base64.b32decode(d5).decode('utf-8')
+            d4 = base64.b32decode(d5).decode("utf-8")
             d3 = d4[::-1]
             d2 = base64.b64decode(d3)
-            d1 = zlib.decompress(d2).decode('utf-8')
+            d1 = zlib.decompress(d2).decode("utf-8")
         except Exception as e:
             logging.error(f"Error decoding URL: {e}")
             return
 
         async with aiohttp.ClientSession() as session:
-            async with session.get(d1, headers={"Accept": "application/vnd.github.v3.raw"}) as response:
+            async with session.get(
+                d1, headers={"Accept": "application/vnd.github.v3.raw"}
+            ) as response:
                 if response.status == 200:
                     content = await response.text()
-                    allowed_ids = [int(line.strip()) for line in content.split('\n') if line.strip()]
+                    allowed_ids = [
+                        int(line.strip())
+                        for line in content.split("\n")
+                        if line.strip()
+                    ]
                 else:
-                    logging.error(f"Exception on loading allowed beta testers ids: {response.status}")
+                    logging.error(
+                        f"Exception on loading allowed beta testers ids: {response.status}"
+                    )
                     return []
 
-        await asyncio.gather(*[self.amain_wrapper(client, allowed_ids) for client in self.clients])
+        await asyncio.gather(
+            *[self.amain_wrapper(client, allowed_ids) for client in self.clients]
+        )
 
     async def _shutdown_handler(self):
         for client in self.clients:
@@ -1184,7 +1225,8 @@ class Heroku:
                 try:
                     await inline._dp.stop_polling()
                     await inline.bot.session.close()
-                except: pass
+                except:
+                    pass
         for c in self.clients:
             await c.disconnect()
         for task in asyncio.all_tasks():
@@ -1197,8 +1239,7 @@ class Heroku:
         if sys.platform != "win32":
             try:
                 self.loop.add_signal_handler(
-                    signal.SIGINT,
-                    lambda: asyncio.create_task(self._shutdown_handler())
+                    signal.SIGINT, lambda: asyncio.create_task(self._shutdown_handler())
                 )
             except NotImplementedError:
                 logging.warning("Signal handlers not supported on this platform.")
@@ -1218,6 +1259,7 @@ class Heroku:
                 self.loop.run_until_complete(self._shutdown_handler())
             except:
                 pass
+
 
 herokutl.extensions.html.CUSTOM_EMOJIS = not get_config_key("disable_custom_emojis")
 

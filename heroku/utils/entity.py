@@ -1,4 +1,3 @@
-
 # ©️ Codrago, 2024-2030
 # This file is a part of Heroku Userbot
 # 🌐 https://github.com/coddrago/Heroku
@@ -22,28 +21,46 @@ from aiogram.types import Message as AiogramMessage
 from herokutl import hints
 from herokutl.tl.custom.message import Message
 from herokutl.tl.functions.account import UpdateNotifySettingsRequest
-from herokutl.tl.functions.channels import (CreateChannelRequest,
-                                            EditPhotoRequest)
-from herokutl.tl.functions.messages import (CreateForumTopicRequest,
-                                            EditForumTopicRequest,
-                                            GetDialogFiltersRequest,
-                                            GetForumTopicsByIDRequest,
-                                            GetForumTopicsRequest,
-                                            SetHistoryTTLRequest,
-                                            UpdateDialogFilterRequest)
-from herokutl.tl.types import (Channel, ForumTopic, ForumTopicDeleted,
-                               InputPeerNotifySettings, MessageEntityBankCard,
-                               MessageEntityBlockquote, MessageEntityBold,
-                               MessageEntityBotCommand, MessageEntityCashtag,
-                               MessageEntityCode, MessageEntityEmail,
-                               MessageEntityHashtag, MessageEntityItalic,
-                               MessageEntityMention, MessageEntityMentionName,
-                               MessageEntityPhone, MessageEntityPre,
-                               MessageEntitySpoiler, MessageEntityStrike,
-                               MessageEntityTextUrl, MessageEntityUnderline,
-                               MessageEntityUnknown, MessageEntityUrl,
-                               PeerChannel, PeerChat, PeerUser,
-                               UpdateNewChannelMessage, User)
+from herokutl.tl.functions.channels import CreateChannelRequest, EditPhotoRequest
+from herokutl.tl.functions.messages import (
+    CreateForumTopicRequest,
+    EditForumTopicRequest,
+    GetDialogFiltersRequest,
+    GetForumTopicsByIDRequest,
+    GetForumTopicsRequest,
+    SetHistoryTTLRequest,
+    UpdateDialogFilterRequest,
+)
+from herokutl.tl.types import (
+    Channel,
+    ForumTopic,
+    ForumTopicDeleted,
+    InputPeerNotifySettings,
+    MessageEntityBankCard,
+    MessageEntityBlockquote,
+    MessageEntityBold,
+    MessageEntityBotCommand,
+    MessageEntityCashtag,
+    MessageEntityCode,
+    MessageEntityEmail,
+    MessageEntityHashtag,
+    MessageEntityItalic,
+    MessageEntityMention,
+    MessageEntityMentionName,
+    MessageEntityPhone,
+    MessageEntityPre,
+    MessageEntitySpoiler,
+    MessageEntityStrike,
+    MessageEntityTextUrl,
+    MessageEntityUnderline,
+    MessageEntityUnknown,
+    MessageEntityUrl,
+    PeerChannel,
+    PeerChat,
+    PeerUser,
+    UpdateNewChannelMessage,
+    User,
+)
 
 from .._internal import fw_protect
 from ..tl_cache import CustomTelegramClient
@@ -78,11 +95,14 @@ logger = logging.getLogger(__name__)
 TAG_RE = re.compile(r"</?([a-zA-Z][a-zA-Z0-9\-]*)(?:\s[^<>]*)?>")
 
 TELEGRAM_HTML_TAGS = {
-    "strong", "b",
-    "em", "i",
+    "strong",
+    "b",
+    "em",
+    "i",
     "tg-spoiler",
     "u",
-    "del", "s",
+    "del",
+    "s",
     "blockquote",
     "code",
     "pre",
@@ -90,6 +110,7 @@ TELEGRAM_HTML_TAGS = {
     "tg-emoji",
     "emoji",
 }
+
 
 def get_lang_flag(countrycode: str) -> str:
     """
@@ -136,15 +157,15 @@ def get_entity_url(
         )
     )
 
-def remove_emoji(text: str) -> str:
 
+def remove_emoji(text: str) -> str:
     """
     Removes all emoji from text
     """
 
     allchars = [str for str in text]
     emoji_list = [c for c in allchars if c in emoji.EMOJI_DATA]
-    clean_text = ''.join([str for str in text if not any(i in str for i in emoji_list)])
+    clean_text = "".join([str for str in text if not any(i in str for i in emoji_list)])
     return clean_text
 
 
@@ -168,6 +189,7 @@ def remove_html(text: str, escape: bool = False, keep_emojis: bool = False) -> s
         )
     )
 
+
 def check_url(url: str) -> bool:
     """
     Statically checks url for validity
@@ -178,6 +200,7 @@ def check_url(url: str) -> bool:
         return bool(urlparse(url).netloc)
     except Exception:
         return False
+
 
 def get_link(user: typing.Union[User, Channel], /) -> str:
     """
@@ -227,8 +250,7 @@ async def asset_channel(
     :return: Peer and bool: is channel new or pre-existent
     """
 
-# thanks xdesai and Legacy
-
+    # thanks xdesai and Legacy
 
     if not hasattr(client, "_channels_cache"):
         client._channels_cache = {}
@@ -326,12 +348,14 @@ async def asset_channel(
     client._channels_cache[title] = {"peer": peer, "exp": int(time.time())}
     return peer, True
 
+
 if typing.TYPE_CHECKING:
     from ..database import Database
 
+
 async def asset_forum_topic(
     client: CustomTelegramClient,
-    db: 'Database',
+    db: "Database",
     peer: hints.Entity,
     title: str,
     description: typing.Optional[str] = None,
@@ -341,35 +365,51 @@ async def asset_forum_topic(
     entity = await client.get_entity(peer)
 
     if not isinstance(entity, Channel):
-        raise TypeError(f"Expected entity to be 'Channel', but got '{type(entity).__name__}'")
+        raise TypeError(
+            f"Expected entity to be 'Channel', but got '{type(entity).__name__}'"
+        )
 
     async def create_topic() -> ForumTopic:
-        result = await client(CreateForumTopicRequest(
-            peer=entity,
-            title=title,
-            icon_emoji_id=(icon_emoji_id if client.heroku_me.premium else None)
-        ))
+        result = await client(
+            CreateForumTopicRequest(
+                peer=entity,
+                title=title,
+                icon_emoji_id=(icon_emoji_id if client.heroku_me.premium else None),
+            )
+        )
 
         await fw_protect()
 
-        await client.send_message(entity=entity, message=(description if description else f"<tg-emoji emoji-id=\"5258503720928288433\">ℹ️</tg-emoji> <b>Content related to <i>'{title}'</i> will be here</b>"), reply_to=result.updates[0].id)
+        await client.send_message(
+            entity=entity,
+            message=(
+                description
+                if description
+                else f"<tg-emoji emoji-id=\"5258503720928288433\">ℹ️</tg-emoji> <b>Content related to <i>'{title}'</i> will be here</b>"
+            ),
+            reply_to=result.updates[0].id,
+        )
 
         await fw_protect()
 
-        result = await client(GetForumTopicsByIDRequest(peer=entity, topics=[result.updates[0].id]))
+        result = await client(
+            GetForumTopicsByIDRequest(peer=entity, topics=[result.updates[0].id])
+        )
 
         return result.topics[0]
 
     forums_cache = db.pointer("heroku.forums", "forums_cache", {})
 
     async def _search_topic(topic_title: str) -> int | None:
-        result = await client(GetForumTopicsRequest(
-            peer=entity,
-            offset_date=None,
-            offset_id=0,
-            offset_topic=0,
-            limit=100,
-        ))
+        result = await client(
+            GetForumTopicsRequest(
+                peer=entity,
+                offset_date=None,
+                offset_id=0,
+                offset_topic=0,
+                limit=100,
+            )
+        )
         await fw_protect()
         for found_topic in result.topics:
             if found_topic.title == topic_title:
@@ -377,13 +417,19 @@ async def asset_forum_topic(
                 return found_topic.id
         return None
 
-    if topic_id := forums_cache.get(entity.title, {}).get(title) or await _search_topic(title):
+    if topic_id := forums_cache.get(entity.title, {}).get(title) or await _search_topic(
+        title
+    ):
         await fw_protect()
-        new_topic = await client(GetForumTopicsByIDRequest(peer=entity, topics=[topic_id]))
+        new_topic = await client(
+            GetForumTopicsByIDRequest(peer=entity, topics=[topic_id])
+        )
         new_topic = new_topic.topics[0]
 
         if isinstance(new_topic, ForumTopicDeleted):
-            logger.warning(f"Topic: '{title}' was found in the database but does not exist in the channel and will be recreated")
+            logger.warning(
+                f"Topic: '{title}' was found in the database but does not exist in the channel and will be recreated"
+            )
             await fw_protect()
             new_topic = await create_topic()
             forums_cache[entity.title][title] = new_topic.id
@@ -397,26 +443,28 @@ async def asset_forum_topic(
         await fw_protect()
         if all(
             p.id != client.loader.inline.bot_id
-            for p in await client.get_participants(
-                entity, limit=20
-            )
+            for p in await client.get_participants(entity, limit=20)
         ):
             await fw_protect()
             await invite_inline_bot(client, entity)
 
     return new_topic
-    
-async def wait_for_content_channel(db: 'Database', delay: float = 10) -> int:
+
+
+async def wait_for_content_channel(db: "Database", delay: float = 10) -> int:
     cid = db.get("heroku.forums", "channel_id", None)
 
     while not cid:
-        logger.warning("Heroku content channel not found in database. Sleeping 10 seconds...")
+        logger.warning(
+            "Heroku content channel not found in database. Sleeping 10 seconds..."
+        )
         await asyncio.sleep(delay)
         cid = db.get("heroku.forums", "channel_id", None)
 
     return cid
 
-async def get_topic_id(db: 'Database', topic_name: str) -> typing.Optional[int]:
+
+async def get_topic_id(db: "Database", topic_name: str) -> typing.Optional[int]:
     """
     Get forum topic ID from database
     :param db: Database instance
@@ -428,6 +476,7 @@ async def get_topic_id(db: 'Database', topic_name: str) -> typing.Optional[int]:
         return forums_cache.get("heroku-userbot", {}).get(topic_name)
     except Exception:
         return None
+
 
 async def set_avatar(
     client: CustomTelegramClient,
@@ -479,6 +528,7 @@ async def set_avatar(
 
     return True
 
+
 async def get_target(message: Message, arg_no: int = 0) -> typing.Optional[int]:
     """
     Get target from message
@@ -515,6 +565,7 @@ async def get_target(message: Message, arg_no: int = 0) -> typing.Optional[int]:
         if isinstance(entity, User):
             return entity.id
 
+
 async def get_user(message: Message) -> typing.Optional[User]:
     """
     Get user who sent message, searching if not found easily
@@ -543,6 +594,7 @@ async def get_user(message: Message) -> typing.Optional[User]:
 
     logger.error("`peer_id` is not a user, chat or channel")
     return None
+
 
 def get_chat_id(message: typing.Union[Message, AiogramMessage]) -> int:
     """
@@ -583,8 +635,12 @@ def escape_non_html(text: str) -> str:
     out = []
     last = 0
     for m in TAG_RE.finditer(text):
-        out.append(escape_html(text[last:m.start()]))
-        out.append(m.group(0) if m.group(1).lower() in TELEGRAM_HTML_TAGS else escape_html(m.group(0)))
+        out.append(escape_html(text[last : m.start()]))
+        out.append(
+            m.group(0)
+            if m.group(1).lower() in TELEGRAM_HTML_TAGS
+            else escape_html(m.group(0))
+        )
         last = m.end()
 
     out.append(escape_html(text[last:]))
@@ -626,6 +682,7 @@ def relocate_entities(
             entities.remove(ent)
 
     return entities
+
 
 def find_caller(
     stack: typing.Optional[typing.List[inspect.FrameInfo]] = None,
@@ -673,6 +730,7 @@ def find_caller(
         ),
         None,
     )
+
 
 async def dnd(
     client: CustomTelegramClient,

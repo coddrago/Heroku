@@ -48,11 +48,16 @@ class CoreMod(loader.Module):
                     "callback": self._inline__choose__installation,
                     "args": (platform,),
                 }
-                for platform in ['vds', 'wsl',
-                                 'userland', 'jamhost',
-                                 'hikkahost', 'lavhost']
+                for platform in [
+                    "vds",
+                    "wsl",
+                    "userland",
+                    "jamhost",
+                    "hikkahost",
+                    "lavhost",
+                ]
             ],
-            2
+            2,
         )
 
     async def blacklistcommon(self, message: Message):
@@ -80,7 +85,12 @@ class CoreMod(loader.Module):
         module = self.allmodules.get_classname(module)
         return f"{str(chatid)}.{module}" if module else chatid
 
-    @loader.command(ru_doc="Информация о Хероку", en_doc="Information of Heroku", ua_doc="Інформація про Хероку", de_doc="Informationen über Heroku")
+    @loader.command(
+        ru_doc="Информация о Хероку",
+        en_doc="Information of Heroku",
+        ua_doc="Інформація про Хероку",
+        de_doc="Informationen über Heroku",
+    )
     async def herokucmd(self, message: Message):
         await utils.answer(
             message,
@@ -99,7 +109,7 @@ class CoreMod(loader.Module):
                 if version.branch == "master"
                 else self.strings("unstable").format(version.branch)
             ),
-            file= "https://raw.githubusercontent.com/coddrago/assets/refs/heads/main/heroku/heroku_cmd.png",
+            file="https://raw.githubusercontent.com/coddrago/assets/refs/heads/main/heroku/heroku_cmd.png",
             reply_to=getattr(message, "reply_to_msg_id", None),
         )
 
@@ -109,7 +119,7 @@ class CoreMod(loader.Module):
         chatid_str = str(chatid)
 
         if chatid_str.startswith("-100"):
-            chatid = (chatid_str[4:])
+            chatid = chatid_str[4:]
 
         self._db.set(
             main.__name__,
@@ -125,7 +135,7 @@ class CoreMod(loader.Module):
         chatid_str = str(chatid)
 
         if chatid_str.startswith("-100"):
-            chatid = (chatid_str[4:])
+            chatid = chatid_str[4:]
 
         self._db.set(
             main.__name__,
@@ -195,24 +205,33 @@ class CoreMod(loader.Module):
             try:
                 entity = await self.client.get_entity(args[1])
             except:
-                return await utils.answer(message, self.strings["invalid_id_or_username"])
-            
+                return await utils.answer(
+                    message, self.strings["invalid_id_or_username"]
+                )
+
             if not isinstance(entity, User):
-                return await utils.answer(message, f"The entity {args[1]} is not a User")
-            
+                return await utils.answer(
+                    message, f"The entity {args[1]} is not a User"
+                )
+
             if entity.id != self.tg_id:
                 sgroup_users = []
                 for g in self._client.dispatcher.security._sgroups.values():
                     for u in g.users:
                         sgroup_users.append(u)
 
-                tsec_users = [rule['target'] for rule in self._client.dispatcher.security._tsec_user]
+                tsec_users = [
+                    rule["target"]
+                    for rule in self._client.dispatcher.security._tsec_user
+                ]
                 ub_owners = self._client.dispatcher.security.owner.copy()
 
                 all_users = sgroup_users + tsec_users + ub_owners
 
                 if entity.id not in all_users:
-                    return await utils.answer(message, self.strings["id_not_found_scgroup"])
+                    return await utils.answer(
+                        message, self.strings["id_not_found_scgroup"]
+                    )
 
                 oldprefix = utils.escape_html(self.get_prefix(entity.id))
                 all_prefixes = self._db.get(
@@ -350,7 +369,7 @@ class CoreMod(loader.Module):
         args = utils.get_args(message)
         if not args:
             await utils.answer(message, self.strings("wrong_usage_tcc"))
-        
+
         if args and len(args) >= 2:
             mod_arg, cmd = args[0], args[1]
             mod_inst = self.allmodules.lookup(mod_arg)
@@ -393,7 +412,9 @@ class CoreMod(loader.Module):
                 if target.split()[0].lower() == cmd.lower():
                     self.allmodules.aliases.pop(alias, None)
 
-            await utils.answer(message, f"Command {cmd} disabled in module {module_key}")
+            await utils.answer(
+                message, f"Command {cmd} disabled in module {module_key}"
+            )
 
     @loader.command()
     async def togglemod(self, message: Message):
@@ -405,7 +426,7 @@ class CoreMod(loader.Module):
         mod_arg = args[0]
         mod_inst = self.allmodules.lookup(mod_arg)
         if not mod_inst:
-            await utils.answer(message, self.strings("mod404").format(mod_arg)) 
+            await utils.answer(message, self.strings("mod404").format(mod_arg))
 
         module_key = mod_inst.__class__.__name__
         disabled = self._db.get(main.__name__, "disabled_modules", [])
@@ -470,19 +491,23 @@ class CoreMod(loader.Module):
 
         args = utils.get_args_raw(message)
 
-        if (not args or args not in {'-vds', '-wsl', '-ul', '-jh', '-hh', '-lh'}) and \
-            not (await self.inline.form(
+        if (
+            not args or args not in {"-vds", "-wsl", "-ul", "-jh", "-hh", "-lh"}
+        ) and not (
+            await self.inline.form(
                 self.strings("choose_installation"),
                 message,
                 reply_markup=self._markup,
                 photo="https://raw.githubusercontent.com/coddrago/assets/refs/heads/main/heroku/heroku_installation.png",
-        )
-            ):
+            )
+        ):
 
             await self.client.send_file(
                 message.peer_id,
                 "https://raw.githubusercontent.com/coddrago/assets/refs/heads/main/heroku/heroku_installation.png",
-                caption=self.strings("vds_install"), reply_to=getattr(message, "reply_to_msg_id", None),)
+                caption=self.strings("vds_install"),
+                reply_to=getattr(message, "reply_to_msg_id", None),
+            )
         match True:
             case _ if "-vds" in args:
                 await utils.answer(message, self.strings("vds_install"))
@@ -501,6 +526,6 @@ class CoreMod(loader.Module):
         with contextlib.suppress(Exception):
             await utils.answer(
                 call,
-                self.strings(f'{platform}_install'),
+                self.strings(f"{platform}_install"),
                 reply_markup=self._markup,
             )

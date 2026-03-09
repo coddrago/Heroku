@@ -15,8 +15,7 @@ import logging
 import time
 import typing
 
-from aiogram.types import (InlineQuery, InlineQueryResultArticle,
-                           InputTextMessageContent)
+from aiogram.types import InlineQuery, InlineQueryResultArticle, InputTextMessageContent
 
 from .. import utils
 from .types import InlineUnit

@@ -36,7 +36,7 @@ from aiogram.types import (
     InputMediaPhoto,
     InputMediaVideo,
 )
- 
+
 from aiogram.enums import ButtonStyle
 
 from aiogram.exceptions import (
@@ -56,11 +56,11 @@ if typing.TYPE_CHECKING:
 logger = logging.getLogger(__name__)
 
 headers = {
-  "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
-  "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
-  "accept": "application/json, text/javascript, */*; q=0.01",
-  "referer": "https://webappinternal.telegram.org/botfather",
-  "cookie": "stel_ln=ru",
+    "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+    "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
+    "accept": "application/json, text/javascript, */*; q=0.01",
+    "referer": "https://webappinternal.telegram.org/botfather",
+    "cookie": "stel_ln=ru",
 }
 HASH_PATTERN = re.compile(r"Main\.init\('([0-9a-f]{18})'\);")
 BOT_ID_PATTERN = (
@@ -85,7 +85,7 @@ class Utils(InlineUnit):
         if style and style in VALID_BUTTON_STYLES:
             return style
         return None
-    
+
     def _get_button_emoji_id(self, button: dict) -> typing.Optional[str]:
         """Extract button custom emoji ID (for premium emoji support)"""
 
@@ -94,7 +94,7 @@ class Utils(InlineUnit):
         if emoji_id:
             return str(emoji_id).strip()
         return None
-    
+
     def _generate_markup(
         self: "InlineManager",
         markup_obj: typing.Optional[typing.Union[HerokuReplyMarkup, str]],
@@ -164,7 +164,7 @@ class Utils(InlineUnit):
 
                     if style := self._get_button_style(button):
                         btn_kwargs["style"] = style
-                    
+
                     if emoji_id := self._get_button_emoji_id(button):
                         btn_kwargs["icon_custom_emoji_id"] = emoji_id
 
@@ -180,7 +180,7 @@ class Utils(InlineUnit):
 
                         case _ if "callback" in button:
                             btn_kwargs["callback_data"] = button["_callback_data"]
-                            
+
                             if setup_callbacks:
                                 self._custom_map[button["_callback_data"]] = {
                                     "handler": button["callback"],
@@ -188,11 +188,15 @@ class Utils(InlineUnit):
                                     "args": button.get("args", {}),
                                     "kwargs": button.get("kwargs", {}),
                                     "force_me": button.get("force_me", False),
-                                    "disable_security": button.get("disable_security", False),
+                                    "disable_security": button.get(
+                                        "disable_security", False
+                                    ),
                                 }
 
                         case _ if "input" in button:
-                            btn_kwargs["switch_inline_query_current_chat"] = button["_switch_query"] + " "
+                            btn_kwargs["switch_inline_query_current_chat"] = (
+                                button["_switch_query"] + " "
+                            )
 
                         case _ if "data" in button:
                             btn_kwargs["callback_data"] = button["data"]
@@ -204,18 +208,24 @@ class Utils(InlineUnit):
                                 btn_kwargs["web_app"] = WebAppInfo(**button["data"])
 
                         case _ if "copy" in button:
-                            btn_kwargs["copy_text"] = CopyTextButton(text=button["copy"])
+                            btn_kwargs["copy_text"] = CopyTextButton(
+                                text=button["copy"]
+                            )
 
                         case _ if "switch_inline_query_current_chat" in button:
-                            btn_kwargs["switch_inline_query_current_chat"] = button["switch_inline_query_current_chat"]
+                            btn_kwargs["switch_inline_query_current_chat"] = button[
+                                "switch_inline_query_current_chat"
+                            ]
 
                         case _ if "switch_inline_query" in button:
-                            btn_kwargs["switch_inline_query"] = button["switch_inline_query"]
+                            btn_kwargs["switch_inline_query"] = button[
+                                "switch_inline_query"
+                            ]
 
                         case _:
                             logger.warning(
                                 (
-                                   "Button have not been added to "
+                                    "Button have not been added to "
                                     "form, because it is not structured "
                                     "properly. %s"
                                 ),
@@ -243,15 +253,22 @@ class Utils(InlineUnit):
     generate_markup = _generate_markup
 
     async def _close_unit_handler(self: "InlineManager", call: InlineCall):
-        return await self._client.delete_messages(call._units.get(call.unit_id).get('chat'), call._units.get(call.unit_id).get('message_id'))
+        return await self._client.delete_messages(
+            call._units.get(call.unit_id).get("chat"),
+            call._units.get(call.unit_id).get("message_id"),
+        )
 
     async def _unload_unit_handler(self: "InlineManager", call: InlineCall):
         await call.unload()
 
-    async def _answer_unit_handler(self: "InlineManager", call: InlineCall, text: str, show_alert: bool):
+    async def _answer_unit_handler(
+        self: "InlineManager", call: InlineCall, text: str, show_alert: bool
+    ):
         await call.answer(text, show_alert=show_alert)
 
-    def _reverse_method_lookup(self: "InlineManager", needle: callable, /) -> typing.Optional[str]:
+    def _reverse_method_lookup(
+        self: "InlineManager", needle: callable, /
+    ) -> typing.Optional[str]:
         return next(
             (
                 name
@@ -264,7 +281,9 @@ class Utils(InlineUnit):
             None,
         )
 
-    async def check_inline_security(self: "InlineManager", *, func: typing.Callable, user: int) -> bool:
+    async def check_inline_security(
+        self: "InlineManager", *, func: typing.Callable, user: int
+    ) -> bool:
         """Checks if user with id `user` is allowed to run function `func`"""
         return await self._client.dispatcher.security.check(
             message=None,
@@ -273,7 +292,9 @@ class Utils(InlineUnit):
             inline_cmd=self._reverse_method_lookup(func),
         )
 
-    def _find_caller_sec_map(self: "InlineManager") -> typing.Optional[typing.Callable[[], int]]:
+    def _find_caller_sec_map(
+        self: "InlineManager",
+    ) -> typing.Optional[typing.Callable[[], int]]:
         try:
             caller = utils.find_caller()
             if not caller:
@@ -433,15 +454,11 @@ class Utils(InlineUnit):
         kind = (
             "file"
             if file
-            else "photo"
-            if photo
-            else "audio"
-            if audio
-            else "video"
-            if video
-            else "gif"
-            if gif
-            else None
+            else (
+                "photo"
+                if photo
+                else "audio" if audio else "video" if video else "gif" if gif else None
+            )
         )
 
         match kind:
@@ -468,7 +485,9 @@ class Utils(InlineUnit):
             case "video":
                 media = InputMediaVideo(media=media, caption=text, parse_mode="HTML")
             case "gif":
-                media = InputMediaAnimation(media=media, caption=text, parse_mode="HTML")
+                media = InputMediaAnimation(
+                    media=media, caption=text, parse_mode="HTML"
+                )
 
         if media is None and text is None and reply_markup:
             try:
@@ -528,11 +547,11 @@ class Utils(InlineUnit):
                 else:
                     return True
             except TelegramAPIError as e:
-                if True: # TODO "" in e.message
+                if True:  # TODO "" in e.message
                     if query:
                         with contextlib.suppress(Exception):
                             await query.answer()
-                elif True: # TODO "" in e.message
+                elif True:  # TODO "" in e.message
                     with contextlib.suppress(Exception):
                         await query.answer(
                             "I should have edited some message, but it is deleted :("
@@ -543,7 +562,6 @@ class Utils(InlineUnit):
                 logger.info("Sleeping %ss on aiogram FloodWait...", e.retry_after)
                 await asyncio.sleep(e.retry_after)
                 return await self._edit_unit(**utils.get_kwargs())
-                
 
                 return False
             else:
@@ -568,7 +586,7 @@ class Utils(InlineUnit):
             await asyncio.sleep(e.retry_after)
             return await self._edit_unit(**utils.get_kwargs())
         except TelegramAPIError:
-            if True: # TODO
+            if True:  # TODO
                 with contextlib.suppress(Exception):
                     await query.answer(
                         "I should have edited some message, but it is deleted :("
@@ -608,7 +626,10 @@ class Utils(InlineUnit):
             unit_id = call.unit_id
 
         try:
-            await self._client.delete_messages(call._units.get(unit_id).get('chat'), call._units.get(unit_id).get('message_id'))
+            await self._client.delete_messages(
+                call._units.get(unit_id).get("chat"),
+                call._units.get(unit_id).get("message_id"),
+            )
         except Exception:
             return False
 
@@ -799,12 +820,19 @@ class Utils(InlineUnit):
     @staticmethod
     async def _get_webapp_session(url: str):
         session = aiohttp.ClientSession()
-        params = unquote(url.split('tgWebAppData=')[1].split('&tgWebAppVersion')[0])
+        params = unquote(url.split("tgWebAppData=")[1].split("&tgWebAppVersion")[0])
         base_url = url.split("?")[0]
 
-        async with session.post(base_url + f"/api?hash=-", headers=headers, data={"_auth": params, "method": "auth"}) as resp:
+        async with session.post(
+            base_url + f"/api?hash=-",
+            headers=headers,
+            data={"_auth": params, "method": "auth"},
+        ) as resp:
             if resp.status != 200:
-                logger.error("Error while getting Cookies to enter botfather webapp: resp%s", resp.status)
+                logger.error(
+                    "Error while getting Cookies to enter botfather webapp: resp%s",
+                    resp.status,
+                )
                 await session.close()
                 raise RuntimeError("Getting Cookies failed")
 
@@ -834,12 +862,14 @@ class Utils(InlineUnit):
         commands: dict[str, str] = dict(),
     ) -> bool | None:
         url: str = (
-            await self._client(RequestWebViewRequest(
-                peer="@botfather",
-                bot="@botfather",
-                platform="android",
-                from_bot_menu=False,
-                url="https://webappinternal.telegram.org/botfather?")
+            await self._client(
+                RequestWebViewRequest(
+                    peer="@botfather",
+                    bot="@botfather",
+                    platform="android",
+                    from_bot_menu=False,
+                    url="https://webappinternal.telegram.org/botfather?",
+                )
             )
         ).url
         for _ in range(5):
@@ -886,10 +916,7 @@ class Utils(InlineUnit):
                     )
                 case 6:
                     return await self._set_commands(
-                        session,
-                        main_url,
-                        _hash,
-                        commands=commands
+                        session, main_url, _hash, commands=commands
                     )
         finally:
             await session.close()

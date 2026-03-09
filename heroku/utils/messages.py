@@ -1,4 +1,3 @@
-
 # ©️ Codrago, 2024-2030
 # This file is a part of Heroku Userbot
 # 🌐 https://github.com/coddrago/Heroku
@@ -30,8 +29,6 @@ from .entity import get_chat_id, FormattingEntity
 from ..inline.types import BotInlineCall, InlineCall, InlineMessage
 from ..types import HerokuReplyMarkup, ListLike
 
-
-
 emoji_pattern = re.compile(
     "["
     "\U0001f600-\U0001f64f"  # emoticons
@@ -44,6 +41,7 @@ emoji_pattern = re.compile(
 
 parser = herokutl.utils.sanitize_parse_mode("html")
 logger = logging.getLogger(__name__)
+
 
 def get_topic(message: Message) -> typing.Optional[int]:
     """
@@ -65,6 +63,7 @@ def get_topic(message: Message) -> typing.Optional[int]:
         )
     )
 
+
 def mime_type(message: Message) -> str:
     """
     Get mime type of document in message
@@ -76,6 +75,7 @@ def mime_type(message: Message) -> str:
         if not isinstance(message, Message) or not getattr(message, "media", False)
         else getattr(getattr(message, "media", False), "mime_type", False) or ""
     )
+
 
 async def get_message_link(
     message: Message,
@@ -209,7 +209,9 @@ def smart_split(
                             - exclude,
                         )
                     )
-                case _ if entity.offset < split_offset_utf16 < entity.offset + entity.length:
+                case _ if (
+                    entity.offset < split_offset_utf16 < entity.offset + entity.length
+                ):
                     current_entities.append(
                         _copy_tl(
                             entity,
@@ -264,6 +266,7 @@ def array_sum(
         result += item
 
     return result
+
 
 async def answer(
     message: typing.Union[Message, InlineCall, InlineMessage],
@@ -325,7 +328,7 @@ async def answer(
 
     kwargs.setdefault("link_preview", False)
 
-    edit = (message.out and not message.via_bot_id and not message.fwd_from)
+    edit = message.out and not message.via_bot_id and not message.fwd_from
     match True:
         case _ if not edit:
             kwargs.setdefault(
@@ -389,7 +392,11 @@ async def answer(
         )
     elif isinstance(response, Message):
         if message.media is None and (
-            response.media is None or isinstance(response.media, (MessageMediaWebPage, MessageMediaPhoto, MessageMediaDocument))
+            response.media is None
+            or isinstance(
+                response.media,
+                (MessageMediaWebPage, MessageMediaPhoto, MessageMediaDocument),
+            )
         ):
             result = await message.edit(
                 response.message,
@@ -471,6 +478,7 @@ async def answer_file(
 
     return response
 
+
 def censor(
     obj: typing.Any,
     to_censor: typing.Optional[typing.Iterable[str]] = None,
@@ -494,6 +502,7 @@ def censor(
 
     return obj
 
+
 def is_serializable(x: typing.Any, /) -> bool:
     """
     Checks if object is JSON-serializable
@@ -513,7 +522,7 @@ def extract_urls(text: str) -> typing.List[str]:
     :param text: Text to extract URLs from
     :return: List of URLs
     """
-    url_regex = re.compile(r'https?://[^\s]+')
+    url_regex = re.compile(r"https?://[^\s]+")
     return url_regex.findall(text)
 
 
@@ -523,4 +532,6 @@ def has_media(message: Message) -> bool:
     :param message: Message to check
     :return: True if message has media, False otherwise
     """
-    return isinstance(message.media, (MessageMediaPhoto, MessageMediaDocument, MessageMediaWebPage))
+    return isinstance(
+        message.media, (MessageMediaPhoto, MessageMediaDocument, MessageMediaWebPage)
+    )

@@ -18,8 +18,10 @@ from .. import version
 parser = herokutl.utils.sanitize_parse_mode("html")
 logger = logging.getLogger(__name__)
 
+
 def _is_no_git() -> bool:
     return os.environ.get("HEROKU_NO_GIT") == "1"
+
 
 # GeekTG Compatibility
 def get_git_info() -> typing.Tuple[str, str]:
@@ -34,6 +36,7 @@ def get_git_info() -> typing.Tuple[str, str]:
         hash_,
         f"https://github.com/coddrago/Heroku/commit/{hash_}" if hash_ else "",
     )
+
 
 def get_git_hash() -> typing.Union[str, bool]:
     """
@@ -60,6 +63,7 @@ def get_commit_url() -> str:
         return f'<a href="https://github.com/coddrago/Heroku/commit/{hash_}">#{hash_[:7]}</a>'
     except Exception:
         return "Unknown"
+
 
 def get_git_status() -> str:
     """
@@ -120,9 +124,8 @@ def get_commit_count() -> int:
     except Exception:
         return 0
 
+
 def is_up_to_date():
     repo = git.Repo(search_parent_directories=True)
-    diff = any(
-        repo.iter_commits(f"HEAD..origin/{version.branch}", max_count=1)
-    )
+    diff = any(repo.iter_commits(f"HEAD..origin/{version.branch}", max_count=1))
     return not diff

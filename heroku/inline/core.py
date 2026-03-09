@@ -22,11 +22,12 @@ from aiogram import Bot, Dispatcher
 from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
 from aiogram.exceptions import TelegramConflictError, TelegramUnauthorizedError
-from herokutl.errors.rpcerrorlist import (InputUserDeactivatedError,
-                                          YouBlockedUserError)
+from herokutl.errors.rpcerrorlist import InputUserDeactivatedError, YouBlockedUserError
 from herokutl.tl.functions.contacts import UnblockRequest
-from herokutl.tl.functions.messages import (GetDialogFiltersRequest,
-                                            UpdateDialogFilterRequest)
+from herokutl.tl.functions.messages import (
+    GetDialogFiltersRequest,
+    UpdateDialogFilterRequest,
+)
 from herokutl.tl.types import DialogFilter, InputPeerUser, Message
 from herokutl.utils import get_display_name
 
@@ -47,6 +48,7 @@ logger = logging.getLogger(__name__)
 
 if typing.TYPE_CHECKING:
     from ..loader import Modules
+
 
 class InlineManager(
     Utils,
@@ -134,7 +136,9 @@ class InlineManager(
 
         self.init_complete = True
 
-        self.bot = Bot(token=self._token, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
+        self.bot = Bot(
+            token=self._token, default=DefaultBotProperties(parse_mode=ParseMode.HTML)
+        )
         self._bot = self.bot
         self._dp = Dispatcher()
 
@@ -170,22 +174,19 @@ class InlineManager(
             self.init_complete = False
             logger.critical("Initialization of inline manager failed!", exc_info=True)
             return False
-        
+
         _folders = await self._client(GetDialogFiltersRequest())
         for folder in _folders.filters:
             if getattr(folder, "title", None) == "Heroku":
                 if any(
                     [
-                        isinstance(peer, InputPeerUser)
-                        and peer.user_id == self.bot_id
+                        isinstance(peer, InputPeerUser) and peer.user_id == self.bot_id
                         for peer in folder.include_peer
                     ]
                 ):
                     break
 
-                pinned = [
-                    await self._client.get_input_entity(self.bot_id)
-                ]
+                pinned = [await self._client.get_input_entity(self.bot_id)]
                 include = folder.include_peers
                 exclude = folder.exclude_peers
                 emoticon = folder.emoticon
@@ -201,7 +202,7 @@ class InlineManager(
                             exclude_peers=exclude,
                             emoticon=emoticon,
                             color=color,
-                        )
+                        ),
                     )
                 )
                 break
@@ -243,7 +244,9 @@ class InlineManager(
 
         self.bot.get_updates = new
 
-        self._task = asyncio.ensure_future(self._dp.start_polling(self._bot, handle_signals=False))
+        self._task = asyncio.ensure_future(
+            self._dp.start_polling(self._bot, handle_signals=False)
+        )
         self._cleaner_task = asyncio.ensure_future(self._cleaner())
 
     async def _stop(self):

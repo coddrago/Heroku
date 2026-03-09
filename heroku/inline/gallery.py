@@ -597,9 +597,7 @@ class Gallery(InlineUnit):
         return (
             caption
             if isinstance(caption, str)
-            else caption()
-            if callable(caption)
-            else ""
+            else caption() if callable(caption) else ""
         )
 
     def _gallery_markup(self: "InlineManager", unit_id: str) -> InlineKeyboardMarkup:

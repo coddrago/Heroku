@@ -1,4 +1,3 @@
-
 # ©️ Dan Gazizullin, 2021-2023
 # This file is a part of Hikka Userbot
 # 🌐 https://github.com/hikariatama/Hikka
@@ -29,6 +28,7 @@ logger = logging.getLogger(__name__)
 
 def hash_msg(message):
     return f"{str(utils.get_chat_id(message))}/{str(message.id)}"
+
 
 async def read_stream(func: callable, stream, delay: float):
     last_task = None
@@ -100,7 +100,7 @@ class MessageEditor:
 
         if self.rc is not None:
             exec_time = time.time() - self.start_time
-            text += (self.strings["time_exec"].format(round(exec_time, 2)))
+            text += self.strings["time_exec"].format(round(exec_time, 2))
 
         with contextlib.suppress(herokutl.errors.rpcerrorlist.MessageNotModifiedError):
             try:
@@ -121,7 +121,10 @@ class MessageEditor:
 
 class SudoMessageEditor(MessageEditor):
     PASS_REQ = ["[sudo] password for", "[sudo] пароль для"]
-    WRONG_PASS = [r"\[sudo\] password for (.*): Sorry, try again\.", r"\[sudo\] пароль для (.*): Попробуйте еще раз.\."]
+    WRONG_PASS = [
+        r"\[sudo\] password for (.*): Sorry, try again\.",
+        r"\[sudo\] пароль для (.*): Попробуйте еще раз.\.",
+    ]
     TOO_MANY_TRIES = [r"\[sudo\] password for (.*): sudo: [0-9]+ incorrect password attempts", r"\[sudo\] пароль для (.*): sudo: [0-9]+ неверные попытки ввода пароля"]  # fmt: skip
 
     def __init__(self, message, command, config, strings, request_message):
@@ -186,7 +189,8 @@ class SudoMessageEditor(MessageEditor):
             handled = True
 
         if len(lines) > 1 and (
-            any(re.fullmatch(i, lastline) for i in self.TOO_MANY_TRIES) and self.state in {1, 3, 4}
+            any(re.fullmatch(i, lastline) for i in self.TOO_MANY_TRIES)
+            and self.state in {1, 3, 4}
         ):
             logger.debug("password wrong lots of times")
             await utils.answer(self.message, self.strings("auth_locked"))
@@ -297,22 +301,22 @@ class TerminalMod(loader.Module):
     strings = {"name": "Terminal"}
 
     DANGEROUS_COMMANDS = [
-        r'rm\s+.*\s+\/\s*\*?',
-        r'rm\s+.*\s+\/etc\/',
-        r'rm\s+.*\s+\/dev\/',
-        r'rm\s+.*\s+\/boot\/',
-        r'rm\s+.*\s+\/root\/',
-        r'rm\s+.*\s+\/sys\/',
-        r'rm\s+.*\s+\/proc\/',
-        r'dd\s+.*if=.*of=/dev/',
-        r'mkfs\.',
-        r'fdisk\s+\/dev/',
-        r'\\x72\\x6d\\x20\\x2d\\x72\\x66\\x20\\x2f',
-        r'which\s+rm',
-        r'chmod\s+.*000\s+.*\/',
-        r':\(\)\s*\{\s*:\|:&\s*\}\s*;\s*:',
-        r'cat\s+.*\/dev\/urandom\s+>\s+\/dev\/[hsv]d[a-z]',
-        r'ln\s+.*-s\s+\/\s+\/dev\/null',
+        r"rm\s+.*\s+\/\s*\*?",
+        r"rm\s+.*\s+\/etc\/",
+        r"rm\s+.*\s+\/dev\/",
+        r"rm\s+.*\s+\/boot\/",
+        r"rm\s+.*\s+\/root\/",
+        r"rm\s+.*\s+\/sys\/",
+        r"rm\s+.*\s+\/proc\/",
+        r"dd\s+.*if=.*of=/dev/",
+        r"mkfs\.",
+        r"fdisk\s+\/dev/",
+        r"\\x72\\x6d\\x20\\x2d\\x72\\x66\\x20\\x2f",
+        r"which\s+rm",
+        r"chmod\s+.*000\s+.*\/",
+        r":\(\)\s*\{\s*:\|:&\s*\}\s*;\s*:",
+        r"cat\s+.*\/dev\/urandom\s+>\s+\/dev\/[hsv]d[a-z]",
+        r"ln\s+.*-s\s+\/\s+\/dev\/null",
     ]
 
     def _is_dangerous(self, cmd: str) -> bool:
@@ -321,7 +325,6 @@ class TerminalMod(loader.Module):
             if re.search(pattern, cmd, re.IGNORECASE):
                 return True
         return False
-
 
     def __init__(self):
         self.config = loader.ModuleConfig(
@@ -341,12 +344,13 @@ class TerminalMod(loader.Module):
         if self._is_dangerous(user_command):
             await utils.answer(
                 message,
-                self.strings("dangerous_command").format(utils.escape_html(user_command)),
+                self.strings("dangerous_command").format(
+                    utils.escape_html(user_command)
+                ),
             )
             return
 
         await self.run_command(message, user_command)
-        
 
     async def run_command(
         self,
@@ -366,7 +370,9 @@ class TerminalMod(loader.Module):
 
         try:
             sproc = await asyncio.create_subprocess_exec(
-                shell, "-c", cmd,
+                shell,
+                "-c",
+                cmd,
                 stdin=asyncio.subprocess.PIPE,
                 stdout=asyncio.subprocess.PIPE,
                 stderr=asyncio.subprocess.PIPE,
@@ -376,12 +382,9 @@ class TerminalMod(loader.Module):
         except Exception as e:
             await utils.answer(
                 message,
-                self.strings("exec_error").format(
-                    utils.escape_html(str(e))
-                ),
+                self.strings("exec_error").format(utils.escape_html(str(e))),
             )
             return
-
 
         if editor is None:
             editor = SudoMessageEditor(message, cmd, self.config, self.strings, message)
@@ -416,9 +419,9 @@ class TerminalMod(loader.Module):
 
         if hash_msg(await message.get_reply_message()) in self.activecmds:
             try:
-                kill_pids = self.activecmds[hash_msg(await message.get_reply_message())] 
+                kill_pids = self.activecmds[hash_msg(await message.get_reply_message())]
                 if "-f" not in utils.get_args_raw(message):
-                     os.killpg(kill_pids.pid, signal.SIGTERM)
+                    os.killpg(kill_pids.pid, signal.SIGTERM)
                 else:
                     os.killpg(kill_pids.pid, signal.SIGKILL)
             except Exception:

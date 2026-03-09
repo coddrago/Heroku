@@ -130,7 +130,7 @@ class HerokuSecurityMod(loader.Module):
             self.strings("global"),
             reply_markup=self._build_markup_global(is_inline),
         )
-    
+
     async def inline__switch_perm_inline_query(self, call: InlineCall):
         query = self._db.get(security.__name__, "allow_inline_query", False)
         self._db.set(security.__name__, "allow_inline_query", not query)
@@ -511,7 +511,7 @@ class HerokuSecurityMod(loader.Module):
             message=message,
             ttl=5 * 60,
         )
-    
+
     @loader.command()
     async def querysec(self, message: Message):
         query = self._db.get(security.__name__, "allow_inline_query", False)
@@ -677,7 +677,8 @@ class HerokuSecurityMod(loader.Module):
                     [
                         self.strings("li").format(
                             i.id, utils.escape_html(get_display_name(i))
-                        ) + (f" ({p})" if p else "")
+                        )
+                        + (f" ({p})" if p else "")
                         for i, p in zip(_resolved_users, _and_prefixes)
                     ]
                 )
@@ -700,11 +701,7 @@ class HerokuSecurityMod(loader.Module):
                     else []
                 )
             )
-            + (
-                [f"command/{command}"]
-                if command in self.allmodules.commands
-                else []
-            )
+            + ([f"command/{command}"] if command in self.allmodules.commands else [])
             + (
                 [f"inline/{needle.lower().removeprefix('@')}"]
                 if needle.lower().removeprefix("@") in self.allmodules.inline_handlers

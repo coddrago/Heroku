@@ -25,8 +25,10 @@ import aiohttp
 import git
 from git import GitCommandError, Repo
 from herokutl.extensions.html import CUSTOM_EMOJIS
-from herokutl.tl.functions.messages import (GetDialogFiltersRequest,
-                                            UpdateDialogFilterRequest)
+from herokutl.tl.functions.messages import (
+    GetDialogFiltersRequest,
+    UpdateDialogFilterRequest,
+)
 from herokutl.tl.types import DialogFilter, Message, TextWithEntities
 
 from .. import loader, main, utils, version
@@ -69,7 +71,11 @@ class UpdaterMod(loader.Module):
         self.set("autoupdate", True)
         if not state:
             self.config["autoupdate"] = False
-            await self.inline.bot(call.answer(self.strings("autoupdate_off").format(prefix=self.get_prefix())))
+            await self.inline.bot(
+                call.answer(
+                    self.strings("autoupdate_off").format(prefix=self.get_prefix())
+                )
+            )
             return
 
         self.config["autoupdate"] = True
@@ -84,9 +90,7 @@ class UpdaterMod(loader.Module):
                 for remote in repo.remotes:
                     remote.fetch()
 
-                if not (
-                    diff := [*repo.iter_commits(f"HEAD..origin/{version.branch}")]
-                ):
+                if not (diff := [*repo.iter_commits(f"HEAD..origin/{version.branch}")]):
                     return False
         except Exception:
             return False
@@ -121,7 +125,7 @@ class UpdaterMod(loader.Module):
                 r = await session.get(
                     url,
                     timeout=aiohttp.ClientTimeout(total=10),
-                    headers={"Accept": "application/vnd.github.v3.raw"}
+                    headers={"Accept": "application/vnd.github.v3.raw"},
                 )
 
                 match r.status:
@@ -131,7 +135,7 @@ class UpdaterMod(loader.Module):
                         if announcement and announcement != previous:
                             await self.inline.bot.send_message(
                                 self.tg_id,
-                                self.strings("announcement").format(announcement)
+                                self.strings("announcement").format(announcement),
                             )
                             self.set("announcement", announcement)
                     case _:
@@ -139,12 +143,13 @@ class UpdaterMod(loader.Module):
             except Exception:
                 pass
 
-
     @loader.loop(interval=60, autostart=True)
     async def poller(self):
         if NO_GIT:
             return
-        if (self.config["disable_notifications"] and not self.config["autoupdate"]) or not self.get_changelog():
+        if (
+            self.config["disable_notifications"] and not self.config["autoupdate"]
+        ) or not self.get_changelog():
             return
 
         self._pending = self.get_latest()
@@ -157,13 +162,14 @@ class UpdaterMod(loader.Module):
             return
 
         if self._pending not in {utils.get_git_hash(), self._notified}:
-            if not self.config["autoupdate"]: manual_update = True
+            if not self.config["autoupdate"]:
+                manual_update = True
             else:
                 try:
                     async with aiohttp.ClientSession() as session:
                         r = await session.get(
                             url=f"https://api.github.com/repos/coddrago/Heroku/contents/heroku/version.py?ref={version.branch}",
-                            headers={"Accept": "application/vnd.github.v3.raw"}
+                            headers={"Accept": "application/vnd.github.v3.raw"},
                         )
                         text = await r.text()
 
@@ -251,12 +257,15 @@ class UpdaterMod(loader.Module):
     @loader.command()
     async def changelog(self, message: Message):
         """Shows the changelog of the last major update"""
-        with open('CHANGELOG.md', mode='r', encoding='utf-8') as f:
-            changelog = f.read().split('##')[1].strip()
+        with open("CHANGELOG.md", mode="r", encoding="utf-8") as f:
+            changelog = f.read().split("##")[1].strip()
         if (await self._client.get_me()).premium:
-            changelog.replace('🌑 Heroku', '<tg-emoji emoji-id=5192765204898783881>🌘</tg-emoji><tg-emoji emoji-id=5195311729663286630>🌘</tg-emoji><tg-emoji emoji-id=5195045669324201904>🌘</tg-emoji>')
+            changelog.replace(
+                "🌑 Heroku",
+                "<tg-emoji emoji-id=5192765204898783881>🌘</tg-emoji><tg-emoji emoji-id=5195311729663286630>🌘</tg-emoji><tg-emoji emoji-id=5195045669324201904>🌘</tg-emoji>",
+            )
 
-        await utils.answer(message, self.strings('changelog').format(changelog))
+        await utils.answer(message, self.strings("changelog").format(changelog))
 
     @loader.command()
     async def restart(self, message: Message):
@@ -278,7 +287,11 @@ class UpdaterMod(loader.Module):
                             "args": (secure_boot,),
                             "style": "primary",
                         },
-                        {"text": self.strings("cancel"), "action": "close", "style": "danger"},
+                        {
+                            "text": self.strings("cancel"),
+                            "action": "close",
+                            "style": "danger",
+                        },
                     ],
                 )
             ):
@@ -432,7 +445,11 @@ class UpdaterMod(loader.Module):
                             "callback": self.inline_update,
                             "style": "primary",
                         },
-                        {"text": self.strings("cancel"), "action": "close", "style": "danger"},
+                        {
+                            "text": self.strings("cancel"),
+                            "action": "close",
+                            "style": "danger",
+                        },
                     ],
                 )
             ):
@@ -447,7 +464,9 @@ class UpdaterMod(loader.Module):
         if self.config["autoupdate"]:
             await utils.answer(message, self.strings["autoupdate_on"])
         else:
-            await utils.answer(message, self.strings["autoupdate_off"].format(prefix=self.get_prefix()))
+            await utils.answer(
+                message, self.strings["autoupdate_off"].format(prefix=self.get_prefix())
+            )
 
     async def inline_update(
         self,
@@ -508,8 +527,16 @@ class UpdaterMod(loader.Module):
 
         self._markup = lambda: self.inline.generate_markup(
             [
-                {"text": self.strings("update"), "data": "heroku/update", "style": "primary",},
-                {"text": self.strings("ignore"), "data": "heroku/ignore_upd", "style": "danger"},
+                {
+                    "text": self.strings("update"),
+                    "data": "heroku/update",
+                    "style": "primary",
+                },
+                {
+                    "text": self.strings("ignore"),
+                    "data": "heroku/ignore_upd",
+                    "style": "danger",
+                },
             ]
         )
 
@@ -551,7 +578,7 @@ class UpdaterMod(loader.Module):
                                 "args": (False,),
                                 "style": "danger",
                             }
-                        ]
+                        ],
                     ]
                 ),
             )
@@ -571,7 +598,7 @@ class UpdaterMod(loader.Module):
             folder_id = 2
 
         folders = await self._client(GetDialogFiltersRequest())
-        filters = getattr(folders, 'filters', folders)
+        filters = getattr(folders, "filters", folders)
         heroku_f = False
 
         if filters:
@@ -594,10 +621,7 @@ class UpdaterMod(loader.Module):
                         folder_id,
                         DialogFilter(
                             folder_id,
-                            title=TextWithEntities(
-                                text='Heroku',
-                                entities=[]
-                            ),
+                            title=TextWithEntities(text="Heroku", entities=[]),
                             pinned_peers=(
                                 [
                                     await self._client.get_input_entity(
@@ -613,7 +637,8 @@ class UpdaterMod(loader.Module):
                                     None,
                                     ignore_migrated=True,
                                 )
-                                if "heroku" in dialog.name or "Heroku" in dialog.name
+                                if "heroku" in dialog.name
+                                or "Heroku" in dialog.name
                                 and dialog.is_channel
                                 or (
                                     self._client.loader.inline.init_complete
@@ -646,7 +671,7 @@ class UpdaterMod(loader.Module):
                     "- User reached the limit of folders in Telegram\n"
                     "- User got floodwait\n"
                     "Ignoring error and adding folder addition to ignore list\n",
-                    exc_info=True
+                    exc_info=True,
                 )
 
     async def update_complete(self):
@@ -719,14 +744,14 @@ class UpdaterMod(loader.Module):
     @loader.command()
     async def rollback(self, message: Message):
         if not (args := utils.get_args_raw(message)).isdigit():
-            await utils.answer(message, self.strings('invalid_args'))
+            await utils.answer(message, self.strings("invalid_args"))
             return
         if int(args) > 10:
-            await utils.answer(message, self.strings('rollback_too_far'))
+            await utils.answer(message, self.strings("rollback_too_far"))
             return
         form = await self.inline.form(
             message=message,
-            text=self.strings('rollback_confirm').format(num=args),
+            text=self.strings("rollback_confirm").format(num=args),
             reply_markup=[
                 [
                     {
@@ -742,13 +767,15 @@ class UpdaterMod(loader.Module):
                         "action": "close",
                         "style": "danger",
                     }
-                ]
-            ]
+                ],
+            ],
         )
 
     async def rollback_confirm(self, call: InlineCall, number: int):
-        await utils.answer(call, self.strings('rollback_process').format(num=number))
-        await asyncio.create_subprocess_shell(f'git reset --hard HEAD~{number}', stdout=asyncio.subprocess.PIPE)
+        await utils.answer(call, self.strings("rollback_process").format(num=number))
+        await asyncio.create_subprocess_shell(
+            f"git reset --hard HEAD~{number}", stdout=asyncio.subprocess.PIPE
+        )
         await self.restart_common(call)
 
     @loader.command()
@@ -756,8 +783,14 @@ class UpdaterMod(loader.Module):
         """| stops your userbot"""
 
         if "LAVHOST" in os.environ:
-            await utils.answer(message, self.strings["ub_stop"].format(emoji=utils.get_platform_emoji()))
+            await utils.answer(
+                message,
+                self.strings["ub_stop"].format(emoji=utils.get_platform_emoji()),
+            )
             await self.client.send_message("lavhostbot", "⏹ Stop")
         else:
-            await utils.answer(message, self.strings["ub_stop"].format(emoji=utils.get_platform_emoji()))
+            await utils.answer(
+                message,
+                self.strings["ub_stop"].format(emoji=utils.get_platform_emoji()),
+            )
             exit()

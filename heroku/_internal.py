@@ -40,10 +40,11 @@ def die():
     match True:
         case _ if "DOCKER" in os.environ:
             sys.exit(0)
-        case _ if sys.platform == 'win32':
+        case _ if sys.platform == "win32":
             sys.exit(0)
         case _:
             os.killpg(os.getpgid(os.getpid()), signal.SIGTERM)
+
 
 def restart():
     if "--sandbox" in " ".join(sys.argv):
@@ -58,7 +59,6 @@ def restart():
     logging.getLogger().setLevel(logging.CRITICAL)
 
     print("🔄 Restarting...")
-
 
     match True:
         case _ if "LAVHOST" in os.environ:
@@ -75,6 +75,7 @@ def restart():
             else:
                 signal.signal(signal.SIGTERM, get_startup_callback())
             die()
+
 
 def print_banner(banner: str):
     print("\033[2J\033[3;1f")
@@ -96,7 +97,13 @@ def check_commit_ancestor(commit, repo_path):
     """Check if commit is ancestor of origin/master"""
     try:
         proc = subprocess.run(
-            ["git", "merge-base", "--is-ancestor", commit, "refs/remotes/origin/master"],
+            [
+                "git",
+                "merge-base",
+                "--is-ancestor",
+                commit,
+                "refs/remotes/origin/master",
+            ],
             cwd=repo_path,
             capture_output=True,
             timeout=5,
@@ -160,8 +167,18 @@ def reset_to_master(repo_path):
         repo.heads.master.checkout(force=True)
     except Exception:
         try:
-            subprocess.run(["git", "reset", "--hard", "HEAD"], cwd=repo_path, capture_output=True, timeout=5)
-            subprocess.run(["git", "checkout", "master", "-f"], cwd=repo_path, capture_output=True, timeout=5)
+            subprocess.run(
+                ["git", "reset", "--hard", "HEAD"],
+                cwd=repo_path,
+                capture_output=True,
+                timeout=5,
+            )
+            subprocess.run(
+                ["git", "checkout", "master", "-f"],
+                cwd=repo_path,
+                capture_output=True,
+                timeout=5,
+            )
         except (subprocess.TimeoutExpired, Exception):
             pass
 
@@ -173,14 +190,18 @@ def restore_worktree(repo_path):
     """
 
     try:
-        proc = subprocess.run(["git", "restore", "."], cwd=repo_path, capture_output=True, timeout=5)
+        proc = subprocess.run(
+            ["git", "restore", "."], cwd=repo_path, capture_output=True, timeout=5
+        )
         if proc.returncode == 0:
             return True
     except (subprocess.TimeoutExpired, Exception):
         pass
 
     try:
-        proc = subprocess.run(["git", "reset", "--hard"], cwd=repo_path, capture_output=True, timeout=5)
+        proc = subprocess.run(
+            ["git", "reset", "--hard"], cwd=repo_path, capture_output=True, timeout=5
+        )
         return proc.returncode == 0
     except (subprocess.TimeoutExpired, Exception):
         return False

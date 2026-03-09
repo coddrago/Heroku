@@ -79,7 +79,11 @@ class Help(loader.Module):
             ),
         )
 
-    @loader.command(ru_doc="[args] | Спрячет ваши модули", ua_doc="[args] | Сховає ваші модулі", de_doc="[args] | Versteckt Ihre Module")
+    @loader.command(
+        ru_doc="[args] | Спрячет ваши модули",
+        ua_doc="[args] | Сховає ваші модулі",
+        de_doc="[args] | Versteckt Ihre Module",
+    )
     async def helphide(self, message: Message):
         """[args] | hide your modules"""
         if not (modules := utils.get_args(message)):
@@ -159,17 +163,14 @@ class Help(loader.Module):
 
         _name = (
             "{} (v{})".format(
-                utils.escape_html(name),
-                ".".join(map(str, module.__version__))
+                utils.escape_html(name), ".".join(map(str, module.__version__))
             )
             if hasattr(module, "__version__")
             else utils.escape_html(name)
         )
 
         reply = "{} <b>{}</b>:".format(
-            "<tg-emoji emoji-id=5134452506935427991>🪐</tg-emoji>",
-            _name,
-            ""
+            "<tg-emoji emoji-id=5134452506935427991>🪐</tg-emoji>", _name, ""
         )
         inline_cmd = ""
         cmds = ""
@@ -181,12 +182,7 @@ class Help(loader.Module):
             )
 
         if isinstance(self.lookup(args), loader.Library):
-            return await utils.answer(
-                message,
-                self.strings["help_lib"].format(
-                    name
-                )
-            )
+            return await utils.answer(message, self.strings["help_lib"].format(name))
 
         commands = {
             name: func
@@ -236,18 +232,18 @@ class Help(loader.Module):
                 )
             )
         cmds = "\n".join(lines)
-        developer = re.search(r"# ?meta developer: ?(.+)", getattr(module, "__source__", None))
+        developer = re.search(
+            r"# ?meta developer: ?(.+)", getattr(module, "__source__", None)
+        )
         dev_text = developer.group(1) if developer else None
-        placeholders = "\n".join(utils.help_placeholders(module.__class__.__name__, self))
+        placeholders = "\n".join(
+            utils.help_placeholders(module.__class__.__name__, self)
+        )
         await utils.answer(
             message,
-            f"{reply}<blockquote expandable>{cmds}{inline_cmd}</blockquote>\n<blockquote expandable>" 
+            f"{reply}<blockquote expandable>{cmds}{inline_cmd}</blockquote>\n<blockquote expandable>"
             + (f"{placeholders}</blockquote>" if placeholders else "")
-            + (
-                f"\n\n{self.strings('developer')}".format(dev_text)
-                if dev_text
-                else ""
-            )
+            + (f"\n\n{self.strings('developer')}".format(dev_text) if dev_text else "")
             + (f"\n\n{self.strings('not_exact')}" if not exact else "")
             + (
                 f"\n{self.strings('core_notice')}"
@@ -256,7 +252,11 @@ class Help(loader.Module):
             ),
         )
 
-    @loader.command(ru_doc="[args] | Помощь с вашими модулями!", ua_doc="[args] | допоможіть з вашими модулями!", de_doc="[args] | Hilfe mit deinen Modulen!")
+    @loader.command(
+        ru_doc="[args] | Помощь с вашими модулями!",
+        ua_doc="[args] | допоможіть з вашими модулями!",
+        de_doc="[args] | Hilfe mit deinen Modulen!",
+    )
     async def help(self, message: Message):
         """[args] | help with your modules!"""
 
@@ -267,7 +267,9 @@ class Help(loader.Module):
         if self.config["banner_url"] and self.config["media_quote"] is True:
             banner = InputMediaWebPage(str(self.config["banner_url"]))
 
-        if self.config["banner_url"] and self.client.heroku_me.premium is False: # bcs non-premium users can add in caption only 1024 symbols
+        if (
+            self.config["banner_url"] and self.client.heroku_me.premium is False
+        ):  # bcs non-premium users can add in caption only 1024 symbols
             banner = InputMediaWebPage(str(self.config["banner_url"]))
 
         if not self.config["banner_url"]:
@@ -362,19 +364,24 @@ class Help(loader.Module):
 
             if force:
                 icommands.extend([*mod.inline_handlers.keys()])
-            else:            
+            else:
                 results = await asyncio.gather(
                     *(
                         self.inline.check_inline_security(
                             func=func,
-                            user=message.sender_id if not message.out else self._client.tg_id,
-                        ) for func in mod.inline_handlers.values()
+                            user=(
+                                message.sender_id
+                                if not message.out
+                                else self._client.tg_id
+                            ),
+                        )
+                        for func in mod.inline_handlers.values()
                     )
                 )
 
                 icommands = [
-                    name for name, passed
-                    in zip(mod.inline_handlers.keys(), results)
+                    name
+                    for name, passed in zip(mod.inline_handlers.keys(), results)
                     if passed is True
                 ]
 
@@ -406,7 +413,10 @@ class Help(loader.Module):
             case _ if only_core:
                 await utils.answer(
                     message,
-                    (self.config["desc_icon"] + " {}\n <blockquote expandable>{}</blockquote><blockquote expandable>{}</blockquote>").format(
+                    (
+                        self.config["desc_icon"]
+                        + " {}\n <blockquote expandable>{}</blockquote><blockquote expandable>{}</blockquote>"
+                    ).format(
                         reply,
                         "".join(core_),
                         (
@@ -415,13 +425,16 @@ class Help(loader.Module):
                             else f"\n\n{self.strings('partial_load')}"
                         ),
                     ),
-                    file = banner,
-                    invert_media = self.config["invert_media"],
+                    file=banner,
+                    invert_media=self.config["invert_media"],
                 )
             case _ if only_loaded:
                 await utils.answer(
                     message,
-                    (self.config["desc_icon"] + " {}\n <blockquote expandable>{}</blockquote><blockquote expandable>{}</blockquote>").format(
+                    (
+                        self.config["desc_icon"]
+                        + " {}\n <blockquote expandable>{}</blockquote><blockquote expandable>{}</blockquote>"
+                    ).format(
                         reply,
                         "".join(plain_ + (no_commands_ if force else [])),
                         (
@@ -430,13 +443,16 @@ class Help(loader.Module):
                             else f"\n\n{self.strings('partial_load')}"
                         ),
                     ),
-                    file = banner,
-                    invert_media = self.config["invert_media"],
+                    file=banner,
+                    invert_media=self.config["invert_media"],
                 )
             case _:
                 await utils.answer(
                     message,
-                    (self.config["desc_icon"] + " {}\n <blockquote expandable>{}</blockquote><blockquote expandable>{}</blockquote><blockquote expandable>{}</blockquote>").format(
+                    (
+                        self.config["desc_icon"]
+                        + " {}\n <blockquote expandable>{}</blockquote><blockquote expandable>{}</blockquote><blockquote expandable>{}</blockquote>"
+                    ).format(
                         reply,
                         "".join(core_),
                         "".join(plain_ + (no_commands_ if force else [])),
@@ -446,14 +462,18 @@ class Help(loader.Module):
                             else f"\n\n{self.strings('partial_load')}"
                         ),
                     ),
-                    file = banner,
-                    invert_media = self.config["invert_media"],
+                    file=banner,
+                    invert_media=self.config["invert_media"],
                 )
 
-    @loader.command(ru_doc="| Ссылка на чат помощи", ua_doc="| посилання для чату служби підтримки", de_doc="| Link zum Support-Chat")
+    @loader.command(
+        ru_doc="| Ссылка на чат помощи",
+        ua_doc="| посилання для чату служби підтримки",
+        de_doc="| Link zum Support-Chat",
+    )
     async def support(self, message):
         """| link for support chat"""
-       
+
         await utils.answer(
             message,
             self.strings("offchats"),

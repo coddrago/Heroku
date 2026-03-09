@@ -57,6 +57,7 @@ def get_network_interfaces() -> typing.Dict[str, str]:
     :return: Dictionary of interface: IP
     """
     import psutil
+
     try:
         interfaces = {}
         for name, addrs in psutil.net_if_addrs().items():

@@ -35,6 +35,7 @@ import getpass
 
 logger = logging.getLogger(__name__)
 
+
 @loader.tds
 class HerokuInfoMod(loader.Module):
     """Show userbot info"""
@@ -46,12 +47,13 @@ class HerokuInfoMod(loader.Module):
             loader.ConfigValue(
                 "custom_message",
                 doc=lambda: (
-                    "<blockquote expandable>" + self.strings("_cfg_cst_msg") + "\n" + self.strings("_cfg_cst_ph").format(
-                        utils.config_placeholders()
-                    ) + "</blockquote>"
-                )
+                    "<blockquote expandable>"
+                    + self.strings("_cfg_cst_msg")
+                    + "\n"
+                    + self.strings("_cfg_cst_ph").format(utils.config_placeholders())
+                    + "</blockquote>"
+                ),
             ),
-
             loader.ConfigValue(
                 "banner_url",
                 "https://raw.githubusercontent.com/coddrago/assets/refs/heads/main/heroku/heroku_info.png",
@@ -85,7 +87,7 @@ class HerokuInfoMod(loader.Module):
                     if line.startswith("PRETTY_NAME"):
                         return line.split("=")[1].strip().strip('"')
         except FileNotFoundError:
-            return self.strings['non_detectable']
+            return self.strings["non_detectable"]
 
     async def _render_info(self, start: float) -> str:
         try:
@@ -97,10 +99,14 @@ class HerokuInfoMod(loader.Module):
         except Exception:
             upd = ""
 
-        me = '<b><a href="tg://user?id={}">{}</a></b>'.format(
-            self._client.heroku_me.id,
-            utils.escape_html(get_display_name(self._client.heroku_me)),
-        ).replace('{', '').replace('}', '')
+        me = (
+            '<b><a href="tg://user?id={}">{}</a></b>'.format(
+                self._client.heroku_me.id,
+                utils.escape_html(get_display_name(self._client.heroku_me)),
+            )
+            .replace("{", "")
+            .replace("}", "")
+        )
         build = utils.get_commit_url()
         _version = f'<i>{".".join(list(map(str, list(version.__version__))))}</i>'
         prefix = f"«<code>{utils.escape_html(self.get_prefix())}</code>»"
@@ -109,49 +115,49 @@ class HerokuInfoMod(loader.Module):
         platform_emoji = utils.get_named_platform_emoji()
 
         for emoji, icon in [
-            ("🍊", "<tg-emoji emoji-id=\"5449599833973203438\">🧡</tg-emoji>"),
-            ("🍇", "<tg-emoji emoji-id=\"5449468596952507859\">💜</tg-emoji>"),
-            ("😶‍🌫️", "<tg-emoji emoji-id=\"5370547013815376328\">😶‍🌫️</tg-emoji>"),
-            ("❓", "<tg-emoji emoji-id=\"5407025283456835913\">📱</tg-emoji>"),
-            ("🍀", "<tg-emoji emoji-id=\"5395325195542078574\">🍀</tg-emoji>"),
-            ("🦾", "<tg-emoji emoji-id=\"5386766919154016047\">🦾</tg-emoji>"),
-            ("🚂", "<tg-emoji emoji-id=\"5359595190807962128\">🚂</tg-emoji>"),
-            ("🐳", "<tg-emoji emoji-id=\"5431815452437257407\">🐳</tg-emoji>"),
-            ("🕶", "<tg-emoji emoji-id=\"5407025283456835913\">📱</tg-emoji>"),
-            ("🐈‍⬛", "<tg-emoji emoji-id=\"6334750507294262724\">🐈‍⬛</tg-emoji>"),
-            ("✌️", "<tg-emoji emoji-id=\"5469986291380657759\">✌️</tg-emoji>"),
-            ("💎", "<tg-emoji emoji-id=\"5471952986970267163\">💎</tg-emoji>"),
-            ("🛡", "<tg-emoji emoji-id=\"5282731554135615450\">🌩</tg-emoji>"),
-            ("🌼", "<tg-emoji emoji-id=\"5224219153077914783\">❤️</tg-emoji>"),
-            ("🎡", "<tg-emoji emoji-id=\"5226711870492126219\">🎡</tg-emoji>"),
-            ("🐧", "<tg-emoji emoji-id=\"5361541227604878624\">🐧</tg-emoji>"),
-            ("🧃", "<tg-emoji emoji-id=\"5422884965593397853\">🧃</tg-emoji>"),
-            ("🦅", "<tg-emoji emoji-id=\"5427286516797831670\">🦅</tg-emoji>"),
-            ("💻", "<tg-emoji emoji-id=\"5469825590884310445\">💻</tg-emoji>"),
-            ("🍏", "<tg-emoji emoji-id=\"5372908412604525258\">🍏</tg-emoji>")
+            ("🍊", '<tg-emoji emoji-id="5449599833973203438">🧡</tg-emoji>'),
+            ("🍇", '<tg-emoji emoji-id="5449468596952507859">💜</tg-emoji>'),
+            ("😶‍🌫️", '<tg-emoji emoji-id="5370547013815376328">😶‍🌫️</tg-emoji>'),
+            ("❓", '<tg-emoji emoji-id="5407025283456835913">📱</tg-emoji>'),
+            ("🍀", '<tg-emoji emoji-id="5395325195542078574">🍀</tg-emoji>'),
+            ("🦾", '<tg-emoji emoji-id="5386766919154016047">🦾</tg-emoji>'),
+            ("🚂", '<tg-emoji emoji-id="5359595190807962128">🚂</tg-emoji>'),
+            ("🐳", '<tg-emoji emoji-id="5431815452437257407">🐳</tg-emoji>'),
+            ("🕶", '<tg-emoji emoji-id="5407025283456835913">📱</tg-emoji>'),
+            ("🐈‍⬛", '<tg-emoji emoji-id="6334750507294262724">🐈‍⬛</tg-emoji>'),
+            ("✌️", '<tg-emoji emoji-id="5469986291380657759">✌️</tg-emoji>'),
+            ("💎", '<tg-emoji emoji-id="5471952986970267163">💎</tg-emoji>'),
+            ("🛡", '<tg-emoji emoji-id="5282731554135615450">🌩</tg-emoji>'),
+            ("🌼", '<tg-emoji emoji-id="5224219153077914783">❤️</tg-emoji>'),
+            ("🎡", '<tg-emoji emoji-id="5226711870492126219">🎡</tg-emoji>'),
+            ("🐧", '<tg-emoji emoji-id="5361541227604878624">🐧</tg-emoji>'),
+            ("🧃", '<tg-emoji emoji-id="5422884965593397853">🧃</tg-emoji>'),
+            ("🦅", '<tg-emoji emoji-id="5427286516797831670">🦅</tg-emoji>'),
+            ("💻", '<tg-emoji emoji-id="5469825590884310445">💻</tg-emoji>'),
+            ("🍏", '<tg-emoji emoji-id="5372908412604525258">🍏</tg-emoji>'),
         ]:
             platform_emoji = platform_emoji.replace(emoji, icon)
         data = {
-            'me': me,
-            'version': _version,
-            'build': build,
-            'prefix': prefix,
-            'platform': platform,
-            'platform_emoji': platform_emoji,
-            'upd': upd,
-            'python_ver': lib_platform.python_version(),
-            'uptime': utils.formatted_uptime(),
-            'cpu_usage': utils.get_cpu_usage(),
-            'ram_usage': f"{utils.get_ram_usage()} MB",
-            'branch': version.branch,
-            'hostname': lib_platform.node(),
-            'user': getpass.getuser(),
-            'os': self._get_os_name() or self.strings('non_detectable'),
-            'kernel': lib_platform.release(),
-            'cpu': f"{psutil.cpu_count(logical=False)} ({psutil.cpu_count()}) core(-s); {psutil.cpu_percent()}% total",
-            'ping': round((time.perf_counter_ns() - start) / 10**6, 3),
-            'htl_ver': herokutl.__version__,
-            'git_status': utils.get_git_status(),
+            "me": me,
+            "version": _version,
+            "build": build,
+            "prefix": prefix,
+            "platform": platform,
+            "platform_emoji": platform_emoji,
+            "upd": upd,
+            "python_ver": lib_platform.python_version(),
+            "uptime": utils.formatted_uptime(),
+            "cpu_usage": utils.get_cpu_usage(),
+            "ram_usage": f"{utils.get_ram_usage()} MB",
+            "branch": version.branch,
+            "hostname": lib_platform.node(),
+            "user": getpass.getuser(),
+            "os": self._get_os_name() or self.strings("non_detectable"),
+            "kernel": lib_platform.release(),
+            "cpu": f"{psutil.cpu_count(logical=False)} ({psutil.cpu_count()}) core(-s); {psutil.cpu_percent()}% total",
+            "ping": round((time.perf_counter_ns() - start) / 10**6, 3),
+            "htl_ver": herokutl.__version__,
+            "git_status": utils.get_git_status(),
         }
         data = await utils.get_placeholders(data, self.config["custom_message"])
         if self.config["custom_message"]:
@@ -159,7 +165,9 @@ class HerokuInfoMod(loader.Module):
                 placeholders_msg = self.config["custom_message"].format(**data)
             except KeyError:
                 logger.exception("Missing placeholder in custom_message")
-                placeholders_msg = "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji>"
+                placeholders_msg = (
+                    "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji>"
+                )
         return (
             placeholders_msg
             if self.config["custom_message"]
@@ -169,18 +177,18 @@ class HerokuInfoMod(loader.Module):
                     if self._client.heroku_me.premium and self.config["show_heroku"]
                     else ""
                 ),
-                me = me,
-                version = _version,
-                prefix = prefix,
-                uptime = utils.formatted_uptime(),
-                branch = version.branch,
+                me=me,
+                version=_version,
+                prefix=prefix,
+                uptime=utils.formatted_uptime(),
+                branch=version.branch,
                 cpu_usage=utils.get_cpu_usage(),
                 ram_usage=f"{utils.get_ram_usage()} MB",
-                ping = round((time.perf_counter_ns() - start) / 10**6, 3), 
-                upd = upd,
-                platform = platform,
-                os=self._get_os_name() or self.strings('non_detectable'),
-                python_ver = lib_platform.python_version(),
+                ping=round((time.perf_counter_ns() - start) / 10**6, 3),
+                upd=upd,
+                platform=platform,
+                os=self._get_os_name() or self.strings("non_detectable"),
+                python_ver=lib_platform.python_version(),
             )
         )
 
@@ -188,10 +196,10 @@ class HerokuInfoMod(loader.Module):
     async def infocmd(self, message: Message):
         start = time.perf_counter_ns()
         media = str(self.config["banner_url"])
-        
+
         if self.config["banner_url"] and self.config["quote_media"] is True:
-            media = InputMediaWebPage(str(self.config["banner_url"]), optional = True)
-        
+            media = InputMediaWebPage(str(self.config["banner_url"]), optional=True)
+
         elif not self.config["banner_url"]:
             media = None
 
@@ -201,25 +209,25 @@ class HerokuInfoMod(loader.Module):
                     await utils.answer(
                         message,
                         await self._render_info(start),
-                        file = media,
+                        file=media,
                         reply_to=getattr(message, "reply_to_msg_id", None),
-                        invert_media = self.config["invert_media"],
+                        invert_media=self.config["invert_media"],
                     )
                 case _:
-                    if '{ping}' in self.config["custom_message"]:
+                    if "{ping}" in self.config["custom_message"]:
                         message = await utils.answer(message, self.config["ping_emoji"])
                     await utils.answer(
                         message,
                         await self._render_info(start),
-                        file = media,
+                        file=media,
                         reply_to=getattr(message, "reply_to_msg_id", None),
-                        invert_media = self.config["invert_media"],
+                        invert_media=self.config["invert_media"],
                     )
         except WebpageMediaEmptyError:
             await utils.answer(
                 message,
                 self.strings["no_banner"].format(
-                    link = self.config["banner_url"], 
+                    link=self.config["banner_url"],
                 ),
                 reply_to=getattr(message, "reply_to_msg_id", None),
             )
@@ -227,5 +235,3 @@ class HerokuInfoMod(loader.Module):
     @loader.command()
     async def ubinfo(self, message: Message):
         await utils.answer(message, self.strings("desc"))
-
-
