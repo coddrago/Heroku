@@ -21,6 +21,7 @@ from herokutl.tl.types import Message
 from .. import loader, utils
 from ..inline.types import BotInlineMessage, InlineCall
 
+
 @loader.tds
 class InlineStuff(loader.Module):
     """Provides support for inline stuff"""
@@ -74,6 +75,7 @@ class InlineStuff(loader.Module):
 
         if not args:
             from .. import main
+
             uid = utils.rand(7)
             genran = "".join(random.choice(main.LATIN_MOCK))
             args = f"{genran}_{uid}_bot"
@@ -105,8 +107,8 @@ class InlineStuff(loader.Module):
     @loader.command()
     async def ch_bot_token(self, message: Message):
         args = utils.get_args_raw(message)
-        if not args or not re.match(r'[0-9]{8,10}:[a-zA-Z0-9_-]{34,36}', args):
-            await utils.answer(message, self.strings('token_invalid'))
+        if not args or not re.match(r"[0-9]{8,10}:[a-zA-Z0-9_-]{34,36}", args):
+            await utils.answer(message, self.strings("token_invalid"))
             return
         self._db.set("heroku.inline", "bot_token", args)
         await utils.answer(message, self.strings("bot_updated"))
@@ -117,15 +119,15 @@ class InlineStuff(loader.Module):
                 await message.answer_photo(
                     "https://raw.githubusercontent.com/coddrago/assets/refs/heads/main/heroku/start_cmd.png",
                     caption=self.strings("this_is_heroku").format(
-                        "<tg-emoji emoji-id=5463379725441341739>🪐</tg-emoji>" 
-                        if self._client.heroku_me.premium 
-                        else "🪐", 
-                        utils.get_platform_emoji() 
-                        if self._client 
-                        else "Heroku"
+                        (
+                            "<tg-emoji emoji-id=5463379725441341739>🪐</tg-emoji>"
+                            if self._client.heroku_me.premium
+                            else "🪐"
+                        ),
+                        utils.get_platform_emoji() if self._client else "Heroku",
                     ),
-                    reply_markup = self.inline.generate_markup(
-                        markup_obj = [
+                    reply_markup=self.inline.generate_markup(
+                        markup_obj=[
                             [
                                 {
                                     "text": "GitHub",
@@ -139,9 +141,9 @@ class InlineStuff(loader.Module):
                                     "url": "https://t.me/heroku_talks",
                                     "emoji_id": "5363805650327450240",
                                 }
-                            ]
+                            ],
                         ]
-                    )
+                    ),
                 )
             case "/profile":
                 if message.from_user.id != self.client.tg_id:
@@ -149,18 +151,18 @@ class InlineStuff(loader.Module):
                 else:
                     await message.answer_photo(
                         "https://raw.githubusercontent.com/coddrago/assets/refs/heads/main/heroku/start_cmd.png",
-                        caption = self.strings["profile_cmd"].format(
+                        caption=self.strings["profile_cmd"].format(
                             prefix=self.get_prefix(),
                             ram_usage=utils.get_ram_usage(),
                             cpu_usage=utils.get_cpu_usage(),
-                            host=utils.get_named_platform()
-                        ), 
-                        reply_markup = self.inline.generate_markup(
+                            host=utils.get_named_platform(),
+                        ),
+                        reply_markup=self.inline.generate_markup(
                             markup_obj=[
                                 [
                                     {
-                                        "text": "Restart", 
-                                        "callback": self.restart, 
+                                        "text": "Restart",
+                                        "callback": self.restart,
                                         "style": "primary",
                                         "args": (message,),
                                         "emoji_id": "5873204392429096339",
@@ -168,15 +170,15 @@ class InlineStuff(loader.Module):
                                 ],
                                 [
                                     {
-                                        "text": "Reset prefix", 
+                                        "text": "Reset prefix",
                                         "callback": self.reset_prefix,
                                         "style": "primary",
                                         "args": (message,),
                                         "emoji_id": "5870903672937911120",
                                     }
-                                ]
+                                ],
                             ]
-                        )
+                        ),
                     )
             case _:
                 return

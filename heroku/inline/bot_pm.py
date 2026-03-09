@@ -64,7 +64,9 @@ class BotPM(InlineUnit):
 
     ss = set_fsm_state
 
-    def get_fsm_state(self: "InlineManager", user: typing.Union[str, int]) -> typing.Union[bool, str]:
+    def get_fsm_state(
+        self: "InlineManager", user: typing.Union[str, int]
+    ) -> typing.Union[bool, str]:
         """
         Get FSM state for user
         :param user: user id

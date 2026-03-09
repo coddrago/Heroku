@@ -209,6 +209,7 @@ class Integer(Validator):
 
         return value
 
+
 class Choice(Validator):
     """
     Check whether entered value is in the allowed list
@@ -835,10 +836,12 @@ class EntityLike(RegExp):
             value = f"@{value}"
 
         return value
-        
+
+
 class RandomLinkList(list):
     def __str__(self):
         import random
+
         if not self:
             return ""
         return str(random.choice(self))
@@ -852,10 +855,7 @@ class RandomLinkList(list):
 
 class RandomLink(Series):
     def __init__(self):
-        super().__init__(
-            validator=Link(),
-            min_len=1
-        )
+        super().__init__(validator=Link(), min_len=1)
         self.internal_id = "Series"
         self.doc = {
             "en": "A list of links, one of which will be chosen randomly",
@@ -865,10 +865,10 @@ class RandomLink(Series):
     @staticmethod
     def _validate(value: ConfigAllowedTypes, /, **kwargs) -> RandomLinkList:
         val_args = kwargs.copy()
-        if 'validator' not in val_args:
-            val_args['validator'] = Link()
-        if 'min_len' not in val_args:
-            val_args['min_len'] = 1
+        if "validator" not in val_args:
+            val_args["validator"] = Link()
+        if "min_len" not in val_args:
+            val_args["min_len"] = 1
 
         clean_list = Series._validate(value, **val_args)
         return RandomLinkList(clean_list)

@@ -31,14 +31,27 @@ from importlib.abc import SourceLoader
 import requests
 from herokutl.hints import EntityLike
 from herokutl.tl.functions.account import UpdateNotifySettingsRequest
-from herokutl.tl.types import (Channel, ChannelForbidden, ChannelFull,
-                               InputPeerNotifySettings, Message, UserFull)
+from herokutl.tl.types import (
+    Channel,
+    ChannelForbidden,
+    ChannelFull,
+    InputPeerNotifySettings,
+    Message,
+    UserFull,
+)
 
 from . import version
 from ._reference_finder import replace_all_refs
-from .inline.types import (BotInlineCall, BotInlineMessage, BotMessage,
-                           HerokuReplyMarkup, InlineCall, InlineMessage,
-                           InlineQuery, InlineUnit)
+from .inline.types import (
+    BotInlineCall,
+    BotInlineMessage,
+    BotMessage,
+    HerokuReplyMarkup,
+    InlineCall,
+    InlineMessage,
+    InlineQuery,
+    InlineUnit,
+)
 from .pointers import PointerDict, PointerList
 
 if typing.TYPE_CHECKING:
@@ -71,6 +84,7 @@ __all__ = [
 
 logger = logging.getLogger(__name__)
 
+
 def _is_external_origin(origin: str) -> bool:
     if not origin:
         return False
@@ -87,7 +101,7 @@ def _make_safe_client_proxy():
     _module_map = weakref.WeakKeyDictionary()
     _inline_map = weakref.WeakKeyDictionary()
     _user_id_map = weakref.WeakKeyDictionary()
-    
+
     _PROTECTED_REQUESTS = {
         "GetStarGiftsRequest",
         "GetSavedStarGiftRequest",
@@ -104,7 +118,7 @@ def _make_safe_client_proxy():
         "GetStarsTransactionsRequest",
         "RefundStarsChargeRequest",
     }
-    
+
     _PAID_REQUESTS = {
         "SendMessageRequest",
         "SendMediaRequest",
@@ -156,7 +170,10 @@ def _make_safe_client_proxy():
             return getattr(_client_map[self], name)
 
         def __setattr__(self, name: str, value):
-            if name in SafeClientProxy._BLOCKED_MAGIC or name in SafeClientProxy._BLOCKED_ATTRS:
+            if (
+                name in SafeClientProxy._BLOCKED_MAGIC
+                or name in SafeClientProxy._BLOCKED_ATTRS
+            ):
                 logger.warning(
                     "Blocked write to client.%s from %s",
                     name,
@@ -169,13 +186,13 @@ def _make_safe_client_proxy():
             _module_map[self] = module_object
             _inline_map[self] = inline_object
             _user_id_map[self] = user_id
-        
+
         def _send_permission_request(self, request_name: str, module, star_count=None):
             async def _async_send():
                 user_id = _user_id_map.get(self)
                 if not user_id:
                     return
-                
+
                 star_text = f" with {star_count} stars" if star_count else ""
                 message_text = f"<b>{module.__class__.__name__}</b> wants to use <code>{request_name}</code>{star_text}, allow?"
 
@@ -194,7 +211,7 @@ def _make_safe_client_proxy():
                         },
                     ]
                 ]
-                
+
                 if random.choice([True, False]):
                     buttons[0].reverse()
 
@@ -218,8 +235,8 @@ def _make_safe_client_proxy():
 
         def __call__(self, *args, **kwargs):
             client = _client_map[self]
-            
-            if args and hasattr(args[0], '__class__'):
+
+            if args and hasattr(args[0], "__class__"):
                 request_name = args[0].__class__.__name__
                 module = _module_map.get(self)
 
@@ -228,12 +245,12 @@ def _make_safe_client_proxy():
                     self._send_permission_request(request_name, module, star_count)
 
                 elif request_name in _PAID_REQUESTS and module:
-                    allow_paid = getattr(module, 'allow_paid_stars', None)
+                    allow_paid = getattr(module, "allow_paid_stars", None)
                     if allow_paid is False:
                         raise PermissionError(
                             f"Module {module.__class__.__name__} denies paid requests like {request_name}"
                         )
-                    
+
                     if allow_paid is None:
                         self._send_permission_request(request_name, module)
 
@@ -302,7 +319,10 @@ def _make_safe_db_proxy():
             return getattr(_db_map[self], name)
 
         def __setattr__(self, name: str, value):
-            if name in SafeDatabaseProxy._BLOCKED_MAGIC or name in SafeDatabaseProxy._BLOCKED_ATTRS:
+            if (
+                name in SafeDatabaseProxy._BLOCKED_MAGIC
+                or name in SafeDatabaseProxy._BLOCKED_ATTRS
+            ):
                 logger.warning(
                     "Blocked write to db.%s from %s",
                     name,
@@ -330,6 +350,7 @@ def _make_safe_db_proxy():
 
 
 SafeDatabaseProxy = _make_safe_db_proxy()
+
 
 def _make_safe_inline_proxy():
     import weakref
@@ -378,7 +399,10 @@ def _make_safe_inline_proxy():
             return getattr(_inline_map[self], name)
 
         def __setattr__(self, name: str, value):
-            if name in SafeInlineProxy._BLOCKED_MAGIC or name in SafeInlineProxy._BLOCKED_ATTRS:
+            if (
+                name in SafeInlineProxy._BLOCKED_MAGIC
+                or name in SafeInlineProxy._BLOCKED_ATTRS
+            ):
                 logger.warning(
                     "Blocked write to inline.%s from %s",
                     name,
@@ -431,7 +455,9 @@ def _make_safe_allmodules_proxy():
             "__setstate__",
         }
 
-        def __init__(self, allmodules, safe_client, safe_allclients, safe_db, safe_inline):
+        def __init__(
+            self, allmodules, safe_client, safe_allclients, safe_db, safe_inline
+        ):
             _allmodules_map[self] = allmodules
             _safe_client_map[self] = safe_client
             _safe_allclients_map[self] = safe_allclients
@@ -469,12 +495,18 @@ def _make_safe_allmodules_proxy():
             return getattr(_allmodules_map[self], name)
 
         def __setattr__(self, name: str, value):
-            if name in SafeAllModulesProxy._BLOCKED_MAGIC or name in SafeAllModulesProxy._BLOCKED_ATTRS:
+            if (
+                name in SafeAllModulesProxy._BLOCKED_MAGIC
+                or name in SafeAllModulesProxy._BLOCKED_ATTRS
+            ):
                 raise AttributeError("Write to allmodules attribute is blocked")
             setattr(_allmodules_map[self], name, value)
 
         def __delattr__(self, name: str):
-            if name in SafeAllModulesProxy._BLOCKED_MAGIC or name in SafeAllModulesProxy._BLOCKED_ATTRS:
+            if (
+                name in SafeAllModulesProxy._BLOCKED_MAGIC
+                or name in SafeAllModulesProxy._BLOCKED_ATTRS
+            ):
                 raise AttributeError("Delete of allmodules attribute is blocked")
             delattr(_allmodules_map[self], name)
 
@@ -556,10 +588,12 @@ class Module:
 
         if is_external:
             safe_client = SafeClientProxy(self.allmodules.client, origin)
-            safe_allclients = [SafeClientProxy(c, origin) for c in self.allmodules.allclients]
+            safe_allclients = [
+                SafeClientProxy(c, origin) for c in self.allmodules.allclients
+            ]
             safe_db = SafeDatabaseProxy(self.allmodules.db, origin)
             safe_inline = SafeInlineProxy(self.allmodules.inline, origin)
-            
+
             try:
                 user_id = self.allmodules.client.tg_id
                 safe_client._set_module_info(self, self.allmodules.inline, user_id)
@@ -567,7 +601,7 @@ class Module:
                     client._set_module_info(self, self.allmodules.inline, user_id)
             except Exception as e:
                 logger.debug("Failed to set module info for request checking: %s", e)
-            
+
             self.allmodules = SafeAllModulesProxy(
                 self.allmodules,
                 safe_client,

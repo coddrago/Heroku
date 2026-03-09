@@ -14,8 +14,10 @@ import logging
 import random
 
 import herokutl
-from herokutl.tl.functions.messages import (GetDialogFiltersRequest,
-                                            UpdateDialogFilterRequest)
+from herokutl.tl.functions.messages import (
+    GetDialogFiltersRequest,
+    UpdateDialogFilterRequest,
+)
 from herokutl.tl.types import Message
 from herokutl.utils import get_display_name
 
@@ -373,13 +375,13 @@ class HerokuSettingsMod(loader.Module):
                 self.strings("confirm_update"),
                 reply_markup=[
                     {
-                        "text": "🪂 Update", 
-                        "callback": self.inline__update, 
+                        "text": "🪂 Update",
+                        "callback": self.inline__update,
                         "style": "primary",
                     },
                     {
-                        "text": "🚫 Cancel", 
-                        "action": "close", 
+                        "text": "🚫 Cancel",
+                        "action": "close",
                         "style": "danger",
                     },
                 ],
@@ -454,15 +456,11 @@ class HerokuSettingsMod(loader.Module):
                 self.strings("confirm_restart"),
                 reply_markup=[
                     {
-                        "text": "🔄 Restart", 
-                        "callback": self.inline__restart, 
-                        "style": "primary"
+                        "text": "🔄 Restart",
+                        "callback": self.inline__restart,
+                        "style": "primary",
                     },
-                    {
-                        "text": "🚫 Cancel", 
-                        "action": "close", 
-                        "style": "danger"
-                    },
+                    {"text": "🚫 Cancel", "action": "close", "style": "danger"},
                 ],
             )
             return
@@ -569,9 +567,9 @@ class HerokuSettingsMod(loader.Module):
             ],
             [
                 {
-                    "text": self.strings("close_menu"), 
-                    "action": "close", 
-                    "style": "danger"
+                    "text": self.strings("close_menu"),
+                    "action": "close",
+                    "style": "danger",
                 }
             ],
         ]

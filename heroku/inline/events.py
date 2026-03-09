@@ -41,7 +41,9 @@ class Events(InlineUnit):
     async def _message_handler(self: "InlineManager", message: AiogramMessage):
         """Processes incoming messages"""
         match True:
-            case _ if message.chat.type != "private" or message.text == "/start heroku init":
+            case _ if (
+                message.chat.type != "private" or message.text == "/start heroku init"
+            ):
                 return
 
         for mod in self._allmodules.modules:
@@ -61,7 +63,8 @@ class Events(InlineUnit):
         """Inline query handler (forms' calls)"""
         if (
             not self._db.get(security.__name__, "allow_inline_query", False)
-            and inline_query.from_user.id not in self._client.dispatcher.security.all_users
+            and inline_query.from_user.id
+            not in self._client.dispatcher.security.all_users
         ):
             return
 
@@ -70,9 +73,12 @@ class Events(InlineUnit):
             return
 
         cmd = query.split()[0].lower()
-        if cmd in self._allmodules.inline_handlers and await self.check_inline_security(
-            func=self._allmodules.inline_handlers[cmd],
-            user=inline_query.from_user.id,
+        if (
+            cmd in self._allmodules.inline_handlers
+            and await self.check_inline_security(
+                func=self._allmodules.inline_handlers[cmd],
+                user=inline_query.from_user.id,
+            )
         ):
             instance = InlineQuery(inline_query=inline_query)
 
@@ -179,7 +185,9 @@ class Events(InlineUnit):
                                                 res.get("caption")
                                             ),
                                             parse_mode="HTML",
-                                            thumbnail_url=res.get("thumb", res["video"]),
+                                            thumbnail_url=res.get(
+                                                "thumb", res["video"]
+                                            ),
                                             video_url=res["video"],
                                             mime_type="video/mp4",
                                             reply_markup=self.generate_markup(
@@ -294,7 +302,9 @@ class Events(InlineUnit):
                             + unit.get("always_allow", [])
                             + button.get("always_allow", [])
                         ):
-                            await call.answer(self.translator.getkey("inline.button403"))
+                            await call.answer(
+                                self.translator.getkey("inline.button403")
+                            )
                             return
 
                     try:
@@ -342,10 +352,12 @@ class Events(InlineUnit):
                     )
                 ):
                     pass
-                case _ if (
-                    call.from_user.id not in self._client.dispatcher.security._owner
-                    and call.from_user.id
-                    not in self._custom_map[call.data].get("always_allow", [])
+                case (
+                    _
+                ) if call.from_user.id not in self._client.dispatcher.security._owner and call.from_user.id not in self._custom_map[
+                    call.data
+                ].get(
+                    "always_allow", []
                 ):
                     await call.answer(self.translator.getkey("inline.button403"))
                     return
@@ -468,7 +480,9 @@ class Events(InlineUnit):
                         title=self.translator.getkey("inline.show_inline_cmds"),
                         description=self.translator.getkey("inline.no_inline_cmds"),
                         input_message_content=InputTextMessageContent(
-                            message_text=self.translator.getkey("inline.no_inline_cmds_msg"),
+                            message_text=self.translator.getkey(
+                                "inline.no_inline_cmds_msg"
+                            ),
                             parse_mode="HTML",
                             disable_web_page_preview=True,
                         ),

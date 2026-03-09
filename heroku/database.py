@@ -31,9 +31,14 @@ import typing
 from herokutl.tl.types import Message, User
 
 from . import main, utils
-from .pointers import (BaseSerializingMiddlewareDict,
-                       BaseSerializingMiddlewareList, NamedTupleMiddlewareDict,
-                       NamedTupleMiddlewareList, PointerDict, PointerList)
+from .pointers import (
+    BaseSerializingMiddlewareDict,
+    BaseSerializingMiddlewareList,
+    NamedTupleMiddlewareDict,
+    NamedTupleMiddlewareList,
+    PointerDict,
+    PointerList,
+)
 from .tl_cache import CustomTelegramClient
 from .types import JSONSerializable
 
@@ -54,6 +59,7 @@ _DB_ALLOWED_WRITERS = {f"{__package__}.modules.heroku_plugin_security"}
 
 class NoAssetsChannel(Exception):
     """Raised when trying to read/store asset with no asset channel present"""
+
 
 class NoContentChannel(Exception):
     """Raised when trying to read/store asset with no content channel present"""
@@ -136,10 +142,10 @@ class Database(dict):
             db = self._db_file.read_text()
             if re.search(r'"(hikka\.)(\S+\":)', db):
                 logging.warning("Converting db after update")
-                db = re.sub(r'(hikka\.)(\S+\":)', lambda m: 'heroku.' + m.group(2), db)
+                db = re.sub(r"(hikka\.)(\S+\":)", lambda m: "heroku." + m.group(2), db)
             if re.search(r'"(legacy\.)(\S+\":)', db):
                 logging.warning("Converting db after update")
-                db = re.sub(r'(legacy\.)(\S+\":)', lambda m: 'heroku.' + m.group(2), db)
+                db = re.sub(r"(legacy\.)(\S+\":)", lambda m: "heroku." + m.group(2), db)
             self._update_from_read(json.loads(db))
         except json.decoder.JSONDecodeError:
             logger.warning("Database read failed! Creating new one...")
@@ -236,22 +242,30 @@ class Database(dict):
         """
 
         try:
-            _assets_topic_id = self.get("heroku.forums", "forums_cache", {})["heroku-userbot"]["Assets"]
+            _assets_topic_id = self.get("heroku.forums", "forums_cache", {})[
+                "heroku-userbot"
+            ]["Assets"]
         except (TypeError, KeyError):
             raise NoAssetsChannel("Tried to save asset to non-existing asset topic.")
 
         if not (_content_channel_id := self.get("heroku.forums", "channel_id", None)):
-            raise NoContentChannel("Tried to save asset with non-existing content channel.")
+            raise NoContentChannel(
+                "Tried to save asset with non-existing content channel."
+            )
 
         return (
-            (await self._client.send_message(_content_channel_id, message, reply_to=_assets_topic_id)).id
+            (
+                await self._client.send_message(
+                    _content_channel_id, message, reply_to=_assets_topic_id
+                )
+            ).id
             if isinstance(message, Message)
             else (
                 await self._client.send_message(
                     _content_channel_id,
                     file=message,
                     force_document=True,
-                    message_thread_id=_assets_topic_id
+                    message_thread_id=_assets_topic_id,
                 )
             ).id
         )
@@ -260,14 +274,20 @@ class Database(dict):
         """Fetch previously saved asset by its asset_id"""
 
         if not (_content_channel_id := self.get("heroku.forums", "channel_id", None)):
-            raise NoContentChannel("Tried to save asset with non-existing content channel.")
+            raise NoContentChannel(
+                "Tried to save asset with non-existing content channel."
+            )
 
         try:
-            _assets_topic_id = self.get("heroku.forums", "forums_cache", {})["heroku-userbot"]["Assets"]
+            _assets_topic_id = self.get("heroku.forums", "forums_cache", {})[
+                "heroku-userbot"
+            ]["Assets"]
         except (TypeError, KeyError):
             raise NoAssetsChannel("Tried to save asset to non-existing asset topic.")
 
-        asset = await self._client.get_messages(_content_channel_id, reply_to=_assets_topic_id, ids=[asset_id])
+        asset = await self._client.get_messages(
+            _content_channel_id, reply_to=_assets_topic_id, ids=[asset_id]
+        )
 
         return asset[0] if asset else None
 

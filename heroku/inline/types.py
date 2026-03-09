@@ -19,7 +19,9 @@ from aiogram.types import InlineQueryResultArticle, InputTextMessageContent
 from aiogram.types import Message as AiogramMessage
 from pydantic import ConfigDict
 
-HerokuReplyMarkup = typing.Union[typing.List[typing.List[dict]], typing.List[dict], dict]
+HerokuReplyMarkup = typing.Union[
+    typing.List[typing.List[dict]], typing.List[dict], dict
+]
 
 logger = logging.getLogger(__name__)
 
@@ -132,6 +134,7 @@ class BotInlineMessage:
 
 class InlineCall(CallbackQuery, InlineMessage):
     """Modified version of classic aiogram `CallbackQuery`"""
+
     model_config = ConfigDict(frozen=False)
 
     def __init__(
@@ -160,6 +163,7 @@ class InlineCall(CallbackQuery, InlineMessage):
 
 class BotInlineCall(CallbackQuery, BotInlineMessage):
     """Modified version of classic aiogram `CallbackQuery`"""
+
     model_config = ConfigDict(frozen=False)
 
     def __init__(
@@ -213,6 +217,7 @@ class InlineQuery(AiogramInlineQuery):
     @staticmethod
     def _get_res(title: str, description: str, thumbnail_url: str) -> list:
         from ..utils.other import rand
+
         return [
             InlineQueryResultArticle(
                 id=rand(20),

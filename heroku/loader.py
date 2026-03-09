@@ -38,12 +38,30 @@ from . import main, security, utils, validators
 from .database import Database
 from .inline.core import InlineManager
 from .translations import Strings, Translator
-from .types import (Command, ConfigValue, CoreOverwriteError, CoreUnloadError,
-                    InlineMessage, JSONSerializable, Library, LibraryConfig,
-                    LoadError, Module, ModuleConfig, SafeAllModulesProxy,
-                    SafeClientProxy, SafeDatabaseProxy, SafeInlineProxy,
-                    SelfSuspend, SelfUnload, StopLoop, StringLoader,
-                    get_callback_handlers, get_commands, get_inline_handlers)
+from .types import (
+    Command,
+    ConfigValue,
+    CoreOverwriteError,
+    CoreUnloadError,
+    InlineMessage,
+    JSONSerializable,
+    Library,
+    LibraryConfig,
+    LoadError,
+    Module,
+    ModuleConfig,
+    SafeAllModulesProxy,
+    SafeClientProxy,
+    SafeDatabaseProxy,
+    SafeInlineProxy,
+    SelfSuspend,
+    SelfUnload,
+    StopLoop,
+    StringLoader,
+    get_callback_handlers,
+    get_commands,
+    get_inline_handlers,
+)
 
 if typing.TYPE_CHECKING:
     from .tl_cache import CustomTelegramClient
@@ -95,7 +113,9 @@ __all__ = [
 logger = logging.getLogger(__name__)
 
 _EXTERNAL_ORIGIN_PREFIXES = ("<external", "<file", "<string")
-_external_context = contextvars.ContextVar("heroku_external_module_origin", default=None)
+_external_context = contextvars.ContextVar(
+    "heroku_external_module_origin", default=None
+)
 _SESSION_AUDIT_INSTALLED = False
 _EXTERNAL_GUARDS_INSTALLED = False
 _MODULE_NAME_BY_HASH: typing.Dict[str, str] = {}
@@ -192,7 +212,9 @@ def _is_external_frame(frame) -> bool:
     return False
 
 
-def _external_stack_info() -> typing.Tuple[bool, typing.Optional[str], typing.Optional[str]]:
+def _external_stack_info() -> (
+    typing.Tuple[bool, typing.Optional[str], typing.Optional[str]]
+):
     frame = sys._getframe()
     if frame:
         frame = frame.f_back
@@ -215,7 +237,6 @@ def _external_stack_info() -> typing.Tuple[bool, typing.Optional[str], typing.Op
     return False, None, None
 
 
-
 def _session_audit_hook(event, args):
     if not args:
         return
@@ -233,8 +254,7 @@ def _session_audit_hook(event, args):
             except Exception:
                 return False
         return isinstance(path, str) and (
-            path.endswith(".session")
-            or path.endswith(".session-journal")
+            path.endswith(".session") or path.endswith(".session-journal")
         )
 
     def _has_session_path(values) -> bool:
@@ -328,6 +348,7 @@ def _is_external_context_active() -> bool:
     has_external_stack, _, _ = _external_stack_info()
     return has_external_stack
 
+
 def _deny_external(reason: str):
     if _is_external_context_active():
         logger.warning("Blocked external module call: %s", reason)
@@ -346,7 +367,11 @@ def _wrap_external(func, reason: str):
 def _noop_external(reason: str, return_value=None):
     def wrapper(*args, **kwargs):
         if _is_external_context_active():
-            logger.warning("Skipped external module call: %s args=%s", reason, _format_audit_args(args))
+            logger.warning(
+                "Skipped external module call: %s args=%s",
+                reason,
+                _format_audit_args(args),
+            )
             return return_value
         return None
 
@@ -369,7 +394,6 @@ class _NoopPopen:
         return self.returncode
 
 
-
 def _install_external_guards():
     global _EXTERNAL_GUARDS_INSTALLED
     if _EXTERNAL_GUARDS_INSTALLED:
@@ -389,13 +413,18 @@ def _install_external_guards():
         ctypes.CDLL = _wrap_external(ctypes.CDLL, "ctypes.CDLL")
         ctypes.PyDLL = _wrap_external(ctypes.PyDLL, "ctypes.PyDLL")
         if hasattr(ctypes, "cdll") and hasattr(ctypes.cdll, "LoadLibrary"):
-            ctypes.cdll.LoadLibrary = _wrap_external(ctypes.cdll.LoadLibrary, "ctypes.cdll.LoadLibrary")
+            ctypes.cdll.LoadLibrary = _wrap_external(
+                ctypes.cdll.LoadLibrary, "ctypes.cdll.LoadLibrary"
+            )
         if hasattr(ctypes, "windll") and hasattr(ctypes.windll, "LoadLibrary"):
-            ctypes.windll.LoadLibrary = _wrap_external(ctypes.windll.LoadLibrary, "ctypes.windll.LoadLibrary")
+            ctypes.windll.LoadLibrary = _wrap_external(
+                ctypes.windll.LoadLibrary, "ctypes.windll.LoadLibrary"
+            )
     except Exception:
         pass
 
     _EXTERNAL_GUARDS_INSTALLED = True
+
 
 owner = security.owner
 
@@ -937,7 +966,9 @@ class Modules:
 
                 spec = importlib.machinery.ModuleSpec(
                     module_name,
-                    StringLoader(Path(mod).read_text(encoding='utf-8'), user_friendly_origin),
+                    StringLoader(
+                        Path(mod).read_text(encoding="utf-8"), user_friendly_origin
+                    ),
                     origin=user_friendly_origin,
                 )
 
@@ -1008,7 +1039,9 @@ class Modules:
                         ]
                     )
 
-                    result = await self.lookup("loader").install_requirements(requirements)
+                    result = await self.lookup("loader").install_requirements(
+                        requirements
+                    )
 
                     importlib.invalidate_caches()
 
@@ -1264,8 +1297,17 @@ class Modules:
         name_l = instance.__class__.__name__.lower()
         module_hash = get_module_hash(instance)
         is_internalized = isinstance(internalized, (list, tuple, set)) and (
-            any(isinstance(item, str) and item.lower() == name_l for item in internalized)
-            or (module_hash and any(isinstance(item, str) and item == module_hash for item in internalized))
+            any(
+                isinstance(item, str) and item.lower() == name_l
+                for item in internalized
+            )
+            or (
+                module_hash
+                and any(
+                    isinstance(item, str) and item == module_hash
+                    for item in internalized
+                )
+            )
         )
         if is_internalized:
             instance.__force_internal__ = True
@@ -1275,8 +1317,10 @@ class Modules:
         if is_internalized and hasattr(instance, "__force_internal__"):
             delattr(instance, "__force_internal__")
         origin = getattr(instance, "__origin__", "")
-        if _is_external_origin(origin) and not is_internalized and not isinstance(
-            getattr(instance, "_client", None), SafeClientProxy
+        if (
+            _is_external_origin(origin)
+            and not is_internalized
+            and not isinstance(getattr(instance, "_client", None), SafeClientProxy)
         ):
             safe_client = SafeClientProxy(self.client, origin)
             safe_allclients = [SafeClientProxy(c, origin) for c in self.allclients]
@@ -1390,7 +1434,9 @@ class Modules:
             return (_command, None)
 
         if module_name and module_name in disabled_commands:
-            disabled_for_mod = [x.lower() for x in disabled_commands.get(module_name, [])]
+            disabled_for_mod = [
+                x.lower() for x in disabled_commands.get(module_name, [])
+            ]
             if cmd.split()[0].lower() in disabled_for_mod:
                 return (_command, None)
 
@@ -1476,7 +1522,11 @@ class Modules:
             mod.client
             if _is_external_origin(origin)
             and isinstance(getattr(mod, "client", None), SafeClientProxy)
-            else (SafeClientProxy(self.client, origin) if _is_external_origin(origin) else self.client)
+            else (
+                SafeClientProxy(self.client, origin)
+                if _is_external_origin(origin)
+                else self.client
+            )
         )
         safe_db = (
             mod.db
@@ -1524,7 +1574,7 @@ class Modules:
             raise
 
         # Check for pack_url and load translations
-        if hasattr(mod, '__source__'):
+        if hasattr(mod, "__source__"):
             pack_url = next(
                 (
                     line.replace(" ", "").split("#packurl:", maxsplit=1)[1]
@@ -1535,9 +1585,7 @@ class Modules:
             )
 
             if pack_url and (
-                transations := await self.translator.load_module_translations(
-                    pack_url
-                )
+                transations := await self.translator.load_module_translations(pack_url)
             ):
                 mod.strings.external_strings = transations
 

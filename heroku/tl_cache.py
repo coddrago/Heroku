@@ -399,9 +399,9 @@ class CustomTelegramClient(TelegramClient):
                 resolved_perms,
                 exp,
             )
-            self._heroku_perms_cache.setdefault(hashable_entity, {})[hashable_user] = (
-                cache_record
-            )
+            self._heroku_perms_cache.setdefault(hashable_entity, {})[
+                hashable_user
+            ] = cache_record
             logger.debug("Saved hashable_entity %s perms to cache", hashable_entity)
 
             def save_user(key: typing.Union[str, int]):
@@ -410,12 +410,12 @@ class CustomTelegramClient(TelegramClient):
                     self._heroku_perms_cache.setdefault(key, {})[user.id] = cache_record
 
                 if getattr(user, "username", None):
-                    self._heroku_perms_cache.setdefault(key, {})[f"@{user.username}"] = (
-                        cache_record
-                    )
-                    self._heroku_perms_cache.setdefault(key, {})[user.username] = (
-                        cache_record
-                    )
+                    self._heroku_perms_cache.setdefault(key, {})[
+                        f"@{user.username}"
+                    ] = cache_record
+                    self._heroku_perms_cache.setdefault(key, {})[
+                        user.username
+                    ] = cache_record
 
             if getattr(entity, "id", None):
                 logger.debug("Saved resolved_entity id %s perms to cache", entity.id)

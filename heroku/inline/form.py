@@ -360,8 +360,8 @@ class Form(InlineUnit):
                 await answer(
                     self.translator.getkey("inline.no_query_results").format(
                         prefix=getattr(self._client, "command_prefix", "."),
-                        ),
-                    )
+                    ),
+                )
             if unit_id in self._units:
                 del self._units[unit_id]
                 return False
@@ -394,7 +394,9 @@ class Form(InlineUnit):
 
         inline_message_id = self._units[unit_id]["inline_message_id"]
 
-        msg = InlineMessage(inline_manager=self, unit_id=unit_id, inline_message_id=inline_message_id)
+        msg = InlineMessage(
+            inline_manager=self, unit_id=unit_id, inline_message_id=inline_message_id
+        )
 
         if not isinstance(base_reply_markup, Placeholder):
             await msg.edit(text, reply_markup=base_reply_markup)
@@ -456,131 +458,131 @@ class Form(InlineUnit):
             match True:
                 case _ if "photo" in form:
                     await inline_query.answer(
-                    [
-                        InlineQueryResultPhoto(
-                            id=utils.rand(20),
-                            title="Heroku",
-                            description="Heroku",
-                            caption=form.get("text"),
-                            parse_mode="HTML",
-                            photo_url=form["photo"],
-                            thumbnail_url=(
-                                "https://img.icons8.com/cotton/452/moon-satellite.png"
-                            ),
-                            reply_markup=self.generate_markup(
-                                form["uid"],
-                            ),
-                        )
-                    ],
-                    cache_time=0,
-                )
+                        [
+                            InlineQueryResultPhoto(
+                                id=utils.rand(20),
+                                title="Heroku",
+                                description="Heroku",
+                                caption=form.get("text"),
+                                parse_mode="HTML",
+                                photo_url=form["photo"],
+                                thumbnail_url=(
+                                    "https://img.icons8.com/cotton/452/moon-satellite.png"
+                                ),
+                                reply_markup=self.generate_markup(
+                                    form["uid"],
+                                ),
+                            )
+                        ],
+                        cache_time=0,
+                    )
                 case _ if "gif" in form:
                     await inline_query.answer(
-                    [
-                        InlineQueryResultGif(
-                            id=utils.rand(20),
-                            title="Heroku",
-                            caption=form.get("text"),
-                            parse_mode="HTML",
-                            gif_url=form["gif"],
-                            thumbnail_url=(
-                                "https://img.icons8.com/cotton/452/moon-satellite.png"
-                            ),
-                            reply_markup=self.generate_markup(
-                                form["uid"],
-                            ),
-                        )
-                    ],
-                    cache_time=0,
-                )
+                        [
+                            InlineQueryResultGif(
+                                id=utils.rand(20),
+                                title="Heroku",
+                                caption=form.get("text"),
+                                parse_mode="HTML",
+                                gif_url=form["gif"],
+                                thumbnail_url=(
+                                    "https://img.icons8.com/cotton/452/moon-satellite.png"
+                                ),
+                                reply_markup=self.generate_markup(
+                                    form["uid"],
+                                ),
+                            )
+                        ],
+                        cache_time=0,
+                    )
                 case _ if "video" in form:
                     await inline_query.answer(
-                    [
-                        InlineQueryResultVideo(
-                            id=utils.rand(20),
-                            title="Heroku",
-                            description="Heroku",
-                            caption=form.get("text"),
-                            parse_mode="HTML",
-                            video_url=form["video"],
-                            thumbnail_url=(
-                                "https://img.icons8.com/cotton/452/moon-satellite.png"
-                            ),
-                            mime_type="video/mp4",
-                            reply_markup=self.generate_markup(
-                                form["uid"],
-                            ),
-                        )
-                    ],
-                    cache_time=0,
-                )
+                        [
+                            InlineQueryResultVideo(
+                                id=utils.rand(20),
+                                title="Heroku",
+                                description="Heroku",
+                                caption=form.get("text"),
+                                parse_mode="HTML",
+                                video_url=form["video"],
+                                thumbnail_url=(
+                                    "https://img.icons8.com/cotton/452/moon-satellite.png"
+                                ),
+                                mime_type="video/mp4",
+                                reply_markup=self.generate_markup(
+                                    form["uid"],
+                                ),
+                            )
+                        ],
+                        cache_time=0,
+                    )
                 case _ if "file" in form:
                     await inline_query.answer(
-                    [
-                        InlineQueryResultDocument(
-                            id=utils.rand(20),
-                            title="Heroku",
-                            description="Heroku",
-                            caption=form.get("text"),
-                            parse_mode="HTML",
-                            document_url=form["file"],
-                            mime_type=form["mime_type"],
-                            reply_markup=self.generate_markup(
-                                form["uid"],
-                            ),
-                        )
-                    ],
-                    cache_time=0,
-                )
+                        [
+                            InlineQueryResultDocument(
+                                id=utils.rand(20),
+                                title="Heroku",
+                                description="Heroku",
+                                caption=form.get("text"),
+                                parse_mode="HTML",
+                                document_url=form["file"],
+                                mime_type=form["mime_type"],
+                                reply_markup=self.generate_markup(
+                                    form["uid"],
+                                ),
+                            )
+                        ],
+                        cache_time=0,
+                    )
                 case _ if "location" in form:
                     await inline_query.answer(
-                    [
-                        InlineQueryResultLocation(
-                            id=utils.rand(20),
-                            latitude=form["location"][0],
-                            longitude=form["location"][1],
-                            title="Heroku",
-                            reply_markup=self.generate_markup(
-                                form["uid"],
-                            ),
-                        )
-                    ],
-                    cache_time=0,
-                )
+                        [
+                            InlineQueryResultLocation(
+                                id=utils.rand(20),
+                                latitude=form["location"][0],
+                                longitude=form["location"][1],
+                                title="Heroku",
+                                reply_markup=self.generate_markup(
+                                    form["uid"],
+                                ),
+                            )
+                        ],
+                        cache_time=0,
+                    )
                 case _ if "audio" in form:
                     await inline_query.answer(
-                    [
-                        InlineQueryResultAudio(
-                            id=utils.rand(20),
-                            audio_url=form["audio"]["url"],
-                            caption=form.get("text"),
-                            parse_mode="HTML",
-                            title=form["audio"].get("title", "Heroku"),
-                            performer=form["audio"].get("performer"),
-                            audio_duration=form["audio"].get("duration"),
-                            reply_markup=self.generate_markup(
-                                form["uid"],
-                            ),
-                        )
-                    ],
-                    cache_time=0,
-                )
+                        [
+                            InlineQueryResultAudio(
+                                id=utils.rand(20),
+                                audio_url=form["audio"]["url"],
+                                caption=form.get("text"),
+                                parse_mode="HTML",
+                                title=form["audio"].get("title", "Heroku"),
+                                performer=form["audio"].get("performer"),
+                                audio_duration=form["audio"].get("duration"),
+                                reply_markup=self.generate_markup(
+                                    form["uid"],
+                                ),
+                            )
+                        ],
+                        cache_time=0,
+                    )
                 case _:
                     await inline_query.answer(
-                    [
-                        InlineQueryResultArticle(
-                            id=utils.rand(20),
-                            title="Heroku",
-                            input_message_content=InputTextMessageContent(
-                                message_text=form["text"],
-                                parse_mode="HTML",
-                                disable_web_page_preview=True,
-                            ),
-                            reply_markup=self.generate_markup(inline_query.query),
-                        )
-                    ],
-                    cache_time=0,
-                )
+                        [
+                            InlineQueryResultArticle(
+                                id=utils.rand(20),
+                                title="Heroku",
+                                input_message_content=InputTextMessageContent(
+                                    message_text=form["text"],
+                                    parse_mode="HTML",
+                                    disable_web_page_preview=True,
+                                ),
+                                reply_markup=self.generate_markup(inline_query.query),
+                            )
+                        ],
+                        cache_time=0,
+                    )
         except Exception as e:
             if form["uid"] in self._error_events:
                 self._error_events[form["uid"]].set()

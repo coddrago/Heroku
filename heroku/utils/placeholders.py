@@ -8,7 +8,12 @@ import typing
 
 custom_placeholders = {}
 
-def register_placeholder(placeholder: str, callback: typing.Callable, description: typing.Optional[str] = None):
+
+def register_placeholder(
+    placeholder: str,
+    callback: typing.Callable,
+    description: typing.Optional[str] = None,
+):
     """
     Register placeholder
     """
@@ -23,6 +28,7 @@ def register_placeholder(placeholder: str, callback: typing.Callable, descriptio
     }
     return True
 
+
 async def get_placeholder(placeholder: str, data: dict | None = None):
     """
     Returns placeholder data
@@ -34,6 +40,7 @@ async def get_placeholder(placeholder: str, data: dict | None = None):
         callback_data = str(await callback())
     return callback_data
 
+
 async def get_placeholders(data, custom_message):
     """
     Returns placeholders if it is in custom_message
@@ -42,8 +49,11 @@ async def get_placeholders(data, custom_message):
         return data
     for placeholder in custom_placeholders.values():
         if f"{{{placeholder['placeholder_name']}}}" in custom_message:
-            data[placeholder["placeholder_name"]] = await get_placeholder(placeholder["placeholder_name"], data)
+            data[placeholder["placeholder_name"]] = await get_placeholder(
+                placeholder["placeholder_name"], data
+            )
     return data
+
 
 def unregister_placeholders(module_name: str) -> int:
     """
@@ -57,17 +67,21 @@ def unregister_placeholders(module_name: str) -> int:
         del custom_placeholders[placeholder_name]
     return True
 
+
 def config_placeholders():
     """
     Return placeholders list for config
     """
     result = []
     for placeholder_name, placeholder_data in custom_placeholders.items():
-        result.append(f"{{{placeholder_name}}} - {placeholder_data.get('description') if placeholder_data.get('description') is not None else 'No docs'}")
+        result.append(
+            f"{{{placeholder_name}}} - {placeholder_data.get('description') if placeholder_data.get('description') is not None else 'No docs'}"
+        )
     if result == []:
         return None
     else:
-        return("\n".join(result))
+        return "\n".join(result)
+
 
 def help_placeholders(module_name, self):
     """
@@ -77,10 +91,17 @@ def help_placeholders(module_name, self):
     for placeholder_name, placeholder_data in custom_placeholders.items():
         if placeholder_data.get("module_name") == module_name:
             if placeholder_data.get("description") is not None:
-                result.append(self.db.get("Help", "__config__", None).get("command_emoji") +f" {{{placeholder_name}}} - {placeholder_data.get('description')}")
+                result.append(
+                    self.db.get("Help", "__config__", None).get("command_emoji")
+                    + f" {{{placeholder_name}}} - {placeholder_data.get('description')}"
+                )
             else:
-                result.append(self.db.get("Help", "__config__", None).get("command_emoji") + f" {{{placeholder_name}}} - No docs")
+                result.append(
+                    self.db.get("Help", "__config__", None).get("command_emoji")
+                    + f" {{{placeholder_name}}} - No docs"
+                )
     return result
+
 
 def debug_placeholders():
     """

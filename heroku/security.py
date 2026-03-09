@@ -192,13 +192,13 @@ class SecurityManager:
         for info in self._tsec_chat.copy():
             if info["expires"] and info["expires"] < time.time():
                 self._tsec_chat.remove(info)
-        
+
         sgroup_users = []
         for g in self._sgroups.values():
             for u in g.users:
                 sgroup_users.append(u)
 
-        tsec_users = [rule['target'] for rule in self._tsec_user]
+        tsec_users = [rule["target"] for rule in self._tsec_user]
         ub_owners = self.owner.copy()
 
         all_users = sgroup_users + tsec_users + ub_owners
@@ -213,7 +213,6 @@ class SecurityManager:
                 del prefixes[id]
 
         self._db.set(main.__name__, "command_prefixes", prefixes)
-
 
     def add_rule(
         self,

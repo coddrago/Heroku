@@ -32,7 +32,9 @@ class Translations(loader.Module):
 
         await call.edit(self.strings("lang_saved").format(self._get_flag(lang)))
 
-    async def _choose_language(self, message: Message | InlineCall, is_meme: bool = False):
+    async def _choose_language(
+        self, message: Message | InlineCall, is_meme: bool = False
+    ):
         reply_markup = utils.chunks(
             [
                 {
@@ -41,7 +43,8 @@ class Translations(loader.Module):
                     "args": (lang,),
                 }
                 for lang, text in (
-                    translations.SUPPORTED_LANGUAGES.items() if not is_meme
+                    translations.SUPPORTED_LANGUAGES.items()
+                    if not is_meme
                     else translations.MEME_LANGUAGES.items()
                 )
             ],
@@ -49,7 +52,9 @@ class Translations(loader.Module):
         )
 
         back_btn = {
-            "text": self.strings("off_langs") if is_meme else self.strings("meme_langs"),
+            "text": (
+                self.strings("off_langs") if is_meme else self.strings("meme_langs")
+            ),
             "callback": self._choose_language,
             "args": (not is_meme,),
         }
@@ -80,7 +85,16 @@ class Translations(loader.Module):
             "🇺🇿": "<tg-emoji emoji-id=5449829434334912605>🇺🇿</tg-emoji>",
         }
 
-        lang2country = {"en": "🇬🇧", "tt": "🥟", "kz": "🇰🇿", "ua": "🇺🇦", "de": "🇩🇪", "jp": "🇯🇵", "fr": "🇫🇷", "uz": "🇺🇿"}
+        lang2country = {
+            "en": "🇬🇧",
+            "tt": "🥟",
+            "kz": "🇰🇿",
+            "ua": "🇺🇦",
+            "de": "🇩🇪",
+            "jp": "🇯🇵",
+            "fr": "🇫🇷",
+            "uz": "🇺🇿",
+        }
 
         for meme in translations.MEME_LANGUAGES.keys():
             lang2country[meme] = "🏴‍☠️"

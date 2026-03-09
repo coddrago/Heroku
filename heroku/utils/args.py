@@ -19,6 +19,7 @@ from .entity import escape_html, relocate_entities
 parser = herokutl.utils.sanitize_parse_mode("html")
 logger = logging.getLogger(__name__)
 
+
 def iter_attrs(obj: typing.Any, /) -> typing.List[typing.Tuple[str, typing.Any]]:
     """
     Returns list of attributes of object
@@ -26,6 +27,7 @@ def iter_attrs(obj: typing.Any, /) -> typing.List[typing.Tuple[str, typing.Any]]
     :return: List of attributes and their values
     """
     return ((attr, getattr(obj, attr)) for attr in dir(obj))
+
 
 def validate_html(html: str) -> str:
     """
@@ -35,7 +37,8 @@ def validate_html(html: str) -> str:
     """
     text, entities = herokutl.extensions.html.parse(html)
     return herokutl.extensions.html.unparse(escape_html(text), entities)
-    
+
+
 def get_kwargs() -> typing.Dict[str, typing.Any]:
     """
     Get kwargs of function, in which is called
@@ -128,7 +131,7 @@ def get_args_split_by(
     if isinstance(separator, str):
         sections = args.split(separator)
     else:
-        sections =[args]
+        sections = [args]
         for sep in separator:
             new_section = []
             for section in sections:
@@ -163,11 +166,8 @@ def get_args_bool(message: typing.Union[Message, str]) -> typing.List[bool]:
     result = []
     for arg in args:
         lower_arg = arg.lower()
-        if lower_arg in ['true', 'yes', '1', 'on']:
+        if lower_arg in ["true", "yes", "1", "on"]:
             result.append(True)
-        elif lower_arg in ['false', 'no', '0', 'off']:
+        elif lower_arg in ["false", "no", "0", "off"]:
             result.append(False)
     return result
-
-
-

@@ -92,9 +92,11 @@ class TestMod(loader.Module):
                 "custom_message",
                 "<tg-emoji emoji-id=5920515922505765329>⚡️</tg-emoji> <b>𝙿𝚒𝚗𝚐: </b><code>{ping}</code><b> 𝚖𝚜 </b>\n<tg-emoji emoji-id=5900104897885376843>🕓</tg-emoji><b> 𝚄𝚙𝚝𝚒𝚖𝚎: </b><code>{uptime}</code>",
                 lambda: (
-                    "<blockquote expandable>" + self.strings("configping") + "\n" + self.strings("configpingph").format(
-                        utils.config_placeholders()
-                    ) + "</blockquote>"
+                    "<blockquote expandable>"
+                    + self.strings("configping")
+                    + "\n"
+                    + self.strings("configpingph").format(utils.config_placeholders())
+                    + "</blockquote>"
                 ),
                 validator=loader.validators.String(),
             ),
@@ -182,7 +184,7 @@ class TestMod(loader.Module):
                             [
                                 {
                                     "text": name,
-                                "callback": self.logs,
+                                    "callback": self.logs,
                                     "args": (False, level),
                                 }
                                 for name, level in [
@@ -197,8 +199,8 @@ class TestMod(loader.Module):
                             2,
                         )
                         + [[{"text": self.strings("cancel"), "action": "close"}]],
-                )
-                else: 
+                    )
+                else:
                     raise
             except Exception as e:
                 await utils.answer(message, self.strings("set_loglevel") + f"\n{e}")
@@ -260,7 +262,11 @@ class TestMod(loader.Module):
 
         if len(logs) <= 2:
             back_button = {"text": self.strings["back"], "callback": self.logs}
-            await utils.answer(message, self.strings("no_logs").format(named_lvl), reply_markup=back_button)
+            await utils.answer(
+                message,
+                self.strings("no_logs").format(named_lvl),
+                reply_markup=back_button,
+            )
             return
 
         logs = self.lookup("evaluator").censor(logs)
@@ -315,9 +321,9 @@ class TestMod(loader.Module):
         start = time.perf_counter_ns()
         message = await utils.answer(message, self.config["ping_emoji"])
         banner = str(self.config["banner_url"])
-        
+
         if self.config["banner_url"] and self.config["quote_media"] is True:
-            banner = InputMediaWebPage(str(self.config["banner_url"]), optional = True)
+            banner = InputMediaWebPage(str(self.config["banner_url"]), optional=True)
 
         elif not self.config["banner_url"]:
             banner = None
@@ -341,10 +347,9 @@ class TestMod(loader.Module):
         await utils.answer(
             message,
             placeholders_msg,
-            file = banner,
-            invert_media = self.config["invert_media"]
+            file=banner,
+            invert_media=self.config["invert_media"],
         )
-
 
     async def client_ready(self):
         self._content_channel_id = await utils.wait_for_content_channel(self._db)

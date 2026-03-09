@@ -42,19 +42,21 @@ class Translator(loader.Module):
                 "telegram",
                 "Translation provider to use",
                 validator=loader.validators.Choice(["telegram", "google"]),
-            )
+            ),
         )
 
     async def _translate_external(self, text: str, target_lang: str) -> str:
 
         provider = self.config["provider"]
-        
+
         def do_translate():
             if provider == "google":
-                return GoogleTranslator(source='auto', target=target_lang).translate(text)
-            
+                return GoogleTranslator(source="auto", target=target_lang).translate(
+                    text
+                )
+
             return text
-        
+
         loop = asyncio.get_event_loop()
         return await loop.run_in_executor(None, do_translate)
 
@@ -99,8 +101,7 @@ class Translator(loader.Module):
                 await utils.answer(message, tr_text)
             else:
                 await utils.answer(
-                    message,
-                    self.strings("translated_text").format(tr_text=tr_text)
+                    message, self.strings("translated_text").format(tr_text=tr_text)
                 )
 
         except Exception:

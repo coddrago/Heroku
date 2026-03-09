@@ -19,6 +19,7 @@ from ..inline.types import BotInlineCall
 
 logger = logging.getLogger(__name__)
 
+
 @loader.tds
 class Quickstart(loader.Module):
     """Notifies user about userbot installation"""
@@ -27,8 +28,8 @@ class Quickstart(loader.Module):
 
     async def client_ready(self):
         await self.request_join(
-            "heroku_talks", 
-            "Heroku help is only available in this chat. By agreeing to join the chat, you agree to the Heroku federation rules and if you violate them, you will be permanently banned."
+            "heroku_talks",
+            "Heroku help is only available in this chat. By agreeing to join the chat, you agree to the Heroku federation rules and if you violate them, you will be permanently banned.",
         )
 
         self.mark = lambda: [
@@ -51,13 +52,12 @@ class Quickstart(loader.Module):
 
         self.text = (
             lambda: self.strings("base").format(
-                utils.get_platform_emoji() if self.client.heroku_me.premium is True else "Heroku"
+                utils.get_platform_emoji()
+                if self.client.heroku_me.premium is True
+                else "Heroku"
             )
             + (
-                "\n"
-                + (
-                    (self.strings("lavhost") if "LAVHOST" in os.environ else "")
-                )
+                "\n" + ((self.strings("lavhost") if "LAVHOST" in os.environ else ""))
             ).rstrip()
         )
 
@@ -68,30 +68,38 @@ class Quickstart(loader.Module):
             if existing_channel_id:
                 try:
                     content_channel = await self.client.get_entity(existing_channel_id)
-                    logger.debug(f"Found existing content channel with ID {existing_channel_id}")
+                    logger.debug(
+                        f"Found existing content channel with ID {existing_channel_id}"
+                    )
                 except Exception as e:
-                    logger.warning(f"Saved channel ID {existing_channel_id} not found or inaccessible: {e}")
+                    logger.warning(
+                        f"Saved channel ID {existing_channel_id} not found or inaccessible: {e}"
+                    )
                     content_channel = None
 
             if not content_channel:
                 async for dialog in self.client.iter_dialogs():
-                    if dialog.title and 'heroku-userbot' in dialog.title.lower():
+                    if dialog.title and "heroku-userbot" in dialog.title.lower():
                         content_channel = dialog.entity
-                        logger.debug(f"Found existing channel '{dialog.title}' with ID {dialog.entity.id}")
-                        self.db.set("heroku.forums", "channel_id", int(dialog.entity.id))
+                        logger.debug(
+                            f"Found existing channel '{dialog.title}' with ID {dialog.entity.id}"
+                        )
+                        self.db.set(
+                            "heroku.forums", "channel_id", int(dialog.entity.id)
+                        )
                         break
 
             if not content_channel:
                 content_channel, _ = await utils.asset_channel(
                     client=self.client,
-                    title='heroku-userbot',
-                    description='🪐 Content related to Heroku will be here',
+                    title="heroku-userbot",
+                    description="🪐 Content related to Heroku will be here",
                     silent=True,
                     invite_bot=True,
                     avatar="https://raw.githubusercontent.com/coddrago/assets/main/heroku/heroku.png",
                     forum=True,
                     hide_general=True,
-                    _folder='heroku',
+                    _folder="heroku",
                 )
                 self.db.set("heroku.forums", "channel_id", int(content_channel.id))
 
@@ -109,28 +117,46 @@ class Quickstart(loader.Module):
 
             if not forum_entity:
                 try:
-                    if not (hasattr(content_channel, 'forum') or not content_channel.forum):
-                        from herokutl.tl.functions.channels import \
-                            ToggleForumRequest
+                    if not (
+                        hasattr(content_channel, "forum") or not content_channel.forum
+                    ):
+                        from herokutl.tl.functions.channels import ToggleForumRequest
+
                         try:
-                            await self.client(ToggleForumRequest(
-                                channel=content_channel,
-                                enabled=True,
-                            ))
+                            await self.client(
+                                ToggleForumRequest(
+                                    channel=content_channel,
+                                    enabled=True,
+                                )
+                            )
                         except Exception as e:
-                            logger.debug(f"Channel might already be a forum or conversion failed: {e}")
-                    
+                            logger.debug(
+                                f"Channel might already be a forum or conversion failed: {e}"
+                            )
+
                     forum_entity = content_channel
                     self.db.set("heroku.forums", "forum_id", int(content_channel.id))
                 except Exception as e:
                     forum_entity = content_channel
 
             required_topics = [
-                ("Assets", "🌆 Your Heroku assets will be stored here", 5877307202888273539),
-                ("Logs", "📊 Inline logs and error reports will be stored here", 5877307202888273539),
-                ("Backups", "💾 Your Heroku backups will be stored here", 5877307202888273539),
+                (
+                    "Assets",
+                    "🌆 Your Heroku assets will be stored here",
+                    5877307202888273539,
+                ),
+                (
+                    "Logs",
+                    "📊 Inline logs and error reports will be stored here",
+                    5877307202888273539,
+                ),
+                (
+                    "Backups",
+                    "💾 Your Heroku backups will be stored here",
+                    5877307202888273539,
+                ),
             ]
-            
+
             for topic_title, topic_desc, emoji_id in required_topics:
                 try:
                     await utils.asset_forum_topic(
@@ -144,7 +170,7 @@ class Quickstart(loader.Module):
                     logger.debug(f"Created or verified topic '{topic_title}'")
                 except Exception:
                     logger.exception(f"Failed to create/verify topic '{topic_title}'")
-            
+
             await utils.invite_inline_bot(self.client, content_channel)
 
         except Exception:

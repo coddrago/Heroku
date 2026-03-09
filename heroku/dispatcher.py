@@ -39,9 +39,8 @@ logger = logging.getLogger(__name__)
 _LAYOUT_TRANSLATION = str.maketrans(
     'ёйцукенгшщзхъфывапролджэячсмитьбю.Ё"№;%:?ЙЦУКЕНГШЩЗХЪФЫВАПРОЛДЖЭ/ЯЧСМИТЬБЮ,'
     + "`qwertyuiop[]asdfghjkl;'zxcvbnm,./~@#$%^&QWERTYUIOP{}ASDFGHJKL:\"|ZXCVBNM<>?",
-    
     "`qwertyuiop[]asdfghjkl;'zxcvbnm,./~@#$%^&QWERTYUIOP{}ASDFGHJKL:\"|ZXCVBNM<>?"
-    + 'ёйцукенгшщзхъфывапролджэячсмитьбю.Ё"№;%:?ЙЦУКЕНГШЩЗХЪФЫВАПРОЛДЖЭ/ЯЧСМИТЬБЮ,'
+    + 'ёйцукенгшщзхъфывапролджэячсмитьбю.Ё"№;%:?ЙЦУКЕНГШЩЗХЪФЫВАПРОЛДЖЭ/ЯЧСМИТЬБЮ,',
 )
 
 ALL_TAGS = [
@@ -279,7 +278,7 @@ class CommandDispatcher:
         else:
             prefix = self._db.get(main.__name__, "command_prefixes", {})
             prefix = prefix.get(str(initiator), main_prefix)
-            
+
         message = utils.censor(event.message)
 
         if not event.message.message:
@@ -291,14 +290,19 @@ class CommandDispatcher:
             and (
                 message.message.startswith(prefix * 2)
                 and any(s != prefix for s in message.message)
-                or message.message.startswith(str.translate(prefix * 2, _LAYOUT_TRANSLATION))
-                and any(s != str.translate(prefix, _LAYOUT_TRANSLATION) for s in message.message)
+                or message.message.startswith(
+                    str.translate(prefix * 2, _LAYOUT_TRANSLATION)
+                )
+                and any(
+                    s != str.translate(prefix, _LAYOUT_TRANSLATION)
+                    for s in message.message
+                )
             )
         ):
             # Allow escaping commands using .'s
             if not watcher:
                 await message.edit(
-                    message.message[len(prefix):],
+                    message.message[len(prefix) :],
                     parse_mode=lambda s: (
                         s,
                         utils.relocate_entities(message.entities, -1, message.message)
@@ -309,7 +313,9 @@ class CommandDispatcher:
 
         match True:
             case _ if (
-                event.message.message.startswith(str.translate(prefix, _LAYOUT_TRANSLATION))
+                event.message.message.startswith(
+                    str.translate(prefix, _LAYOUT_TRANSLATION)
+                )
                 and str.translate(prefix, _LAYOUT_TRANSLATION) != prefix
             ):
                 message.message = str.translate(message.message, _LAYOUT_TRANSLATION)
@@ -330,18 +336,19 @@ class CommandDispatcher:
         whitelist_chats = self._db.get(main.__name__, "whitelist_chats", [])
         whitelist_modules = self._db.get(main.__name__, "whitelist_modules", [])
 
-        if ((chat_id := utils.get_chat_id(message)) in blacklist_chats or (whitelist_chats and chat_id not in whitelist_chats)):
-            return False 
+        if (chat_id := utils.get_chat_id(message)) in blacklist_chats or (
+            whitelist_chats and chat_id not in whitelist_chats
+        ):
+            return False
 
         if not message.message or len(message.message.strip()) == len(prefix):
             return False  # Message is just the prefix
 
-
-        command = message.message[len(prefix):].strip().split(maxsplit=1)[0]
+        command = message.message[len(prefix) :].strip().split(maxsplit=1)[0]
         tag = command.split("@", maxsplit=1)
-        #logger.info(f"Received command: {command}")
+        # logger.info(f"Received command: {command}")
         tag = command.split("@", maxsplit=1)
-        #logger.info(f"Command tag: {tag}")
+        # logger.info(f"Command tag: {tag}")
 
         if len(tag) == 2:
             if tag[1] == "me":
@@ -355,8 +362,7 @@ class CommandDispatcher:
             and event.message is not None
             and event.message.message is not None
             and not any(
-                f"@{username}" in command.lower()
-                for username in self._cached_usernames
+                f"@{username}" in command.lower() for username in self._cached_usernames
             )
         ):
             pass
@@ -396,7 +402,7 @@ class CommandDispatcher:
                         return False
 
                     break
-            
+
             return False
 
         message.message = prefix + txt + message.message[len(prefix + command) :]
@@ -623,7 +629,9 @@ class CommandDispatcher:
         whitelist_chats = self._db.get(main.__name__, "whitelist_chats", [])
         whitelist_modules = self._db.get(main.__name__, "whitelist_modules", [])
 
-        if ((chat_id := utils.get_chat_id(message)) in blacklist_chats or (whitelist_chats and chat_id not in whitelist_chats)):
+        if (chat_id := utils.get_chat_id(message)) in blacklist_chats or (
+            whitelist_chats and chat_id not in whitelist_chats
+        ):
             logger.debug("Message is blocklisted")
 
         for func in self._modules.watchers:
@@ -686,4 +694,3 @@ class CommandDispatcher:
             await loader._call_with_external_context(func, message)
         except Exception as e:
             await exception_handler(e, message, *args)
-
