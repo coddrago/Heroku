@@ -1248,7 +1248,7 @@ class Modules:
                 mod
                 for mod in self.modules
                 if mod.__class__.__name__.lower() == modname.lower()
-                or mod.name.lower() == modname.lower()
+                or getattr(mod, "name", "").lower() == modname.lower()
             ),
             False,
         )
