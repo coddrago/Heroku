@@ -202,10 +202,10 @@ class Utils(InlineUnit):
                             btn_kwargs["callback_data"] = button["data"]
 
                         case _ if "web_app" in button:
-                            if isinstance(button["data"], str):
-                                btn_kwargs["web_app"] = WebAppInfo(url=button["data"])
+                            if isinstance(button["web_app"], str):
+                                btn_kwargs["web_app"] = WebAppInfo(url=button["web_app"])
                             else:
-                                btn_kwargs["web_app"] = WebAppInfo(**button["data"])
+                                btn_kwargs["web_app"] = WebAppInfo(**button["web_app"])
 
                         case _ if "copy" in button:
                             btn_kwargs["copy_text"] = CopyTextButton(
