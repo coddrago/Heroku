@@ -800,6 +800,7 @@ class Utils(InlineUnit):
                 or "data" in button
                 or "action" in button
                 or "copy" in button
+                or "web_app" in button
                 for button in row
             )
             for row in buttons
@@ -811,7 +812,9 @@ class Utils(InlineUnit):
                 "  - `callback`\n"
                 "  - `input`\n"
                 "  - `data`\n"
-                "  - `action`"
+                "  - `action`\n"
+                "  - `copy`\n"
+                "  - `web_app`"
             )
             return None
 
