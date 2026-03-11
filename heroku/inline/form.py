@@ -356,27 +356,27 @@ class Form(InlineUnit):
         except ChatSendInlineForbiddenError:
             await answer(self.translator.getkey("inline.inline403"))
         except Exception as e:
+            logger.exception("Can't send form")
+
+            del self._units[unit_id]
+
             if "No query results" in str(e):
                 await answer(
                     self.translator.getkey("inline.no_query_results").format(
                         prefix=getattr(self._client, "command_prefix", "."),
                     ),
                 )
-            if unit_id in self._units:
-                del self._units[unit_id]
-                return False
-            logger.exception("Can't send form")
 
-            del self._units[unit_id]
-            await answer(
-                self.translator.getkey("inline.invoke_failed_logs").format(
-                    utils.escape_html(
-                        "\n".join(traceback.format_exc().splitlines()[1:])
+            else:
+                await answer(
+                    self.translator.getkey("inline.invoke_failed_logs").format(
+                        utils.escape_html(
+                            "\n".join(traceback.format_exc().splitlines()[1:])
+                        )
                     )
+                    if self._db.get(main.__name__, "inlinelogs", True)
+                    else self.translator.getkey("inline.invoke_failed")
                 )
-                if self._db.get(main.__name__, "inlinelogs", True)
-                else self.translator.getkey("inline.invoke_failed")
-            )
 
             return False
 
