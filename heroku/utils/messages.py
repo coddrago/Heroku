@@ -416,7 +416,7 @@ async def answer(
             response.name = name
 
         if message.media is not None and edit:
-            await message.edit(file=response, **kwargs)
+            result = await message.edit(file=response, **kwargs)
         else:
             kwargs.setdefault(
                 "reply_to",
