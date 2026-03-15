@@ -115,10 +115,16 @@ class TokenObtainment(InlineUnit):
                 return False
 
             content = await resp.json()
+            if content.get("error", False) == "NEWBOT_LIMIT_EXCEEDED":
+                logger.error(
+                    "Error while creating the bot. You've reached the limit of bots per account. "
+                    "Please, remove some of your bots or use one of yours by setting its username with "
+                    "command ch_heroku_bot @username"
+                )
+                return False
             if not content.get("ok", False):
                 logger.error(
-                    "Error while creating the bot. "
-                    "Maybe you've been banned or exceeded the limit: %s",
+                    "Error while creating the bot. Maybe you've been banned: %s",
                     content,
                 )
                 return False
