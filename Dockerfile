@@ -1,4 +1,4 @@
-FROM python:3.14 AS python-base
+FROM python:3.13 AS python-base
 FROM python-base AS builder-base
 
 ENV PYTHONUNBUFFERED=1 \
@@ -17,8 +17,8 @@ ENV PYTHONUNBUFFERED=1 \
 
 RUN apt-get update && \
     apt-get install -y wget gnupg2 && \
-    wget http://security.debian.org/debian-security/pool/updates/main/o/openssl/libssl1.1_1.1.1w-0+deb11u3_amd64.deb && \
-    apt-get install -y ./libssl1.1_1.1.1w-0+deb11u3_amd64.deb
+    wget http://security.debian.org/debian-security/pool/updates/main/o/openssl/libssl1.1_1.1.1w-0+deb11u5_amd64.deb && \
+    apt-get install -y ./libssl1.1_1.1.1w-0+deb11u5_amd64.deb
 RUN apt-get update && apt-get upgrade -y && apt-get install --no-install-recommends -y \
     build-essential \
     curl \
