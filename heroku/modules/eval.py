@@ -65,7 +65,7 @@ class Evaluator(loader.Module):
         reply = await message.get_reply_message()
 
         if not args and reply and reply.text:
-            args = utils.remove_html(reply.text)
+            args = reply.message
 
         args = args.replace("\xa0", "\x20")
 
