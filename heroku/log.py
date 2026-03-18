@@ -447,18 +447,23 @@ class TelegramLogsHandler(logging.Handler):
 
     async def _exc_sender(self, *funcs: typing.Callable[..., Coroutine]):
         for func in funcs:
-            try:
-                await func()
-            except TelegramRetryAfter as e:
-                await asyncio.sleep(e.retry_after)
-                await func()
-            except RuntimeError:
-                logging.debug(
-                    "RuntimeError in sender, probably event loop is closed, skipping",
-                    exc_info=True,
-                )
-            except Exception:
-                logging.debug("Failed to send log message", exc_info=True)
+            attempt = 0
+            while attempt < 2:
+                try:
+                    await func()
+                    break
+                except TelegramRetryAfter as e:
+                    attempt += 1
+                    await asyncio.sleep(e.retry_after)
+                except RuntimeError:
+                    logging.debug(
+                        "RuntimeError in sender, probably event loop is closed, skipping",
+                        exc_info=True,
+                    )
+                    break
+                except Exception:
+                    logging.debug("Failed to send log message", exc_info=True)
+                    break
 
     def emit(self, record: logging.LogRecord):
         try:
