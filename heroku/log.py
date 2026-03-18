@@ -464,6 +464,11 @@ class TelegramLogsHandler(logging.Handler):
                 except Exception:
                     logging.debug("Failed to send log message", exc_info=True)
                     break
+            if attempt > 2:
+                logging.debug(
+                    "Failed to send log message after retries, skipping",
+                    exc_info=True,
+                )
 
     def emit(self, record: logging.LogRecord):
         try:
