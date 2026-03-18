@@ -14,6 +14,7 @@
 
 import asyncio
 import contextlib
+import git
 import inspect
 import io
 import linecache
@@ -23,7 +24,7 @@ import sys
 import traceback
 import typing
 import os
-import git
+import functools
 from logging.handlers import RotatingFileHandler
 from collections.abc import Coroutine
 
@@ -362,7 +363,7 @@ class TelegramLogsHandler(logging.Handler):
                 except Exception:
                     topic_id = None
 
-                coros = []
+                funcs = []
                 for item in self.tg_buff:
                     if not isinstance(item[0], HerokuException):
                         continue
@@ -373,8 +374,9 @@ class TelegramLogsHandler(logging.Handler):
                     ).get("disable_internet_warn", False):
                         continue
 
-                    coros.append(
-                        self._mods[client_id].inline.bot.send_message(
+                    funcs.append(
+                        functools.partial(
+                            self._mods[client_id].inline.bot.send_message,
                             self._mods[client_id].logchat,
                             item[0].message,
                             reply_markup=self._mods[client_id].inline.generate_markup(
@@ -394,7 +396,7 @@ class TelegramLogsHandler(logging.Handler):
                         )
                     )
 
-                self._exc_queue[client_id] = coros
+                self._exc_queue[client_id] = funcs
 
             await asyncio.gather(
                 *(
@@ -443,16 +445,20 @@ class TelegramLogsHandler(logging.Handler):
                             )
                         )
 
-    async def _exc_sender(self, *coros: Coroutine):
-        for coro in coros:
+    async def _exc_sender(self, *funcs: typing.Callable[..., Coroutine]):
+        for func in funcs:
             try:
-                await coro
+                await func()
             except TelegramRetryAfter as e:
                 await asyncio.sleep(e.retry_after)
+                await func()
             except RuntimeError:
-                pass
+                logging.debug(
+                    "RuntimeError in sender, probably event loop is closed, skipping",
+                    exc_info=True,
+                )
             except Exception:
-                return
+                logging.debug("Failed to send log message", exc_info=True)
 
     def emit(self, record: logging.LogRecord):
         try:
