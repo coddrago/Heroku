@@ -94,8 +94,7 @@ class TestMod(loader.Module):
                 lambda: (
                     "<blockquote expandable>"
                     + self.strings("configping")
-                    + "\n"
-                    + self.strings("configpingph").format(utils.config_placeholders()) if utils.config_placeholders() else ""
+                    + ("\n" + self.strings("configpingph").format("\n"+utils.config_placeholders()) if utils.config_placeholders() else "")
                     + "</blockquote>"
                 ),
                 validator=loader.validators.String(),
