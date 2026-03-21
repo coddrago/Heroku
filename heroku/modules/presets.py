@@ -558,30 +558,14 @@ class Presets(loader.Module):
                 loaded.append(alias)
 
             else:
-                if len(loaded) >= 1:
-                    await utils.answer(
-                        message,
-                        self.strings("no_command_loaded").format(
-                            utils.escape_html(cmd),
-                            "\n".join(f"{alias}" for alias in loaded),
-                        ),
-                    )
-                else:
-                    await utils.answer(
-                        message,
-                        self.lookup("settings")
-                        .strings("no_command")
-                        .format(utils.escape_html(cmd)),
-                    )
-                fail = True
-        if not fail:
-            await utils.answer(
-                message,
-                self.lookup("settings")
-                .strings("aliases_list")
-                .format("\n".join(f"{alias}" for alias in loaded)),
-                reply_to=getattr(message, "reply_to_msg_id", None),
-            )
+                logger.exception(f"Falied to load alias {alias}")
+        await utils.answer(
+            message,
+            self.lookup("settings")
+            .strings("aliases_list")
+            .format("\n".join(f"{alias}" for alias in loaded)),
+            reply_to=getattr(message, "reply_to_msg_id", None),
+        )
 
     @loader.command(alias="al")
     async def aliasload(self, message: Message):

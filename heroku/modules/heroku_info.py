@@ -50,7 +50,7 @@ class HerokuInfoMod(loader.Module):
                     "<blockquote expandable>"
                     + self.strings("_cfg_cst_msg")
                     + "\n"
-                    + self.strings("_cfg_cst_ph").format(utils.config_placeholders())
+                    + self.strings("_cfg_cst_ph").format(utils.config_placeholders()) if utils.config_placeholders() else ""
                     + "</blockquote>"
                 ),
             ),
