@@ -15,8 +15,9 @@ import datetime
 import time
 import typing
 
+from herokutl.custom import Message
 from herokutl.hints import EntityLike
-from herokutl.tl.types import Message, PeerUser, User
+from herokutl.tl.types import PeerUser, User
 from herokutl.utils import get_display_name
 
 from .. import loader, main, security, utils
@@ -1066,7 +1067,7 @@ class HerokuSecurityMod(loader.Module):
             return
 
         if args[0] == "user":
-            if not message.is_private and not message.is_reply:
+            if not message.is_private and not message.is_reply and len(args) < 3:
                 await utils.answer(message, self.strings("no_target"))
                 return
 
@@ -1077,11 +1078,18 @@ class HerokuSecurityMod(loader.Module):
                     (await message.get_reply_message()).sender_id,
                     exp=0,
                 )
+            elif len(args) == 3:
+                _ent = int(args[1]) if args[1].isdigit() else args[1]
+                try:
+                    target = await self._client.get_entity(_ent, exp=0)
+                except ValueError:
+                    await utils.answer(message, self.strings("no_target"))
+                    return
 
             if not self._client.dispatcher.security.remove_rule(
                 "user",
                 target.id,
-                args[1],
+                args[-1],
             ):
                 await utils.answer(message, self.strings("no_rules"))
                 return
@@ -1091,7 +1099,7 @@ class HerokuSecurityMod(loader.Module):
                 self.strings("rule_removed").format(
                     utils.get_entity_url(target),
                     utils.escape_html(get_display_name(target)),
-                    utils.escape_html(args[1]),
+                    utils.escape_html(args[-1]),
                 ),
             )
             return
@@ -1156,7 +1164,7 @@ class HerokuSecurityMod(loader.Module):
             return
 
         if args == "user":
-            if not message.is_private and not message.is_reply:
+            if not message.is_private and not message.is_reply and len(args) < 2:
                 await utils.answer(message, self.strings("no_target"))
                 return
 
@@ -1167,6 +1175,13 @@ class HerokuSecurityMod(loader.Module):
                     (await message.get_reply_message()).sender_id,
                     exp=0,
                 )
+            elif len(args) == 2:
+                _ent = int(args[1]) if args[1].isdigit() else args[1]
+                try:
+                    target = await self._client.get_entity(_ent, exp=0)
+                except ValueError:
+                    await utils.answer(message, self.strings("no_target"))
+                    return
 
             if not self._client.dispatcher.security.remove_rules("user", target.id):
                 await utils.answer(message, self.strings("no_rules"))
