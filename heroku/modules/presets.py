@@ -540,14 +540,13 @@ class Presets(loader.Module):
             logger.error("Invalid aliases format")
             return
 
-        fail = False
+        loaded = []
         for item in data:
             alias = item["alias"]
             cmd_str = item["command"]
             parts = cmd_str.split(maxsplit=1)
             cmd = parts[0]
             rest = parts[1] if len(parts) > 1 else None
-            loaded = []
             if self.allmodules.add_alias(alias, cmd, rest):
                 self.lookup("Presets").set(
                     "aliases",
@@ -559,7 +558,8 @@ class Presets(loader.Module):
                 loaded.append(alias)
 
             else:
-                logger.exception(f"Falied to load alias {alias}")
+                logger.error("Falied to load alias %s", alias)
+
         await utils.answer(
             message,
             self.lookup("settings")
