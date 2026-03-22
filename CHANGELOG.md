@@ -112,6 +112,7 @@
 - remove info in photo switch
 - remove show_heroku from info
 - improve presets button translations
+- add custom presets
 - fix restore button invoke
 - improve logging logic
 
