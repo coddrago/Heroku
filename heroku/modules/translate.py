@@ -92,7 +92,7 @@ class Translator(loader.Module):
         try:
             if provider == "telegram":
                 tr_text = await self._client.translate(
-                    message.peer_id, message, lang, raw_text=text, entities=entities
+                    message.peer_id, message, lang, entities=entities
                 )
             else:
                 tr_text = await self._translate_external(text, lang)
