@@ -253,7 +253,7 @@ class HerokuBackupMod(loader.Module):
             await self.inline.bot(
                 call.answer(self.strings("all_restored_bot"), show_alert=True)
             )
-            await self.invoke("restart", "-f", peer=call.message.peer_id)
+            await self.invoke("restart", "-f", peer=call.message.chat.id)
         except Exception:
             logger.exception("Restore from backupall failed")
             await self.inline.bot(
