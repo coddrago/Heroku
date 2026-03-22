@@ -111,6 +111,9 @@
 - remove watchdog func from tester
 - remove info in photo switch
 - remove show_heroku from info
+- improve presets button translations
+- fix restore button invoke
+- improve logging logic
 
 ## 🪐 Heroku 1.7.2
 - added autoupdate
