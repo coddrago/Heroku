@@ -16,7 +16,7 @@ ENV PYTHONUNBUFFERED=1 \
     GIT_PYTHON_REFRESH=quiet
 
 RUN apt-get update && \
-    apt-get install -y wget gnupg2 \
+    apt-get install -y wget gnupg2 
 
 RUN apt-get update && apt-get upgrade -y && apt-get install --no-install-recommends -y \
     build-essential \
