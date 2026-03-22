@@ -109,7 +109,8 @@ class Presets(loader.Module):
     strings = {"name": "Presets"}
 
     async def client_ready(self):
-        self._markup = utils.chunks(
+        self._markup_gen = functools.partial(
+            utils.chunks,
             [
                 {
                     "text": self.strings(f"_{preset}_title"),
@@ -132,11 +133,11 @@ class Presets(loader.Module):
             self._client.tg_id,
             'https://raw.githubusercontent.com/coddrago/assets/refs/heads/main/heroku/presets_cmd.png',
             caption=self.strings('welcome'),
-            reply_markup=self.inline.generate_markup(self._markup),
+            reply_markup=self.inline.generate_markup(self._markup_gen()),
         )
 
     async def _back(self, call: InlineCall):
-        await call.edit(self.strings("welcome"), reply_markup=self._markup)
+        await call.edit(self.strings("welcome"), reply_markup=self._markup_gen())
 
     async def _choose_menu(self, call: InlineCall, page: int = 0, preset: str = "", to_remove: list | None = None):
         if not preset:
@@ -321,7 +322,7 @@ class Presets(loader.Module):
             message=message,
             photo='https://raw.githubusercontent.com/coddrago/assets/refs/heads/main/heroku/presets_cmd.png',
             text=self.strings('welcome').replace('/presets', self.get_prefix() + 'presets'),
-            reply_markup=self._markup,
+            reply_markup=self._markup_gen(),
         )
         
     @loader.command(alias="lp")
