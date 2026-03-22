@@ -308,11 +308,12 @@ class TestMod(loader.Module):
             time_sleep = float(utils.get_args_raw(message))
             if time_sleep > 86400 * 365 * 100:
                 await utils.answer(message, self.strings("suspend_invalid_time"))
-            await utils.answer(
-                message,
-                self.strings("suspended").format(time_sleep),
-            )
-            time.sleep(time_sleep)
+            else:
+                await utils.answer(
+                    message,
+                    self.strings("suspended").format(time_sleep),
+                )
+                time.sleep(time_sleep)
         except ValueError:
             await utils.answer(message, self.strings("suspend_invalid_time"))
 
