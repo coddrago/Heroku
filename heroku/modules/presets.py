@@ -467,8 +467,7 @@ class Presets(loader.Module):
             await message.edit(self.lookup("loader").strings['load_failed'])
             logger.error("Invalid aliases format")
             return
-        
-        fail = False
+
         loaded = []
         for item in data:
             alias = item["alias"]
@@ -487,23 +486,14 @@ class Presets(loader.Module):
                 loaded.append(alias)
 
             else:
-                if len(loaded) >= 1:
-                    await utils.answer(
-                        message,
-                        self.strings("no_command_loaded").format(utils.escape_html(cmd), "\n".join(f"{alias}" for alias in loaded)),
-                    )
-                else:
-                    await utils.answer(
-                        message,
-                        self.lookup("settings").strings("no_command").format(utils.escape_html(cmd)),
-                    )
-                fail = True
-        if not fail:
-            await utils.answer(
-                message,
-                self.lookup("settings").strings("aliases_list").format("\n".join(f"{alias}" for alias in loaded)),
-                reply_parameters=ReplyParameters(message_id=getattr(message, "reply_to_msg_id", None)),
-            )
+                logger.error("Falied to load alias %s", alias)
+
+        await utils.answer(
+            message,
+            self.lookup("settings").strings("aliases_list").format("\n".join(f"{alias}" for alias in loaded)),
+            reply_parameters=ReplyParameters(message_id=getattr(message, "reply_to_msg_id", None)),
+        )
+
     @loader.command(alias="al")
     async def aliasload(self, message: Message):
         """send aliases via file"""
