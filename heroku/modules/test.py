@@ -306,6 +306,8 @@ class TestMod(loader.Module):
     async def suspend(self, message: Message):
         try:
             time_sleep = float(utils.get_args_raw(message))
+            if time_sleep > 86400 * 365 * 100:
+                time_sleep = 86400 * 365 * 100
             await utils.answer(
                 message,
                 self.strings("suspended").format(time_sleep),
