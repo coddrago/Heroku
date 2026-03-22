@@ -4,7 +4,7 @@
 # You can redistribute it and/or modify it under the terms of the GNU AGPLv3
 # 🔑 https://www.gnu.org/licenses/agpl-3.0.html
 
-# ©️ Codrago, 2024-2025
+# ©️ Codrago, 2024-2030
 # This file is a part of Heroku Userbot
 # 🌐 https://github.com/coddrago/Heroku
 # You can redistribute it and/or modify it under the terms of the GNU AGPLv3
@@ -15,8 +15,9 @@ import datetime
 import time
 import typing
 
+from herokutl.custom import Message
 from herokutl.hints import EntityLike
-from herokutl.tl.types import Message, PeerUser, User
+from herokutl.tl.types import PeerUser, User
 from herokutl.utils import get_display_name
 
 from .. import loader, main, security, utils
@@ -129,6 +130,19 @@ class HerokuSecurityMod(loader.Module):
         await call.edit(
             self.strings("global"),
             reply_markup=self._build_markup_global(is_inline),
+        )
+
+    async def inline__switch_perm_inline_query(self, call: InlineCall):
+        query = self._db.get(security.__name__, "allow_inline_query", False)
+        self._db.set(security.__name__, "allow_inline_query", not query)
+
+        await call.answer("Inline query permission set!")
+        await call.edit(
+            self.strings("querysec_info"),
+            reply_markup={
+                "text": "❌" if query else "✅",
+                "callback": self.inline__switch_perm_inline_query,
+            },
         )
 
     def _build_markup(
@@ -312,7 +326,7 @@ class HerokuSecurityMod(loader.Module):
                 (
                     self.strings("permissions_list").format(
                         "\n".join(
-                            "<emoji document_id=4974307891025543730>▫️</emoji>"
+                            "<tg-emoji emoji-id=4974307891025543730>▫️</tg-emoji>"
                             " <b>{}</b> <code>{}</code> <b>{}</b>".format(
                                 self.strings(rule["rule_type"]),
                                 rule["rule"],
@@ -499,8 +513,21 @@ class HerokuSecurityMod(loader.Module):
             ttl=5 * 60,
         )
 
+    @loader.command()
+    async def querysec(self, message: Message):
+        query = self._db.get(security.__name__, "allow_inline_query", False)
+        await self.inline.form(
+            self.strings("querysec_info"),
+            reply_markup={
+                "text": "✅" if query else "❌",
+                "callback": self.inline__switch_perm_inline_query,
+            },
+            message=message,
+            ttl=5 * 60,
+        )
+
     async def _resolve_user(self, message: Message):
-        if not (args := utils.get_args_raw(message)) and not (
+        if not (args := utils.get_args_raw(message).replace("@", "")) and not (
             reply := await message.get_reply_message()
         ):
             await utils.answer(message, self.strings("no_user"))
@@ -651,7 +678,8 @@ class HerokuSecurityMod(loader.Module):
                     [
                         self.strings("li").format(
                             i.id, utils.escape_html(get_display_name(i))
-                        ) + (f" ({p})" if p else "")
+                        )
+                        + (f" ({p})" if p else "")
                         for i, p in zip(_resolved_users, _and_prefixes)
                     ]
                 )
@@ -674,11 +702,7 @@ class HerokuSecurityMod(loader.Module):
                     else []
                 )
             )
-            + (
-                [f"command/{command}"]
-                if command in self.allmodules.commands
-                else []
-            )
+            + ([f"command/{command}"] if command in self.allmodules.commands else [])
             + (
                 [f"inline/{needle.lower().removeprefix('@')}"]
                 if needle.lower().removeprefix("@") in self.allmodules.inline_handlers
@@ -959,33 +983,34 @@ class HerokuSecurityMod(loader.Module):
         await self._confirm(message, "sgroup", target, possible_rules[0], duration)
 
     async def _tsec_user(self, message: Message, args: list):
-        if len(args) == 1:
-            if not message.is_private and not message.is_reply:
-                await utils.answer(message, self.strings("no_target"))
-                return
-            await utils.answer(message, self.strings("no_rule"))
-            return
 
-        if len(args) >= 2:
-            try:
-                if not args[1].isdigit() and not args[1].startswith("@"):
-                    raise ValueError
-
-                target = await self._client.get_entity(
-                    int(args[1]) if args[1].isdigit() else args[1],
-                    exp=0,
-                )
-            except (ValueError, TypeError):
-                if message.is_private:
-                    target = await self._client.get_entity(message.peer_id, exp=0)
-                elif message.is_reply:
-                    target = await self._client.get_entity(
-                        (await message.get_reply_message()).sender_id,
-                        exp=0,
-                    )
-                else:
+        match args:
+            case [single]:
+                if not message.is_private and not message.is_reply:
                     await utils.answer(message, self.strings("no_target"))
                     return
+                await utils.answer(message, self.strings("no_rule"))
+                return
+            case _ if len(args) >= 2:
+                try:
+                    if not args[1].isdigit() and not args[1].startswith("@"):
+                        raise ValueError
+
+                    target = await self._client.get_entity(
+                        int(args[1]) if args[1].isdigit() else args[1],
+                        exp=0,
+                    )
+                except (ValueError, TypeError):
+                    if message.is_private:
+                        target = await self._client.get_entity(message.peer_id, exp=0)
+                    elif message.is_reply:
+                        target = await self._client.get_entity(
+                            (await message.get_reply_message()).sender_id,
+                            exp=0,
+                        )
+                    else:
+                        await utils.answer(message, self.strings("no_target"))
+                        return
 
         if target.id in self._client.dispatcher.security.owner:
             await utils.answer(message, self.strings("owner_target"))
@@ -1042,7 +1067,7 @@ class HerokuSecurityMod(loader.Module):
             return
 
         if args[0] == "user":
-            if not message.is_private and not message.is_reply:
+            if not message.is_private and not message.is_reply and len(args) < 3:
                 await utils.answer(message, self.strings("no_target"))
                 return
 
@@ -1053,11 +1078,18 @@ class HerokuSecurityMod(loader.Module):
                     (await message.get_reply_message()).sender_id,
                     exp=0,
                 )
+            elif len(args) == 3:
+                _ent = int(args[1]) if args[1].isdigit() else args[1]
+                try:
+                    target = await self._client.get_entity(_ent, exp=0)
+                except ValueError:
+                    await utils.answer(message, self.strings("no_target"))
+                    return
 
             if not self._client.dispatcher.security.remove_rule(
                 "user",
                 target.id,
-                args[1],
+                args[-1],
             ):
                 await utils.answer(message, self.strings("no_rules"))
                 return
@@ -1067,7 +1099,7 @@ class HerokuSecurityMod(loader.Module):
                 self.strings("rule_removed").format(
                     utils.get_entity_url(target),
                     utils.escape_html(get_display_name(target)),
-                    utils.escape_html(args[1]),
+                    utils.escape_html(args[-1]),
                 ),
             )
             return
@@ -1132,7 +1164,7 @@ class HerokuSecurityMod(loader.Module):
             return
 
         if args == "user":
-            if not message.is_private and not message.is_reply:
+            if not message.is_private and not message.is_reply and len(args) < 2:
                 await utils.answer(message, self.strings("no_target"))
                 return
 
@@ -1143,6 +1175,13 @@ class HerokuSecurityMod(loader.Module):
                     (await message.get_reply_message()).sender_id,
                     exp=0,
                 )
+            elif len(args) == 2:
+                _ent = int(args[1]) if args[1].isdigit() else args[1]
+                try:
+                    target = await self._client.get_entity(_ent, exp=0)
+                except ValueError:
+                    await utils.answer(message, self.strings("no_target"))
+                    return
 
             if not self._client.dispatcher.security.remove_rules("user", target.id):
                 await utils.answer(message, self.strings("no_rules"))
@@ -1203,7 +1242,7 @@ class HerokuSecurityMod(loader.Module):
                 self.strings("rules").format(
                     "\n".join(
                         [
-                            "<emoji document_id=6037355667365300960>👥</emoji> <b><a"
+                            "<tg-emoji emoji-id=6037355667365300960>👥</tg-emoji> <b><a"
                             " href='{}'>{}</a> {} {} {}</b> <code>{}</code>".format(
                                 rule["entity_url"],
                                 utils.escape_html(rule["entity_name"]),
@@ -1215,7 +1254,7 @@ class HerokuSecurityMod(loader.Module):
                             for rule in self._client.dispatcher.security.tsec_chat
                         ]
                         + [
-                            "<emoji document_id=6037122016849432064>👤</emoji> <b><a"
+                            "<tg-emoji emoji-id=6037122016849432064>👤</tg-emoji> <b><a"
                             " href='{}'>{}</a> {} {} {}</b> <code>{}</code>".format(
                                 rule["entity_url"],
                                 utils.escape_html(rule["entity_name"]),
@@ -1229,7 +1268,7 @@ class HerokuSecurityMod(loader.Module):
                         + [
                             "\n".join(
                                 [
-                                    "<emoji document_id=5870704313440932932>🔒</emoji>"
+                                    "<tg-emoji emoji-id=5870704313440932932>🔒</tg-emoji>"
                                     " <code>{}</code> <b>{} {} {}</b> <code>{}</code>".format(
                                         utils.escape_html(group.name),
                                         self._convert_time(

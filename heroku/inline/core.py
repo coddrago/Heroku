@@ -6,7 +6,7 @@
 # You can redistribute it and/or modify it under the terms of the GNU AGPLv3
 # 🔑 https://www.gnu.org/licenses/agpl-3.0.html
 
-# ©️ Codrago, 2024-2025
+# ©️ Codrago, 2024-2030
 # This file is a part of Heroku Userbot
 # 🌐 https://github.com/coddrago/Heroku
 # You can redistribute it and/or modify it under the terms of the GNU AGPLv3
@@ -19,12 +19,16 @@ import time
 import typing
 
 from aiogram import Bot, Dispatcher
+from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
 from aiogram.exceptions import TelegramConflictError, TelegramUnauthorizedError
-from aiogram.client.default import DefaultBotProperties
 from herokutl.errors.rpcerrorlist import InputUserDeactivatedError, YouBlockedUserError
 from herokutl.tl.functions.contacts import UnblockRequest
-from herokutl.tl.types import Message
+from herokutl.tl.functions.messages import (
+    GetDialogFiltersRequest,
+    UpdateDialogFilterRequest,
+)
+from herokutl.tl.types import DialogFilter, InputPeerUser, Message
 from herokutl.utils import get_display_name
 
 from .. import utils
@@ -41,6 +45,9 @@ from .token_obtainment import TokenObtainment
 from .utils import Utils
 
 logger = logging.getLogger(__name__)
+
+if typing.TYPE_CHECKING:
+    from ..loader import Modules
 
 
 class InlineManager(
@@ -122,14 +129,16 @@ class InlineManager(
         self._name = get_display_name(self._client.heroku_me)
 
         if not ignore_token_checks:
-            is_token_asserted = await self._assert_token()
+            is_token_asserted = await self.assert_token()
             if not is_token_asserted:
                 self.init_complete = False
                 return
 
         self.init_complete = True
 
-        self.bot = Bot(token=self._token, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
+        self.bot = Bot(
+            token=self._token, default=DefaultBotProperties(parse_mode=ParseMode.HTML)
+        )
         self._bot = self.bot
         self._dp = Dispatcher()
 
@@ -139,7 +148,7 @@ class InlineManager(
             self.bot_id = bot_me.id
         except TelegramUnauthorizedError:
             logger.critical("Token expired, revoking...")
-            return await self._dp_revoke_token(False)
+            return await self.dp_revoke_token(False)
 
         try:
             m = await self._client.send_message(self.bot_username, "/start heroku init")
@@ -166,6 +175,38 @@ class InlineManager(
             logger.critical("Initialization of inline manager failed!", exc_info=True)
             return False
 
+        _folders = await self._client(GetDialogFiltersRequest())
+        for folder in _folders.filters:
+            if getattr(folder, "title", None) == "Heroku":
+                if any(
+                    [
+                        isinstance(peer, InputPeerUser) and peer.user_id == self.bot_id
+                        for peer in folder.include_peer
+                    ]
+                ):
+                    break
+
+                pinned = [await self._client.get_input_entity(self.bot_id)]
+                include = folder.include_peers
+                exclude = folder.exclude_peers
+                emoticon = folder.emoticon
+                color = folder.color
+
+                await self._client(
+                    UpdateDialogFilterRequest(
+                        folder.id,
+                        DialogFilter(
+                            folder.id,
+                            pinned_peers=pinned,
+                            include_peers=include,
+                            exclude_peers=exclude,
+                            emoticon=emoticon,
+                            color=color,
+                        ),
+                    )
+                )
+                break
+
         await self._client.delete_messages(self.bot_username, m)
 
         self._dp.inline_query.register(
@@ -189,7 +230,7 @@ class InlineManager(
         )
 
         old = self.bot.get_updates
-        revoke = self._dp_revoke_token
+        revoke = self.dp_revoke_token
 
         async def new(*args, **kwargs):
             nonlocal revoke, old
@@ -203,7 +244,9 @@ class InlineManager(
 
         self.bot.get_updates = new
 
-        self._task = asyncio.ensure_future(self._dp.start_polling(self._bot, handle_signals=False))
+        self._task = asyncio.ensure_future(
+            self._dp.start_polling(self._bot, handle_signals=False)
+        )
         self._cleaner_task = asyncio.ensure_future(self._cleaner())
 
     async def _stop(self):

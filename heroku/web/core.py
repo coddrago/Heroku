@@ -91,10 +91,14 @@ class Web(root.Web):
                     ["hostname", "-i"],
                     stdout=subprocess.PIPE,
                     check=True,
+                    timeout=5,
+                    stderr=subprocess.PIPE,
                 )
                 .stdout.decode("utf-8")
                 .strip()
             )
+
+            ip = os.environ.get("HEROKU_IP", ip)
 
             url = f"http://{ip}:{self.port}"
 

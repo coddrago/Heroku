@@ -4,7 +4,7 @@
 # You can redistribute it and/or modify it under the terms of the GNU AGPLv3
 # 🔑 https://www.gnu.org/licenses/agpl-3.0.html
 
-# ©️ Codrago, 2024-2025
+# ©️ Codrago, 2024-2030
 # This file is a part of Heroku Userbot
 # 🌐 https://github.com/coddrago/Heroku
 # You can redistribute it and/or modify it under the terms of the GNU AGPLv3
@@ -20,12 +20,15 @@ from aiogram.types import InlineQuery, InlineQueryResultArticle, InputTextMessag
 from .. import utils
 from .types import InlineUnit
 
+if typing.TYPE_CHECKING:
+    from ..inline.core import InlineManager
+
 logger = logging.getLogger(__name__)
 
 
 class QueryGallery(InlineUnit):
     async def query_gallery(
-        self,
+        self: "InlineManager",
         query: InlineQuery,
         items: typing.List[typing.Dict[str, typing.Any]],
         *,

@@ -6,7 +6,7 @@
 # You can redistribute it and/or modify it under the terms of the GNU AGPLv3
 # 🔑 https://www.gnu.org/licenses/agpl-3.0.html
 
-# ©️ Codrago, 2024-2025
+# ©️ Codrago, 2024-2030
 # This file is a part of Heroku Userbot
 # 🌐 https://github.com/coddrago/Heroku
 # You can redistribute it and/or modify it under the terms of the GNU AGPLv3
@@ -99,7 +99,7 @@ class LoaderMod(loader.Module):
             ),
             loader.ConfigValue(
                 "command_emoji",
-                "<emoji document_id=5197195523794157505>▫️</emoji>",
+                "<tg-emoji emoji-id=5197195523794157505>▫️</tg-emoji>",
                 lambda: "Emoji for command",
             ),
         )
@@ -183,23 +183,44 @@ class LoaderMod(loader.Module):
             },
         )
 
-    @loader.command()
-    async def dlm(self, message: Message, force_pm: bool = False):
+    @loader.command(alias="dlm")
+    async def dlmod(self, message: Message, force_pm: bool = False):
+
         if args := utils.get_args(message):
-            args = args[0]
+            match args:
+                case [single]:
+                    args = single
+                    await utils.answer(message, self.strings("finding_module_in_repos"))
+                    if (
+                        await self.download_and_install(args, message, force_pm)
+                        == MODULE_LOADING_FORBIDDEN
+                    ):
+                        return
 
-            await utils.answer(
-                message, self.strings("finding_module_in_repos")
-            )
+                    if self.fully_loaded:
+                        self.update_modules_in_db()
+                case _:
+                    not_installed = []
 
-            if (
-                await self.download_and_install(args, message, force_pm)
-                == MODULE_LOADING_FORBIDDEN
-            ):
-                return
+                    await utils.answer(
+                        message, "Installing {} modules...".format(len(args))
+                    )
 
-            if self.fully_loaded:
-                self.update_modules_in_db()
+                    for arg in args:
+                        result = await self.download_and_install(arg)
+
+                        if result == MODULE_LOADING_FAILED:
+                            not_installed.append(arg)
+                    await utils.answer(
+                        message,
+                        "{} modules was installed.\n\nModules <code>{}</code> cannot be installed because they are not available in the repo".format(
+                            len(args) - len(not_installed),
+                            "</code>, <code>".join(not_installed),
+                        ),
+                    )
+
+                    if self.fully_loaded:
+                        self.update_modules_in_db()
         else:
             await self.inline.list(
                 message,
@@ -355,28 +376,12 @@ class LoaderMod(loader.Module):
         path_: str,
         mode: str,
     ):
-        save = False
-        if mode == "all_yes":
-            self._db.set(main.__name__, "permanent_modules_fs", True)
-            self._db.set(main.__name__, "disable_modules_fs", False)
-            await call.answer(self.strings("will_save_fs"))
-            save = True
-        elif mode == "all_no":
-            self._db.set(main.__name__, "disable_modules_fs", True)
-            self._db.set(main.__name__, "permanent_modules_fs", False)
-        elif mode == "once":
-            save = True
 
-        await self.load_module(doc, call, origin=path_ or "<string>", save_fs=save)
+        await self.load_module(doc, call, origin=path_ or "<string>", save_fs=True)
 
     @loader.command(alias="lm")
-    async def loadmod(self, message: Message, force_pm: bool = False):
+    async def loadmod(self, message: Message):
         args = utils.get_args_raw(message)
-        if "-fs" in args:
-            force_save = True
-            args = args.replace("-fs", "").strip()
-        else:
-            force_save = False
 
         msg = message if message.file else (await message.get_reply_message())
 
@@ -384,9 +389,7 @@ class LoaderMod(loader.Module):
             await utils.answer(message, self.strings("provide_module"))
             return
 
-        await utils.answer(
-            message, self.strings("loading_module_via_file")
-        )
+        await utils.answer(message, self.strings("loading_module_via_file"))
 
         path_ = None
         doc = await msg.download_media(bytes)
@@ -397,74 +400,10 @@ class LoaderMod(loader.Module):
             await utils.answer(message, self.strings("bad_unicode"))
             return
 
-        if (
-            not self._db.get(
-                main.__name__,
-                "disable_modules_fs",
-                False,
-            )
-            and not self._db.get(main.__name__, "permanent_modules_fs", False)
-            and not force_save
-        ):
-            if message.file:
-                await message.edit("")
-                message = await message.respond("🪐", reply_to=utils.get_topic(message))
-
-            if await self.inline.form(
-                self.strings("module_fs"),
-                message=message,
-                reply_markup=[
-                    [
-                        {
-                            "text": self.strings("save"),
-                            "callback": self._inline__load,
-                            "args": (doc, path_, "once"),
-                        },
-                        {
-                            "text": self.strings("no_save"),
-                            "callback": self._inline__load,
-                            "args": (doc, path_, "no"),
-                        },
-                    ],
-                    [
-                        {
-                            "text": self.strings("save_for_all"),
-                            "callback": self._inline__load,
-                            "args": (doc, path_, "all_yes"),
-                        }
-                    ],
-                    [
-                        {
-                            "text": self.strings("never_save"),
-                            "callback": self._inline__load,
-                            "args": (doc, path_, "all_no"),
-                        }
-                    ],
-                ],
-            ):
-                return
-
         if path_ is not None:
-            await self.load_module(
-                doc,
-                message,
-                origin=path_,
-                save_fs=(
-                    force_save
-                    or self._db.get(main.__name__, "permanent_modules_fs", False)
-                    and not self._db.get(main.__name__, "disable_modules_fs", False)
-                ),
-            )
+            await self.load_module(doc, message, origin=path_, save_fs=True)
         else:
-            await self.load_module(
-                doc,
-                message,
-                save_fs=(
-                    force_save
-                    or self._db.get(main.__name__, "permanent_modules_fs", False)
-                    and not self._db.get(main.__name__, "disable_modules_fs", False)
-                ),
-            )
+            await self.load_module(doc, message, save_fs=True)
 
     async def approve_internal(
         self,
@@ -488,7 +427,9 @@ class LoaderMod(loader.Module):
         )
 
     async def install_requirements(self, requirements: list):
-        is_venv = hasattr(sys, 'real_prefix') or sys.prefix != getattr(sys, 'base_prefix', sys.prefix)
+        is_venv = hasattr(sys, "real_prefix") or sys.prefix != getattr(
+            sys, "base_prefix", sys.prefix
+        )
         need_user_flag = loader.USER_INSTALL and not is_venv
 
         pip = await asyncio.create_subprocess_exec(
@@ -511,6 +452,74 @@ class LoaderMod(loader.Module):
 
         return True
 
+    async def install_packages(self, packages: list):
+        try:
+            is_root = os.geteuid() == 0
+
+            def _which(names):
+                for n in names:
+                    p = shutil.which(n)
+                    if p:
+                        return p
+                return None
+
+            pm = None
+            if _which(["apt", "apt-get"]):
+                pm = "apt"
+            elif _which(["apk"]):
+                pm = "apk"
+            elif _which(["dnf"]):
+                pm = "dnf"
+            elif _which(["yum"]):
+                pm = "yum"
+            elif _which(["pacman"]):
+                pm = "pacman"
+            elif _which(["brew"]):
+                pm = "brew"
+
+            if not pm:
+                logger.debug("No supported package manager found")
+                return False
+
+            cmd = []
+            if pm == "apt":
+                tool = _which(["apt", "apt-get"])
+                cmd = [tool, "install", "-y", *packages]
+            elif pm == "apk":
+                cmd = ["apk", "add", "--no-cache", *packages]
+            elif pm == "dnf":
+                cmd = ["dnf", "install", "-y", *packages]
+            elif pm == "yum":
+                cmd = ["yum", "install", "-y", *packages]
+            elif pm == "pacman":
+                cmd = ["pacman", "-Syu", "--noconfirm", *packages]
+            elif pm == "brew":
+                cmd = ["brew", "install", *packages]
+
+            if not is_root and shutil.which("sudo"):
+                cmd = ["sudo", *cmd]
+
+            proc = await asyncio.create_subprocess_exec(
+                *cmd,
+                stdout=asyncio.subprocess.PIPE,
+                stderr=asyncio.subprocess.PIPE,
+            )
+
+            out, err = await proc.communicate()
+
+            if proc.returncode != 0:
+                logger.debug(
+                    "Package install failed (%s): %s",
+                    " ".join(cmd),
+                    err.decode(errors="ignore") if err else out.decode(errors="ignore"),
+                )
+                return False
+
+            return True
+        except Exception:
+            logger.exception("install_packages failed")
+            return False
+
     async def load_module(
         self,
         doc: str,
@@ -518,9 +527,10 @@ class LoaderMod(loader.Module):
         name: typing.Optional[str] = None,
         origin: str = "<string>",
         did_requirements: bool = False,
-        save_fs: bool = False,
+        save_fs: bool = True,
         blob_link: bool = False,
         did_requires: bool = False,
+        did_packages: bool = False,
     ):
         if any(
             line.replace(" ", "") == "#scope:ffmpeg" for line in doc.splitlines()
@@ -571,14 +581,14 @@ class LoaderMod(loader.Module):
             requirements = []
             try:
                 requirements = list(
-                                filter(
-                                    lambda x: not x.startswith(("-", "_", ".")),
-                                    map(
-                                        str.strip,
-                                        loader.VALID_PIP_PACKAGES.search(doc)[1].split(),
-                                    ),
-                                )
-                            )
+                    filter(
+                        lambda x: not x.startswith(("-", "_", ".")),
+                        map(
+                            str.strip,
+                            loader.VALID_PIP_PACKAGES.search(doc)[1].split(),
+                        ),
+                    )
+                )
             except TypeError:
                 pass
 
@@ -591,6 +601,36 @@ class LoaderMod(loader.Module):
                 kwargs["did_requires"] = True
 
                 return await self.load_module(**kwargs)  # Try again
+
+        if not did_packages:
+            packages = []
+            try:
+                packages = list(
+                    filter(
+                        lambda x: not x.startswith(("-", "_", ".")),
+                        map(
+                            str.strip,
+                            loader.VALID_APT_PACKAGES.search(doc)[1].split(),
+                        ),
+                    )
+                )
+            except TypeError:
+                pass
+
+            if packages:
+                result = await self.install_packages(packages)
+
+                if not result:
+                    if message is not None:
+                        await utils.answer(message, self.strings("requirements_failed"))
+                    return
+
+                importlib.invalidate_caches()
+
+                kwargs = utils.get_kwargs()
+                kwargs["did_packages"] = True
+
+                return await self.load_module(**kwargs)
 
         blob_link = self.strings("blob_link") if blob_link else ""
 
@@ -623,10 +663,10 @@ class LoaderMod(loader.Module):
 
         module_name = f"heroku.modules.{uid}"
         doc = geek.compat(doc)
-        
+
         async def restart_inline(call: InlineCall):
             await call.edit(self.strings["requirements_restarted"])
-            await self.invoke("restart", "-f", message = message)
+            await self.invoke("restart", "-f", message=message)
 
         async def core_overwrite(e: CoreOverwriteError):
             nonlocal message
@@ -683,12 +723,10 @@ class LoaderMod(loader.Module):
                     if message is not None:
                         await self.inline.form(
                             message=message,
-                            text = self.strings("requirements_restart").format(e.name),
-                            reply_markup = [
-                                {
-                                    "text": "🚀 Restart", "callback": restart_inline
-                                }
-                            ]
+                            text=self.strings("requirements_restart").format(e.name),
+                            reply_markup=[
+                                {"text": "🚀 Restart", "callback": restart_inline}
+                            ],
                         )
 
                     return
@@ -698,8 +736,7 @@ class LoaderMod(loader.Module):
                         message,
                         self.strings("requirements_installing").format(
                             "\n".join(
-                                f"{self.config['command_emoji']}"
-                                f" {req}"
+                                f"{self.config['command_emoji']}" f" {req}"
                                 for req in requirements
                             )
                         ),
@@ -708,10 +745,7 @@ class LoaderMod(loader.Module):
                 result = await self.install_requirements(requirements)
                 if not result:
                     if message is not None:
-                        await utils.answer(
-                            message,
-                            self.strings("requirements_failed")
-                        )
+                        await utils.answer(message, self.strings("requirements_failed"))
 
                     return
 
@@ -736,7 +770,7 @@ class LoaderMod(loader.Module):
                         await utils.answer(
                             message,
                             (
-                                "<emoji document_id=5454225457916420314>😖</emoji>"
+                                "<tg-emoji emoji-id=5454225457916420314>😖</tg-emoji>"
                                 f" <b>{utils.escape_html(str(e))}</b>"
                             ),
                         )
@@ -744,11 +778,11 @@ class LoaderMod(loader.Module):
                         await utils.answer(
                             message,
                             (
-                                self.strings('scam_module').format(
+                                self.strings("scam_module").format(
                                     name=instance.__class__.__name__,
                                     prefix=self.get_prefix(),
                                 )
-                            )
+                            ),
                         )
                 return
         except Exception as e:
@@ -817,7 +851,7 @@ class LoaderMod(loader.Module):
                         await utils.answer(
                             message,
                             (
-                                "<emoji document_id=5454225457916420314>😖</emoji>"
+                                "<tg-emoji emoji-id=5454225457916420314>😖</tg-emoji>"
                                 f" <b>{utils.escape_html(str(e))}</b>"
                             ),
                         )
@@ -825,11 +859,11 @@ class LoaderMod(loader.Module):
                         await utils.answer(
                             message,
                             (
-                                self.strings('scam_module').format(
+                                self.strings("scam_module").format(
                                     name=instance.__class__.__name__,
                                     prefix=self.get_prefix(),
                                 )
-                            )
+                            ),
                         )
                 return
             except loader.SelfUnload as e:
@@ -844,7 +878,7 @@ class LoaderMod(loader.Module):
                     await utils.answer(
                         message,
                         (
-                            "<emoji document_id=5454225457916420314>😖</emoji>"
+                            "<tg-emoji emoji-id=5454225457916420314>😖</tg-emoji>"
                             f" <b>{utils.escape_html(str(e))}</b>"
                         ),
                     )
@@ -925,12 +959,13 @@ class LoaderMod(loader.Module):
         if message is None:
             return
 
-        modhelp = ""
+        modhelp = []
+        mod_doc = ""
 
         if instance.__doc__:
-            modhelp += (
-                "<i>\n<emoji document_id=5879813604068298387>ℹ️</emoji>"
-                f" {utils.escape_html(inspect.getdoc(instance))}</i>\n"
+            mod_doc += (
+                "<i>\n<tg-emoji emoji-id=5879813604068298387>ℹ️</tg-emoji>"
+                f" {utils.escape_html(inspect.getdoc(instance))}</i>\n\n"
             )
 
         subscribe = ""
@@ -941,7 +976,7 @@ class LoaderMod(loader.Module):
             value = getattr(instance, key)
             if isinstance(value, loader.Library):
                 depends_from.append(
-                    "<emoji document_id=5197195523794157505>▫️</emoji>"
+                    "<tg-emoji emoji-id=5197195523794157505>▫️</tg-emoji>"
                     " <code>{}</code> <b>{}</b> <code>{}</code>".format(
                         value.__class__.__name__,
                         self.strings("by"),
@@ -952,6 +987,9 @@ class LoaderMod(loader.Module):
                         ),
                     )
                 )
+        placeholders = utils.help_placeholders(
+            getattr(getattr(instance, "__class__"), "__name__"), self
+        )
 
         depends_from = (
             self.strings("depends_from").format("\n".join(depends_from))
@@ -960,20 +998,16 @@ class LoaderMod(loader.Module):
         )
 
         def loaded_msg(use_subscribe: bool = True):
-            nonlocal \
-                modname, \
-                version, \
-                modhelp, \
-                developer, \
-                origin, \
-                subscribe, \
-                blob_link, \
-                depends_from
+            nonlocal modname, version, mod_doc, modhelp, placeholders, developer, origin, subscribe, blob_link, depends_from
             return self.strings("loaded").format(
                 modname.strip(),
                 version,
                 utils.ascii_face(),
-                modhelp,
+                mod_doc if mod_doc else "",
+                "<blockquote expandable>{}</blockquote>".format("\n".join(modhelp)),
+                "<blockquote expandable>{}</blockquote>".format(
+                    "\n".join(placeholders)
+                ),
                 developer if not subscribe or not use_subscribe else "",
                 depends_from,
                 (
@@ -1018,11 +1052,7 @@ class LoaderMod(loader.Module):
                         },
                     ]
 
-            developer = self.strings("developer").format(
-                utils.escape_html(developer)
-                if isinstance(developer_entity, Channel)
-                else f"<code>{utils.escape_html(developer)}</code>"
-            )
+            developer = self.strings("developer").format(utils.escape_html(developer))
         else:
             developer = ""
 
@@ -1037,15 +1067,17 @@ class LoaderMod(loader.Module):
             instance.commands.items(),
             key=lambda x: x[0],
         ):
-            modhelp += "\n{} <code>{}{}</code> {}".format(
-                f"{self.config['command_emoji']}",
-                utils.escape_html(self.get_prefix()),
-                _name,
-                (
-                    utils.escape_html(inspect.getdoc(fun))
-                    if fun.__doc__
-                    else self.strings("undoc")
-                ),
+            modhelp.append(
+                "{} <code>{}{}</code> {}".format(
+                    f"{self.config['command_emoji']}",
+                    utils.escape_html(self.get_prefix()),
+                    _name,
+                    (
+                        utils.escape_html(inspect.getdoc(fun))
+                        if fun.__doc__
+                        else self.strings("undoc")
+                    ),
+                )
             )
 
         if self.inline.init_complete:
@@ -1053,13 +1085,15 @@ class LoaderMod(loader.Module):
                 instance.inline_handlers.items(),
                 key=lambda x: x[0],
             ):
-                modhelp += self.strings("ihandler").format(
-                    f"@{self.inline.bot_username} {_name}",
-                    (
-                        utils.escape_html(inspect.getdoc(fun))
-                        if fun.__doc__
-                        else self.strings("undoc")
-                    ),
+                modhelp.append(
+                    self.strings("ihandler").format(
+                        f"@{self.inline.bot_username} {_name}",
+                        (
+                            utils.escape_html(inspect.getdoc(fun))
+                            if fun.__doc__
+                            else self.strings("undoc")
+                        ),
+                    )
                 )
 
         try:
@@ -1086,15 +1120,31 @@ class LoaderMod(loader.Module):
 
     @loader.command(alias="ulm")
     async def unloadmod(self, message: Message):
-        if not (args := utils.get_args_raw(message)):
+        if not (raw_args := utils.get_args_raw(message)):
             await utils.answer(message, self.strings("no_class"))
             return
 
-        if len(args.split("\n")) == 1:
-            msg = await self.unload_module(args)
+        args = raw_args
+        force = False
+        first_line = args.split("\n", 1)[0].strip()
+        if first_line == "-f":
+            force = True
+            rest = args.split("\n", 1)
+            args = rest[1].strip() if len(rest) > 1 else ""
+        elif args.startswith("-f "):
+            force = True
+            args = args[3:].strip()
 
+        if not args:
+            await utils.answer(message, self.strings("no_class"))
+            return
+
+        raw_list = re.split(r"[,\n]", args)
+        modules = [m.strip() for m in raw_list if m.strip()]
+
+        if len(modules) == 1:
+            msg = await self.unload_module(modules[0], force=force)
         else:
-            modules = [m for m in args.split("\n") if m]
             success = []
             errors = []
             msg = ""
@@ -1104,25 +1154,23 @@ class LoaderMod(loader.Module):
                     if "💡" in status:
                         status = status.split("<code>")[0]
 
-                    errors.append(
-                        f"<code>{module}</code> — {status}"
-                    )
-                else: success.append(f"<code>{module}</code>")
+                    errors.append(f"<code>{module}</code> — {status}")
+                else:
+                    success.append(f"<code>{module}</code>")
 
             if success:
                 msg += self.strings["modules_unloaded"].format(
-                    unloaded_num = len(success),
-                    unloaded=", ".join(success)
+                    unloaded_num=len(success), unloaded=", ".join(success)
                 )
             if errors:
-                msg += ("\n" + self.strings["modules_not_unloaded"].format(
-                    not_unloaded = len(errors),
+                msg += "\n" + self.strings["modules_not_unloaded"].format(
+                    not_unloaded=len(errors),
                     errors="\n".join(errors),
-                ))
+                )
 
         await utils.answer(message, msg)
 
-    async def unload_module(self, module: str) -> str:
+    async def unload_module(self, module: str, force: bool = False) -> str:
         instance = self.lookup(module)
 
         if issubclass(instance.__class__, loader.Library):
@@ -1145,7 +1193,7 @@ class LoaderMod(loader.Module):
 
         msg = (
             self.strings("unloaded").format(
-                "<emoji document_id=5784993237412351403>✅</emoji>",
+                "<tg-emoji emoji-id=5784993237412351403>✅</tg-emoji>",
                 ", ".join(
                     [(mod[:-3] if mod.endswith("Mod") else mod) for mod in worked]
                 ),
@@ -1153,8 +1201,40 @@ class LoaderMod(loader.Module):
             if worked
             else self.strings("not_unloaded")
         )
-        return msg
+        for mod_name in worked:
+            utils.unregister_placeholders(mod_name)
 
+        if force and worked:
+            try:
+                for key in list(self._db.keys()):
+                    if not isinstance(key, str):
+                        continue
+                    low = key.lower()
+                    for mod_name in worked:
+                        base = mod_name[:-3] if mod_name.endswith("Mod") else mod_name
+                        candidates = {mod_name.lower(), base.lower()}
+                        if any(
+                            low == c
+                            or low.startswith(c + ".")
+                            or low.startswith(c + "_")
+                            or c in low
+                            for c in candidates
+                        ):
+                            try:
+                                del self._db[key]
+                            except Exception:
+                                pass
+
+                try:
+                    self._db.save()
+                except Exception:
+                    logger.debug(
+                        "Failed to save DB after force-unload cleanup", exc_info=True
+                    )
+            except Exception:
+                logger.exception("Failed to cleanup DB for force unload")
+
+        return msg
 
     @loader.command()
     async def clearmodules(self, message: Message):
@@ -1309,9 +1389,7 @@ class LoaderMod(loader.Module):
             await utils.answer(message, self.strings("args"))
             return
 
-        await utils.answer(
-            message, self.strings("ml_load_module")
-        )
+        await utils.answer(message, self.strings("ml_load_module"))
 
         exact = True
         if not (

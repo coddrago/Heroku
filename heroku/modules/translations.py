@@ -4,7 +4,7 @@
 # You can redistribute it and/or modify it under the terms of the GNU AGPLv3
 # 🔑 https://www.gnu.org/licenses/agpl-3.0.html
 
-# ©️ Codrago, 2024-2025
+# ©️ Codrago, 2024-2030
 # This file is a part of Heroku Userbot
 # 🌐 https://github.com/coddrago/Heroku
 # You can redistribute it and/or modify it under the terms of the GNU AGPLv3
@@ -32,21 +32,72 @@ class Translations(loader.Module):
 
         await call.edit(self.strings("lang_saved").format(self._get_flag(lang)))
 
-    def _get_flag(self, lang: str) -> str:
-        emoji_flags = {
-            "🇬🇧": "<emoji document_id=6323589145717376403>🇬🇧</emoji>",
-            "🇺🇿": "<emoji document_id=6323430017179059570>🇺🇿</emoji>",
-            "🇷🇺": "<emoji document_id=6323139226418284334>🇷🇺</emoji>",
-            "🇺🇦": "<emoji document_id=5276140694891666474>🇺🇦</emoji>",
-            "🇮🇹": "<emoji document_id=6323471399188957082>🇮🇹</emoji>",
-            "🇩🇪": "<emoji document_id=6320817337033295141>🇩🇪</emoji>",
-            "🇪🇸": "<emoji document_id=6323315062379382237>🇪🇸</emoji>",
-            "🇹🇷": "<emoji document_id=6321003171678259486>🇹🇷</emoji>",
-            "🇰🇿": "<emoji document_id=6323135275048371614>🇰🇿</emoji>",
-            "🥟": "<emoji document_id=5382337996123020810>🥟</emoji>",
+    async def _choose_language(
+        self, message: Message | InlineCall, is_meme: bool = False
+    ):
+        reply_markup = utils.chunks(
+            [
+                {
+                    "text": text,
+                    "callback": self._change_language,
+                    "args": (lang,),
+                }
+                for lang, text in (
+                    translations.SUPPORTED_LANGUAGES.items()
+                    if not is_meme
+                    else translations.MEME_LANGUAGES.items()
+                )
+            ],
+            2,
+        )
+
+        back_btn = {
+            "text": (
+                self.strings("off_langs") if is_meme else self.strings("meme_langs")
+            ),
+            "callback": self._choose_language,
+            "args": (not is_meme,),
         }
 
-        lang2country = {"en": "🇬🇧", "tt": "🥟", "kk": "🇰🇿", "ua": "🇺🇦", "de": "🇩🇪"}
+        reply_markup.append([back_btn])
+
+        await utils.answer(
+            message=message,
+            response=self.strings("choose_language"),
+            reply_markup=reply_markup,
+        )
+
+    def _get_flag(self, lang: str) -> str:
+        emoji_flags = {
+            "🇬🇧": "<tg-emoji emoji-id=6323589145717376403>🇬🇧</tg-emoji>",
+            "🇺🇿": "<tg-emoji emoji-id=6323430017179059570>🇺🇿</tg-emoji>",
+            "🇷🇺": "<tg-emoji emoji-id=6323139226418284334>🇷🇺</tg-emoji>",
+            "🇺🇦": "<tg-emoji emoji-id=5276140694891666474>🇺🇦</tg-emoji>",
+            "🇮🇹": "<tg-emoji emoji-id=6323471399188957082>🇮🇹</tg-emoji>",
+            "🇩🇪": "<tg-emoji emoji-id=6320817337033295141>🇩🇪</tg-emoji>",
+            "🇪🇸": "<tg-emoji emoji-id=6323315062379382237>🇪🇸</tg-emoji>",
+            "🇹🇷": "<tg-emoji emoji-id=6321003171678259486>🇹🇷</tg-emoji>",
+            "🇰🇿": "<tg-emoji emoji-id=5228718354658769982>🇰🇿</tg-emoji>",
+            "🥟": "<tg-emoji emoji-id=5382337996123020810>🥟</tg-emoji>",
+            "🇯🇵": "<tg-emoji emoji-id=5456261908069885892>🇯🇵</tg-emoji>",
+            "🇫🇷": "<tg-emoji emoji-id=5202132623060640759>🇫🇷</tg-emoji>",
+            "🏴‍☠️": "<tg-emoji emoji-id=5386372293263892965>🏴‍☠️</tg-emoji>",
+            "🇺🇿": "<tg-emoji emoji-id=5449829434334912605>🇺🇿</tg-emoji>",
+        }
+
+        lang2country = {
+            "en": "🇬🇧",
+            "tt": "🥟",
+            "kz": "🇰🇿",
+            "ua": "🇺🇦",
+            "de": "🇩🇪",
+            "jp": "🇯🇵",
+            "fr": "🇫🇷",
+            "uz": "🇺🇿",
+        }
+
+        for meme in translations.MEME_LANGUAGES.keys():
+            lang2country[meme] = "🏴‍☠️"
 
         lang = lang2country.get(lang) or utils.get_lang_flag(lang)
         return emoji_flags.get(lang, lang)
@@ -54,21 +105,8 @@ class Translations(loader.Module):
     @loader.command()
     async def setlang(self, message: Message):
         if not (args := utils.get_args_raw(message).lower()):
-            await self.inline.form(
-                message=message,
-                text=self.strings("choose_language"),
-                reply_markup=utils.chunks(
-                    [
-                        {
-                            "text": text,
-                            "callback": self._change_language,
-                            "args": (lang,),
-                        }
-                        for lang, text in translations.SUPPORTED_LANGUAGES.items()
-                    ],
-                    2,
-                ),
-            )
+
+            await self._choose_language(message=message)
             return
 
         if any(len(i) != 2 and not utils.check_url(i) for i in args.split()):
@@ -90,7 +128,7 @@ class Translations(loader.Module):
                         (
                             self._get_flag(lang)
                             if not utils.check_url(lang)
-                            else "<emoji document_id=5433653135799228968>📁</emoji>"
+                            else "<tg-emoji emoji-id=5433653135799228968>📁</tg-emoji>"
                         )
                         for lang in args.split()
                     ]

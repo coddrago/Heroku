@@ -4,7 +4,7 @@
 # You can redistribute it and/or modify it under the terms of the GNU AGPLv3
 # 🔑 https://www.gnu.org/licenses/agpl-3.0.html
 
-# ©️ Codrago, 2024-2025
+# ©️ Codrago, 2024-2030
 # This file is a part of Heroku Userbot
 # 🌐 https://github.com/coddrago/Heroku
 # You can redistribute it and/or modify it under the terms of the GNU AGPLv3
@@ -117,9 +117,14 @@ class HerokuConfigMod(loader.Module):
                         "text": self.strings("back_btn"),
                         "callback": self.inline__configure,
                         "args": (mod,),
+                        "style": "primary",
                         "kwargs": {"obj_type": obj_type},
                     },
-                    {"text": self.strings("close_btn"), "action": "close"},
+                    {
+                        "text": self.strings("close_btn"),
+                        "action": "close",
+                        "style": "danger",
+                    },
                 ]
             ],
             inline_message_id=inline_message_id,
@@ -149,9 +154,14 @@ class HerokuConfigMod(loader.Module):
                         "text": self.strings("back_btn"),
                         "callback": self.inline__configure,
                         "args": (mod,),
+                        "style": "primary",
                         "kwargs": {"obj_type": obj_type},
                     },
-                    {"text": self.strings("close_btn"), "action": "close"},
+                    {
+                        "text": self.strings("close_btn"),
+                        "action": "close",
+                        "style": "danger",
+                    },
                 ]
             ],
         )
@@ -268,9 +278,14 @@ class HerokuConfigMod(loader.Module):
                     "text": self.strings("back_btn"),
                     "callback": self.inline__configure,
                     "args": (mod,),
+                    "style": "primary",
                     "kwargs": {"obj_type": obj_type},
                 },
-                {"text": self.strings("close_btn"), "action": "close"},
+                {
+                    "text": self.strings("close_btn"),
+                    "action": "close",
+                    "style": "danger",
+                },
             ],
         ]
 
@@ -319,9 +334,14 @@ class HerokuConfigMod(loader.Module):
                         "text": self.strings("back_btn"),
                         "callback": self.inline__configure,
                         "args": (mod,),
+                        "style": "primary",
                         "kwargs": {"obj_type": obj_type},
                     },
-                    {"text": self.strings("close_btn"), "action": "close"},
+                    {
+                        "text": self.strings("close_btn"),
+                        "action": "close",
+                        "style": "danger",
+                    },
                 ]
             ],
             inline_message_id=inline_message_id,
@@ -384,9 +404,14 @@ class HerokuConfigMod(loader.Module):
                         "text": self.strings("back_btn"),
                         "callback": self.inline__configure,
                         "args": (mod,),
+                        "style": "primary",
                         "kwargs": {"obj_type": obj_type},
                     },
-                    {"text": self.strings("close_btn"), "action": "close"},
+                    {
+                        "text": self.strings("close_btn"),
+                        "action": "close",
+                        "style": "danger",
+                    },
                 ]
             ],
             inline_message_id=inline_message_id,
@@ -451,9 +476,14 @@ class HerokuConfigMod(loader.Module):
                     "text": self.strings("back_btn"),
                     "callback": self.inline__configure,
                     "args": (mod,),
+                    "style": "primary",
                     "kwargs": {"obj_type": obj_type},
                 },
-                {"text": self.strings("close_btn"), "action": "close"},
+                {
+                    "text": self.strings("close_btn"),
+                    "action": "close",
+                    "style": "danger",
+                },
             ],
         ]
 
@@ -492,9 +522,14 @@ class HerokuConfigMod(loader.Module):
                         "text": self.strings("back_btn"),
                         "callback": self.inline__configure,
                         "args": (mod,),
+                        "style": "primary",
                         "kwargs": {"obj_type": obj_type},
                     },
-                    {"text": self.strings("close_btn"), "action": "close"},
+                    {
+                        "text": self.strings("close_btn"),
+                        "action": "close",
+                        "style": "danger",
+                    },
                 ]
             ],
         )
@@ -527,7 +562,9 @@ class HerokuConfigMod(loader.Module):
             )
             return
 
-        await self.inline__configure_option(call, mod=mod, config_opt=option, force_hidden=False, obj_type=obj_type)
+        await self.inline__configure_option(
+            call, mod=mod, config_opt=option, force_hidden=False, obj_type=obj_type
+        )
         await call.answer("✅")
 
     def _generate_choice_markup(
@@ -593,9 +630,14 @@ class HerokuConfigMod(loader.Module):
                     "text": self.strings("back_btn"),
                     "callback": self.inline__configure,
                     "args": (mod,),
+                    "style": "primary",
                     "kwargs": {"obj_type": obj_type},
                 },
-                {"text": self.strings("close_btn"), "action": "close"},
+                {
+                    "text": self.strings("close_btn"),
+                    "action": "close",
+                    "style": "danger",
+                },
             ],
         ]
 
@@ -662,9 +704,14 @@ class HerokuConfigMod(loader.Module):
                     "text": self.strings("back_btn"),
                     "callback": self.inline__configure,
                     "args": (mod,),
+                    "style": "primary",
                     "kwargs": {"obj_type": obj_type},
                 },
-                {"text": self.strings("close_btn"), "action": "close"},
+                {
+                    "text": self.strings("close_btn"),
+                    "action": "close",
+                    "style": "danger",
+                },
             ],
         ]
 
@@ -681,7 +728,7 @@ class HerokuConfigMod(loader.Module):
         args = [
             utils.escape_html(config_opt),
             utils.escape_html(mod),
-            utils.escape_html(module.config.getdoc(config_opt)),
+            utils.escape_non_html(module.config.getdoc(config_opt)),
             self.prep_value(module.config.getdef(config_opt)),
             (
                 self.prep_value(module.config[config_opt])
@@ -702,7 +749,12 @@ class HerokuConfigMod(loader.Module):
                         {
                             "text": self.strings("hide_value"),
                             "callback": self.inline__configure_option,
-                            "kwargs": {"obj_type": obj_type, "mod": mod, "config_opt": config_opt, "force_hidden": False},
+                            "kwargs": {
+                                "obj_type": obj_type,
+                                "mod": mod,
+                                "config_opt": config_opt,
+                                "force_hidden": False,
+                            },
                         }
                     ]
                 ]
@@ -712,7 +764,12 @@ class HerokuConfigMod(loader.Module):
                         {
                             "text": self.strings("show_hidden"),
                             "callback": self.inline__configure_option,
-                            "kwargs": {"obj_type": obj_type, "mod": mod, "config_opt": config_opt, "force_hidden": True},
+                            "kwargs": {
+                                "obj_type": obj_type,
+                                "mod": mod,
+                                "config_opt": config_opt,
+                                "force_hidden": True,
+                            },
                         }
                     ]
                 ]
@@ -745,73 +802,73 @@ class HerokuConfigMod(loader.Module):
                     eng_art="n" if doc.lower().startswith(tuple("euioay")) else "",
                 )
             ]
-            if validator.internal_id == "Boolean":
-                await call.edit(
-                    self.strings(
-                        "configuring_option"
-                        if isinstance(obj_type, bool)
-                        else "configuring_option_lib"
-                    ).format(*args),
-                    reply_markup=additonal_button_row
-                    + self._generate_bool_markup(mod, config_opt, obj_type),
-                )
-                return
+            match validator.internal_id:
+                case "Boolean":
+                    await call.edit(
+                        self.strings(
+                            "configuring_option"
+                            if isinstance(obj_type, bool)
+                            else "configuring_option_lib"
+                        ).format(*args),
+                        reply_markup=additonal_button_row
+                        + self._generate_bool_markup(mod, config_opt, obj_type),
+                    )
+                    return
+                case "Series":
+                    await call.edit(
+                        self.strings(
+                            "configuring_option"
+                            if isinstance(obj_type, bool)
+                            else "configuring_option_lib"
+                        ).format(*args),
+                        reply_markup=additonal_button_row
+                        + self._generate_series_markup(call, mod, config_opt, obj_type),
+                    )
+                    return
+                case "Choice":
+                    await call.edit(
+                        self.strings(
+                            "configuring_option"
+                            if isinstance(obj_type, bool)
+                            else "configuring_option_lib"
+                        ).format(*args),
+                        reply_markup=additonal_button_row
+                        + self._generate_choice_markup(call, mod, config_opt, obj_type),
+                    )
+                    return
+                case "MultiChoice":
+                    await call.edit(
+                        self.strings(
+                            "configuring_option"
+                            if isinstance(obj_type, bool)
+                            else "configuring_option_lib"
+                        ).format(*args),
+                        reply_markup=additonal_button_row
+                        + self._generate_multi_choice_markup(
+                            call, mod, config_opt, obj_type
+                        ),
+                    )
+                    return
 
-            if validator.internal_id == "Series":
-                await call.edit(
-                    self.strings(
-                        "configuring_option"
-                        if isinstance(obj_type, bool)
-                        else "configuring_option_lib"
-                    ).format(*args),
-                    reply_markup=additonal_button_row
-                    + self._generate_series_markup(call, mod, config_opt, obj_type),
-                )
-                return
-
-            if validator.internal_id == "Choice":
-                await call.edit(
-                    self.strings(
-                        "configuring_option"
-                        if isinstance(obj_type, bool)
-                        else "configuring_option_lib"
-                    ).format(*args),
-                    reply_markup=additonal_button_row
-                    + self._generate_choice_markup(call, mod, config_opt, obj_type),
-                )
-                return
-
-            if validator.internal_id == "MultiChoice":
-                await call.edit(
-                    self.strings(
-                        "configuring_option"
-                        if isinstance(obj_type, bool)
-                        else "configuring_option_lib"
-                    ).format(*args),
-                    reply_markup=additonal_button_row
-                    + self._generate_multi_choice_markup(
-                        call, mod, config_opt, obj_type
-                    ),
-                )
-                return
-            
         text = self.strings(
-                "configuring_option"
-                if isinstance(obj_type, bool)
-                else "configuring_option_lib"
-            ).format(*args)
-        
+            "configuring_option"
+            if isinstance(obj_type, bool)
+            else "configuring_option_lib"
+        ).format(*args)
+
         if len(text) > 4096:
             additonal_button_row += self.inline.build_pagination(
                 callback=functools.partial(
-                    self.inline__configure_option, mod=mod, config_opt=config_opt, force_hidden=force_hidden, obj_type=obj_type
+                    self.inline__configure_option,
+                    mod=mod,
+                    config_opt=config_opt,
+                    force_hidden=force_hidden,
+                    obj_type=obj_type,
                 ),
                 total_pages=ceil(len(text) / 4096),
                 current_page=page + 1,
             )
-            text = list(utils.smart_split(
-                *html.parse(text)
-            ))[page]
+            text = list(utils.smart_split(*html.parse(text)))[page]
 
         await call.edit(
             text,
@@ -839,9 +896,14 @@ class HerokuConfigMod(loader.Module):
                         "text": self.strings("back_btn"),
                         "callback": self.inline__configure,
                         "args": (mod,),
+                        "style": "primary",
                         "kwargs": {"obj_type": obj_type},
                     },
-                    {"text": self.strings("close_btn"), "action": "close"},
+                    {
+                        "text": self.strings("close_btn"),
+                        "action": "close",
+                        "style": "danger",
+                    },
                 ],
             ],
         )
@@ -851,14 +913,31 @@ class HerokuConfigMod(loader.Module):
         call: InlineCall,
         mod: str,
         obj_type: typing.Union[bool, str] = False,
+        folder: typing.Optional[str] = None,
     ):
+
+        module = self.lookup(mod)
+
+        direct = []
+        for param in module.config:
+            config_value = module.config._config.get(param)
+            if folder is None:
+                if (
+                    not config_value
+                    or not hasattr(config_value, "folder")
+                    or not config_value.folder
+                ):
+                    direct.append(param)
+            else:
+                direct.append(param)
+
         btns = [
             {
                 "text": param,
                 "callback": self.inline__configure_option,
                 "kwargs": {"obj_type": obj_type, "mod": mod, "config_opt": param},
             }
-            for param in self.lookup(mod).config
+            for param in direct
         ]
 
         await call.edit(
@@ -866,26 +945,32 @@ class HerokuConfigMod(loader.Module):
                 "configuring_mod" if isinstance(obj_type, bool) else "configuring_lib"
             ).format(
                 utils.escape_html(mod),
-                "\n".join(
-                    [
-                        "▫️ <code>{}</code>: <b>{}</b>".format(
-                            utils.escape_html(key),
-                            (
-                                self._get_value(mod, key)
-                                if len(self._get_value(mod, key)) < 200
-                                else (
-                                    list(
-                                        utils.smart_split(
-                                            *html.parse(self._get_value(mod, key)),
-                                            200
+                (
+                    "\n".join(
+                        [
+                            "▫️ <code>{}</code>: <b>{}</b>".format(
+                                utils.escape_html(param),
+                                (
+                                    self._get_value(mod, param)
+                                    if len(self._get_value(mod, param)) < 200
+                                    else (
+                                        list(
+                                            utils.smart_split(
+                                                *html.parse(
+                                                    self._get_value(mod, param)
+                                                ),
+                                                200,
                                             )
-                                        )[0] +
-                                    "..."
+                                        )[0]
+                                        + "..."
                                     )
-                            ),
-                        )
-                        for key in self.lookup(mod).config
-                    ]
+                                ),
+                            )
+                            for param in direct
+                        ]
+                    )
+                    if direct
+                    else "No options"
                 ),
             ),
             reply_markup=list(utils.chunks(btns, 2))
@@ -894,14 +979,82 @@ class HerokuConfigMod(loader.Module):
                     {
                         "text": self.strings("back_btn"),
                         "callback": self.inline__global_config,
+                        "style": "primary",
                         "kwargs": {"obj_type": obj_type},
                     },
-                    {"text": self.strings("close_btn"), "action": "close"},
+                    {
+                        "text": self.strings("close_btn"),
+                        "action": "close",
+                        "style": "danger",
+                    },
                 ]
             ],
         )
 
+    def _get_all_folders(self) -> dict:
+        folders = {}
+        for mod in self.allmodules.modules:
+            if not hasattr(mod, "config") or not mod.config:
+                continue
+            mod_name = (
+                mod.strings("name") if callable(mod.strings) else mod.__class__.__name__
+            )
+            module_folders = set()
+            for param in mod.config:
+                config_value = mod.config._config.get(param)
+                if (
+                    config_value
+                    and hasattr(config_value, "folder")
+                    and config_value.folder
+                ):
+                    module_folders.add(config_value.folder)
+
+            for folder_name in module_folders:
+                if folder_name not in folders:
+                    folders[folder_name] = {}
+                folders[folder_name][mod_name] = [p for p in mod.config]
+        try:
+            from . import presets as _presets_mod
+
+            preset_folders = self.db.get("presets", "folders")
+        except Exception:
+            preset_folders = {}
+
+        if preset_folders:
+            for folder_name, mod_list in preset_folders.items():
+                if folder_name not in folders:
+                    folders[folder_name] = {}
+                for raw_mod in mod_list:
+                    for mod in self.allmodules.modules:
+                        try:
+                            if mod.__class__.__name__.lower() == raw_mod.lower():
+                                mod_name = (
+                                    mod.strings("name")
+                                    if callable(mod.strings)
+                                    else mod.__class__.__name__
+                                )
+                                if mod_name not in folders[folder_name]:
+                                    folders[folder_name][mod_name] = [
+                                        p for p in mod.config
+                                    ]
+                                break
+                        except Exception:
+                            continue
+
+        return folders
+
     async def inline__choose_category(self, call: typing.Union[Message, InlineCall]):
+        all_folders = self._get_all_folders()
+
+        folder_btns = [
+            {
+                "text": f"📁 {folder_name}",
+                "callback": self.inline__global_folder,
+                "kwargs": {"folder": folder_name},
+            }
+            for folder_name in sorted(all_folders.keys())
+        ]
+
         await utils.answer(
             call,
             self.strings("choose_core"),
@@ -931,7 +1084,71 @@ class HerokuConfigMod(loader.Module):
                     and any(hasattr(lib, "config") for lib in self.allmodules.libraries)
                     else []
                 ),
-                [{"text": self.strings("close_btn"), "action": "close"}],
+                *list(utils.chunks(folder_btns, 2)),
+                [
+                    {
+                        "text": self.strings("close_btn"),
+                        "action": "close",
+                        "style": "danger",
+                    }
+                ],
+            ],
+        )
+
+    async def inline__global_folder(
+        self,
+        call: InlineCall,
+        folder: str,
+    ):
+        all_folders = self._get_all_folders()
+        folder_options = all_folders.get(folder, {})
+
+        btns = [
+            {
+                "text": f"{mod_name}",
+                "callback": self.inline__configure,
+                "kwargs": {"obj_type": False, "mod": mod_name, "folder": folder},
+            }
+            for mod_name in sorted(folder_options.keys())
+        ]
+
+        text_parts = []
+        for mod_name, params in folder_options.items():
+            try:
+                raw_parts = []
+                for param in params:
+                    try:
+                        raw_value = str(self.lookup(mod_name).config[param])
+                        if len(raw_value) > 100:
+                            raw_value = raw_value[:100] + "..."
+                        raw_parts.append(
+                            f"<code>{utils.escape_html(param)}</code>: <code>{utils.escape_html(raw_value)}</code>"
+                        )
+                    except Exception:
+                        raw_parts.append(f"<code>{utils.escape_html(param)}</code>")
+                text_parts.append(f"▫️ <b>{utils.escape_html(mod_name)}</b>")
+            except Exception:
+                text_parts.append(f"▫️ <b>{utils.escape_html(mod_name)}</b>")
+
+        await call.edit(
+            self.strings("configuring_folder").format(
+                utils.escape_html(folder),
+                "\n".join(text_parts) if text_parts else "No options",
+            ),
+            reply_markup=list(utils.chunks(btns, 1))
+            + [
+                [
+                    {
+                        "text": self.strings("back_btn"),
+                        "callback": self.inline__choose_category,
+                        "style": "primary",
+                    },
+                    {
+                        "text": self.strings("close_btn"),
+                        "action": "close",
+                        "style": "danger",
+                    },
+                ]
             ],
         )
 
@@ -987,8 +1204,13 @@ class HerokuConfigMod(loader.Module):
                 {
                     "text": self.strings("back_btn"),
                     "callback": self.inline__choose_category,
+                    "style": "primary",
                 },
-                {"text": self.strings("close_btn"), "action": "close"},
+                {
+                    "text": self.strings("close_btn"),
+                    "action": "close",
+                    "style": "danger",
+                },
             ]
         ]
 
@@ -1003,19 +1225,31 @@ class HerokuConfigMod(loader.Module):
     async def configcmd(self, message: Message):
         args = utils.get_args_raw(message)
         args_s = args.split()
-        if len(args_s) == 1 and self.lookup(args_s[0]) and hasattr(self.lookup(args_s[0]), 'config'):
-            form = await self.inline.form(self.config["cfg_emoji"], message, silent=True)
-            mod = self.lookup(args)
+        if (
+            len(args_s) == 1
+            and self.lookup(args_s[0])
+            and hasattr(self.lookup(args_s[0]), "config")
+        ):
+            form = await self.inline.form(
+                self.config["cfg_emoji"], message, silent=True
+            )
+            mod = self.lookup(args_s[0])
             if isinstance(mod, loader.Library):
                 type_ = "library"
             else:
                 type_ = mod.__origin__.startswith("<core")
 
-            await self.inline__configure(form, args, obj_type=type_)
+            await self.inline__configure(form, args_s[0], obj_type=type_)
             return
 
-        if len(args_s) == 2 and self.lookup(args_s[0]) and hasattr(self.lookup(args_s[0]), 'config'):
-            form = await self.inline.form(self.config["cfg_emoji"], message, silent=True)
+        if (
+            len(args_s) == 2
+            and self.lookup(args_s[0])
+            and hasattr(self.lookup(args_s[0]), "config")
+        ):
+            form = await self.inline.form(
+                self.config["cfg_emoji"], message, silent=True
+            )
             mod = self.lookup(args_s[0])
             if isinstance(mod, loader.Library):
                 type_ = "library"
@@ -1023,41 +1257,81 @@ class HerokuConfigMod(loader.Module):
                 type_ = mod.__origin__.startswith("<core")
 
             if args_s[1] in mod.config.keys():
-                await self.inline__configure_option(form, mod=args_s[0], config_opt=args_s[1], obj_type=type_)
+                await self.inline__configure_option(
+                    form, mod=args_s[0], config_opt=args_s[1], obj_type=type_
+                )
             else:
-                await self.inline__configure(form, args, obj_type=type_)
+                await self.inline__choose_category(message)
             return
 
         await self.inline__choose_category(message)
 
     @loader.command(alias="fcfg")
     async def fconfig(self, message: Message):
-        args = utils.get_args_raw(message).split(maxsplit=2)
+        raw = utils.get_args_raw(message).strip()
+        reply = await message.get_reply_message()
 
-        if len(args) < 3:
+        if not raw:
             await utils.answer(message, self.strings("args"))
             return
 
-        mod, option, value = args
+        parts = [p.strip() for p in raw.split("&&") if p.strip()]
+        if not parts:
+            await utils.answer(message, self.strings("args"))
+            return
+
+        first = parts[0].split(maxsplit=2)
+
+        if len(first) == 3:
+            mod, option, value = first
+        elif len(first) == 2 and reply:
+            mod, option = first
+            value = reply.raw_text
+            if not value:
+                await utils.answer(message, self.strings("args"))
+                return
+        else:
+            await utils.answer(message, self.strings("args"))
+            return
 
         if not (instance := self.lookup(mod)):
             await utils.answer(message, self.strings("no_mod"))
             return
 
-        if option not in instance.config:
+        updates = []
+
+        def apply_update(opt: str, val: str):
+            if opt not in instance.config:
+                return f"NO_OPTION::{opt}"
+            instance.config[opt] = val
+            return f"OK::{opt}"
+
+        res = apply_update(option, value)
+        if res.startswith("NO_OPTION::"):
             await utils.answer(message, self.strings("no_option"))
             return
+        updates.append((option, self._get_value(mod, option)))
 
-        instance.config[option] = value
-        await utils.answer(
-            message,
-            self.strings(
-                "option_saved"
-                if isinstance(instance, loader.Module)
-                else "option_saved_lib"
-            ).format(
-                utils.escape_html(option),
-                utils.escape_html(mod),
-                self._get_value(mod, option),
-            ),
-        )
+        for p in parts[1:]:
+            seg = p.split(maxsplit=1)
+            if len(seg) < 2:
+                await utils.answer(message, self.strings("args"))
+                return
+            opt, val = seg
+            res = apply_update(opt, val)
+            if res.startswith("NO_OPTION::"):
+                await utils.answer(message, self.strings("no_option"))
+                return
+            updates.append((opt, self._get_value(mod, opt)))
+
+        lines = []
+        for opt, val in updates:
+            lines.append(
+                self.strings(
+                    "option_saved"
+                    if isinstance(instance, loader.Module)
+                    else "option_saved_lib"
+                ).format(utils.escape_html(opt), utils.escape_html(mod), val)
+            )
+
+        await utils.answer(message, "\n".join(lines))

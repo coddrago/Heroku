@@ -1,4 +1,120 @@
 # Heroku Changelog
+## 🪐 Heroku 2.0.0
+- rework utils
+- add prefix to start message
+- fix create bot
+- remove debugger
+- improve error message
+- add protection in terminal
+- add media_quote, invert_media to help, ping and info cmds
+- remove "heroku" from bot username
+- fix asset channel
+- add entity validation for setprefix
+- update readme
+- add utils.get_platform_named_emoji
+- add multiload
+- fix error in help lib
+- add config to internet error ignore
+- update heroku-tl to 2.0.0
+- add time execution to eval and terminal
+- add type annotations (developer oriented)
+- add japanese language
+- add french language
+- add protection for messages from 777000 and 489000
+- add help -c (core modules) and help -l (loaded modules)
+- new info
+- fix folders
+- rework bot creation
+- add python version in info
+- remove -S flag from sudo
+- add link validator to help, info, ping
+- add meme lang packs
+- add UwU language to meme pack
+- add leet(1337) to meme pack
+- add tiktokkid to meme pack
+- remove support python 3.9
+- rework if else to match/case
+- add utils.format_file_size
+- add utils.is_url
+- add utils.get_iso_time
+- add utils.safe_getattr
+- add utils.get_last_commit_message
+- add utils.get_commit_count
+- add utils.get_hostname
+- add utils.resolve_domain
+- add utils.is_port_open
+- add utils.get_network_interfaces
+- add utils.get_disk_usage
+- add utils.get_ip_address
+- add utils.get_args_bool
+- add utils.get_args_int
+- fix pack_url
+- add togglecmd cmd for disable or enable any cmd
+- add togglemod cmd for disable or enable any module
+- add clearmodule cmd
+- add placeholder system
+- move all log chat to forumTopics
+- add execution in .e from reply
+- add utils.asset_forum_topic
+- add utils.create_topic
+- add operator to fcfg
+- remove invokecmd
+- remove uninstall_herokucmd
+- remove debugmodcmd
+- add new validator RandomLink
+- replace validators in help, herokuinfo, tester to RandomLink
+- add and remove some modules in presets
+- replace TgCrypto to TgCrypto-pyrofork
+- impove keyboard layout
+- refactor clean up socket path assignment handling
+- improve platform model detection
+- add blockquote to dlm and lm cmds
+- improve boolean validation
+- add requirements installation when launching the userbot
+- add mini protection in eval
+- fix database path
+- fconfig value from reply
+- migrate from json to orjson
+- backupall send backup in backupchat
+- fully remove save to fs
+- optimize username handling & fix logic
+- protection for session files
+- add premium emoji in some cases with inline
+- add developer in help
+- add folder for config
+- remove pyproject.toml
+- add more session protection
+- add custom presets
+- add message about no query answer
+- add ulm -f
+- fix permission denied in info 
+- add hiding the phone in htl
+- add more protection for official telegram account (777000)
+- add button styles support for aiogram 3.25.0+ (danger, primary, success)
+- add premium emoji support in buttons via icon_custom_emoji_id (aiogram 3.25.0+)
+- add aliases export/import
+- add folders
+- restrict inline queries for not allowed users
+- add new styles button in some cases
+- add some "icons" in buttons
+- remove utils.html_escape from eval
+- fix watcherbl
+- remove blacklist from ubguard.codrago.life
+- fix config mod args when args is wrong
+- add some translation providers to translator
+- fix: replace all no-break spaces with regular ones in Evaluator
+- add premium icon to /start and /profile
+- fix critical bug with inline
+- fix: update hashable_entity check to handle negative channel ID's
+- add bot command adding
+- improve error handling and add debug logging for bot command settings 
+- remove watchdog func from tester
+- remove info in photo switch
+- remove show_heroku from info
+- improve presets button translations
+- fix restore button invoke
+- improve logging logic
+
 ## 🪐 Heroku 1.7.2
 - added autoupdate
 - updated heroku-tl to 1.7.2

@@ -4,13 +4,14 @@
 # You can redistribute it and/or modify it under the terms of the GNU AGPLv3
 # 🔑 https://www.gnu.org/licenses/agpl-3.0.html
 
-# ©️ Codrago, 2024-2025
+# ©️ Codrago, 2024-2030
 # This file is a part of Heroku Userbot
 # 🌐 https://github.com/coddrago/Heroku
 # You can redistribute it and/or modify it under the terms of the GNU AGPLv3
 # 🔑 https://www.gnu.org/licenses/agpl-3.0.html
 
 import logging
+import typing
 
 from aiogram.types import CallbackQuery
 from aiogram.types import InlineQuery as AiogramInlineQuery
@@ -18,9 +19,14 @@ from aiogram.types import InlineQueryResultArticle, InputTextMessageContent
 from aiogram.types import Message as AiogramMessage
 from pydantic import ConfigDict
 
-from .. import utils
+HerokuReplyMarkup = typing.Union[
+    typing.List[typing.List[dict]], typing.List[dict], dict
+]
 
 logger = logging.getLogger(__name__)
+
+if typing.TYPE_CHECKING:
+    from .core import InlineManager
 
 
 class InlineMessage:
@@ -63,7 +69,8 @@ class InlineMessage:
         cid = entity.get("chat")
 
         await self.inline_manager._client.delete_messages(cid, msgid)
-        return await self.original_call.answer("")
+        if hasattr(self, "original_call"):
+            return await self.original_call.answer("")
 
     async def unload(self) -> bool:
         return await self.inline_manager._unload_unit(unit_id=self.unit_id)
@@ -127,6 +134,7 @@ class BotInlineMessage:
 
 class InlineCall(CallbackQuery, InlineMessage):
     """Modified version of classic aiogram `CallbackQuery`"""
+
     model_config = ConfigDict(frozen=False)
 
     def __init__(
@@ -155,6 +163,7 @@ class InlineCall(CallbackQuery, InlineMessage):
 
 class BotInlineCall(CallbackQuery, BotInlineMessage):
     """Modified version of classic aiogram `CallbackQuery`"""
+
     model_config = ConfigDict(frozen=False)
 
     def __init__(
@@ -207,9 +216,11 @@ class InlineQuery(AiogramInlineQuery):
 
     @staticmethod
     def _get_res(title: str, description: str, thumbnail_url: str) -> list:
+        from ..utils.other import rand
+
         return [
             InlineQueryResultArticle(
-                id=utils.rand(20),
+                id=rand(20),
                 title=title,
                 description=description,
                 input_message_content=InputTextMessageContent(

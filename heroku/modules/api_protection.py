@@ -4,20 +4,20 @@
 # You can redistribute it and/or modify it under the terms of the GNU AGPLv3
 # 🔑 https://www.gnu.org/licenses/agpl-3.0.html
 
-# ©️ Codrago, 2024-2025
+# ©️ Codrago, 2024-2030
 # This file is a part of Heroku Userbot
 # 🌐 https://github.com/coddrago/Heroku
 # You can redistribute it and/or modify it under the terms of the GNU AGPLv3
 # 🔑 https://www.gnu.org/licenses/agpl-3.0.html
 
 import asyncio
-import io
 import json
 import logging
 import random
 import time
 import typing
 
+from aiogram.types import BufferedInputFile
 from herokutl.tl import functions
 from herokutl.tl.tlobject import TLRequest
 from herokutl.tl.types import Message
@@ -25,7 +25,6 @@ from herokutl.utils import is_list_like
 
 from .. import loader, utils
 from ..inline.types import InlineCall
-from ..web.debugger import WebDebugger
 
 logger = logging.getLogger(__name__)
 
@@ -51,12 +50,16 @@ GROUPS = [
 
 
 CONSTRUCTORS = {
-    (entity_name[0].lower() + entity_name[1:]).rsplit("Request", 1)[0]: getattr(cur_entity, "CONSTRUCTOR_ID")
+    (entity_name[0].lower() + entity_name[1:]).rsplit("Request", 1)[0]: getattr(
+        cur_entity, "CONSTRUCTOR_ID"
+    )
     for group in GROUPS
     for entity_name in dir(getattr(functions, group))
-    if hasattr((cur_entity := getattr(getattr(functions, group), entity_name)), "__bases__") 
-       and TLRequest in cur_entity.__bases__ 
-       and hasattr(cur_entity, "CONSTRUCTOR_ID")
+    if hasattr(
+        (cur_entity := getattr(getattr(functions, group), entity_name)), "__bases__"
+    )
+    and TLRequest in cur_entity.__bases__
+    and hasattr(cur_entity, "CONSTRUCTOR_ID")
 }
 
 
@@ -100,15 +103,22 @@ class APIRatelimiterMod(loader.Module):
                         "importChatInvite",
                     ]
                 ),
-                on_change=self.on_forbidden_methods_update
+                on_change=self.on_forbidden_methods_update,
             ),
         )
 
     async def client_ready(self):
         asyncio.ensure_future(self._install_protection())
-    
+
     async def on_forbidden_methods_update(self):
-        self._client.forbid_constructors(list(map(lambda x: CONSTRUCTORS[x], self.config['forbidden_methods'], )))
+        self._client.forbid_constructors(
+            list(
+                map(
+                    lambda x: CONSTRUCTORS[x],
+                    self.config["forbidden_methods"],
+                )
+            )
+        )
 
     async def _install_protection(self):
         await asyncio.sleep(30)  # Restart lock
@@ -153,13 +163,11 @@ class APIRatelimiterMod(loader.Module):
                         and not self._lock
                     ):
                         self._lock = True
-                        report = io.BytesIO(
-                            json.dumps(
-                                self._ratelimiter,
-                                indent=4,
-                            ).encode()
-                        )
-                        report.name = "local_fw_report.json"
+                        report_bytes = json.dumps(
+                            self._ratelimiter,
+                            indent=4,
+                        ).encode()
+                        report = BufferedInputFile(report_bytes, "local_fw_report.json")
 
                         await self.inline.bot.send_document(
                             self.tg_id,
@@ -206,39 +214,6 @@ class APIRatelimiterMod(loader.Module):
             reply_markup=[
                 {"text": self.strings("btn_no"), "action": "close"},
                 {"text": self.strings("btn_yes"), "callback": self._finish},
-            ],
-        )
-
-    @property
-    def _debugger(self) -> WebDebugger:
-        return logging.getLogger().handlers[0].web_debugger
-
-    async def _show_pin(self, call: InlineCall):
-        self.inline.bot(await call.answer(f"Werkzeug PIN: {self._debugger.pin}", show_alert=True))
-
-    @loader.command()
-    async def debugger(self, message: Message):
-        if not self._debugger:
-            await utils.answer(message, self.strings("debugger_disabled"))
-            return
-
-        await self.inline.form(
-            message=message,
-            text=self.strings("web_pin"),
-            reply_markup=[
-                [
-                    {
-                        "text": self.strings("web_pin_btn"),
-                        "callback": self._show_pin,
-                    }
-                ],
-                [
-                    {"text": self.strings("proxied_url"), "url": self._debugger.url},
-                    {
-                        "text": self.strings("local_url"),
-                        "url": f"http://127.0.0.1:{self._debugger.port}",
-                    },
-                ],
             ],
         )
 

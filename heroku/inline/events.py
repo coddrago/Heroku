@@ -4,7 +4,7 @@
 # You can redistribute it and/or modify it under the terms of the GNU AGPLv3
 # 🔑 https://www.gnu.org/licenses/agpl-3.0.html
 
-# ©️ Codrago, 2024-2025
+# ©️ Codrago, 2024-2030
 # This file is a part of Heroku Userbot
 # 🌐 https://github.com/coddrago/Heroku
 # You can redistribute it and/or modify it under the terms of the GNU AGPLv3
@@ -28,17 +28,23 @@ from aiogram.types import (
 )
 from aiogram.types import Message as AiogramMessage
 
-from .. import utils
+from .. import loader, utils, security
 from .types import BotInlineCall, InlineCall, InlineQuery, InlineUnit
+
+if typing.TYPE_CHECKING:
+    from ..inline.core import InlineManager
 
 logger = logging.getLogger(__name__)
 
 
 class Events(InlineUnit):
-    async def _message_handler(self, message: AiogramMessage):
+    async def _message_handler(self: "InlineManager", message: AiogramMessage):
         """Processes incoming messages"""
-        if message.chat.type != "private" or message.text == "/start heroku init":
-            return
+        match True:
+            case _ if (
+                message.chat.type != "private" or message.text == "/start heroku init"
+            ):
+                return
 
         for mod in self._allmodules.modules:
             if (
@@ -49,26 +55,39 @@ class Events(InlineUnit):
                 continue
 
             try:
-                await mod.aiogram_watcher(message)
+                await loader._call_with_external_context(mod.aiogram_watcher, message)
             except Exception:
                 logger.exception("Error on running aiogram watcher!")
 
-    async def _inline_handler(self, inline_query: AiogramInlineQuery):
+    async def _inline_handler(self: "InlineManager", inline_query: AiogramInlineQuery):
         """Inline query handler (forms' calls)"""
+        if (
+            not self._db.get(security.__name__, "allow_inline_query", False)
+            and inline_query.from_user.id
+            not in self._client.dispatcher.security.all_users
+        ):
+            return
+
         if not (query := inline_query.query):
             await self._query_help(inline_query)
             return
 
         cmd = query.split()[0].lower()
-        if cmd in self._allmodules.inline_handlers and await self.check_inline_security(
-            func=self._allmodules.inline_handlers[cmd],
-            user=inline_query.from_user.id,
+        if (
+            cmd in self._allmodules.inline_handlers
+            and await self.check_inline_security(
+                func=self._allmodules.inline_handlers[cmd],
+                user=inline_query.from_user.id,
+            )
         ):
             instance = InlineQuery(inline_query=inline_query)
 
             try:
                 if not (
-                    result := await self._allmodules.inline_handlers[cmd](instance)
+                    result := await loader._call_with_external_context(
+                        self._allmodules.inline_handlers[cmd],
+                        instance,
+                    )
                 ):
                     return
             except Exception:
@@ -166,7 +185,9 @@ class Events(InlineUnit):
                                                 res.get("caption")
                                             ),
                                             parse_mode="HTML",
-                                            thumbnail_url=res.get("thumb", res["video"]),
+                                            thumbnail_url=res.get(
+                                                "thumb", res["video"]
+                                            ),
                                             video_url=res["video"],
                                             mime_type="video/mp4",
                                             reply_markup=self.generate_markup(
@@ -211,7 +232,7 @@ class Events(InlineUnit):
         await self._list_inline_handler(inline_query)
 
     async def _callback_query_handler(
-        self,
+        self: "InlineManager",
         call: CallbackQuery,
         reply_markup: typing.Optional[
             typing.List[typing.List[typing.Dict[str, typing.Any]]]
@@ -228,12 +249,13 @@ class Events(InlineUnit):
         for func in self._allmodules.callback_handlers.values():
             if await self.check_inline_security(func=func, user=call.from_user.id):
                 try:
-                    await func(
+                    await loader._call_with_external_context(
+                        func,
                         (
                             BotInlineCall
                             if getattr(getattr(call, "message", None), "chat", None)
                             else InlineCall
-                        )(call, self, None)
+                        )(call, self, None),
                     )
                 except Exception:
                     logger.exception("Error on running callback watcher!")
@@ -253,34 +275,37 @@ class Events(InlineUnit):
                     continue
 
                 if button.get("_callback_data") == call.data:
-                    if (
-                        button.get("disable_security", False)
-                        or unit.get("disable_security", False)
-                        or (
-                            unit.get("force_me", False)
-                            and call.from_user.id == self._me
-                        )
-                        or not unit.get("force_me", False)
-                        and (
-                            await self.check_inline_security(
-                                func=unit.get(
-                                    "perms_map",
-                                    lambda: self._client.dispatcher.security._default,
-                                )(),  # we call it so we can get reloaded rights in runtime
-                                user=call.from_user.id,
+                    match True:
+                        case _ if (
+                            button.get("disable_security", False)
+                            or unit.get("disable_security", False)
+                            or (
+                                unit.get("force_me", False)
+                                and call.from_user.id == self._me
                             )
-                            if "message" in unit
-                            else False
-                        )
-                    ):
-                        pass
-                    elif call.from_user.id not in (
-                        self._client.dispatcher.security._owner
-                        + unit.get("always_allow", [])
-                        + button.get("always_allow", [])
-                    ):
-                        await call.answer(self.translator.getkey("inline.button403"))
-                        return
+                            or not unit.get("force_me", False)
+                            and (
+                                await self.check_inline_security(
+                                    func=unit.get(
+                                        "perms_map",
+                                        lambda: self._client.dispatcher.security._default,
+                                    )(),
+                                    user=call.from_user.id,
+                                )
+                                if "message" in unit
+                                else False
+                            )
+                        ):
+                            pass
+                        case _ if call.from_user.id not in (
+                            self._client.dispatcher.security._owner
+                            + unit.get("always_allow", [])
+                            + button.get("always_allow", [])
+                        ):
+                            await call.answer(
+                                self.translator.getkey("inline.button403")
+                            )
+                            return
 
                     try:
                         result = await button["callback"](
@@ -306,33 +331,36 @@ class Events(InlineUnit):
                     return result
 
         if call.data in self._custom_map:
-            if (
-                self._custom_map[call.data].get("disable_security", False)
-                or (
-                    self._custom_map[call.data].get("force_me", False)
-                    and call.from_user.id == self._me
-                )
-                or not self._custom_map[call.data].get("force_me", False)
-                and (
-                    await self.check_inline_security(
-                        func=self._custom_map[call.data].get(
-                            "perms_map",
-                            lambda: self._client.dispatcher.security._default,
-                        )(),
-                        user=call.from_user.id,
+            match True:
+                case _ if (
+                    self._custom_map[call.data].get("disable_security", False)
+                    or (
+                        self._custom_map[call.data].get("force_me", False)
+                        and call.from_user.id == self._me
                     )
-                    if "message" in self._custom_map[call.data]
-                    else False
-                )
-            ):
-                pass
-            elif (
-                call.from_user.id not in self._client.dispatcher.security._owner
-                and call.from_user.id
-                not in self._custom_map[call.data].get("always_allow", [])
-            ):
-                await call.answer(self.translator.getkey("inline.button403"))
-                return
+                    or not self._custom_map[call.data].get("force_me", False)
+                    and (
+                        await self.check_inline_security(
+                            func=self._custom_map[call.data].get(
+                                "perms_map",
+                                lambda: self._client.dispatcher.security._default,
+                            )(),
+                            user=call.from_user.id,
+                        )
+                        if "message" in self._custom_map[call.data]
+                        else False
+                    )
+                ):
+                    pass
+                case (
+                    _
+                ) if call.from_user.id not in self._client.dispatcher.security._owner and call.from_user.id not in self._custom_map[
+                    call.data
+                ].get(
+                    "always_allow", []
+                ):
+                    await call.answer(self.translator.getkey("inline.button403"))
+                    return
 
             await self._custom_map[call.data]["handler"](
                 (
@@ -346,7 +374,7 @@ class Events(InlineUnit):
             return
 
     async def _chosen_inline_handler(
-        self,
+        self: "InlineManager",
         chosen_inline_query: ChosenInlineResult,
     ):
         query = chosen_inline_query.query
@@ -390,7 +418,7 @@ class Events(InlineUnit):
                         )
                         return
 
-    async def _query_help(self, inline_query: InlineQuery):
+    async def _query_help(self: "InlineManager", inline_query: InlineQuery):
         _help = []
         for name, fun in self._allmodules.inline_handlers.items():
             if not await self.check_inline_security(
@@ -452,7 +480,9 @@ class Events(InlineUnit):
                         title=self.translator.getkey("inline.show_inline_cmds"),
                         description=self.translator.getkey("inline.no_inline_cmds"),
                         input_message_content=InputTextMessageContent(
-                            message_text=self.translator.getkey("inline.no_inline_cmds_msg"),
+                            message_text=self.translator.getkey(
+                                "inline.no_inline_cmds_msg"
+                            ),
                             parse_mode="HTML",
                             disable_web_page_preview=True,
                         ),

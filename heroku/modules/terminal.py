@@ -1,38 +1,21 @@
-#    Friendly Telegram (telegram userbot)
-#    Copyright (C) 2018-2019 The Authors
-
-#    This program is free software: you can redistribute it and/or modify
-#    it under the terms of the GNU Affero General Public License as published by
-#    the Free Software Foundation, either version 3 of the License, or
-#    (at your option) any later version.
-
-#    This program is distributed in the hope that it will be useful,
-#    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#    GNU Affero General Public License for more details.
-
-#    You should have received a copy of the GNU Affero General Public License
-#    along with this program.  If not, see <https://www.gnu.org/licenses/>.
-
 # ©️ Dan Gazizullin, 2021-2023
 # This file is a part of Hikka Userbot
 # 🌐 https://github.com/hikariatama/Hikka
 # You can redistribute it and/or modify it under the terms of the GNU AGPLv3
 # 🔑 https://www.gnu.org/licenses/agpl-3.0.html
 
-# ©️ Codrago, 2024-2025
+# ©️ Codrago, 2024-2030
 # This file is a part of Heroku Userbot
 # 🌐 https://github.com/coddrago/Heroku
 # You can redistribute it and/or modify it under the terms of the GNU AGPLv3
 # 🔑 https://www.gnu.org/licenses/agpl-3.0.html
-
-# meta developer: @bsolute
 
 import asyncio
 import contextlib
 import logging
 import os
 import re
+import time
 import typing
 import signal
 
@@ -45,6 +28,7 @@ logger = logging.getLogger(__name__)
 
 def hash_msg(message):
     return f"{str(utils.get_chat_id(message))}/{str(message.id)}"
+
 
 async def read_stream(func: callable, stream, delay: float):
     last_task = None
@@ -92,6 +76,7 @@ class MessageEditor:
         self.config = config
         self.strings = strings
         self.request_message = request_message
+        self.start_time = time.time()
 
     async def update_stdout(self, stdout):
         self.stdout = stdout
@@ -113,6 +98,10 @@ class MessageEditor:
         text += (self.strings("stderr") + stderr) if stderr else ""
         text += self.strings("end")
 
+        if self.rc is not None:
+            exec_time = time.time() - self.start_time
+            text += self.strings["time_exec"].format(round(exec_time, 2))
+
         with contextlib.suppress(herokutl.errors.rpcerrorlist.MessageNotModifiedError):
             try:
                 self.message = await utils.answer(self.message, text)
@@ -131,9 +120,11 @@ class MessageEditor:
 
 
 class SudoMessageEditor(MessageEditor):
-    # Let's just hope these are safe to parse
     PASS_REQ = ["[sudo] password for", "[sudo] пароль для"]
-    WRONG_PASS = [r"\[sudo\] password for (.*): Sorry, try again\.", r"\[sudo\] пароль для (.*): Попробуйте еще раз.\."]
+    WRONG_PASS = [
+        r"\[sudo\] password for (.*): Sorry, try again\.",
+        r"\[sudo\] пароль для (.*): Попробуйте еще раз.\.",
+    ]
     TOO_MANY_TRIES = [r"\[sudo\] password for (.*): sudo: [0-9]+ incorrect password attempts", r"\[sudo\] пароль для (.*): sudo: [0-9]+ неверные попытки ввода пароля"]  # fmt: skip
 
     def __init__(self, message, command, config, strings, request_message):
@@ -161,7 +152,8 @@ class SudoMessageEditor(MessageEditor):
             and self.state == 1
         ):
             logger.debug("switching state to 0")
-            await utils.answer(message, self.strings("auth_fail"))
+            await utils.answer(self.message, self.strings("auth_fail"))
+
             self.state = 0
             handled = True
             await asyncio.sleep(2)
@@ -197,7 +189,8 @@ class SudoMessageEditor(MessageEditor):
             handled = True
 
         if len(lines) > 1 and (
-            any(re.fullmatch(i, lastline) for i in self.TOO_MANY_TRIES) and self.state in {1, 3, 4}
+            any(re.fullmatch(i, lastline) for i in self.TOO_MANY_TRIES)
+            and self.state in {1, 3, 4}
         ):
             logger.debug("password wrong lots of times")
             await utils.answer(self.message, self.strings("auth_locked"))
@@ -264,24 +257,25 @@ class RawMessageEditor(SudoMessageEditor):
     async def redraw(self):
         logger.debug(self.rc)
 
-        if self.rc is None:
-            text = (
-                "<code>"
-                + utils.escape_html(self.stdout[max(len(self.stdout) - 4095, 0) :])
-                + "</code>"
-            )
-        elif self.rc == 0:
-            text = (
-                "<code>"
-                + utils.escape_html(self.stdout[max(len(self.stdout) - 4090, 0) :])
-                + "</code>"
-            )
-        else:
-            text = (
-                "<code>"
-                + utils.escape_html(self.stderr[max(len(self.stderr) - 4095, 0) :])
-                + "</code>"
-            )
+        match self.rc:
+            case None:
+                text = (
+                    "<code>"
+                    + utils.escape_html(self.stdout[max(len(self.stdout) - 4095, 0) :])
+                    + "</code>"
+                )
+            case 0:
+                text = (
+                    "<code>"
+                    + utils.escape_html(self.stdout[max(len(self.stdout) - 4090, 0) :])
+                    + "</code>"
+                )
+            case _:
+                text = (
+                    "<code>"
+                    + utils.escape_html(self.stderr[max(len(self.stderr) - 4095, 0) :])
+                    + "</code>"
+                )
 
         if self.rc is not None and self.show_done:
             text += "\n" + self.strings("done")
@@ -306,6 +300,32 @@ class TerminalMod(loader.Module):
 
     strings = {"name": "Terminal"}
 
+    DANGEROUS_COMMANDS = [
+        r"rm\s+.*\s+\/\s*\*?",
+        r"rm\s+.*\s+\/etc\/",
+        r"rm\s+.*\s+\/dev\/",
+        r"rm\s+.*\s+\/boot\/",
+        r"rm\s+.*\s+\/root\/",
+        r"rm\s+.*\s+\/sys\/",
+        r"rm\s+.*\s+\/proc\/",
+        r"dd\s+.*if=.*of=/dev/",
+        r"mkfs\.",
+        r"fdisk\s+\/dev/",
+        r"\\x72\\x6d\\x20\\x2d\\x72\\x66\\x20\\x2f",
+        r"which\s+rm",
+        r"chmod\s+.*000\s+.*\/",
+        r":\(\)\s*\{\s*:\|:&\s*\}\s*;\s*:",
+        r"cat\s+.*\/dev\/urandom\s+>\s+\/dev\/[hsv]d[a-z]",
+        r"ln\s+.*-s\s+\/\s+\/dev\/null",
+    ]
+
+    def _is_dangerous(self, cmd: str) -> bool:
+        """Return True if the command matches any banned pattern."""
+        for pattern in self.DANGEROUS_COMMANDS:
+            if re.search(pattern, cmd, re.IGNORECASE):
+                return True
+        return False
+
     def __init__(self):
         self.config = loader.ModuleConfig(
             loader.ConfigValue(
@@ -319,32 +339,18 @@ class TerminalMod(loader.Module):
 
     @loader.command()
     async def terminalcmd(self, message):
-        await self.run_command(message, utils.get_args_raw(message))
-        
-    @loader.command()
-    async def pipcmd(self, message):
-        await self.run_command(
-            message,
-            ("pip " if os.geteuid() == 0 else "sudo -S pip ")
-            + utils.get_args_raw(message)
-            )
+        user_command = utils.get_args_raw(message)
 
-    @loader.command()
-    async def aptcmd(self, message):
-        await self.run_command(
-            message,
-            ("apt " if os.geteuid() == 0 else "sudo -S apt ")
-            + utils.get_args_raw(message)
-            + " -y",
-            RawMessageEditor(
+        if self._is_dangerous(user_command):
+            await utils.answer(
                 message,
-                f"apt {utils.get_args_raw(message)}",
-                self.config,
-                self.strings,
-                message,
-                True,
-            ),
-        )
+                self.strings("dangerous_command").format(
+                    utils.escape_html(user_command)
+                ),
+            )
+            return
+
+        await self.run_command(message, user_command)
 
     async def run_command(
         self,
@@ -352,27 +358,33 @@ class TerminalMod(loader.Module):
         cmd: str,
         editor: typing.Optional[MessageEditor] = None,
     ):
-        if len(cmd.split(" ")) > 1 and cmd.split(" ")[0] == "sudo":
-            needsswitch = True
 
-            for word in cmd.split(" ", 1)[1].split(" "):
-                if word[0] != "-":
-                    break
+        if self._is_dangerous(cmd):
+            await utils.answer(
+                message,
+                self.strings("dangerous_command").format(utils.escape_html(cmd)),
+            )
+            return
 
-                if word == "-S":
-                    needsswitch = False
+        shell = os.environ.get("SHELL", "/bin/sh")
 
-            if needsswitch:
-                cmd = " ".join([cmd.split(" ", 1)[0], "-S", cmd.split(" ", 1)[1]])
-
-        sproc = await asyncio.create_subprocess_exec(
-            "/bin/bash", "-c", cmd,
-            stdin=asyncio.subprocess.PIPE,
-            stdout=asyncio.subprocess.PIPE,
-            stderr=asyncio.subprocess.PIPE,
-            cwd=utils.get_base_dir(),
-            preexec_fn=os.setsid,
-        )
+        try:
+            sproc = await asyncio.create_subprocess_exec(
+                shell,
+                "-c",
+                cmd,
+                stdin=asyncio.subprocess.PIPE,
+                stdout=asyncio.subprocess.PIPE,
+                stderr=asyncio.subprocess.PIPE,
+                cwd=utils.get_base_dir(),
+                preexec_fn=os.setsid,
+            )
+        except Exception as e:
+            await utils.answer(
+                message,
+                self.strings("exec_error").format(utils.escape_html(str(e))),
+            )
+            return
 
         if editor is None:
             editor = SudoMessageEditor(message, cmd, self.config, self.strings, message)
@@ -407,9 +419,9 @@ class TerminalMod(loader.Module):
 
         if hash_msg(await message.get_reply_message()) in self.activecmds:
             try:
-                kill_pids = self.activecmds[hash_msg(await message.get_reply_message())] 
+                kill_pids = self.activecmds[hash_msg(await message.get_reply_message())]
                 if "-f" not in utils.get_args_raw(message):
-                     os.killpg(kill_pids.pid, signal.SIGTERM)
+                    os.killpg(kill_pids.pid, signal.SIGTERM)
                 else:
                     os.killpg(kill_pids.pid, signal.SIGKILL)
             except Exception:

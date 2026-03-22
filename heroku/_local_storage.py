@@ -6,7 +6,7 @@
 # You can redistribute it and/or modify it under the terms of the GNU AGPLv3
 # 🔑 https://www.gnu.org/licenses/agpl-3.0.html
 
-# ©️ Codrago, 2024-2025
+# ©️ Codrago, 2024-2030
 # This file is a part of Heroku Userbot
 # 🌐 https://github.com/coddrago/Heroku
 # You can redistribute it and/or modify it under the terms of the GNU AGPLv3
@@ -114,7 +114,6 @@ class RemoteStorage:
 
             await asyncio.sleep(5)
 
-
     @staticmethod
     def _parse_url(url: str) -> typing.Tuple[str, str, str]:
         """
@@ -124,17 +123,18 @@ class RemoteStorage:
         """
         domain_name = url.split("/")[2]
 
-        if domain_name == "raw.githubusercontent.com":
-            owner, repo, branch = url.split("/")[3:6]
-            module_name = url.split("/")[-1].split(".")[0]
-            repo = f"git+{owner}/{repo}:{branch}"
-        elif domain_name == "github.com":
-            owner, repo, _, branch = url.split("/")[3:7]
-            module_name = url.split("/")[-1].split(".")[0]
-            repo = f"git+{owner}/{repo}:{branch}"
-        else:
-            repo, module_name = url.rsplit("/", maxsplit=1)
-            repo = repo.strip("/")
+        match domain_name:
+            case "raw.githubusercontent.com":
+                owner, repo, branch = url.split("/")[3:6]
+                module_name = url.split("/")[-1].split(".")[0]
+                repo = f"git+{owner}/{repo}:{branch}"
+            case "github.com":
+                owner, repo, _, branch = url.split("/")[3:7]
+                module_name = url.split("/")[-1].split(".")[0]
+                repo = f"git+{owner}/{repo}:{branch}"
+            case _:
+                repo, module_name = url.rsplit("/", maxsplit=1)
+                repo = repo.strip("/")
 
         return url, repo, module_name
 

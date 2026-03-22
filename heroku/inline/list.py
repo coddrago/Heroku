@@ -4,7 +4,7 @@
 # You can redistribute it and/or modify it under the terms of the GNU AGPLv3
 # 🔑 https://www.gnu.org/licenses/agpl-3.0.html
 
-# ©️ Codrago, 2024-2025
+# ©️ Codrago, 2024-2030
 # This file is a part of Heroku Userbot
 # 🌐 https://github.com/coddrago/Heroku
 # You can redistribute it and/or modify it under the terms of the GNU AGPLv3
@@ -35,12 +35,15 @@ from .. import main, utils
 from ..types import HerokuReplyMarkup
 from .types import InlineMessage, InlineUnit
 
+if typing.TYPE_CHECKING:
+    from ..inline.core import InlineManager
+
 logger = logging.getLogger(__name__)
 
 
 class List(InlineUnit):
     async def list(
-        self,
+        self: "InlineManager",
         message: typing.Union[Message, int],
         strings: typing.List[str],
         *,
@@ -249,20 +252,20 @@ class List(InlineUnit):
         return InlineMessage(self, unit_id, self._units[unit_id]["inline_message_id"])
 
     async def _list_page(
-        self,
+        self: "InlineManager",
         call: CallbackQuery,
         page: typing.Union[int, str],
         unit_id: str = None,
     ):
-        if page == "close":
-            await self._delete_unit_message(call, unit_id=unit_id)
-            return
-
-        if self._units[unit_id]["current_index"] < 0 or page >= len(
-            self._units[unit_id]["strings"]
-        ):
-            await call.answer("Can't go to this page", show_alert=True)
-            return
+        match True:
+            case _ if page == "close":
+                await self._delete_unit_message(call, unit_id=unit_id)
+                return
+            case _ if self._units[unit_id]["current_index"] < 0 or page >= len(
+                self._units[unit_id]["strings"]
+            ):
+                await call.answer("Can't go to this page", show_alert=True)
+                return
 
         self._units[unit_id]["current_index"] = page
 
@@ -287,7 +290,7 @@ class List(InlineUnit):
             await call.answer("Error occurred", show_alert=True)
             return
 
-    def _list_markup(self, unit_id: str) -> InlineKeyboardMarkup:
+    def _list_markup(self: "InlineManager", unit_id: str) -> InlineKeyboardMarkup:
         """Generates aiogram markup for `list`"""
         callback = functools.partial(self._list_page, unit_id=unit_id)
         return self.generate_markup(
@@ -300,7 +303,7 @@ class List(InlineUnit):
             + [[{"text": "🔻 Close", "callback": callback, "args": ("close",)}]],
         )
 
-    async def _list_inline_handler(self, inline_query: InlineQuery):
+    async def _list_inline_handler(self: "InlineManager", inline_query: InlineQuery):
         for unit in self._units.copy().values():
             if (
                 inline_query.from_user.id == self._me

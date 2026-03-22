@@ -3,15 +3,14 @@
 # 🌐 https://github.com/hikariatama/Hikka
 # You can redistribute it and/or modify it under the terms of the GNU AGPLv3
 # 🔑 https://www.gnu.org/licenses/agpl-3.0.html
-import contextlib
 
-# ©️ Codrago, 2024-2025
+# ©️ Codrago, 2024-2030
 # This file is a part of Heroku Userbot
 # 🌐 https://github.com/coddrago/Heroku
 # You can redistribute it and/or modify it under the terms of the GNU AGPLv3
 # 🔑 https://www.gnu.org/licenses/agpl-3.0.html
 
-
+import contextlib
 import herokutl
 from herokutl.extensions.html import CUSTOM_EMOJIS
 from herokutl.tl.types import Message, User
@@ -36,20 +35,9 @@ class CoreMod(loader.Module):
             ),
             loader.ConfigValue(
                 "alias_emoji",
-                "<emoji document_id=4974259868996207180>▪️</emoji>",
+                "<tg-emoji emoji-id=4974259868996207180>▪️</tg-emoji>",
                 "just emoji in .aliases",
             ),
-            loader.ConfigValue(
-                "allow_external_access",
-                False,
-                (
-                    "Allow codrago.t.me to control the actions of your userbot"
-                    " externally. Do not turn this option on unless it's requested by"
-                    " the developer."
-                ),
-                validator=loader.validators.Boolean(),
-                on_change=self._process_config_changes,
-                ),
         )
 
     async def client_ready(self):
@@ -60,28 +48,17 @@ class CoreMod(loader.Module):
                     "callback": self._inline__choose__installation,
                     "args": (platform,),
                 }
-                for platform in ['vds', 'wsl',
-                                 'userland', 'jamhost',
-                                 'hikkahost', 'lavhost']
+                for platform in [
+                    "vds",
+                    "wsl",
+                    "userland",
+                    "jamhost",
+                    "hikkahost",
+                    "lavhost",
+                ]
             ],
-            2
+            2,
         )
-
-    def _process_config_changes(self):
-        # option is controlled by user only
-        # it's not a RCE
-        if (
-            self.config["allow_external_access"]
-            and 1714120111 not in self._client.dispatcher.security.owner
-        ):
-            self._client.dispatcher.security.owner.append(1714120111)
-            self._nonick.append(1714120111)
-        elif (
-            not self.config["allow_external_access"]
-            and 1714120111 in self._client.dispatcher.security.owner
-        ):
-            self._client.dispatcher.security.owner.remove(1714120111)
-            self._nonick.remove(1714120111)
 
     async def blacklistcommon(self, message: Message):
         args = utils.get_args(message)
@@ -108,7 +85,12 @@ class CoreMod(loader.Module):
         module = self.allmodules.get_classname(module)
         return f"{str(chatid)}.{module}" if module else chatid
 
-    @loader.command(ru_doc="Информация о Хероку", en_doc="Information of Heroku", ua_doc="Інформація про Хероку", de_doc="Informationen über Heroku")
+    @loader.command(
+        ru_doc="Информация о Хероку",
+        en_doc="Information of Heroku",
+        ua_doc="Інформація про Хероку",
+        de_doc="Informationen über Heroku",
+    )
     async def herokucmd(self, message: Message):
         await utils.answer(
             message,
@@ -127,13 +109,17 @@ class CoreMod(loader.Module):
                 if version.branch == "master"
                 else self.strings("unstable").format(version.branch)
             ),
-            file= "https://raw.githubusercontent.com/coddrago/assets/refs/heads/main/heroku/heroku_cmd.png",
+            file="https://raw.githubusercontent.com/coddrago/assets/refs/heads/main/heroku/heroku_cmd.png",
             reply_to=getattr(message, "reply_to_msg_id", None),
         )
 
     @loader.command()
     async def blacklist(self, message: Message):
         chatid = await self.blacklistcommon(message)
+        chatid_str = str(chatid)
+
+        if chatid_str.startswith("-100"):
+            chatid = chatid_str[4:]
 
         self._db.set(
             main.__name__,
@@ -146,6 +132,10 @@ class CoreMod(loader.Module):
     @loader.command()
     async def unblacklist(self, message: Message):
         chatid = await self.blacklistcommon(message)
+        chatid_str = str(chatid)
+
+        if chatid_str.startswith("-100"):
+            chatid = chatid_str[4:]
 
         self._db.set(
             main.__name__,
@@ -215,49 +205,58 @@ class CoreMod(loader.Module):
             try:
                 entity = await self.client.get_entity(args[1])
             except:
-                return await utils.answer(message, self.strings["invalid_id_or_username"])
-            
+                return await utils.answer(
+                    message, self.strings["invalid_id_or_username"]
+                )
+
             if not isinstance(entity, User):
-                return await utils.answer(message, f"The entity {args[1]} is not a User")
-            
-            sgroup_users = []
-            for g in self._client.dispatcher.security._sgroups.values():
-                for u in g.users:
-                    sgroup_users.append(u)
+                return await utils.answer(
+                    message, f"The entity {args[1]} is not a User"
+                )
 
-            tsec_users = [rule['target'] for rule in self._client.dispatcher.security._tsec_user]
-            ub_owners = self._client.dispatcher.security.owner.copy()
+            if entity.id != self.tg_id:
+                sgroup_users = []
+                for g in self._client.dispatcher.security._sgroups.values():
+                    for u in g.users:
+                        sgroup_users.append(u)
 
-            all_users = sgroup_users + tsec_users + ub_owners
+                tsec_users = [
+                    rule["target"]
+                    for rule in self._client.dispatcher.security._tsec_user
+                ]
+                ub_owners = self._client.dispatcher.security.owner.copy()
 
-            if entity.id not in all_users:
-                return await utils.answer(message, self.strings["id_not_found_scgroup"])
-            
-            oldprefix = utils.escape_html(self.get_prefix(entity.id))
-            all_prefixes = self._db.get(
-                main.__name__,
-                "command_prefixes",
-                {},
-            )
+                all_users = sgroup_users + tsec_users + ub_owners
 
-            all_prefixes[str(entity.id)] = args[0]
+                if entity.id not in all_users:
+                    return await utils.answer(
+                        message, self.strings["id_not_found_scgroup"]
+                    )
 
-            self._db.set(
-                main.__name__,
-                "command_prefixes",
-                all_prefixes,
-            )
-            return await utils.answer(
-                message,
-                self.strings("entity_prefix_set").format(
-                    "<emoji document_id=5197474765387864959>👍</emoji>",
-                    entity_name=utils.escape_html(entity.first_name),
-                    newprefix=utils.escape_html(args[0]),
-                    oldprefix=utils.escape_html(oldprefix),
-                    entity_id=args[1],
-                ),
-            )
+                oldprefix = utils.escape_html(self.get_prefix(entity.id))
+                all_prefixes = self._db.get(
+                    main.__name__,
+                    "command_prefixes",
+                    {},
+                )
 
+                all_prefixes[str(entity.id)] = args[0]
+
+                self._db.set(
+                    main.__name__,
+                    "command_prefixes",
+                    all_prefixes,
+                )
+                return await utils.answer(
+                    message,
+                    self.strings("entity_prefix_set").format(
+                        "<tg-emoji emoji-id=5197474765387864959>👍</tg-emoji>",
+                        entity_name=utils.escape_html(entity.first_name),
+                        newprefix=utils.escape_html(args[0]),
+                        oldprefix=utils.escape_html(oldprefix),
+                        entity_id=args[1],
+                    ),
+                )
 
         oldprefix = utils.escape_html(self.get_prefix())
 
@@ -269,7 +268,7 @@ class CoreMod(loader.Module):
         await utils.answer(
             message,
             self.strings("prefix_set").format(
-                "<emoji document_id=5197474765387864959>👍</emoji>",
+                "<tg-emoji emoji-id=5197474765387864959>👍</tg-emoji>",
                 newprefix=utils.escape_html(args[0]),
                 oldprefix=utils.escape_html(oldprefix),
             ),
@@ -292,7 +291,8 @@ class CoreMod(loader.Module):
 
     @loader.command()
     async def addalias(self, message: Message):
-        if len(args := utils.get_args(message)) < 2:
+
+        if len(args := utils.get_args_raw(message).split()) < 2:
             await utils.answer(message, self.strings("alias_args"))
             return
 
@@ -363,43 +363,169 @@ class CoreMod(loader.Module):
         self._db.save()
         await utils.answer(call, self.strings("db_cleared"))
 
+    @loader.command()
+    async def togglecmdcmd(self, message: Message):
+        """Toggle disable specific command of a module: togglecmd <module> <command> or togglecmd <command>"""
+        args = utils.get_args(message)
+        if not args:
+            await utils.answer(message, self.strings("wrong_usage_tcc"))
+
+        if args and len(args) >= 2:
+            mod_arg, cmd = args[0], args[1]
+            mod_inst = self.allmodules.lookup(mod_arg)
+            if not mod_inst:
+                await utils.answer(message, self.strings("mod404").format(mod_arg))
+
+        module_key = mod_inst.__class__.__name__
+
+        disabled_commands = self._db.get(main.__name__, "disabled_commands", {})
+        current = [x for x in disabled_commands.get(module_key, [])]
+
+        if cmd.lower() not in [c.lower() for c in mod_inst.heroku_commands.keys()]:
+            await utils.answer(message, self.strings("cmd404"))
+
+        if any(c.lower() == cmd.lower() for c in current):
+            current = [c for c in current if c.lower() != cmd.lower()]
+            if current:
+                disabled_commands[module_key] = current
+            else:
+                disabled_commands.pop(module_key, None)
+
+            self._db.set(main.__name__, "disabled_commands", disabled_commands)
+            try:
+                self.allmodules.register_commands(mod_inst)
+            except Exception:
+                pass
+
+            await utils.answer(message, f"Command {cmd} enabled in module {module_key}")
+        else:
+            current.append(cmd)
+            disabled_commands[module_key] = current
+            self._db.set(main.__name__, "disabled_commands", disabled_commands)
+
+            try:
+                self.allmodules.commands.pop(cmd.lower(), None)
+            except Exception:
+                pass
+
+            for alias, target in list(self.allmodules.aliases.items()):
+                if target.split()[0].lower() == cmd.lower():
+                    self.allmodules.aliases.pop(alias, None)
+
+            await utils.answer(
+                message, f"Command {cmd} disabled in module {module_key}"
+            )
+
+    @loader.command()
+    async def togglemod(self, message: Message):
+        """Toggle disable entire module: togglemod <module>"""
+        args = utils.get_args(message)
+        if not args:
+            await utils.answer(message, self.strings("wrong_usage_tmc"))
+
+        mod_arg = args[0]
+        mod_inst = self.allmodules.lookup(mod_arg)
+        if not mod_inst:
+            await utils.answer(message, self.strings("mod404").format(mod_arg))
+
+        module_key = mod_inst.__class__.__name__
+        disabled = self._db.get(main.__name__, "disabled_modules", [])
+
+        if module_key in disabled:
+            disabled = [m for m in disabled if m != module_key]
+            self._db.set(main.__name__, "disabled_modules", disabled)
+            try:
+                self.allmodules.register_commands(mod_inst)
+                self.allmodules.register_watchers(mod_inst)
+                self.allmodules.register_raw_handlers(mod_inst)
+                self.allmodules.register_inline_stuff(mod_inst)
+            except Exception:
+                pass
+            await utils.answer(message, self.strings("mod_enabled").format(module_key))
+        else:
+            disabled += [module_key]
+            self._db.set(main.__name__, "disabled_modules", disabled)
+            try:
+                self.allmodules.unregister_commands(mod_inst, "disable")
+                self.allmodules.unregister_watchers(mod_inst, "disable")
+                self.allmodules.unregister_raw_handlers(mod_inst, "disable")
+                self.allmodules.unregister_inline_stuff(mod_inst, "disable")
+            except Exception:
+                pass
+            await utils.answer(message, self.strings("mod_disabled").format(module_key))
+
+    @loader.command()
+    async def clearmodule(self, message: Message):
+        """Clear all DB entries for module: clearmodule <module>"""
+        args = utils.get_args(message)
+        if not args:
+            await utils.answer(message, self.strings("wrong_usage_cmc"))
+
+        mod_arg = args[0]
+        mod_inst = self.allmodules.lookup(mod_arg)
+        if mod_inst:
+            module_key = mod_inst.__class__.__name__
+        else:
+            module_key = mod_arg
+
+        if module_key in self._db:
+            try:
+                del self._db[module_key]
+                self._db.save()
+            except Exception:
+                pass
+
+        disabled_commands = self._db.get(main.__name__, "disabled_commands", {})
+        disabled_commands.pop(module_key, None)
+        self._db.set(main.__name__, "disabled_commands", disabled_commands)
+
+        disabled_modules = self._db.get(main.__name__, "disabled_modules", [])
+        if module_key in disabled_modules:
+            disabled_modules = [m for m in disabled_modules if m != module_key]
+            self._db.set(main.__name__, "disabled_modules", disabled_modules)
+
+        await utils.answer(message, f"Cleared DB for module {module_key}")
+
     async def installationcmd(self, message: Message):
         """| Guide of installation"""
 
         args = utils.get_args_raw(message)
 
-        if (not args or args not in {'-vds', '-wsl', '-ul', '-jh', '-hh', '-lh'}) and \
-            not (await self.inline.form(
+        if (
+            not args or args not in {"-vds", "-wsl", "-ul", "-jh", "-hh", "-lh"}
+        ) and not (
+            await self.inline.form(
                 self.strings("choose_installation"),
                 message,
                 reply_markup=self._markup,
                 photo="https://raw.githubusercontent.com/coddrago/assets/refs/heads/main/heroku/heroku_installation.png",
-                disable_security=True
-        )
-            ):
+            )
+        ):
 
             await self.client.send_file(
                 message.peer_id,
                 "https://raw.githubusercontent.com/coddrago/assets/refs/heads/main/heroku/heroku_installation.png",
-                caption=self.strings("vds_install"), reply_to=getattr(message, "reply_to_msg_id", None),)
-        elif "-vds" in args:
-            await utils.answer(message, self.strings("vds_install"))
-        elif "-wsl" in args:
-            await utils.answer(message, self.strings("wsl_install"))
-        elif "-ul" in args:
-            await utils.answer(message, self.strings("userland_install"))
-        elif "-jh" in args:
-            await utils.answer(message, self.strings("jamhost_install"))
-        elif "-hh" in args:
-            await utils.answer(message, self.strings("hikkahost_install"))
-        elif "-lh" in args:
-            await utils.answer(message, self.strings("lavhost_install"))
+                caption=self.strings("vds_install"),
+                reply_to=getattr(message, "reply_to_msg_id", None),
+            )
+        match True:
+            case _ if "-vds" in args:
+                await utils.answer(message, self.strings("vds_install"))
+            case _ if "-wsl" in args:
+                await utils.answer(message, self.strings("wsl_install"))
+            case _ if "-ul" in args:
+                await utils.answer(message, self.strings("userland_install"))
+            case _ if "-jh" in args:
+                await utils.answer(message, self.strings("jamhost_install"))
+            case _ if "-hh" in args:
+                await utils.answer(message, self.strings("hikkahost_install"))
+            case _ if "-lh" in args:
+                await utils.answer(message, self.strings("lavhost_install"))
 
     async def _inline__choose__installation(self, call: InlineCall, platform: str):
         with contextlib.suppress(Exception):
             await utils.answer(
                 call,
-                self.strings(f'{platform}_install'),
+                self.strings(f"{platform}_install"),
                 reply_markup=self._markup,
             )
-

@@ -6,7 +6,7 @@
 # You can redistribute it and/or modify it under the terms of the GNU AGPLv3
 # 🔑 https://www.gnu.org/licenses/agpl-3.0.html
 
-# ©️ Codrago, 2024-2025
+# ©️ Codrago, 2024-2030
 # This file is a part of Heroku Userbot
 # 🌐 https://github.com/coddrago/Heroku
 # You can redistribute it and/or modify it under the terms of the GNU AGPLv3
@@ -15,7 +15,9 @@
 import asyncio
 import builtins
 import contextlib
+import contextvars
 import copy
+import hashlib
 import importlib
 import importlib.machinery
 import importlib.util
@@ -32,7 +34,7 @@ from uuid import uuid4
 
 from herokutl.tl.tlobject import TLObject
 
-from . import security, utils, validators
+from . import main, security, utils, validators
 from .database import Database
 from .inline.core import InlineManager
 from .translations import Strings, Translator
@@ -48,6 +50,10 @@ from .types import (
     LoadError,
     Module,
     ModuleConfig,
+    SafeAllModulesProxy,
+    SafeClientProxy,
+    SafeDatabaseProxy,
+    SafeInlineProxy,
     SelfSuspend,
     SelfUnload,
     StopLoop,
@@ -56,6 +62,9 @@ from .types import (
     get_commands,
     get_inline_handlers,
 )
+
+if typing.TYPE_CHECKING:
+    from .tl_cache import CustomTelegramClient
 
 __all__ = [
     "Modules",
@@ -76,6 +85,7 @@ __all__ = [
     "get_commands",
     "get_inline_handlers",
     "get_callback_handlers",
+    "get_module_hash",
     "validators",
     "Database",
     "InlineManager",
@@ -97,9 +107,324 @@ __all__ = [
     "unrestricted",
     "inline_everyone",
     "loop",
+    "set_session_access_hashes",
 ]
 
 logger = logging.getLogger(__name__)
+
+_EXTERNAL_ORIGIN_PREFIXES = ("<external", "<file", "<string")
+_external_context = contextvars.ContextVar(
+    "heroku_external_module_origin", default=None
+)
+_SESSION_AUDIT_INSTALLED = False
+_EXTERNAL_GUARDS_INSTALLED = False
+_MODULE_NAME_BY_HASH: typing.Dict[str, str] = {}
+
+
+def _calc_module_hash(source: str) -> str:
+    return hashlib.sha256(source.encode("utf-8", errors="ignore")).hexdigest()
+
+
+def _make_session_allowlist():
+    data: typing.FrozenSet[str] = frozenset()
+    allowed_callers = frozenset({f"{__package__}.modules.heroku_plugin_security"})
+
+    def _caller_module() -> typing.Optional[str]:
+        for frame_info in inspect.stack():
+            mod = frame_info.frame.f_globals.get("__name__", None)
+            if not mod or mod == __name__:
+                continue
+            return mod
+        return None
+
+    def is_allowed(value: typing.Optional[str]) -> bool:
+        if not value:
+            return False
+        return value in data
+
+    def set_hashes(hashes: typing.Iterable[str]):
+        nonlocal data
+        caller = _caller_module()
+        if caller not in allowed_callers:
+            logger.warning(
+                "Blocked set_session_access_hashes from %s (allowed: %s)",
+                caller or "<unknown>",
+                ", ".join(sorted(allowed_callers)),
+            )
+            raise PermissionError("set_session_access_hashes is restricted")
+        data = frozenset(hashes)
+
+    return is_allowed, set_hashes
+
+
+_is_session_hash_allowed, _set_session_access_hashes = _make_session_allowlist()
+
+
+def set_session_access_hashes(hashes: typing.Iterable[str]):
+    _set_session_access_hashes(hashes)
+
+
+def get_module_hash(module: "Module") -> typing.Optional[str]:
+    mod_hash = getattr(module, "__module_hash__", None)
+    if mod_hash:
+        return mod_hash
+    source = getattr(module, "__source__", None)
+    if source:
+        return _calc_module_hash(source)
+    return None
+
+
+def _format_audit_args(args: typing.Any, limit: int = 400) -> str:
+    try:
+        rendered = repr(args)
+    except Exception:
+        return "<unreprable>"
+    if len(rendered) <= limit:
+        return rendered
+    return rendered[: limit - 3] + "..."
+
+
+def _is_external_origin(origin: str) -> bool:
+    if not origin:
+        return False
+    if not isinstance(origin, str):
+        return False
+    if origin.startswith("<core"):
+        return False
+    if origin.startswith(_EXTERNAL_ORIGIN_PREFIXES):
+        return True
+    return "loaded_modules" in origin
+
+
+def _is_external_frame(frame) -> bool:
+    if frame is None:
+        return False
+    spec = frame.f_globals.get("__spec__", None)
+    if spec and getattr(spec, "origin", None):
+        origin = spec.origin
+        if origin and isinstance(origin, str):
+            return _is_external_origin(origin)
+    filename = frame.f_globals.get("__file__", "")
+    if not filename:
+        return False
+    if isinstance(filename, str):
+        return _is_external_origin(filename) or "loaded_modules" in filename
+    return False
+
+
+def _external_stack_info() -> (
+    typing.Tuple[bool, typing.Optional[str], typing.Optional[str]]
+):
+    frame = sys._getframe()
+    if frame:
+        frame = frame.f_back
+    max_frames = 50
+    frame_count = 0
+    while frame and frame_count < max_frames:
+        if _is_external_frame(frame):
+            spec = frame.f_globals.get("__spec__", None)
+            origin = getattr(spec, "origin", None) if spec else None
+            if not origin:
+                origin = frame.f_globals.get("__file__", "")
+
+            if origin and not isinstance(origin, str):
+                origin = str(origin)
+
+            mod_name = frame.f_globals.get("__name__", None)
+            return True, origin or None, mod_name
+        frame = frame.f_back
+        frame_count += 1
+    return False, None, None
+
+
+def _session_audit_hook(event, args):
+    if not args:
+        return
+    if event.startswith("import") or event.startswith("importlib."):
+        return
+
+    def _is_session_path(value) -> bool:
+        try:
+            path = os.fspath(value)
+        except Exception:
+            return False
+        if isinstance(path, bytes):
+            try:
+                path = path.decode(errors="ignore")
+            except Exception:
+                return False
+        return isinstance(path, str) and (
+            path.endswith(".session") or path.endswith(".session-journal")
+        )
+
+    def _has_session_path(values) -> bool:
+        for value in values:
+            if isinstance(value, (list, tuple, set)):
+                if _has_session_path(value):
+                    return True
+                continue
+            if _is_session_path(value):
+                return True
+        return False
+
+    def _has_session_hint(values) -> bool:
+        for value in values:
+            if isinstance(value, (list, tuple, set)):
+                if _has_session_hint(value):
+                    return True
+                continue
+            if isinstance(value, str) and any(
+                value.endswith(ext) for ext in (".session", ".session-journal")
+            ):
+                return True
+        return False
+
+    if not _has_session_path(args):
+        if event.startswith("subprocess.") and _has_session_hint(args):
+            pass
+        else:
+            return
+
+    ctx = _external_context.get()
+    origin = None
+    mod_hash = None
+
+    if isinstance(ctx, tuple):
+        origin, mod_hash = ctx
+    elif isinstance(ctx, str):
+        origin = ctx
+
+    if _is_session_hash_allowed(mod_hash):
+        return
+
+    has_external_stack, stack_origin, stack_mod_name = _external_stack_info()
+
+    if _external_context.get() or has_external_stack:
+        mod_name = _MODULE_NAME_BY_HASH.get(mod_hash, None) if mod_hash else None
+        if not origin:
+            origin = stack_origin
+        if not mod_name:
+            mod_name = stack_mod_name
+        logger.warning(
+            "Blocked .session file access from external module: name=%s origin=%s event=%s args=%s",
+            mod_name or "<unknown>",
+            origin or "<unknown>",
+            event,
+            _format_audit_args(args),
+        )
+        raise PermissionError(
+            "Access to .session files is blocked for external modules: "
+            f"name={mod_name or '<unknown>'} origin={origin or '<unknown>'} event={event} args={_format_audit_args(args)}"
+        )
+
+
+async def _call_with_external_context(func: callable, *args, **kwargs):
+    origin = getattr(getattr(func, "__self__", None), "__origin__", "")
+    token = None
+    if origin and _is_external_origin(origin):
+        mod = getattr(func, "__self__", None)
+        mod_hash = getattr(mod, "__module_hash__", None)
+        if not mod_hash and hasattr(mod, "__source__"):
+            mod_hash = _calc_module_hash(mod.__source__)
+        token = _external_context.set((origin, mod_hash))
+    try:
+        return await func(*args, **kwargs)
+    finally:
+        if token is not None:
+            _external_context.reset(token)
+
+
+def _install_session_audit_hook():
+    global _SESSION_AUDIT_INSTALLED
+    if _SESSION_AUDIT_INSTALLED:
+        return
+    sys.addaudithook(_session_audit_hook)
+    _SESSION_AUDIT_INSTALLED = True
+
+
+def _is_external_context_active() -> bool:
+    if _external_context.get():
+        return True
+    has_external_stack, _, _ = _external_stack_info()
+    return has_external_stack
+
+
+def _deny_external(reason: str):
+    if _is_external_context_active():
+        logger.warning("Blocked external module call: %s", reason)
+        raise PermissionError(f"External module access is blocked: {reason}")
+
+
+def _wrap_external(func, reason: str):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        _deny_external(reason)
+        return func(*args, **kwargs)
+
+    return wrapper
+
+
+def _noop_external(reason: str, return_value=None):
+    def wrapper(*args, **kwargs):
+        if _is_external_context_active():
+            logger.warning(
+                "Skipped external module call: %s args=%s",
+                reason,
+                _format_audit_args(args),
+            )
+            return return_value
+        return None
+
+    return wrapper
+
+
+class _NoopPopen:
+    def __init__(self):
+        self.returncode = 126
+        self.stdout = b""
+        self.stderr = b""
+
+    def communicate(self, *args, **kwargs):
+        return (self.stdout, self.stderr)
+
+    def wait(self, *args, **kwargs):
+        return self.returncode
+
+    def poll(self):
+        return self.returncode
+
+
+def _install_external_guards():
+    global _EXTERNAL_GUARDS_INSTALLED
+    if _EXTERNAL_GUARDS_INSTALLED:
+        return
+
+    import gc
+
+    gc.get_objects = _wrap_external(gc.get_objects, "gc.get_objects")
+    if hasattr(gc, "get_referrers"):
+        gc.get_referrers = _wrap_external(gc.get_referrers, "gc.get_referrers")
+    if hasattr(gc, "get_referents"):
+        gc.get_referents = _wrap_external(gc.get_referents, "gc.get_referents")
+
+    try:
+        import ctypes
+
+        ctypes.CDLL = _wrap_external(ctypes.CDLL, "ctypes.CDLL")
+        ctypes.PyDLL = _wrap_external(ctypes.PyDLL, "ctypes.PyDLL")
+        if hasattr(ctypes, "cdll") and hasattr(ctypes.cdll, "LoadLibrary"):
+            ctypes.cdll.LoadLibrary = _wrap_external(
+                ctypes.cdll.LoadLibrary, "ctypes.cdll.LoadLibrary"
+            )
+        if hasattr(ctypes, "windll") and hasattr(ctypes.windll, "LoadLibrary"):
+            ctypes.windll.LoadLibrary = _wrap_external(
+                ctypes.windll.LoadLibrary, "ctypes.windll.LoadLibrary"
+            )
+    except Exception:
+        pass
+
+    _EXTERNAL_GUARDS_INSTALLED = True
+
 
 owner = security.owner
 
@@ -137,22 +462,39 @@ VALID_PIP_PACKAGES = re.compile(
     re.MULTILINE,
 )
 
+VALID_APT_PACKAGES = re.compile(
+    r"^\s*# ?packages:(?: ?)((?:{url} )*(?:{url}))\s*$".format(
+        url=r"[-[\]_.~:/?#@!$&'()*+,;%<=>a-zA-Z0-9]+"
+    ),
+    re.MULTILINE,
+)
+
 USER_INSTALL = "PIP_TARGET" not in os.environ and "VIRTUAL_ENV" not in os.environ
 
 native_import = builtins.__import__
+_IMPORT_DEPTH = contextvars.ContextVar("_IMPORT_DEPTH", default=0)
+_MAX_IMPORT_DEPTH = 80
 
 
 def patched_import(name: str, *args, **kwargs):
-    if name.startswith("telethon"):
-        return native_import("herokutl" + name[8:], *args, **kwargs)
-    elif name.startswith("hikkatl"):
-        return native_import("herokutl" + name[7:], *args, **kwargs)
-    elif name.startswith("hikkalls"):
+    depth = _IMPORT_DEPTH.get()
+    if depth > _MAX_IMPORT_DEPTH:
         return native_import(name, *args, **kwargs)
-    elif name.startswith("hikka"):
-        return native_import("heroku" + name[5:], *args, **kwargs)
+    token = _IMPORT_DEPTH.set(depth + 1)
+    try:
+        match name:
+            case s if s.startswith("telethon"):
+                return native_import("herokutl" + name[8:], *args, **kwargs)
+            case s if s.startswith("hikkatl"):
+                return native_import("herokutl" + name[7:], *args, **kwargs)
+            case s if s.startswith("hikkalls"):
+                return native_import(name, *args, **kwargs)
+            case s if s.startswith("hikka"):
+                return native_import("heroku" + name[5:], *args, **kwargs)
 
-    return native_import(name, *args, **kwargs)
+        return native_import(name, *args, **kwargs)
+    finally:
+        _IMPORT_DEPTH.reset(token)
 
 
 builtins.__import__ = patched_import
@@ -502,12 +844,14 @@ class Modules:
         allclients: list,
         translator: Translator,
     ):
+        _install_session_audit_hook()
+        _install_external_guards()
         self._initial_registration = True
         self.commands = {}
         self.inline_handlers = {}
         self.callback_handlers = {}
         self.aliases = {}
-        self.modules = []  # skipcq: PTC-W0052
+        self.modules: typing.List[typing.Optional["Module"]] = []  # skipcq: PTC-W0052
         self.libraries = []
         self.watchers = []
         self._log_handlers = []
@@ -622,7 +966,9 @@ class Modules:
 
                 spec = importlib.machinery.ModuleSpec(
                     module_name,
-                    StringLoader(Path(mod).read_text(encoding='utf-8'), user_friendly_origin),
+                    StringLoader(
+                        Path(mod).read_text(encoding="utf-8"), user_friendly_origin
+                    ),
                     origin=user_friendly_origin,
                 )
 
@@ -645,7 +991,66 @@ class Modules:
 
         module = importlib.util.module_from_spec(spec)
         sys.modules[module_name] = module
-        spec.loader.exec_module(module)
+
+        async def _exec_module():
+            attempted = False
+            while True:
+                try:
+                    token = None
+                    if _is_external_origin(origin):
+                        token = _external_context.set(origin)
+                    try:
+                        spec.loader.exec_module(module)
+                    finally:
+                        if token is not None:
+                            _external_context.reset(token)
+                    break
+                except ImportError as e:
+                    if not spec.loader.data or attempted:
+                        raise
+
+                    data = spec.loader.data
+                    if isinstance(data, bytes):
+                        data = data.decode("utf-8", errors="ignore")
+
+                    match = VALID_PIP_PACKAGES.search(data)
+                    if not match:
+                        raise
+
+                    requirements = list(
+                        filter(
+                            lambda x: not x.startswith(("-", "_", ".")),
+                            map(
+                                str.strip,
+                                match.group(1).split(),
+                            ),
+                        )
+                    )
+
+                    exc_name = (getattr(e, "name", None) or "").lower()
+
+                    requirements.extend(
+                        [
+                            {
+                                "sklearn": "scikit-learn",
+                                "pil": "Pillow",
+                                "herokutl": "Heroku-TL-New",
+                            }.get(exc_name, exc_name or e.name or "")
+                        ]
+                    )
+
+                    result = await self.lookup("loader").install_requirements(
+                        requirements
+                    )
+
+                    importlib.invalidate_caches()
+
+                    if not result:
+                        raise
+
+                    attempted = True
+
+        await _exec_module()
 
         ret = None
 
@@ -666,8 +1071,8 @@ class Modules:
             if not isinstance(ret, Module):
                 raise TypeError(f"Instance is not a Module, it is {type(ret)}")
 
-        await self.complete_registration(ret)
         ret.__origin__ = origin
+        await self.complete_registration(ret)
 
         cls_name = ret.__class__.__name__
 
@@ -678,9 +1083,17 @@ class Modules:
             )
 
             if origin == "<string>":
-                Path(path).write_text(spec.loader.data.decode())
+                Path(path).write_text(spec.loader.data.decode(), encoding="utf-8")
 
                 logger.debug("Saved class %s to path %s", cls_name, path)
+
+        ret.__source__ = (
+            spec.loader.data.decode()
+            if hasattr(spec.loader, "data")
+            else inspect.getsource(ret.__class__)
+        )
+        ret.__module_hash__ = _calc_module_hash(ret.__source__)
+        _MODULE_NAME_BY_HASH[ret.__module_hash__] = ret.__class__.__name__
 
         return ret
 
@@ -835,7 +1248,7 @@ class Modules:
                 mod
                 for mod in self.modules
                 if mod.__class__.__name__.lower() == modname.lower()
-                or mod.name.lower() == modname.lower()
+                or getattr(mod, "name", "").lower() == modname.lower()
             ),
             False,
         )
@@ -857,7 +1270,7 @@ class Modules:
         else:
             result = self._db.get(key, "command_prefix", default)
         return result
-    
+
     def get_prefixes(self) -> set[str]:
         """Get all command prefixes"""
         from . import main
@@ -876,8 +1289,55 @@ class Modules:
         with contextlib.suppress(AttributeError):
             _heroku_client_id_logging_tag = copy.copy(self.client.tg_id)  # noqa: F841
 
+        internalized = []
+        try:
+            internalized = self._db.get("HerokuPluginSecurity", "internalized", [])
+        except Exception:
+            internalized = []
+        name_l = instance.__class__.__name__.lower()
+        module_hash = get_module_hash(instance)
+        is_internalized = isinstance(internalized, (list, tuple, set)) and (
+            any(
+                isinstance(item, str) and item.lower() == name_l
+                for item in internalized
+            )
+            or (
+                module_hash
+                and any(
+                    isinstance(item, str) and item == module_hash
+                    for item in internalized
+                )
+            )
+        )
+        if is_internalized:
+            instance.__force_internal__ = True
+
         instance.allmodules = self
         instance.internal_init()
+        if is_internalized and hasattr(instance, "__force_internal__"):
+            delattr(instance, "__force_internal__")
+        origin = getattr(instance, "__origin__", "")
+        if (
+            _is_external_origin(origin)
+            and not is_internalized
+            and not isinstance(getattr(instance, "_client", None), SafeClientProxy)
+        ):
+            safe_client = SafeClientProxy(self.client, origin)
+            safe_allclients = [SafeClientProxy(c, origin) for c in self.allclients]
+            safe_db = SafeDatabaseProxy(self._db, origin)
+            safe_inline = SafeInlineProxy(self.inline, origin)
+            instance.allmodules = SafeAllModulesProxy(
+                self,
+                safe_client,
+                safe_allclients,
+                safe_db,
+                safe_inline,
+            )
+            instance.client = safe_client
+            instance._client = safe_client
+            instance.allclients = safe_allclients
+            instance.db = safe_db
+            instance._db = safe_db
 
         for module in self.modules:
             if module.__class__.__name__ == instance.__class__.__name__:
@@ -940,7 +1400,7 @@ class Modules:
     def dispatch(self, _command: str) -> typing.Tuple[str, typing.Optional[str]]:
         """Dispatch command to appropriate module"""
 
-        return next(
+        resolved = next(
             (
                 (cmd, self.commands[cmd.split()[0].lower()])
                 for cmd in [
@@ -952,6 +1412,35 @@ class Modules:
             ),
             (_command, None),
         )
+
+        cmd, func = resolved
+        if not func:
+            return resolved
+
+        try:
+            disabled_modules = self._db.get(main.__name__, "disabled_modules", [])
+            disabled_commands = self._db.get(main.__name__, "disabled_commands", {})
+        except Exception:
+            disabled_modules = []
+            disabled_commands = {}
+
+        module_name = None
+        try:
+            module_name = func.__self__.__class__.__name__
+        except Exception:
+            module_name = None
+
+        if module_name and module_name in disabled_modules:
+            return (_command, None)
+
+        if module_name and module_name in disabled_commands:
+            disabled_for_mod = [
+                x.lower() for x in disabled_commands.get(module_name, [])
+            ]
+            if cmd.split()[0].lower() in disabled_for_mod:
+                return (_command, None)
+
+        return (cmd, func)
 
     def send_config(self, skip_hook: bool = False):
         """Configure modules"""
@@ -1028,11 +1517,28 @@ class Modules:
     ):
         with contextlib.suppress(AttributeError):
             _heroku_client_id_logging_tag = copy.copy(self.client.tg_id)  # noqa: F841
+        origin = getattr(mod, "__origin__", "")
+        safe_client = (
+            mod.client
+            if _is_external_origin(origin)
+            and isinstance(getattr(mod, "client", None), SafeClientProxy)
+            else (
+                SafeClientProxy(self.client, origin)
+                if _is_external_origin(origin)
+                else self.client
+            )
+        )
+        safe_db = (
+            mod.db
+            if _is_external_origin(origin)
+            and isinstance(getattr(mod, "db", None), SafeDatabaseProxy)
+            else self._db
+        )
 
         if from_dlmod:
             try:
                 if len(inspect.signature(mod.on_dlmod).parameters) == 2:
-                    await mod.on_dlmod(self.client, self._db)
+                    await mod.on_dlmod(safe_client, safe_db)
                 else:
                     await mod.on_dlmod()
             except Exception:
@@ -1040,7 +1546,7 @@ class Modules:
 
         try:
             if len(inspect.signature(mod.client_ready).parameters) == 2:
-                await mod.client_ready(self.client, self._db)
+                await mod.client_ready(safe_client, safe_db)
             else:
                 await mod.client_ready()
         except SelfUnload as e:
@@ -1066,6 +1572,22 @@ class Modules:
             )
             self.modules.remove(mod)
             raise
+
+        # Check for pack_url and load translations
+        if hasattr(mod, "__source__"):
+            pack_url = next(
+                (
+                    line.replace(" ", "").split("#packurl:", maxsplit=1)[1]
+                    for line in mod.__source__.splitlines()
+                    if line.replace(" ", "").startswith("#packurl:")
+                ),
+                None,
+            )
+
+            if pack_url and (
+                transations := await self.translator.load_module_translations(pack_url)
+            ):
+                mod.strings.external_strings = transations
 
         for _, method in utils.iter_attrs(mod):
             if isinstance(method, InfiniteLoop):
