@@ -14,7 +14,7 @@ import asyncio
 import logging
 
 from deep_translator import GoogleTranslator, MyMemoryTranslator
-from herokutl.tl.types import Message
+from herokutl.tl.custom import Message
 
 from .. import loader, utils
 
@@ -63,7 +63,7 @@ class Translator(loader.Module):
     @loader.command()
     async def tr(self, message: Message):
         """[lang] <text> - Translate text or reply to a message"""
-        if not (args := utils.get_args_raw(message)):
+        if not (args := utils.get_args_raw(message.raw_text)):
             text = None
             lang = self.strings("language")
         else:
@@ -82,7 +82,7 @@ class Translator(loader.Module):
                 await utils.answer(message, self.strings("no_args"))
                 return
 
-            text = reply.text
+            text = reply.raw_text
             entities = reply.entities
         else:
             entities = []
@@ -92,7 +92,7 @@ class Translator(loader.Module):
         try:
             if provider == "telegram":
                 tr_text = await self._client.translate(
-                    message.peer_id, message, lang, entities=entities
+                    message.peer_id, message, lang, raw_text=text, entities=entities
                 )
             else:
                 tr_text = await self._translate_external(text, lang)
