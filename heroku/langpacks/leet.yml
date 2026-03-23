@@ -311,7 +311,7 @@ settings:
   aliases_list: "<b>🔗 1mp0rt3d 4l145:</b>\n\n<blockquote expandable>{}</blockquote>"
   aliases_file: "<tg-emoji emoji-id=5256113064821926998>📁</tg-emoji> <b>Y0ur 4l145</b>\n\n<tg-emoji emoji-id=5134452506935427991>🪐</tg-emoji> <b>{prefix}la 1n r3ply t0 th1s m3ss4g3 t0 1mp0rt</b>"  
   aliases: "<b>🔗 4l14535:</b>\n"
-  happy_beta: "<tg-emoji emoji-id=5465188915990255885>🌟</tg-emoji> <b>Y0u 4r3 4 h4ppy 0wn3r 0f 7h3 <code>{}</code> v3r510n!</b>"
+  happy_beta: "\n\n<tg-emoji emoji-id=5465188915990255885>🌟</tg-emoji> <b>Y0u 4r3 4 h4ppy 0wn3r 0f 7h3 <code>{}</code> v3r510n!</b>"
   no_command: "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>Cmd</b> <code>{}</code> <b>d035 n07 3x157</b>"
   no_command_loaded: "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>Cmd</b> <code>{}</code> <b>d035 n07 3x157</b>\n\n<b>L04d3d 4l145:</b> <blockquote expandable>{}</blockquote>"
   alias_args: "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>U mu57 pr0v1d3 4 cmd & 7h3 4l145 4 17</b>"

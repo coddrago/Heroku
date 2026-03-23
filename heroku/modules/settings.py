@@ -95,7 +95,7 @@ class CoreMod(loader.Module):
 
         branch_text = ""
         if version.branch == "master":
-            branch_test = ""
+            branch_text = ""
         elif version.branch == "beta":
             branch_text = self.strings["happy_beta"].format(version.branch)
         else: 

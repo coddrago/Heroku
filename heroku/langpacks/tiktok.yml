@@ -289,7 +289,7 @@ settings:
   aliases_list: "<b>🔗 Импортнул алиасы:</b>\n\n<blockquote expandable>{}</blockquote>"
   aliases_file: "<tg-emoji emoji-id=5256113064821926998>📁</tg-emoji> <b>Твои алиасы</b>\n\n<tg-emoji emoji-id=5134452506935427991>🪐</tg-emoji> <b>{prefix}la в ответ на это сообщение для импорта</b>"
   aliases: "<b>🔗 Твои алиасы:</b>\n"
-  happy_beta: "<tg-emoji emoji-id=5465188915990255885>🌟</tg-emoji> <b>Ты теперь счастливый юзер <code>{}</code> версии, это имба</b> ✨"
+  happy_beta: "\n\n<tg-emoji emoji-id=5465188915990255885>🌟</tg-emoji> <b>Ты теперь счастливый юзер <code>{}</code> версии, это имба</b> ✨"
   no_command: "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>Нет такой команды</b> <code>{}</code>"
   no_command_loaded: "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>Нет такой команды</b> <code>{}</code>\n\n<b>Загруженные алиасы:</b> <blockquote expandable>{}</blockquote>"
   unstable: "\n\n<tg-emoji emoji-id=5355133243773435190>❕</tg-emoji> <b>Ты на ветке</b> <code>{}</code> <b>сидишь, бро</b>"

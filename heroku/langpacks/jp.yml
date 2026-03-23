@@ -311,7 +311,7 @@ settings:
   aliases_list: "<b>🔗 エイリアスをインポートしました:</b>\n\n<blockquote expandable>{}</blockquote>"
   aliases_file: "<tg-emoji emoji-id=5256113064821926998>📁</tg-emoji> <b>あなたのエイリアス</b>\n\n<tg-emoji emoji-id=5134452506935427991>🪐</tg-emoji> <b>このメッセージに返信して {prefix}la でエイリアスをインポート</b>"
   aliases: "<b>🔗 エイリアス:</b>\n"
-  ハッピー・ベータ: "<tg-emoji emoji-id=5465188915990255885>🌟</tg-emoji>  <b>あなたは、<code>{}</code>バージョンの幸運な所有者ですね！</b>"
+  happy_beta: "\n\n<tg-emoji emoji-id=5465188915990255885>🌟</tg-emoji>  <b>あなたは、<code>{}</code>バージョンの幸運な所有者ですね！</b>"
   no_command: "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>コマンド</b> <code>{}</code> <b>は存在しません</b>"
   no_command_loaded: "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>コマンド</b> <code>{}</code> <b>は存在しません</b>\n\n<b>読み込まれたエイリアス：</b><blockquote expandable>{}</blockquote>"
   alias_args: "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>コマンドとそのエイリアスを指定する必要があります</b>"
