@@ -342,6 +342,7 @@ settings:
   aliases_list: "<b>🔗 Imported aliases:</b>\n\n<blockquote expandable>{}</blockquote>"
   aliases_file: "<tg-emoji emoji-id=5256113064821926998>📁</tg-emoji> <b>Your aliases</b>\n\n<tg-emoji emoji-id=5134452506935427991>🪐</tg-emoji> <b>{prefix}la in reply to this message to import aliases</b>"
   aliases: "<b>🔗 Aliases:</b>\n"
+  happy_beta: "<tg-emoji emoji-id=5465188915990255885>🌟</tg-emoji> <b>You are a happy owner of the <code>{}</code> version!</b>"
   no_command: "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>Command</b> <code>{}</code> <b>does not exist</b>"
   no_command_loaded: "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>Command</b> <code>{}</code> <b>does not exist</b>\n\n<b>Loaded aliases:</b> <blockquote expandable>{}</blockquote>"
   alias_args: "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>You must provide a command and the alias for it</b>"

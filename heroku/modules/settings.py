@@ -105,9 +105,12 @@ class CoreMod(loader.Module):
                 f"{herokutl.__version__} #{herokutl.tl.alltlobjects.LAYER}",
             )
             + (
-                ""
-                if version.branch == "master"
-                else self.strings("unstable").format(version.branch)
+                if version.branch == "master":
+                    ""
+                elif version.branch == "beta":
+                    self.strings["happy_beta"].format(version.branch)
+                else: 
+                    self.strings("unstable").format(version.branch)
             ),
             file="https://raw.githubusercontent.com/coddrago/assets/refs/heads/main/heroku/heroku_cmd.png",
             reply_to=getattr(message, "reply_to_msg_id", None),
