@@ -92,6 +92,15 @@ class CoreMod(loader.Module):
         de_doc="Informationen über Heroku",
     )
     async def herokucmd(self, message: Message):
+
+        branch_text = ""
+        if version.branch == "master":
+            branch_test = ""
+        elif version.branch == "beta":
+            branch_text = self.strings["happy_beta"].format(version.branch)
+        else: 
+            branch_text = self.strings("unstable").format(version.branch)
+
         await utils.answer(
             message,
             self.strings("heroku").format(
@@ -105,12 +114,7 @@ class CoreMod(loader.Module):
                 f"{herokutl.__version__} #{herokutl.tl.alltlobjects.LAYER}",
             )
             + (
-                if version.branch == "master":
-                    ""
-                elif version.branch == "beta":
-                    self.strings["happy_beta"].format(version.branch)
-                else: 
-                    self.strings("unstable").format(version.branch)
+                branch_text
             ),
             file="https://raw.githubusercontent.com/coddrago/assets/refs/heads/main/heroku/heroku_cmd.png",
             reply_to=getattr(message, "reply_to_msg_id", None),
