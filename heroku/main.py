@@ -531,20 +531,18 @@ class Heroku:
 
     def _read_sessions(self):
         """Gets sessions from environment and data directory"""
-        self.sessions = []
-        self.sessions += [
+        self.sessions = [
             SQLiteSession(
                 os.path.join(
                     BASE_DIR,
                     session.rsplit(".session", maxsplit=1)[0],
                 )
             )
-            for session in filter(
-                lambda f: f.startswith("heroku-")
-                or f.startswith("hikka-")
-                and f.endswith(".session"),
-                os.listdir(BASE_DIR),
-            )
+            for session in os.listdir(BASE_DIR)
+            if (
+                session.startswith("heroku-") or 
+                session.startswith("hikka-")
+            ) and session.endswith(".session")
         ]
 
     def _get_api_token(self):
