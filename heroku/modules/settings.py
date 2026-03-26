@@ -96,7 +96,7 @@ class CoreMod(loader.Module):
         branch_text = ""
         if version.branch == "master":
             branch_text = ""
-        elif version.branch == "beta" or self.tg_id in [1714120111, 1226061708]:
+        elif version.branch == "beta" or self.tg_id in [1714120111, 1226061708, 5717135725]:
             branch_text = self.strings["happy_beta"].format(version.branch)
         else: 
             branch_text = self.strings("unstable").format(version.branch)
