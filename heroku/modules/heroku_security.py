@@ -596,6 +596,7 @@ class HerokuSecurityMod(loader.Module):
 
         if user.id not in getattr(self._client.dispatcher.security, group):
             getattr(self._client.dispatcher.security, group).append(user.id)
+            self._client.dispatcher.security._reload_rights(force=True)
 
         await message.edit(
             (
@@ -646,6 +647,7 @@ class HerokuSecurityMod(loader.Module):
 
         if user.id in self._client.dispatcher.security.owner:
             self._client.dispatcher.security.owner.remove(user.id)
+            self._client.dispatcher.security._reload_rights(force=True)
 
         await utils.answer(
             message,

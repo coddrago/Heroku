@@ -81,6 +81,8 @@ BASE_DIR = (
 
 BASE_PATH = Path(BASE_DIR)
 CONFIG_PATH = BASE_PATH / "config.json"
+_CONFIG_CACHE: typing.Optional[dict] = None
+_CONFIG_MTIME_NS: typing.Optional[int] = None
 
 # fmt: off
 LATIN_MOCK = [
@@ -302,6 +304,24 @@ def run_config():
     return configurator.api_config(None)
 
 
+def _read_config() -> dict:
+    global _CONFIG_CACHE, _CONFIG_MTIME_NS
+
+    try:
+        stat = CONFIG_PATH.stat()
+    except FileNotFoundError:
+        _CONFIG_CACHE = {}
+        _CONFIG_MTIME_NS = None
+        return {}
+
+    if _CONFIG_CACHE is not None and _CONFIG_MTIME_NS == stat.st_mtime_ns:
+        return _CONFIG_CACHE
+
+    _CONFIG_CACHE = json.loads(CONFIG_PATH.read_text())
+    _CONFIG_MTIME_NS = stat.st_mtime_ns
+    return _CONFIG_CACHE
+
+
 def get_config_key(key: str) -> typing.Union[str, bool]:
     """
     Parse and return key from config
@@ -309,7 +329,7 @@ def get_config_key(key: str) -> typing.Union[str, bool]:
     :return: Value of config key or `False`, if it doesn't exist
     """
     try:
-        return json.loads(CONFIG_PATH.read_text()).get(key, False)
+        return _read_config().get(key, False)
     except FileNotFoundError:
         return False
 
@@ -321,9 +341,11 @@ def save_config_key(key: str, value: str) -> bool:
     :param value: Desired value in config
     :return: `True` on success, otherwise `False`
     """
+    global _CONFIG_CACHE, _CONFIG_MTIME_NS
+
     try:
         # Try to open our newly created json config
-        config = json.loads(CONFIG_PATH.read_text())
+        config = _read_config().copy()
     except FileNotFoundError:
         # If it doesn't exist, just default config to none
         # It won't cause problems, bc after new save
@@ -334,6 +356,8 @@ def save_config_key(key: str, value: str) -> bool:
     config[key] = value
     # And save config
     CONFIG_PATH.write_text(json.dumps(config, indent=4))
+    _CONFIG_CACHE = config
+    _CONFIG_MTIME_NS = CONFIG_PATH.stat().st_mtime_ns
     return True
 
 
@@ -532,19 +556,14 @@ class Heroku:
     def _read_sessions(self):
         """Gets sessions from environment and data directory"""
         self.sessions = []
-        self.sessions += [
-            SQLiteSession(
-                os.path.join(
-                    BASE_DIR,
-                    session.rsplit(".session", maxsplit=1)[0],
-                )
-            )
-            for session in filter(
-                lambda f: f.startswith("heroku-")
-                and f.endswith(".session"),
-                os.listdir(BASE_DIR),
-            )
-        ]
+        with os.scandir(BASE_DIR) as entries:
+            self.sessions += [
+                SQLiteSession(entry.path.rsplit(".session", maxsplit=1)[0])
+                for entry in entries
+                if entry.is_file()
+                and entry.name.startswith("heroku-")
+                and entry.name.endswith(".session")
+            ]
 
     def _get_api_token(self):
         """Get API Token from disk or environment"""

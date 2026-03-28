@@ -628,6 +628,23 @@ LOADED_MODULES_PATH = Path(LOADED_MODULES_DIR)
 LOADED_MODULES_PATH.mkdir(parents=True, exist_ok=True)
 
 
+def _iter_module_files(
+    directory: typing.Union[str, Path],
+    *,
+    suffix: str = ".py",
+    include: typing.Optional[typing.Callable[[str], bool]] = None,
+) -> typing.List[str]:
+    with os.scandir(directory) as entries:
+        return [
+            entry.path
+            for entry in entries
+            if entry.is_file()
+            and entry.name.endswith(suffix)
+            and not entry.name.startswith("_")
+            and (include(entry.name) if include else True)
+        ]
+
+
 def translatable_docstring(cls):
     """Decorator that makes triple-quote docstrings translatable"""
 
@@ -911,13 +928,7 @@ class Modules:
         external_mods = []
 
         if not mods:
-            mods = [
-                os.path.join(utils.get_base_dir(), MODULES_NAME, mod)
-                for mod in filter(
-                    lambda x: (x.endswith(".py") and not x.startswith("_")),
-                    os.listdir(os.path.join(utils.get_base_dir(), MODULES_NAME)),
-                )
-            ]
+            mods = _iter_module_files(os.path.join(utils.get_base_dir(), MODULES_NAME))
 
             self.secure_boot = self._db.get(__name__, "secure_boot", False)
 
@@ -925,13 +936,10 @@ class Modules:
                 []
                 if self.secure_boot
                 else [
-                    (LOADED_MODULES_PATH / mod).resolve()
-                    for mod in filter(
-                        lambda x: (
-                            x.endswith(f"{self.client.tg_id}.py")
-                            and not x.startswith("_")
-                        ),
-                        os.listdir(LOADED_MODULES_DIR),
+                    Path(mod).resolve()
+                    for mod in _iter_module_files(
+                        LOADED_MODULES_DIR,
+                        include=lambda name: name.endswith(f"{self.client.tg_id}.py"),
                     )
                 ]
             )
