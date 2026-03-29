@@ -105,6 +105,8 @@ class Web(root.Web):
         username, _, password = dec_creds.partition(":")
         if not password:
             return self._auth_required_resp()
+        if len(password) => 1000 or len(username) => 1000:
+            return self._auth_required_resp()
 
         if not (
             hmac.compare_digest(username, self._username)
