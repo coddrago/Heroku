@@ -25,7 +25,8 @@ from herokutl.errors import (
     SessionPasswordNeededError,
 )
 from herokutl.sessions import MemorySession
-from herokutl.tl.types import Message, User
+from herokutl.tl.custom import Message
+from herokutl.tl.types import User
 from herokutl.utils import parse_phone
 
 from .. import loader, main, utils

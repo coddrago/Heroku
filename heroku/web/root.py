@@ -63,7 +63,7 @@ class Web:
         self._qr_task = None
         self._2fa_needed = None
         self._sessions = []
-        self._ratelimit = {}
+        self._ratelimit = {"__global_count__": 0}
         self.api_token = kwargs.pop("api_token")
         self.data_root = kwargs.pop("data_root")
         self.connection = kwargs.pop("connection")
@@ -482,9 +482,19 @@ class Web:
 
         return web.Response()
 
+    async def _close_tunnel(self, reason: str):
+        logger.warning("Weburl tunnel closed. Reason: %s", reason)
+        self.stop()
+
     async def web_auth(self, request: web.Request) -> web.Response:
         if self._check_session(request):
             return web.Response(body=request.cookies.get("session", "unauthorized"))
+        
+        if self._ratelimit["__global_count__"] >= 5:
+            await self._close_tunnel("Global rate limit exceeded")
+            return web.Response(status=429)
+        
+        self._ratelimit["__global_count__"] += 1
 
         token = utils.rand(8)
 
@@ -499,10 +509,22 @@ class Web:
             ]
         )
 
-        ips = request.headers.get("X-FORWARDED-FOR", None) or request.remote
+        xff = request.headers.get("X-FORWARDED-FOR", "")
+        xff_ips = [ip.strip() for ip in xff.split(",") if ip.strip()]
+        if len(xff_ips) > 10:
+            await self._close_tunnel(
+                f"X-Forwarded-For contains {len(xff_ips)} hops"
+            )
+            return web.Response(status=429)
+
+        ips = xff or request.remote or ""
+        parsed_ips = re.findall(r"[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}", ips)
+        if not parsed_ips and request.remote:
+            parsed_ips = [request.remote]
+
         cities = []
 
-        for ip in re.findall(r"[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}", ips):
+        for ip in parsed_ips:
             if ip not in self._ratelimit:
                 self._ratelimit[ip] = []
 
