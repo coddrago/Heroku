@@ -1,4 +1,10 @@
 # Heroku Changelog
+## 🪐 Heroku 2.1.0
+- fix security check in help
+- fix blockquote in config
+- add pip packages backup to backupall
+- fix placeholders in help
+
 ## 🪐 Heroku 2.0.0
 - rework utils
 - add prefix to start message

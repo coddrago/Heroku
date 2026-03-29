@@ -92,10 +92,8 @@ class TestMod(loader.Module):
                 "custom_message",
                 "<tg-emoji emoji-id=5920515922505765329>⚡️</tg-emoji> <b>𝙿𝚒𝚗𝚐: </b><code>{ping}</code><b> 𝚖𝚜 </b>\n<tg-emoji emoji-id=5900104897885376843>🕓</tg-emoji><b> 𝚄𝚙𝚝𝚒𝚖𝚎: </b><code>{uptime}</code>",
                 lambda: (
-                    "<blockquote expandable>"
-                    + self.strings("configping")
+                    self.strings("configping")
                     + ("\n" + self.strings("configpingph").format("\n"+utils.config_placeholders()) if utils.config_placeholders() else "")
-                    + "</blockquote>"
                 ),
                 validator=loader.validators.String(),
             ),
