@@ -1005,7 +1005,7 @@ class LoaderMod(loader.Module):
                 utils.ascii_face(),
                 mod_doc if mod_doc else "",
                 "<blockquote expandable>{}</blockquote>".format("\n".join(modhelp)),
-                "<blockquote expandable>{}</blockquote>".format(
+                "\n<blockquote expandable>{}</blockquote>".format(
                     "\n".join(placeholders)
                 ),
                 developer if not subscribe or not use_subscribe else "",
