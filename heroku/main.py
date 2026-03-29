@@ -613,6 +613,7 @@ class Heroku:
             api_token=self.api_token,
             proxy=self.proxy,
             connection=self.conn,
+            first_start=not self.clients,
         )
 
     async def _get_token(self):
@@ -720,6 +721,12 @@ class Heroku:
         """Shows web banner"""
         logging.info("🔎 Web mode ready for configuration")
         logging.info("🔗 Please visit %s", self.web.url)
+        if self.web._username and self.web._password:
+            logging.info(
+                "🔐 Use following credentials to log in:\n👤 Username: %s\n🔑 Password: %s",
+                self.web._username,
+                self.web._password,
+            )
 
     async def wait_for_web_auth(self, token: str) -> bool:
         """

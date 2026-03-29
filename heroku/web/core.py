@@ -23,10 +23,13 @@
 # 🔑 https://www.gnu.org/licenses/agpl-3.0.html
 
 import asyncio
+import base64
 import contextlib
+import hmac
 import inspect
 import logging
 import os
+import secrets
 import subprocess
 
 import aiohttp_jinja2
@@ -50,6 +53,9 @@ class Web(root.Web):
         self.client_data = {}
         self.app = web.Application()
         self.proxypasser = None
+        self._username = None
+        self._password = None
+        self._basic_auth = False
         aiohttp_jinja2.setup(
             self.app,
             filters={"getdoc": inspect.getdoc, "ascii": ascii},
@@ -58,8 +64,66 @@ class Web(root.Web):
         self.app["static_root_url"] = "/static"
 
         super().__init__(**kwargs)
+
+        self._setup_basic_auth()
         self.app.router.add_get("/favicon.ico", self.favicon)
         self.app.router.add_static("/static/", "web-resources/static")
+
+    def _setup_basic_auth(self):
+        if not self.first_start:
+            return
+
+        self._username = self._rand(12)
+        self._password = self._rand(20)
+        self.app.middlewares.append(self._first_start_middleware)
+
+        logger.debug(
+            "First start. Starting web with %s username and %s password",
+            self._username,
+            self._password,
+        )
+
+    def _rand(self, length: int) -> str:
+        alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+        return "".join(secrets.choice(alphabet) for _ in range(length))
+
+    @web.middleware
+    async def _first_start_middleware(self, request, handler):
+        if not self.first_start or not self._basic_auth:
+            return await handler(request)
+
+        auth_header = request.headers.get("Authorization", "")
+        if not auth_header.startswith("Basic "):
+            return self._auth_required_resp()
+
+        creds = auth_header.split(" ", 1)[1].strip()
+        try:
+            dec_creds = base64.b64decode(creds).decode("utf-8")
+        except Exception:
+            return self._auth_required_resp()
+
+        username, _, password = dec_creds.partition(":")
+        if not password:
+            return self._auth_required_resp()
+
+        if not (
+            hmac.compare_digest(username, self._username)
+            and hmac.compare_digest(password, self._password)
+        ):
+            return self._auth_required_resp()
+
+        return await handler(request)
+
+    @staticmethod
+    def _auth_required_resp() -> web.Response:
+        return web.Response(
+            status=401,
+            text="Authorization required",
+            headers={
+                "WWW-Authenticate": 'Basic realm="Heroku Web Setup"',
+                "Cache-Control": "no-store",
+            },
+        )
 
     async def start_if_ready(
         self,
@@ -101,6 +165,9 @@ class Web(root.Web):
             ip = os.environ.get("HEROKU_IP", ip)
 
             url = f"http://{ip}:{self.port}"
+            self._basic_auth = self.first_start
+        else:
+            self._basic_auth = False
 
         self.url = url
         return url

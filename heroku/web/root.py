@@ -68,6 +68,7 @@ class Web:
         self.data_root = kwargs.pop("data_root")
         self.connection = kwargs.pop("connection")
         self.proxy = kwargs.pop("proxy")
+        self.first_start = kwargs.pop("first_start", False)
 
         self.app.router.add_get("/", self.root)
         self.app.router.add_put("/set_api", self.set_tg_api)
