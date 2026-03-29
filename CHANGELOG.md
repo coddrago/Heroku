@@ -1,9 +1,10 @@
 # Heroku Changelog
 ## 🪐 Heroku 2.1.0
 - fix security check in help
-- fix blockquote in config
+- fix blockquote in config and info
 - add pip packages backup to backupall
 - fix placeholders in help
+- fix placeholders caption in UwU language
 
 ## 🪐 Heroku 2.0.0
 - rework utils
