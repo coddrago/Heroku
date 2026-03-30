@@ -119,6 +119,7 @@ _external_context = contextvars.ContextVar(
 _SESSION_AUDIT_INSTALLED = False
 _EXTERNAL_GUARDS_INSTALLED = False
 _MODULE_NAME_BY_HASH: typing.Dict[str, str] = {}
+_MODULE_HASH_BY_MODNAME: typing.Dict[str, str] = {}
 
 
 def _calc_module_hash(source: str) -> str:
@@ -127,7 +128,10 @@ def _calc_module_hash(source: str) -> str:
 
 def _make_session_allowlist():
     data: typing.FrozenSet[str] = frozenset()
-    allowed_callers = frozenset({f"{__package__}.modules.heroku_plugin_security"})
+    allowed_callers = frozenset({
+        f"{__package__}.modules.heroku_plugin_security",
+        __name__,
+    })
 
     def _caller_module() -> typing.Optional[str]:
         for frame_info in inspect.stack():
@@ -237,6 +241,40 @@ def _external_stack_info() -> (
     return False, None, None
 
 
+def _resolve_mod_hash_from_context() -> typing.Tuple[
+    typing.Optional[str], typing.Optional[str]
+]:
+    ctx = _external_context.get()
+    origin = None
+    mod_hash = None
+
+    if isinstance(ctx, tuple) and len(ctx) == 2:
+        origin, mod_hash = ctx
+    elif isinstance(ctx, str):
+        origin = ctx
+
+    return origin, mod_hash
+
+
+def _resolve_mod_hash_from_stack(
+    stack_mod_name: typing.Optional[str],
+) -> typing.Optional[str]:
+    if not stack_mod_name:
+        return None
+
+    direct = _MODULE_HASH_BY_MODNAME.get(stack_mod_name)
+    if direct:
+        return direct
+
+    for h, name in _MODULE_NAME_BY_HASH.items():
+        if name == stack_mod_name or (
+            stack_mod_name and stack_mod_name.endswith(f".{name}")
+        ):
+            return h
+
+    return None
+
+
 def _session_audit_hook(event, args):
     if not args:
         return
@@ -285,37 +323,39 @@ def _session_audit_hook(event, args):
         else:
             return
 
-    ctx = _external_context.get()
-    origin = None
-    mod_hash = None
-
-    if isinstance(ctx, tuple):
-        origin, mod_hash = ctx
-    elif isinstance(ctx, str):
-        origin = ctx
+    origin, mod_hash = _resolve_mod_hash_from_context()
 
     if _is_session_hash_allowed(mod_hash):
         return
 
     has_external_stack, stack_origin, stack_mod_name = _external_stack_info()
 
-    if _external_context.get() or has_external_stack:
-        mod_name = _MODULE_NAME_BY_HASH.get(mod_hash, None) if mod_hash else None
-        if not origin:
-            origin = stack_origin
-        if not mod_name:
-            mod_name = stack_mod_name
-        logger.warning(
-            "Blocked .session file access from external module: name=%s origin=%s event=%s args=%s",
-            mod_name or "<unknown>",
-            origin or "<unknown>",
-            event,
-            _format_audit_args(args),
-        )
-        raise PermissionError(
-            "Access to .session files is blocked for external modules: "
-            f"name={mod_name or '<unknown>'} origin={origin or '<unknown>'} event={event} args={_format_audit_args(args)}"
-        )
+    if not _external_context.get() and not has_external_stack:
+        return
+
+    if not mod_hash:
+        mod_hash = _resolve_mod_hash_from_stack(stack_mod_name)
+
+    if _is_session_hash_allowed(mod_hash):
+        return
+
+    mod_name = _MODULE_NAME_BY_HASH.get(mod_hash, None) if mod_hash else None
+    if not origin:
+        origin = stack_origin
+    if not mod_name:
+        mod_name = stack_mod_name
+
+    logger.warning(
+        "Blocked .session file access from external module: name=%s origin=%s event=%s args=%s",
+        mod_name or "<unknown>",
+        origin or "<unknown>",
+        event,
+        _format_audit_args(args),
+    )
+    raise PermissionError(
+        "Access to .session files is blocked for external modules: "
+        f"name={mod_name or '<unknown>'} origin={origin or '<unknown>'} event={event} args={_format_audit_args(args)}"
+    )
 
 
 async def _call_with_external_context(func: callable, *args, **kwargs):
@@ -863,9 +903,20 @@ class Modules:
         self.db = db
         self.translator = translator
         self.secure_boot = False
+        self._sync_session_allowlist_from_db()
         asyncio.ensure_future(self._junk_collector())
         self.inline = InlineManager(self.client, self._db, self)
         self.client.heroku_inline = self.inline
+
+    def _sync_session_allowlist_from_db(self):
+        try:
+            session_allow = self._db.get(
+                "HerokuPluginSecurity", "session_allow", []
+            )
+            if session_allow:
+                set_session_access_hashes(session_allow)
+        except Exception as e:
+            logger.debug("Failed to sync session allowlist from db: %s", e)
 
     async def _junk_collector(self):
         """
@@ -992,13 +1043,24 @@ class Modules:
         module = importlib.util.module_from_spec(spec)
         sys.modules[module_name] = module
 
+        source_data = (
+            spec.loader.data.decode()
+            if hasattr(spec.loader, "data") and spec.loader.data
+            else None
+        )
+        pre_hash = _calc_module_hash(source_data) if source_data else None
+
+        if pre_hash:
+            _MODULE_HASH_BY_MODNAME[module_name] = pre_hash
+
         async def _exec_module():
             attempted = False
             while True:
                 try:
                     token = None
                     if _is_external_origin(origin):
-                        token = _external_context.set(origin)
+                        ctx_hash = pre_hash
+                        token = _external_context.set((origin, ctx_hash))
                     try:
                         spec.loader.exec_module(module)
                     finally:
@@ -1072,6 +1134,16 @@ class Modules:
                 raise TypeError(f"Instance is not a Module, it is {type(ret)}")
 
         ret.__origin__ = origin
+
+        ret.__source__ = (
+            source_data
+            if source_data
+            else inspect.getsource(ret.__class__)
+        )
+        ret.__module_hash__ = _calc_module_hash(ret.__source__)
+        _MODULE_NAME_BY_HASH[ret.__module_hash__] = ret.__class__.__name__
+        _MODULE_HASH_BY_MODNAME[module_name] = ret.__module_hash__
+
         await self.complete_registration(ret)
 
         cls_name = ret.__class__.__name__
@@ -1086,14 +1158,6 @@ class Modules:
                 Path(path).write_text(spec.loader.data.decode(), encoding="utf-8")
 
                 logger.debug("Saved class %s to path %s", cls_name, path)
-
-        ret.__source__ = (
-            spec.loader.data.decode()
-            if hasattr(spec.loader, "data")
-            else inspect.getsource(ret.__class__)
-        )
-        ret.__module_hash__ = _calc_module_hash(ret.__source__)
-        _MODULE_NAME_BY_HASH[ret.__module_hash__] = ret.__class__.__name__
 
         return ret
 
@@ -1312,6 +1376,22 @@ class Modules:
         if is_internalized:
             instance.__force_internal__ = True
 
+            if module_hash:
+                try:
+                    session_allow = self._db.get(
+                        "HerokuPluginSecurity", "session_allow", []
+                    )
+                    if module_hash not in session_allow:
+                        session_allow.append(module_hash)
+                        self._db.set(
+                            "HerokuPluginSecurity", "session_allow", session_allow
+                        )
+                    set_session_access_hashes(session_allow)
+                except Exception as e:
+                    logger.debug(
+                        "Failed to add module hash to session allowlist: %s", e
+                    )
+
         instance.allmodules = self
         instance.internal_init()
         if is_internalized and hasattr(instance, "__force_internal__"):
@@ -1517,6 +1597,7 @@ class Modules:
     ):
         with contextlib.suppress(AttributeError):
             _heroku_client_id_logging_tag = copy.copy(self.client.tg_id)  # noqa: F841
+
         origin = getattr(mod, "__origin__", "")
         safe_client = (
             mod.client
@@ -1535,43 +1616,55 @@ class Modules:
             else self._db
         )
 
-        if from_dlmod:
-            try:
-                if len(inspect.signature(mod.on_dlmod).parameters) == 2:
-                    await mod.on_dlmod(safe_client, safe_db)
-                else:
-                    await mod.on_dlmod()
-            except Exception:
-                logger.info("Can't process `on_dlmod` hook", exc_info=True)
+        token = None
+        if _is_external_origin(origin):
+            mod_hash = getattr(mod, "__module_hash__", None)
+            if not mod_hash and hasattr(mod, "__source__"):
+                mod_hash = _calc_module_hash(mod.__source__)
+            token = _external_context.set((origin, mod_hash))
 
         try:
-            if len(inspect.signature(mod.client_ready).parameters) == 2:
-                await mod.client_ready(safe_client, safe_db)
-            else:
-                await mod.client_ready()
-        except SelfUnload as e:
-            if no_self_unload:
-                raise e
+            if from_dlmod:
+                try:
+                    if len(inspect.signature(mod.on_dlmod).parameters) == 2:
+                        await mod.on_dlmod(safe_client, safe_db)
+                    else:
+                        await mod.on_dlmod()
+                except Exception:
+                    logger.info("Can't process `on_dlmod` hook", exc_info=True)
 
-            logger.debug("Unloading %s, because it raised SelfUnload", mod)
-            self.modules.remove(mod)
-        except SelfSuspend as e:
-            if no_self_unload:
-                raise e
+            try:
+                if len(inspect.signature(mod.client_ready).parameters) == 2:
+                    await mod.client_ready(safe_client, safe_db)
+                else:
+                    await mod.client_ready()
+            except SelfUnload as e:
+                if no_self_unload:
+                    raise e
 
-            logger.debug("Suspending %s, because it raised SelfSuspend", mod)
-            return
-        except Exception as e:
-            logger.exception(
-                (
-                    "Failed to send mod init complete signal for %s due to %s,"
-                    " attempting unload"
-                ),
-                mod,
-                e,
-            )
-            self.modules.remove(mod)
-            raise
+                logger.debug("Unloading %s, because it raised SelfUnload", mod)
+                self.modules.remove(mod)
+                return
+            except SelfSuspend as e:
+                if no_self_unload:
+                    raise e
+
+                logger.debug("Suspending %s, because it raised SelfSuspend", mod)
+                return
+            except Exception as e:
+                logger.exception(
+                    (
+                        "Failed to send mod init complete signal for %s due to %s,"
+                        " attempting unload"
+                    ),
+                    mod,
+                    e,
+                )
+                self.modules.remove(mod)
+                raise
+        finally:
+            if token is not None:
+                _external_context.reset(token)
 
         # Check for pack_url and load translations
         if hasattr(mod, "__source__"):
