@@ -101,8 +101,8 @@ class TokenObtainment(InlineUnit):
 
         data = {
             "title": f"🪐 Heroku {utils.get_version_raw()}"[:64],
-            "username": username,
             "about": "",
+            "username": username,
             "userpic": photo_id,
             "method": "createBot",
         }
@@ -111,7 +111,12 @@ class TokenObtainment(InlineUnit):
             url + f"/api?hash={_hash}", data=data, headers=inutils.headers
         ) as resp:
             if resp.status != 200:
-                logger.error("Error while creating the bot: resp%s", resp.status)
+                logger.error(
+                    "Error while creating the bot: resp%s\ncontent: %s\ndata: %s",
+                    resp.status, 
+                    await resp.text(), 
+                    data,
+                )
                 return False
 
             content = await resp.json()
@@ -124,8 +129,9 @@ class TokenObtainment(InlineUnit):
                 return False
             if not content.get("ok", False):
                 logger.error(
-                    "Error while creating the bot. Maybe you've been banned: %s",
+                    "Error while creating the bot. Maybe you've been banned: %s\ndata: %s",
                     content,
+                    data,
                 )
                 return False
             # bot_id = content["bot_id"]
