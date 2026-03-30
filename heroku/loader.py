@@ -1512,7 +1512,6 @@ class Modules:
 
     async def send_ready(self):
         """Send all data to all modules"""
-        await self.inline.register_manager()
         await asyncio.gather(
             *[self.send_ready_one_wrapper(mod) for mod in self.modules]
         )

@@ -325,13 +325,20 @@ class TelegramLogsHandler(logging.Handler):
 
     async def get_logs_topic_id_by_client(self, client_id: int) -> typing.Optional[int]:
         """Get logs topic ID from database"""
-        try:
-            db = self._mods[client_id].db
-            topic_id = await utils.get_topic_id(db, "Logs")
-            return topic_id
-        except Exception:
-            logging.exception("Failed to get logs topic ID")
-            return None
+        allmods = self._mods[client_id]
+        topic_id = await utils.get_topic_id(allmods.db, "Logs")
+        if not topic_id:
+            logging.debug(f"No logs topic found for client {client_id}. Creating new one.")
+            topic = await utils.asset_forum_topic(
+                allmods.client,
+                allmods.db,
+                allmods.logchat,
+                "Logs",
+                "📊 Inline logs and error reports will be stored here",
+                5877307202888273539,
+            )
+            topic_id = topic.id
+        return topic_id
 
     async def sender(self):
         async with self._send_lock:
@@ -358,10 +365,7 @@ class TelegramLogsHandler(logging.Handler):
 
             self._exc_queue = {}
             for client_id in self._mods:
-                try:
-                    topic_id = await self.get_logs_topic_id_by_client(client_id)
-                except Exception:
-                    topic_id = None
+                topic_id = await self.get_logs_topic_id_by_client(client_id)
 
                 funcs = []
                 for item in self.tg_buff:

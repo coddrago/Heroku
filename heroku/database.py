@@ -123,6 +123,52 @@ class Database(dict):
         self._db_file = main.BASE_PATH / f"config-{self._client.tg_id}.json"
         self.read()
 
+    async def ensure_content_channel(self):
+        content_channel = None
+        existing_channel_id = self.get("heroku.forums", "channel_id", None)
+
+        if existing_channel_id:
+            try:
+                content_channel = await self._client.get_entity(existing_channel_id)
+                logger.debug(
+                    "Found existing content channel with ID %s in database",
+                    existing_channel_id,
+                )
+            except Exception as e:
+                logger.warning(
+                        f"Saved channel ID {existing_channel_id} not found or inaccessible: {e}"
+                    )
+                content_channel = None
+                self.set("heroku.forums", "forums_cache", {"heroku-userbot": {}})
+
+        if not content_channel:
+            async for dialog in self._client.iter_dialogs():
+                if dialog.title and "heroku-userbot" in dialog.title.lower():
+                    content_channel = dialog.entity
+                    logger.debug(
+                        "Found existing channel '%s' with ID %s",
+                        dialog.title,
+                        dialog.entity.id,
+                    )
+                    self.set("heroku.forums", "channel_id", int(dialog.entity.id))
+                    break
+
+        if not content_channel:
+            content_channel, _ = await utils.asset_channel(
+                client=self._client,
+                title="heroku-userbot",
+                description="🪐 Content related to Heroku will be here",
+                silent=True,
+                invite_bot=True,
+                avatar="https://raw.githubusercontent.com/coddrago/assets/main/heroku/heroku.png",
+                forum=True,
+                hide_general=True,
+                _folder="heroku",
+            )
+            self.set("heroku.forums", "channel_id", int(content_channel.id))
+
+        return content_channel
+
     def read(self):
         """Read database and stores it in self"""
         if self._redis:
