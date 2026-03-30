@@ -59,9 +59,7 @@ async def invite_inline_bot(
     try:
         await client(InviteToChannelRequest(peer, [client.loader.inline.bot_username]))
     except Exception as e:
-        raise RuntimeError(
-            "Can't invite inline bot to old asset chat, which is required by module"
-        ) from e
+        raise RuntimeError(f"Can't invite inline bot to old asset chat, which is required by module: {e}")
 
     with contextlib.suppress(Exception):
         await client(

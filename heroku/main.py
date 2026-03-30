@@ -1151,7 +1151,6 @@ class Heroku:
         db = database.Database(client)
         client.heroku_db = db
         await db.init()
-
         logging.debug("Got DB")
         logging.debug("Loading logging config...")
 
@@ -1173,6 +1172,8 @@ class Heroku:
 
         await modules.register_all(None)
         modules.send_config()
+        await modules.inline.register_manager()
+        await db.ensure_content_channel()
         await modules.send_ready()
 
         if first:

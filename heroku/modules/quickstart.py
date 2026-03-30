@@ -27,29 +27,6 @@ class Quickstart(loader.Module):
     strings = {"name": "Quickstart"}
 
     async def client_ready(self):
-        await self.request_join(
-            "heroku_talks",
-            "Heroku help is only available in this chat. By agreeing to join the chat, you agree to the Heroku federation rules and if you violate them, you will be permanently banned.",
-        )
-
-        self.mark = lambda: [
-            [
-                {
-                    "text": self.strings("btn_support"),
-                    "url": "https://t.me/heroku_talks",
-                }
-            ],
-        ] + utils.chunks(
-            [
-                {
-                    "text": self.strings.get("language", lang),
-                    "data": f"heroku/lang/{lang}",
-                }
-                for lang in translations.SUPPORTED_LANGUAGES
-            ],
-            3,
-        )
-
         self.text = (
             lambda: self.strings("base").format(
                 utils.get_platform_emoji()
@@ -76,6 +53,7 @@ class Quickstart(loader.Module):
                         f"Saved channel ID {existing_channel_id} not found or inaccessible: {e}"
                     )
                     content_channel = None
+                    self.db.set("heroku.forums", "forums_cache", {"heroku-userbot": {}})
 
             if not content_channel:
                 async for dialog in self.client.iter_dialogs():
@@ -90,18 +68,7 @@ class Quickstart(loader.Module):
                         break
 
             if not content_channel:
-                content_channel, _ = await utils.asset_channel(
-                    client=self.client,
-                    title="heroku-userbot",
-                    description="🪐 Content related to Heroku will be here",
-                    silent=True,
-                    invite_bot=True,
-                    avatar="https://raw.githubusercontent.com/coddrago/assets/main/heroku/heroku.png",
-                    forum=True,
-                    hide_general=True,
-                    _folder="heroku",
-                )
-                self.db.set("heroku.forums", "channel_id", int(content_channel.id))
+                content_channel = await self.db.ensure_content_channel()
 
             if not content_channel:
                 raise RuntimeError("Failed to get or create content channel!")
@@ -146,11 +113,6 @@ class Quickstart(loader.Module):
                     5877307202888273539,
                 ),
                 (
-                    "Logs",
-                    "📊 Inline logs and error reports will be stored here",
-                    5877307202888273539,
-                ),
-                (
                     "Backups",
                     "💾 Your Heroku backups will be stored here",
                     5877307202888273539,
@@ -181,6 +143,29 @@ class Quickstart(loader.Module):
                 "- This error will occur every restart\n\n"
                 "You can try solving this by leaving some channels/groups"
             )
+
+        await self.request_join(
+            "heroku_talks",
+            "Heroku help is only available in this chat. By agreeing to join the chat, you agree to the Heroku federation rules and if you violate them, you will be permanently banned.",
+        )
+
+        self.mark = lambda: [
+            [
+                {
+                    "text": self.strings("btn_support"),
+                    "url": "https://t.me/heroku_talks",
+                }
+            ],
+        ] + utils.chunks(
+            [
+                {
+                    "text": self.strings.get("language", lang),
+                    "data": f"heroku/lang/{lang}",
+                }
+                for lang in translations.SUPPORTED_LANGUAGES
+            ],
+            3,
+        )
 
         if self.get("no_msg"):
             return
