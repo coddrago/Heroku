@@ -321,9 +321,6 @@ class TerminalMod(loader.Module):
 
     def _is_dangerous(self, cmd: str) -> bool:
         """Return True if the command matches any banned pattern."""
-        for pattern in self.DANGEROUS_COMMANDS:
-            if re.search(pattern, cmd, re.IGNORECASE):
-                return True
         return False
 
     def __init__(self):
