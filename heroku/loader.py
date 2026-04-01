@@ -1628,7 +1628,7 @@ class Modules:
                 mod_hash = _calc_module_hash(mod.__source__)
             token = _external_context.set((origin, mod_hash))
 
-               try:
+        try:
             if from_dlmod:
                 try:
                     if len(inspect.signature(mod.on_dlmod).parameters) == 2:
