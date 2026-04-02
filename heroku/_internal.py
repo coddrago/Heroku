@@ -93,9 +93,14 @@ def print_banner(banner: str):
         print(f.read())
 
 
-def check_commit_ancestor(commit, repo_path):
+def check_commit_ancestor(repo, branch):
     """Check if commit is ancestor of origin/master"""
     try:
+        commit = repo.commit(branch).hexsha
+        repo_path = repo.working_tree_dir or os.path.abspath(
+            os.path.join(os.path.dirname(__file__), "..")
+        )
+
         proc = subprocess.run(
             [
                 "git",
