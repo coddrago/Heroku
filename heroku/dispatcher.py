@@ -555,16 +555,16 @@ class CommandDispatcher:
             "no_channels": lambda: not getattr(m, "is_channel", False),
             "no_groups": (
                 lambda: not getattr(m, "is_group", False)
-                or getattr(m, "private", False)
+                or getattr(m, "is_private", False)
                 or getattr(m, "is_channel", False)
             ),
             "only_groups": (
                 lambda: getattr(m, "is_group", False)
-                or not getattr(m, "private", False)
+                or not getattr(m, "is_private", False)
                 and not getattr(m, "is_channel", False)
             ),
-            "no_pm": lambda: not getattr(m, "private", False),
-            "only_pm": lambda: getattr(m, "private", False),
+            "no_pm": lambda: not getattr(m, "is_private", False),
+            "only_pm": lambda: getattr(m, "is_private", False),
             "no_inline": lambda: not getattr(m, "via_bot_id", False),
             "no_stickers": lambda: not getattr(m, "sticker", False),
             "no_docs": lambda: not getattr(m, "document", False),
