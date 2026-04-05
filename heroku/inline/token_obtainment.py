@@ -171,6 +171,13 @@ class TokenObtainment(InlineUnit):
             bot_id = ids.group(1)
 
         if bot_id:
+            hdrs = inutils.headers.copy()
+            hdrs.update(
+                {
+                    "x-aj-referer": "https://webappinternal.telegram.org/botfather",
+                    "x-requested-with": "XMLHttpRequest",
+                }
+            )
             if revoke_token:
                 async with session.post(
                     url + f"/api?hash={_hash}",
@@ -183,13 +190,6 @@ class TokenObtainment(InlineUnit):
 
                     token = (await resp.json())["token"]
             else:
-                hdrs = inutils.headers.copy()
-                hdrs.update(
-                    {
-                        "x-aj-referer": "https://webappinternal.telegram.org/botfather",
-                        "x-requested-with": "XMLHttpRequest",
-                    }
-                )
                 async with session.get(url + f"/bot/{bot_id}", headers=hdrs) as resp:
                     if resp.status != 200:
                         logger.error("Error while getting token: resp%s", resp.status)
