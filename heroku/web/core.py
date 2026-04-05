@@ -64,8 +64,10 @@ class Web(root.Web):
         self.app["static_root_url"] = "/static"
 
         super().__init__(**kwargs)
-
-        self._setup_basic_auth()
+        if self.arguments.no_auth_web:
+            self._basic_auth = False
+        else:
+            self._setup_basic_auth()
         self.app.router.add_get("/favicon.ico", self.favicon)
         self.app.router.add_static("/static/", "web-resources/static")
 
@@ -185,7 +187,11 @@ class Web(root.Web):
         await self.get_url(proxy_pass)
 
         self.running.set()
-        print(f"Heroku Userbot Web Interface running on {self.port}")
+        from ..main import get_config_key
+        if get_config_key("lang") and get_config_key("lang") == "ru":
+            print(f"Веб-интерфейс Heroku запущен на {self.port}")
+        else:
+            print(f"Heroku Userbot Web Interface running on {self.port}")
 
     async def stop(self):
         await self.runner.shutdown()

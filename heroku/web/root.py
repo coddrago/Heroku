@@ -64,6 +64,7 @@ class Web:
         self._2fa_needed = None
         self._sessions = []
         self._ratelimit = {"__global_count__": 0}
+        self.arguments = kwargs.pop("arguments", None)
         self.api_token = kwargs.pop("api_token")
         self.data_root = kwargs.pop("data_root")
         self.connection = kwargs.pop("connection")

@@ -64,6 +64,7 @@ from .secure import patcher
 from .tl_cache import CustomTelegramClient
 from .translations import Translator
 from .version import __version__
+from .configurator import get_lang
 
 try:
     from .web import core
@@ -422,6 +423,12 @@ def parse_arguments() -> dict:
         help="Disable authentication and API token input, exitting if needed",
     )
     parser.add_argument(
+        "--no-auth-web",
+        dest="no_auth_web",
+        action="store_true",
+        help="Disable web authentication",
+    )
+    parser.add_argument(
         "--proxy-host",
         dest="proxy_host",
         action="store",
@@ -614,6 +621,7 @@ class Heroku:
             proxy=self.proxy,
             connection=self.conn,
             first_start=not self.clients,
+            arguments=self.arguments,
         )
 
     async def _get_token(self):
@@ -719,14 +727,27 @@ class Heroku:
 
     async def _web_banner(self):
         """Shows web banner"""
-        logging.info("🔎 Web mode ready for configuration")
-        logging.info("🔗 Please visit %s", self.web.url)
-        if self.web._username and self.web._password:
-            logging.info(
-                "🔐 Use following credentials to log in:\n👤 Username: %s\n🔑 Password: %s",
-                self.web._username,
-                self.web._password,
-            )
+        if not get_config_key("lang"):
+            ru = get_lang()
+            logging.info("test")
+        if get_config_key("lang") == "ru":
+            logging.info("🔎 Веб-режим готов к настройке")
+            logging.info("🔗 Пожалуйста, перейдите на %s", self.web.url)
+            if self.web._username and self.web._password:
+                logging.info(
+                    "🔐 Используйте эти данные для входа:\n👤 Логин: %s\n🔑 Пароль: %s",
+                    self.web._username,
+                    self.web._password,
+                )
+        else:
+            logging.info("🔎 Web mode ready for configuration")
+            logging.info("🔗 Please visit %s", self.web.url)
+            if self.web._username and self.web._password:
+                logging.info(
+                    "🔐 Use following credentials to log in:\n👤 Username: %s\n🔑 Password: %s",
+                    self.web._username,
+                    self.web._password,
+                )
 
     async def wait_for_web_auth(self, token: str) -> bool:
         """
@@ -746,9 +767,14 @@ class Heroku:
         return False
 
     async def _phone_login(self, client: CustomTelegramClient) -> bool:
-        phone = input(
-            "\033[0;96mEnter phone: \033[0m" if self.arguments.tty else "Enter phone: "
-        )
+        if get_config_key("lang") == "ru":
+            phone = input(
+                "\033[0;96mВведите номер телефона: \033[0m" if self.arguments.tty else "Введите номер телефона: "
+            )
+        else:
+            phone = input(
+                "\033[0;96mEnter phone: \033[0m" if self.arguments.tty else "Enter phone: "
+            )
 
         await client.start(phone)
 
@@ -768,13 +794,22 @@ class Heroku:
             try:
                 if await self._check_bot(client, bot):
                     db.set("heroku.inline", "custom_bot", bot)
-                    print("Bot username saved!")
+                    if get_config_key("lang") == "ru":
+                        print("Юзернейм бота сохранен!")
+                    else:
+                        print("Bot username saved!")
                     break
                 else:
-                    print("Bot username is occupied. Try again or leave it empty")
+                    if get_config_key("lang") == "ru":
+                        print("Юзернейм бота занят. Попробуйте снова или оставьте поле пустым")
+                    else:
+                        print("Bot username is occupied. Try again or leave it empty")
                     continue
             except Exception:
-                print("Something went wrong")
+                if get_config_key("lang") == "ru":
+                    print("Что-то пошло не так")
+                else:
+                    print("Something went wrong")
 
         await self.save_client_session(client)
         self.clients += [client]
@@ -804,7 +839,10 @@ class Heroku:
                 continue
             break
         else:
-            print("Can't check bot. WebApp is not available now")
+            if get_config_key("lang") == "ru":
+                print("Не могу проверить бота. WebApp недоступен сейчас")
+            else:
+                print("Can't check bot. WebApp is not available now")
             return False
 
         session, _hash = result
@@ -838,27 +876,43 @@ class Heroku:
                 system_lang_code="en-US",
             )
             await client.connect()
-
-            print(
-                ("\033[0;96m{}\033[0m" if self.arguments.tty else "{}").format(
-                    "You can use QR-code to login from another device (your friend's"
-                    " phone, for example)."
+            if get_config_key("lang") == "ru":
+                print(
+                    ("\033[0;96m{}\033[0m" if self.arguments.tty else "{}").format(
+                        "Вы можете использовать QR-код для входа с другого устройства (например, с телефона друга)."
+                    )
                 )
-            )
 
-            user_choice = input(
-                "\033[0;96mUse QR code? [y/N]: \033[0m"
-                if self.arguments.tty
-                else "Use QR code? [y/N]: "
-            ).lower()
+                user_choice = input(
+                    "\033[0;96mИспользовать QR-код? [д/Н]: \033[0m"
+                    if self.arguments.tty
+                    else "Использовать QR-код? [д/Н]: "
+                ).lower()
+            else:
+                print(
+                    ("\033[0;96m{}\033[0m" if self.arguments.tty else "{}").format(
+                        "You can use QR-code to login from another device (your friend's"
+                        " phone, for example)."
+                    )
+                )
+
+                user_choice = input(
+                    "\033[0;96mUse QR code? [y/N]: \033[0m"
+                    if self.arguments.tty
+                    else "Use QR code? [y/N]: "
+                ).lower()
 
             match user_choice:
                 case "y":
                     pass
+                case "д":
+                    pass
                 case _:
                     return await self._phone_login(client)
-
-            print("\033[0;96mLoading QR code...\033[0m")
+            if get_config_key("lang") == "ru":
+                print("\033[0;96mЗагрузка QR-кода...\033[0m")
+            else:
+                print("\033[0;96mLoading QR code...\033[0m")
             qr_login = await client.qr_login()
 
             def print_qr():
@@ -866,8 +920,12 @@ class Heroku:
                 qr.add_data(qr_login.url)
                 print("\033[2J\033[3;1f")
                 qr.print_ascii(invert=True)
-                print("\033[0;96mScan the QR code above to log in.\033[0m")
-                print("\033[0;96mPress Ctrl+C to cancel.\033[0m")
+                if get_config_key("lang") == "ru":
+                    print("\033[0;96mОтсканируйте QR-код выше для входа.\033[0m")
+                    print("\033[0;96mНажмите Ctrl+C для отмены.\033[0m")
+                else:
+                    print("\033[0;96mScan the QR code above to log in.\033[0m")
+                    print("\033[0;96mPress Ctrl+C to cancel.\033[0m")
 
             async def qr_login_poll() -> bool:
                 logged_in = False
@@ -896,11 +954,18 @@ class Heroku:
                     print_banner("2fa.txt")
                     password = await client(GetPasswordRequest())
                     while True:
-                        _2fa = getpass(
-                            f"\033[0;96mEnter 2FA password ({password.hint}): \033[0m"
+                        if get_config_key("lang") == "ru":
+                            _2fa = getpass(
+                            f"\033[0;96mВведите пароль 2FA ({password.hint}): \033[0m"
                             if self.arguments.tty
-                            else f"Enter 2FA password ({password.hint}): "
-                        )
+                            else f"Введите пароль 2FA ({password.hint}): "
+                            )
+                        else:
+                            _2fa = getpass(
+                                f"\033[0;96mEnter 2FA password ({password.hint}): \033[0m"
+                                if self.arguments.tty
+                                else f"Enter 2FA password ({password.hint}): "
+                            )
                         try:
                             await client._on_login(
                                 (
@@ -912,14 +977,33 @@ class Heroku:
                                 ).user
                             )
                         except PasswordHashInvalidError:
-                            print("\033[0;91mInvalid 2FA password!\033[0m")
+                            if get_config_key("lang") == "ru":
+                                print("\033[0;91mНеверный пароль 2FA!\033[0m")
+                            else:
+                                print("\033[0;91mInvalid 2FA password!\033[0m")
                         except FloodWaitError as e:
-                            seconds, minutes, hours = (
-                                e.seconds % 3600 % 60,
-                                e.seconds % 3600 // 60,
-                                e.seconds // 3600,
-                            )
-                            seconds, minutes, hours = (
+                            if get_config_key("lang") == "ru":
+                                seconds, minutes, hours = (
+                                    e.seconds % 3600 % 60,
+                                    e.seconds % 3600 // 60,
+                                    e.seconds // 3600,
+                                )
+                                seconds, minutes, hours = (
+                                    f"{seconds} секунд(-ы)",
+                                    f"{minutes} минут(-ы) " if minutes else "",
+                                    f"{hours} час(-ы) " if hours else "",
+                                )
+                                print(
+                                    "\033[0;91mУ вас FloodWait! Пожалуйста, подождите"
+                                    f" {hours}{minutes}{seconds}\033[0m"
+                                )
+                            else:
+                                seconds, minutes, hours = (
+                                    e.seconds % 3600 % 60,
+                                    e.seconds % 3600 // 60,
+                                    e.seconds // 3600,
+                                )
+                                seconds, minutes, hours = (
                                 f"{seconds} second(-s)",
                                 f"{minutes} minute(-s) " if minutes else "",
                                 f"{hours} hour(-s) " if hours else "",
@@ -935,7 +1019,10 @@ class Heroku:
                     pass
 
             print_banner("success.txt")
-            print("\033[0;92mLogged in successfully!\033[0m")
+            if get_config_key("lang") == "ru":
+                print("\033[0;92mВы успешно вошли!\033[0m")
+            else:
+                print("\033[0;92mLogged in successfully!\033[0m")
             await self.save_client_session(client)
             self.clients += [client]
             return True
@@ -1280,7 +1367,10 @@ class Heroku:
         except Exception as e:
             logging.exception("Unexpected exception in main loop: %s", e)
         finally:
-            logging.info("Bye!")
+            if get_config_key("lang") == "ru":
+                logging.info("Пока!")
+            else:
+                logging.info("Bye!")
             try:
                 self.loop.run_until_complete(self._shutdown_handler())
             except:

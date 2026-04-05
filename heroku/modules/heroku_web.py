@@ -101,6 +101,7 @@ class HerokuWebMod(loader.Module):
                     api_token=main.heroku.api_token,
                     proxy=main.heroku.proxy,
                     connection=main.heroku.conn,
+                    arguments=main.heroku.arguments,
                 )
                 await main.heroku.web.add_loader(
                     self._client, self.allmodules, self._db
