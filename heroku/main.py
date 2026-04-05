@@ -729,7 +729,6 @@ class Heroku:
         """Shows web banner"""
         if not get_config_key("lang"):
             ru = get_lang()
-            logging.info("test")
         if get_config_key("lang") == "ru":
             logging.info("🔎 Веб-режим готов к настройке")
             logging.info("🔗 Пожалуйста, перейдите на %s", self.web.url)

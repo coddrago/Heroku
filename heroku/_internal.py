@@ -57,9 +57,11 @@ def restart():
         sys.exit(0)
 
     logging.getLogger().setLevel(logging.CRITICAL)
-
-    print("🔄 Restarting...")
-
+    from .main import get_config_key
+    if get_config_key("lang") == "ru":
+        print("🔄 Перезапуск...")
+    else:
+        print("🔄 Restarting...")
     match True:
         case _ if "LAVHOST" in os.environ:
             os.system("lavhost restart")
