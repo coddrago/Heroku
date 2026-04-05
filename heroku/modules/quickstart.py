@@ -27,11 +27,6 @@ class Quickstart(loader.Module):
     strings = {"name": "Quickstart"}
 
     async def client_ready(self):
-        await self.request_join(
-            "heroku_talks",
-            "Heroku help is only available in this chat. By agreeing to join the chat, you agree to the Heroku federation rules and if you violate them, you will be permanently banned.",
-        )
-
         if not self._db.get(translations.__name__, "lang", False):
             from ..main import get_config_key
             lang = get_config_key("lang") or "en"
