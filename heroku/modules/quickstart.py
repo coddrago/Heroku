@@ -32,24 +32,6 @@ class Quickstart(loader.Module):
             lang = get_config_key("lang") or "en"
             self._db.set(translations.__name__, "lang", lang)
 
-        self.mark = lambda: [
-            [
-                {
-                    "text": self.strings("btn_support"),
-                    "url": "https://t.me/heroku_talks",
-                }
-            ],
-        ] + utils.chunks(
-            [
-                {
-                    "text": self.strings.get("language", lang),
-                    "data": f"heroku/lang/{lang}",
-                }
-                for lang in translations.SUPPORTED_LANGUAGES
-            ],
-            3,
-        )
-
         self.text = (
             lambda: self.strings("base").format(
                 utils.get_platform_emoji()
