@@ -19,7 +19,7 @@ import subprocess
 import sys
 
 from ._internal import restart
-
+from .main import get_config_key
 if "--no-git" in sys.argv:
     os.environ["HEROKU_NO_GIT"] = "1"
 
@@ -122,9 +122,12 @@ else:
             prev_hash = f.read().strip()
 
     if prev_hash != get_file_hash("requirements.txt"):
-        print(
-            "\U0001f504 Detected changes in requirements.txt, updating dependencies..."
-        )
+        if get_config_key('lang') == "ru":
+            print("🔄 Обнаружены изменения в requirements.txt, обновление зависимостей...")
+        else:
+            print(
+                "🔄 Detected changes in requirements.txt, updating dependencies..."
+            )
         deps()
         restart()
 

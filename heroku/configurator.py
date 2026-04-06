@@ -15,7 +15,6 @@ import string
 import sys
 import typing
 
-
 def tty_print(text: str, tty: bool):
     """
     Print text to terminal if tty is True,
@@ -31,59 +30,142 @@ def tty_input(text: str, tty: bool) -> str:
     """
     return input(text if tty else re.sub(r"\033\[[0-9;]*m", "", text))
 
+def get_lang():
+    """
+    Get system language
+    If ru, returns True, otherwise False
+    """
+    from . import main
+    import locale
+
+    lang = locale.getlocale()[0].split('_')[0]
+    if lang == 'C' or lang == None:
+        lang = input("Please enter your language (EN/ru): ").lower()
+        if lang:
+            if lang == 'ru':
+                main.save_config_key("lang", "ru")
+                return True
+            if lang == 'en':
+                main.save_config_key("lang", "en")
+                return False
+            main.save_config_key("lang", "en")
+            return False
+        else: 
+            return False
+    if lang.startswith('ru'):
+        main.save_config_key("lang", "ru")
+        return True
+    else:
+        main.save_config_key("lang", "en")
+        return False 
 
 def api_config(tty: typing.Optional[bool] = None):
     """Request API config from user and set"""
     from . import main
     from ._internal import print_banner
+    print(main.get_config_key("lang"))
+    if not main.get_config_key("lang"):
+        ru = get_lang()
 
     if tty is None:
-        print("\033[0;91mThe quick brown fox jumps over the lazy dog\033[0m")
-        tty = input("Is the text above colored? [y/N]").lower() == "y"
+        if ru:
+            print("\033[0;91mУ лукоморья дуб зеленый, золотая цепь на дубе том\033[0m")
+        else:
+            print("\033[0;91mThe quick brown fox jumps over the lazy dog\033[0m")
+        if ru:
+            inp = input("Текст выше окрашен? [д/Н] ").lower()
+            tty = True if inp in ("y", "д") else False
+        else:
+            tty = input("Is the text above colored? [y/N] ").lower() == "y"
 
     if tty:
         print_banner("banner.txt")
+    if ru:
+        tty_print("\033[0;95mДобро пожаловать в юзербот Heroku!\033[0m", tty)
+        tty_print("\033[0;96m1. Зайдите на https://my.telegram.org и войдите\033[0m", tty)
+        tty_print("\033[0;96m2. Нажмите на \033[1;96mAPI development tools\033[0m", tty)
+        tty_print(
+            (
+                "\033[0;96m3. Создайте новое приложение, указав необходимые"
+                " данные\033[0m"
+            ),
+            tty,
+        )
+        tty_print(
+            (
+                "\033[0;96m4. Скопируйте ваши \033[1;96mAPI ID\033[0;96m и \033[1;96mAPI"
+                " hash\033[0m"
+            ),
+            tty,
+        )
 
-    tty_print("\033[0;95mWelcome to Heroku Userbot!\033[0m", tty)
-    tty_print("\033[0;96m1. Go to https://my.telegram.org and login\033[0m", tty)
-    tty_print("\033[0;96m2. Click on \033[1;96mAPI development tools\033[0m", tty)
-    tty_print(
-        (
-            "\033[0;96m3. Create a new application, by entering the required"
-            " details\033[0m"
-        ),
-        tty,
-    )
-    tty_print(
-        (
-            "\033[0;96m4. Copy your \033[1;96mAPI ID\033[0;96m and \033[1;96mAPI"
-            " hash\033[0m"
-        ),
-        tty,
-    )
+        while api_id := tty_input("\033[0;95mВведите API ID: \033[0m", tty):
+            if api_id.isdigit():
+                break
 
-    while api_id := tty_input("\033[0;95mEnter API ID: \033[0m", tty):
-        if api_id.isdigit():
-            break
+            tty_print("\033[0;91mНеверный ID\033[0m", tty)
 
-        tty_print("\033[0;91mInvalid ID\033[0m", tty)
+        if not api_id:
+            tty_print("\033[0;91mОтменено\033[0m", tty)
+            sys.exit(0)
 
-    if not api_id:
-        tty_print("\033[0;91mCancelled\033[0m", tty)
-        sys.exit(0)
+        while api_hash := tty_input("\033[0;95mВведите API hash: \033[0m", tty):
+            if len(api_hash) == 32 and all(
+                symbol in string.hexdigits for symbol in api_hash
+            ):
+                break
 
-    while api_hash := tty_input("\033[0;95mEnter API hash: \033[0m", tty):
-        if len(api_hash) == 32 and all(
-            symbol in string.hexdigits for symbol in api_hash
-        ):
-            break
+            tty_print("\033[0;91mНеверный хэш\033[0m", tty)
 
-        tty_print("\033[0;91mInvalid hash\033[0m", tty)
+        if not api_hash:
+            tty_print("\033[0;91mОтменено\033[0m", tty)
+            sys.exit(0)
 
-    if not api_hash:
-        tty_print("\033[0;91mCancelled\033[0m", tty)
-        sys.exit(0)
+        main.save_config_key("api_id", int(api_id))
+        main.save_config_key("api_hash", api_hash)
+        tty_print("\033[0;92mAPI конфиг сохранен\033[0m", tty)
+    else:
+        tty_print("\033[0;95mWelcome to Heroku Userbot!\033[0m", tty)
+        tty_print("\033[0;96m1. Go to https://my.telegram.org and login\033[0m", tty)
+        tty_print("\033[0;96m2. Click on \033[1;96mAPI development tools\033[0m", tty)
+        tty_print(
+            (
+                "\033[0;96m3. Create a new application, by entering the required"
+                " details\033[0m"
+            ),
+            tty,
+        )
+        tty_print(
+            (
+                "\033[0;96m4. Copy your \033[1;96mAPI ID\033[0;96m and \033[1;96mAPI"
+                " hash\033[0m"
+            ),
+            tty,
+        )
 
-    main.save_config_key("api_id", int(api_id))
-    main.save_config_key("api_hash", api_hash)
-    tty_print("\033[0;92mAPI config saved\033[0m", tty)
+        while api_id := tty_input("\033[0;95mEnter API ID: \033[0m", tty):
+            if api_id.isdigit():
+                break
+
+            tty_print("\033[0;91mInvalid ID\033[0m", tty)
+
+        if not api_id:
+            tty_print("\033[0;91mCancelled\033[0m", tty)
+            sys.exit(0)
+
+        while api_hash := tty_input("\033[0;95mEnter API hash: \033[0m", tty):
+            if len(api_hash) == 32 and all(
+                symbol in string.hexdigits for symbol in api_hash
+            ):
+                break
+
+            tty_print("\033[0;91mInvalid hash\033[0m", tty)
+
+        if not api_hash:
+            tty_print("\033[0;91mCancelled\033[0m", tty)
+            sys.exit(0)
+
+        main.save_config_key("api_id", int(api_id))
+        main.save_config_key("api_hash", api_hash)
+        tty_print("\033[0;92mAPI config saved\033[0m", tty)
+

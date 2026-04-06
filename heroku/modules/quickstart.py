@@ -27,6 +27,11 @@ class Quickstart(loader.Module):
     strings = {"name": "Quickstart"}
 
     async def client_ready(self):
+        if not self._db.get(translations.__name__, "lang", False):
+            from ..main import get_config_key
+            lang = get_config_key("lang") or "en"
+            self._db.set(translations.__name__, "lang", lang)
+
         self.text = (
             lambda: self.strings("base").format(
                 utils.get_platform_emoji()
