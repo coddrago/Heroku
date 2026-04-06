@@ -10,7 +10,6 @@ deep-translator
 meval==2.5
 aiohttp_jinja2==1.5
 aiohttp==3.11.18
-asyncssh==2.14.2
 Jinja2==3.0.3
 requests==2.27.1
 certifi==2024.8.30
