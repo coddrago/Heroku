@@ -19,7 +19,7 @@ import subprocess
 import sys
 
 from ._internal import restart
-
+from .main import get_config_key
 if "--no-git" in sys.argv:
     os.environ["HEROKU_NO_GIT"] = "1"
 
