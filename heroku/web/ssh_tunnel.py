@@ -16,7 +16,7 @@ class SSHTunnel:
         self.ssh_commands = [
             (
                 f"ssh -o StrictHostKeyChecking=no -R 80:127.0.0.1:{port} serveo.net -T -n",
-                r"https:\/\/(\S*serveo\.net\S*)",
+                r"https:\/\/(\S*serveousercontent\.com\S*)",
             ),
             (
                 f"ssh -o StrictHostKeyChecking=no -R 80:127.0.0.1:{port} nokey@localhost.run",

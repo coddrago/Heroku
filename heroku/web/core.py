@@ -73,9 +73,14 @@ class Web(root.Web):
         if not self.first_start:
             return
 
+        self.app.middlewares.append(self._first_start_middleware)
+
+    def _ensure_basic_auth_credentials(self):
+        if self._username and self._password:
+            return
+
         self._username = self._rand(12)
         self._password = self._rand(20)
-        self.app.middlewares.append(self._first_start_middleware)
 
         logger.debug(
             "First start. Starting web with %s username and %s password",
@@ -168,6 +173,8 @@ class Web(root.Web):
 
             url = f"http://{ip}:{self.port}"
             self._basic_auth = self.first_start
+            if self._basic_auth:
+                self._ensure_basic_auth_credentials()
         else:
             self._basic_auth = False
 

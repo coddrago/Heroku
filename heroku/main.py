@@ -727,6 +727,10 @@ class Heroku:
                 self.web._username,
                 self.web._password,
             )
+        if "serveo" in self.web.url:
+            logging.warning("⚠️  You might see a Serveo warning before opening this link.")
+            logging.warning("⚠️  This is normal for free Serveo tunnels.")
+            logging.warning("⚠️  The page is only used to register your userbot session.")
 
     async def wait_for_web_auth(self, token: str) -> bool:
         """
