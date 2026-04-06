@@ -859,7 +859,8 @@ class Heroku:
         """Responsible for first start"""
         if self.arguments.no_auth:
             return False
-
+        if not get_config_key("lang"):
+            get_lang()
         if not self.web:
             client = CustomTelegramClient(
                 MemorySession(),

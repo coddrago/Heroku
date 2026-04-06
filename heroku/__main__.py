@@ -121,14 +121,13 @@ else:
         with open(".requirements_hash", "r") as f:
             prev_hash = f.read().strip()
 
-    if prev_hash != get_file_hash("requirements.txt") and get_config_key('lang') == "ru":
-        print("🔄 Обнаружены изменения в requirements.txt, обновление зависимостей...")
-        deps()
-        restart()
-    else:
-        print(
-            "\U0001f504 Detected changes in requirements.txt, updating dependencies..."
-        )
+    if prev_hash != get_file_hash("requirements.txt"):
+        if get_config_key('lang') == "ru":
+            print("🔄 Обнаружены изменения в requirements.txt, обновление зависимостей...")
+        else:
+            print(
+                "🔄 Detected changes in requirements.txt, updating dependencies..."
+            )
         deps()
         restart()
 

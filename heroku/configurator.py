@@ -63,8 +63,9 @@ def api_config(tty: typing.Optional[bool] = None):
     """Request API config from user and set"""
     from . import main
     from ._internal import print_banner
-    
-    ru = get_lang()
+    print(main.get_config_key("lang"))
+    if not main.get_config_key("lang"):
+        ru = get_lang()
 
     if tty is None:
         if ru:
