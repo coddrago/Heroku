@@ -127,7 +127,15 @@ class TokenObtainment(InlineUnit):
                     "command ch_heroku_bot @username"
                 )
                 return False
-            if not content.get("ok", False):
+            elif content.get("error", False) == "Error":
+                logger.error(
+                    "Error while creating the bot. Please, send the following information to the developers: %s\ndata: %s",
+                    content,
+                    data,
+                )
+                # в этом случае бот может быть создан, так шо стоит перепроверить его наличие
+                # тута главное собрать побольше информации для нас, чтобы понять, в каких случаях может возникать эта ошибка
+            elif not content.get("ok", False):
                 logger.error(
                     "Error while creating the bot. Maybe you've been banned: %s\ndata: %s",
                     content,
@@ -216,8 +224,9 @@ class TokenObtainment(InlineUnit):
                 ) as resp:
                     if resp.status != 200:
                         logger.error(
-                            "Error while changing bot inline settings: resp%s",
+                            "Error while changing bot inline settings: resp%s\nbody: %s",
                             resp.status,
+                            await resp.text(),
                         )
                         return False
 
