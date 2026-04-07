@@ -667,7 +667,7 @@ class Heroku:
         session.save()
 
         if not delay_restart:
-            client.disconnect()
+            await client.disconnect()
             restart()
 
         client.session = session
@@ -714,7 +714,7 @@ class Heroku:
                     print("Something went wrong")
 
         if delay_restart:
-            client.disconnect()
+            await client.disconnect()
             await asyncio.sleep(3600)  # Will be restarted from web anyway
 
     async def _web_banner(self):

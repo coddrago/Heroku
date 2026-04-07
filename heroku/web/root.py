@@ -484,7 +484,7 @@ class Web:
 
     async def _close_tunnel(self, reason: str):
         logger.warning("Weburl tunnel closed. Reason: %s", reason)
-        self.stop()
+        await self.stop()
 
     async def web_auth(self, request: web.Request) -> web.Response:
         if self._check_session(request):
