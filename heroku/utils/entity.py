@@ -250,8 +250,6 @@ async def asset_channel(
     :return: Peer and bool: is channel new or pre-existent
     """
 
-    # thanks xdesai and Legacy
-
     if not hasattr(client, "_channels_cache"):
         client._channels_cache = {}
 
@@ -260,11 +258,6 @@ async def asset_channel(
         and client._channels_cache[title]["exp"] > time.time()
     ):
         return client._channels_cache[title]["peer"], False
-
-    if title.startswith("hikka-"):
-        title = title.replace("hikka-", "heroku-")
-    if title.startswith("legacy-"):
-        title = title.replace("legacy-", "heroku-")
 
     async for d in client.iter_dialogs():
         if d.title == title:
@@ -288,6 +281,7 @@ async def asset_channel(
             CreateChannelRequest(
                 title,
                 description,
+                broadcast=channel,
                 megagroup=not channel,
                 forum=forum,
             )
