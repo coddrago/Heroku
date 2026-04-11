@@ -72,9 +72,10 @@ class Evaluator(loader.Module):
         real_db = self.db
         self.db = self._SecureDB(real_db)
 
+        output_print = StringIO()
+
         try:
             start_time = time.time()
-            output_print = StringIO()
             with contextlib.redirect_stdout(output_print):
                 result = await meval(
                     args,
@@ -85,6 +86,7 @@ class Evaluator(loader.Module):
 
         except Exception:
             item = HerokuException.from_exc_info(*sys.exc_info())
+            print_output = output_print.getvalue()
 
             await utils.answer(
                 message,
@@ -101,6 +103,15 @@ class Evaluator(loader.Module):
                             + item.full_stack.splitlines()[-1]
                         )
                     ),
+                )
+                + (
+                    self.strings["print_outp"].format(
+                        "python",
+                        print_output,
+                        utils.escape_html(self.censor(print_output)),
+                    )
+                    if print_output
+                    else ""
                 ),
             )
 
