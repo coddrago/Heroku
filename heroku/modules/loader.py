@@ -1314,7 +1314,7 @@ class LoaderMod(loader.Module):
 
         for file in os.scandir(loader.LOADED_MODULES_DIR):
             try:
-                shutil.rmtree(file.path)
+                os.remove(file.path)
             except Exception:
                 logger.debug("Failed to remove %s", file.path, exc_info=True)
 
