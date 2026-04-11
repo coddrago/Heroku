@@ -193,6 +193,7 @@ heroku_web:
   privacy_leak_nowarn: "⚠️ <b>7h15 cmd g1v35 4cc355 2 ur H3r0ku w3b 1n73rf4c3. 17'5 n07 r3c0mm3nd3d 2 run 17 1n publ1c gr0up ch475. C0n51d3r u51ng 17 1n <a href='tg://openmessage?user_id={}'>S4v3d m5g5</a>.</b>"
   opening_tunnel: "🔁 <b>0p3n1ng 7unn3l 2 H3r0ku w3b 1n73rf4c3...</b>"
   tunnel_opened: "🎉 <b>7unn3l 0p3n3d. 7h15 l1nk 15 v4l1d 4 4b0u7 20 m1n5</b>"
+  tunnel_opened_pass: "🎉 <b>7unn3l 0p3n3d. 7h15 l1nk 15 v4l1d 4 4b0u7 20 m1n5</b>\n\n🔐 <b>L0g1n:</b> <code>{}</code>\n🔑 <b>P455w0rd:</b> <code>{}</code>"
   host_denied: "<tg-emoji emoji-id=6037254263187443802>💬</tg-emoji> S35510n 4dd1710n cmd5 r n07 4v41l4bl3 0n ur h0571ng, plz c0n74c7 ur h0571ng 4dm1n157r4710n."
   web_btn: "🌍 W3b 1n73rf4c3"
   _cmd_doc_weburl: "0p3n5 w3b 7unn3l 2 ur H3r0ku w3b 1n73rf4c3"

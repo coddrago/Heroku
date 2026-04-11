@@ -179,6 +179,7 @@ heroku_web:
   privacy_leak_nowarn: "⚠️ <b>Dieser Befehl gewährt Zugriff auf die Heroku-Weboberfläche. Die Ausführung in öffentlichen Chats stellt ein Sicherheitsrisiko dar. Es wird empfohlen, dies in den <a href='tg://openmessage?user_id={}'>Gespeicherten Nachrichten</a> auszuführen.</b>"
   opening_tunnel: "🔁 <b>Öffne Tunnel zur Heroku-Weboberfläche...</b>"
   tunnel_opened: "🎉 <b>Der Tunnel ist geöffnet. Dieser Link bleibt maximal 20 Minuten aktiv</b>"
+  tunnel_opened_pass: "🎉 <b>Der Tunnel ist geöffnet. Dieser Link bleibt maximal 20 Minuten aktiv</b>\n\n🔐 <b>Login:</b> <code>{}</code>\n🔑 <b>Passwort:</b> <code>{}</code>"
   host_denied: "<tg-emoji emoji-id=6037254263187443802>💬</tg-emoji> Befehle zum Hinzufügen von Sitzungen sind auf Ihrem Hosting nicht verfügbar, wenden Sie sich an die Verwaltung Ihres Hostings."
   web_btn: "🌍 Web-Oberfläche"
   btn_yes: "🚸 Trotzdem öffnen"

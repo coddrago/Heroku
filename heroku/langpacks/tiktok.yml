@@ -179,6 +179,7 @@ heroku_web:
   privacy_leak_nowarn: "⚠️ <b>Эй, это доступ к вебу Heroku. Не пали это в чатах, а то взломают как лоха. Юзай в <a href='tg://openmessage?user_id={}'>Избранном</a>.</b>"
   opening_tunnel: "🔁 <b>Копаю туннель к вебу...</b>"
   tunnel_opened: "🎉 <b>Туннель прокопан. Ссылка живет 20 минут, успевай</b>"
+  tunnel_opened_pass: "🎉 <b>Туннель прокопан. Ссылка живет 20 минут, успевай</b>\n\n🔐 <b>Логин:</b> <code>{}</code>\n🔑 <b>Пароль:</b> <code>{}</code>"
   host_denied: "<tg-emoji emoji-id=6037254263187443802>💬</tg-emoji> Хостинг не разрешает, сорян. Пиши админам хостинга."
   web_btn: "🌍 Веб-морда"
   _cmd_doc_weburl: "Открыть туннель к вебу"

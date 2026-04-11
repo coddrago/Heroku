@@ -224,6 +224,7 @@ heroku_web:
   privacy_leak_nowarn: "⚠️ <b>This command gives access to your Heroku web interface. It's not recommended to run it in public group chats. Consider using it in <a href='tg://openmessage?user_id={}'>Saved messages</a>.</b>"
   opening_tunnel: "🔁 <b>Opening tunnel to Heroku web interface...</b>"
   tunnel_opened: "🎉 <b>Tunnel opened. This link is valid for about 20 minutes</b>"
+  tunnel_opened_pass: "🎉 <b>Tunnel opened. This link is valid for about 20 minutes</b>\n\n🔐 <b>Login:</b> <code>{}</code>\n🔑 <b>Password:</b> <code>{}</code>"
   host_denied: "<tg-emoji emoji-id=6037254263187443802>💬</tg-emoji> Session addition commands are not available on your hosting, please contact your hosting administration."
   web_btn: "🌍 Web interface"
   _cmd_doc_weburl: "Opens web tunnel to your Heroku web interface"

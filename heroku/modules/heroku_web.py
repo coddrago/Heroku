@@ -132,8 +132,17 @@ class HerokuWebMod(loader.Module):
 
             url = await main.heroku.web.get_url(proxy_pass=True)
 
+            web_ = main.heroku.web
+            if web_._basic_auth and web_._username and web_._password:
+                text = self.strings("tunnel_opened_pass").format(
+                    web_._username,
+                    web_._password,
+                )
+            else:
+                text = self.strings("tunnel_opened")
+
             await form.edit(
-                self.strings("tunnel_opened"),
+                text,
                 reply_markup={"text": self.strings("web_btn"), "url": url},
                 photo="https://raw.githubusercontent.com/coddrago/assets/refs/heads/main/heroku/tunnel_opened.png",
             )

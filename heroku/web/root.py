@@ -546,8 +546,11 @@ class Web:
             try:
                 res = (
                     await utils.run_sync(
-                        requests.get,
-                        f"https://freegeoip.app/json/{ip}",
+                        functools.partial(
+                            requests.get,
+                            f"https://freegeoip.app/json/{ip}",
+                            timeout=3,
+                        )
                     )
                 ).json()
                 cities += [

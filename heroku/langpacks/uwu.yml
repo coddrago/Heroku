@@ -193,6 +193,7 @@ heroku_web:
   privacy_leak_nowarn: "⚠️ <b>Dis command gives access to youw Hewoku web intewface. It's nyot wecommended to wun it in pubwic gwoup chats. Considew using it in <a href='tg://openmessage?user_id={}'>Saved messages</a>.</b>"
   opening_tunnel: "🔁 <b>Openying tunnyew to Hewoku web intewface...</b>"
   tunnel_opened: "🎉 <b>Tunnyew opened. Dis wink is vawid fow about 20 minyutes</b>"
+  tunnel_opened_pass: "🎉 <b>Tunnyew opened. Dis wink is vawid fow about 20 minyutes</b>\n\n🔐 <b>Wogin:</b> <code>{}</code>\n🔑 <b>Passwowd:</b> <code>{}</code>"
   host_denied: "<tg-emoji emoji-id=6037254263187443802>💬</tg-emoji> Session addition commands awe nyot avaiwabwe on youw hosting, pwease contact youw hosting administwation."
   web_btn: "🌍 Web intewface"
   _cmd_doc_weburl: "Opens web tunnyew to youw Hewoku web intewface"

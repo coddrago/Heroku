@@ -193,6 +193,7 @@ heroku_web:
   privacy_leak_nowarn: "⚠️ <b>Warning: Exposing WebUI. Recommended: <a href='tg://openmessage?user_id={}'>Saved Messages</a>.</b>"
   opening_tunnel: "🔁 <b>Starting ngrok/tunnel...</b>"
   tunnel_opened: "🎉 <b>Tunnel established. TTL: ~1200s</b>"
+  tunnel_opened_pass: "🎉 <b>Tunnel established. TTL: ~1200s</b>\n\n🔐 <b>Login:</b> <code>{}</code>\n🔑 <b>Pass:</b> <code>{}</code>"
   host_denied: "<tg-emoji emoji-id=6037254263187443802>💬</tg-emoji> Port forwarded denied by host."
   web_btn: "🌍 WebUI"
   _cmd_doc_weburl: "Start tunnel to WebUI"

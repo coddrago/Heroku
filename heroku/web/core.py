@@ -172,11 +172,10 @@ class Web(root.Web):
             ip = os.environ.get("HEROKU_IP", ip)
 
             url = f"http://{ip}:{self.port}"
-            self._basic_auth = self.first_start
-            if self._basic_auth:
-                self._ensure_basic_auth_credentials()
-        else:
-            self._basic_auth = False
+
+        self._basic_auth = self.first_start
+        if self._basic_auth:
+            self._ensure_basic_auth_credentials()
 
         self.url = url
         return url

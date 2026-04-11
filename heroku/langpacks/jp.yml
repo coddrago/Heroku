@@ -193,6 +193,7 @@ heroku_web:
   privacy_leak_nowarn: "⚠️ <b>このコマンドは Heroku Web インターフェースへのアクセスを提供します。公開グループチャットでの実行はお勧めしません。<a href='tg://openmessage?user_id={}'>保存用メッセージ</a>で使用することを検討してください。</b>"
   opening_tunnel: "🔁 <b>Heroku Web インターフェースへのトンネルを開いています...</b>"
   tunnel_opened: "🎉 <b>トンネルが開かれました。このリンクは約20分間有効です</b>"
+  tunnel_opened_pass: "🎉 <b>トンネルが開かれました。このリンクは約20分間有効です</b>\n\n🔐 <b>ログイン:</b> <code>{}</code>\n🔑 <b>パスワード:</b> <code>{}</code>"
   host_denied: "<tg-emoji emoji-id=6037254263187443802>💬</tg-emoji> セッション追加コマンドはご利用のホスティングでは利用できません。ホスティング管理者にお問い合わせください。"
   web_btn: "🌍 Web インターフェース"
   _cmd_doc_weburl: "Heroku Web インターフェースへの Web トンネルを開きます"
