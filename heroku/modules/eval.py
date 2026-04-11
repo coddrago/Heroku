@@ -67,6 +67,10 @@ class Evaluator(loader.Module):
         if not args and reply and reply.text:
             args = reply.message
 
+        skip_output = args.startswith(("-so ", "--skip-output "))
+        if skip_output:
+            args = args.split(" ", 1)[1]
+
         args = args.replace("\xa0", "\x20")
 
         real_db = self.db
@@ -118,6 +122,9 @@ class Evaluator(loader.Module):
             return
         finally:
             self.db = real_db
+
+        if skip_output:
+            return
 
         if callable(getattr(result, "stringify", None)):
             with contextlib.suppress(Exception):
