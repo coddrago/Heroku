@@ -466,7 +466,7 @@ class CoreMod(loader.Module):
         """Clear all DB entries for module: clearmodule <module>"""
         args = utils.get_args(message)
         if not args:
-            await utils.answer(message, self.strings("wrong_usage_cmc"))
+            return await utils.answer(message, self.strings("wrong_usage_cmc"))
 
         mod_arg = args[0]
         mod_inst = self.allmodules.lookup(mod_arg)
@@ -491,7 +491,7 @@ class CoreMod(loader.Module):
             disabled_modules = [m for m in disabled_modules if m != module_key]
             self._db.set(main.__name__, "disabled_modules", disabled_modules)
 
-        await utils.answer(message, f"Cleared DB for module {module_key}")
+        await utils.answer(message, self.strings["cmc_done"].format(mod_arg))
 
     async def installationcmd(self, message: Message):
         """| Guide of installation"""
