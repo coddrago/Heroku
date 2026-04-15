@@ -205,7 +205,7 @@ class LoaderMod(loader.Module):
 
         if args := utils.get_args(message):
             match args:
-                case ["-all"]:
+                case [single] if single.lstrip("-").lower() == "all":
                     repos = [self.config["MODULES_REPO"]] + self.config[
                         "ADDITIONAL_REPOS"
                     ]
