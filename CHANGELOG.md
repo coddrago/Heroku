@@ -5,6 +5,9 @@
 - add pip packages backup to backupall
 - fix placeholders in help
 - fix placeholders caption in UwU language
+- fix loader.tag's
+- add -all argument to .dlm
+- add banner to .dlm
 
 ## 🪐 Heroku 2.0.0
 - rework utils
