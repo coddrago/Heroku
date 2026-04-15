@@ -316,9 +316,9 @@ class LoaderMod(loader.Module):
             failed_list = "\n".join(not_installed)
             await call.edit(
                 self.strings("dlm_all_from_repo_error_somemods")
-                + "\n<pre><code class=\"language-Installation failed for:\">"
+                + "<blockquote expandable>"
                 + failed_list
-                + "</code></pre>"
+                + "</blockquote>"
             )
         else:
             await call.edit(self.strings("installed_all_from_repo"))
