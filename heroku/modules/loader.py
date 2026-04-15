@@ -36,7 +36,7 @@ import requests
 from herokutl.errors.common import ScamDetectionError
 from herokutl.errors.rpcerrorlist import MediaCaptionTooLongError
 from herokutl.tl.functions.channels import JoinChannelRequest
-from herokutl.tl.types import Channel, Message
+from herokutl.tl.types import Channel, InputMediaWebPage, Message
 
 from .. import loader, main, utils
 from .._local_storage import RemoteStorage
@@ -101,6 +101,12 @@ class LoaderMod(loader.Module):
                 "command_emoji",
                 "<tg-emoji emoji-id=5197195523794157505>▫️</tg-emoji>",
                 lambda: "Emoji for command",
+            ),
+            loader.ConfigValue(
+                "show_banner",
+                True,
+                lambda: self.strings("show_banner_doc"),
+                validator=loader.validators.Boolean(),
             ),
         )
 
@@ -183,11 +189,42 @@ class LoaderMod(loader.Module):
             },
         )
 
+    def _get_banner_url(self, doc: str) -> typing.Optional[str]:
+        match = re.search(r"# ?meta banner: ?(.+)", doc)
+        return match.group(1).strip() if match else None
+
+    def _repo_to_label(self, repo: str) -> str:
+        parsed = urlparse(repo)
+        parts = [p for p in parsed.path.strip("/").split("/") if p]
+        if len(parts) >= 2:
+            return f"{parts[0]}/{parts[1]}"
+        return repo
+
     @loader.command(alias="dlm")
     async def dlmod(self, message: Message, force_pm: bool = False):
 
         if args := utils.get_args(message):
             match args:
+                case ["all"]:
+                    repos = [self.config["MODULES_REPO"]] + self.config[
+                        "ADDITIONAL_REPOS"
+                    ]
+                    repos = [r for r in repos if r.startswith("http")]
+                    buttons = [
+                        [
+                            {
+                                "text": self._repo_to_label(repo),
+                                "callback": self._inline__install_all_from_repo,
+                                "args": (repo,),
+                            }
+                        ]
+                        for repo in repos
+                    ]
+                    await self.inline.form(
+                        self.strings("choose_repo"),
+                        message,
+                        reply_markup=buttons,
+                    )
                 case [single]:
                     args = single
                     await utils.answer(message, self.strings("finding_module_in_repos"))
@@ -249,6 +286,45 @@ class LoaderMod(loader.Module):
                     for repo, mods in (await self.get_repo_list()).items()
                 ],
             )
+
+    async def _inline__install_all_from_repo(
+        self,
+        call: InlineCall,
+        repo: str,
+    ):
+        await call.edit(self.strings("installing_all_from_repo"))
+
+        links = await self._get_repo(repo)
+
+        if not links:
+            await call.edit(self.strings("dlm_all_from_repo_error_nomods"))
+            return
+
+        not_installed = []
+
+        for link in links:
+            full_url = f"{repo.strip('/')}/{link}.py"
+            result = await self.download_and_install(full_url)
+            if result != MODULE_LOADING_SUCCESS:
+                not_installed.append(link.split("/")[-1])
+
+        installed_count = len(links) - len(not_installed)
+
+        if installed_count == 0:
+            await call.edit(self.strings("dlm_all_from_repo_error_nomods"))
+        elif not_installed:
+            failed_list = "\n".join(not_installed)
+            await call.edit(
+                self.strings("dlm_all_from_repo_error_somemods")
+                + "\n<pre><code class=\"language-Installation failed for:\">"
+                + failed_list
+                + "</code></pre>"
+            )
+        else:
+            await call.edit(self.strings("installed_all_from_repo"))
+
+        if self.fully_loaded:
+            self.update_modules_in_db()
 
     async def _get_modules_to_load(self):
         todo = self.get("loaded_modules", {})
@@ -1056,11 +1132,28 @@ class LoaderMod(loader.Module):
         else:
             developer = ""
 
+        banner_kwargs = {}
+        if self.config["show_banner"] and not subscribe_markup:
+            try:
+                banner_url = self._get_banner_url(doc)
+                if banner_url:
+                    banner_kwargs = {
+                        "file": InputMediaWebPage(banner_url, optional=True),
+                        "invert_media": True,
+                    }
+            except Exception:
+                pass
+
         if any(
             line.replace(" ", "") == "#scope:disable_onload_docs"
             for line in doc.splitlines()
         ):
-            await utils.answer(message, loaded_msg(), reply_markup=subscribe_markup)
+            await utils.answer(
+                message,
+                loaded_msg(),
+                reply_markup=subscribe_markup,
+                **banner_kwargs,
+            )
             return
 
         for _name, fun in sorted(
@@ -1097,7 +1190,12 @@ class LoaderMod(loader.Module):
                 )
 
         try:
-            await utils.answer(message, loaded_msg(), reply_markup=subscribe_markup)
+            await utils.answer(
+                message,
+                loaded_msg(),
+                reply_markup=subscribe_markup,
+                **banner_kwargs,
+            )
         except MediaCaptionTooLongError:
             await message.reply(loaded_msg(False))
 
@@ -1314,7 +1412,7 @@ class LoaderMod(loader.Module):
 
         for file in os.scandir(loader.LOADED_MODULES_DIR):
             try:
-                os.remove(file.path)
+                shutil.rmtree(file.path)
             except Exception:
                 logger.debug("Failed to remove %s", file.path, exc_info=True)
 

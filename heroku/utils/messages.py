@@ -385,11 +385,54 @@ async def answer(
 
                 return result
 
-        result = await (message.edit if edit else message.respond)(
-            text,
-            parse_mode=lambda t: (t, entities),
-            **kwargs,
-        )
+        if edit:
+            result = await message.edit(
+                text,
+                parse_mode=lambda t: (t, entities),
+                **kwargs,
+            )
+        else:
+            file = kwargs.pop("file", None)
+            invert_media = kwargs.pop("invert_media", False)
+
+            if file is not None and invert_media:
+                reply_to = kwargs.pop("reply_to", None)
+
+                sent = await message.respond(
+                    text,
+                    parse_mode=lambda t: (t, entities),
+                    reply_to=reply_to,
+                    **kwargs,
+                )
+
+                result = await sent.edit(
+                    text,
+                    file=file,
+                    parse_mode=lambda t: (t, entities),
+                    invert_media=True,
+                    **{k: v for k, v in kwargs.items() if k != "reply_to"},
+                )
+            elif file is not None:
+                reply_to = kwargs.pop(
+                    "reply_to",
+                    getattr(message, "reply_to_msg_id", get_topic(message)),
+                )
+                result = await message.client.send_file(
+                    message.peer_id,
+                    file,
+                    caption=text,
+                    parse_mode=lambda t: (t, entities),
+                    reply_to=reply_to,
+                    **kwargs,
+                )
+                if message.out:
+                    await message.delete()
+            else:
+                result = await message.respond(
+                    text,
+                    parse_mode=lambda t: (t, entities),
+                    **kwargs,
+                )
     elif isinstance(response, Message):
         if message.media is None and (
             response.media is None

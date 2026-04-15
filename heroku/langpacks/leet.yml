@@ -605,6 +605,12 @@ loader:
   _cmd_doc_unloadmod: "Unl04d m0dul3 by cl455 n4m3"
   _cls_doc: "L04d5 m0dul35"
   basic_auth_doc: "B451c 4u7h 4 m0dul3 r3p0"
+  choose_repo: "<tg-emoji emoji-id=5873153278023307367>🗂️</tg-emoji> <b>Ch00s3 4 r3p0 2 1n574ll 4ll m0dul35 fr0m:</b>"
+  installing_all_from_repo: "<tg-emoji emoji-id=5873204392429096339>⏳</tg-emoji> <b>1n574ll1ng 4ll m0dul35 fr0m r3p0...</b>"
+  installed_all_from_repo: "<tg-emoji emoji-id=5429092129638980960>🪐</tg-emoji> <b>4ll m0dul35 fr0m r3p0 1n574ll3d 5ucc355fully!</b>"
+  dlm_all_from_repo_error_nomods: "<tg-emoji emoji-id=5312383351217201533>⚠️</tg-emoji> <b>N0 m0dul35 f0und 1n 7h15 r3p0, f4gg07!</b>"
+  dlm_all_from_repo_error_somemods: "<tg-emoji emoji-id=5312383351217201533>⚠️</tg-emoji> <b>50m3 m0dul35 f41l3d 2 1n574ll, b17ch:</b>\n"
+  show_banner_doc: "5h0w # m374 b4nn3r l1k3 pr3v13w?"
 
 translations:
   name: "7r4n5l4710n5"

@@ -575,6 +575,12 @@ loader:
   _cmd_doc_addrepo: "Добавить репо"
   _cmd_doc_delrepo: "Удалить репо"
   basic_auth_doc: "Вход в репо"
+  choose_repo: "<tg-emoji emoji-id=5873153278023307367>🗂️</tg-emoji> <b>Сигма, выбери репозиторий, из которого будем качать все модули, ризз или ливни:</b>"
+  installing_all_from_repo: "<tg-emoji emoji-id=5873204392429096339>⏳</tg-emoji> <b>Качаем все модули из репы... подожди секунду, не отписывайся, щавель уже в деле</b>"
+  installed_all_from_repo: "<tg-emoji emoji-id=5429092129638980960>🪐</tg-emoji> <b>Все модули из репозитория успешно установлены! Сигма момент</b>"
+  dlm_all_from_repo_error_nomods: "<tg-emoji emoji-id=5312383351217201533>⚠️</tg-emoji> <b>В этой репе нет ни одного модуля. Кринж</b>"
+  dlm_all_from_repo_error_somemods: "<tg-emoji emoji-id=5312383351217201533>⚠️</tg-emoji> <b>Плаки, плаки. Некоторые модули не установились, кароче фейл, щавель не зашёл:</b>\n"
+  show_banner_doc: "Сигма или нормис?)"
 
 translations:
   lang_saved: "{} <b>Язык сменил, красава!</b>"

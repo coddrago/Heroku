@@ -605,6 +605,12 @@ loader:
   _cmd_doc_unloadmod: "Unwoad moduwe by cwass nyame"
   _cls_doc: "Woads moduwes"
   basic_auth_doc: "Basic aud fow moduwe wepo"
+  choose_repo: "<tg-emoji emoji-id=5873153278023307367>🗂️</tg-emoji> <b>Pwease chwoose a wepositowy to instaww aww moduwes fwom, senpai~ :3</b>"
+  installing_all_from_repo: "<tg-emoji emoji-id=5873204392429096339>⏳</tg-emoji> <b>Instawwing aww da moduwes fwom wepositowy... pwease wait a wittle, nyaa~ >w<</b>"
+  installed_all_from_repo: "<tg-emoji emoji-id=5429092129638980960>🪐</tg-emoji> <b>Aww moduwes fwom wepositowy instawwed successfuwwy! OwO yippee~</b>"
+  dlm_all_from_repo_error_nomods: "<tg-emoji emoji-id=5312383351217201533>⚠️</tg-emoji> <b>Nyooo moduwes found in dis wepositowy! >///< Awe you suwe, mastew?</b>"
+  dlm_all_from_repo_error_somemods: "<tg-emoji emoji-id=5312383351217201533>⚠️</tg-emoji> <b>Some moduwes faiwed to instaww... sowwy senpai :c</b>\n"
+  show_banner_doc: "Show # meta bannyew wike pweview? Pwease? :3"
 
 translations:
   name: "Twanswations"

@@ -574,6 +574,12 @@ loader:
   _cmd_doc_addrepo: "Додати додатковий репозиторій"
   _cmd_doc_delrepo: "Видалити додатковий репозиторій"
   basic_auth_doc: "Авторизація для доступу до репозиторію"
+  choose_repo: "<tg-emoji emoji-id=5873153278023307367>🗂️</tg-emoji> <b>Обери репозиторій, з якого встановити всі модулі:</b>"
+  installing_all_from_repo: "<tg-emoji emoji-id=5873204392429096339>⏳</tg-emoji> <b>Встановлюю всі модулі з репозиторію...</b>"
+  installed_all_from_repo: "<tg-emoji emoji-id=5429092129638980960>🪐</tg-emoji> <b>Всі модулі з репозиторію успішно встановлено!</b>"
+  dlm_all_from_repo_error_nomods: "<tg-emoji emoji-id=5312383351217201533>⚠️</tg-emoji> <b>У цьому репозиторії не знайдено жодного модуля!</b>"
+  dlm_all_from_repo_error_somemods: "<tg-emoji emoji-id=5312383351217201533>⚠️</tg-emoji> <b>Деякі модулі не вдалося встановити:</b>\n"
+  show_banner_doc: "Показати прев'ю мета-банера?"
 
 translations:
   lang_saved: "{} <b>Мову збережено!</b>"

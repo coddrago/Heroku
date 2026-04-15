@@ -625,6 +625,12 @@ translations:
   _cmd_doc_dllangpack: "[url] - Load LangPack"
   _cmd_doc_setlang: "[langs] - Set locale priority"
   _cls_doc: "Localization"
+  choose_repo: "<tg-emoji emoji-id=5873153278023307367>🗂️</tg-emoji> <b>Choose a repository to install all modules from I use Arch btw:</b>"
+  installing_all_from_repo: "<tg-emoji emoji-id=5873204392429096339>⏳</tg-emoji> <b>Cloning repo and installing all modules via git pull && makepkg -si...</b>"
+  installed_all_from_repo: "<tg-emoji emoji-id=5429092129638980960>🪐</tg-emoji> <b>All modules from repository installed successfully! (no errors, chad moment)</b>"
+  dlm_all_from_repo_error_nomods: "<tg-emoji emoji-id=5312383351217201533>⚠️</tg-emoji> <b>No modules found in this repository! RTFM or gtfo, normie.</b>"
+  dlm_all_from_repo_error_somemods: "<tg-emoji emoji-id=5312383351217201533>⚠️</tg-emoji> <b>Some modules failed to install:</b>\n"
+  show_banner_doc: "Show # meta banner like preview? (y/N)"
 
 eval:
   name: "Evaluator"

@@ -605,6 +605,12 @@ loader:
   _cmd_doc_unloadmod: "クラス名でモジュールをアンロードします"
   _cls_doc: "モジュールを読み込みます"
   basic_auth_doc: "モジュールリポジトリの基本認証"
+  choose_repo: "<tg-emoji emoji-id=5873153278023307367>🗂️</tg-emoji> <b>すべてのモジュールをインストールするリポジトリを選択してください:</b>"
+  installing_all_from_repo: "<tg-emoji emoji-id=5873204392429096339>⏳</tg-emoji> <b>リポジトリからすべてのモジュールをインストール中...</b>"
+  installed_all_from_repo: "<tg-emoji emoji-id=5429092129638980960>🪐</tg-emoji> <b>リポジトリからすべてのモジュールが正常にインストールされました！</b>"
+  dlm_all_from_repo_error_nomods: "<tg-emoji emoji-id=5312383351217201533>⚠️</tg-emoji> <b>このリポジトリにモジュールが見つかりません！</b>"
+  dlm_all_from_repo_error_somemods: "<tg-emoji emoji-id=5312383351217201533>⚠️</tg-emoji> <b>一部のモジュールのインストールに失敗しました:</b>\n"
+  show_banner_doc: "メタバナーのプレビューを表示しますか？"
 
 translations:
   name: "Translations"

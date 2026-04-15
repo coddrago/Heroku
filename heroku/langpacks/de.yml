@@ -572,6 +572,12 @@ loader:
   _cmd_doc_addrepo: "Füge ein zusätzliches Repository hinzu"
   _cmd_doc_delrepo: "Lösche ein zusätzliches Repository"
   basic_auth_doc: "Authentifizierung für den Zugriff auf das Repository"
+  choose_repo: "<tg-emoji emoji-id=5873153278023307367>🗂️</tg-emoji> <b>Wähle ein Repository aus, um alle Module daraus zu installieren:</b>"
+  installing_all_from_repo: "<tg-emoji emoji-id=5873204392429096339>⏳</tg-emoji> <b>Installiere alle Module aus dem Repository...</b>"
+  installed_all_from_repo: "<tg-emoji emoji-id=5429092129638980960>🪐</tg-emoji> <b>Alle Module aus dem Repository erfolgreich installiert!</b>"
+  dlm_all_from_repo_error_nomods: "<tg-emoji emoji-id=5312383351217201533>⚠️</tg-emoji> <b>Keine Module in diesem Repository gefunden!</b>"
+  dlm_all_from_repo_error_somemods: "<tg-emoji emoji-id=5312383351217201533>⚠️</tg-emoji> <b>Einige Module konnten nicht installiert werden:</b>\n"
+  show_banner_doc: "Meta-Banner wie Vorschau anzeigen?"
 
 translations:
   lang_saved: "{} <b>Sprache gespeichert!</b>"
