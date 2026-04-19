@@ -856,7 +856,11 @@ class HerokuConfigMod(loader.Module):
             else "configuring_option_lib"
         ).format(*args)
 
-        if len(text) > 4096:
+        parsed_text, parsed_entities = html.parse(text)
+        pages = list(utils.smart_split(parsed_text, parsed_entities))
+
+        if len(pages) > 1:
+            page = min(max(page, 0), len(pages) - 1)
             additonal_button_row += self.inline.build_pagination(
                 callback=functools.partial(
                     self.inline__configure_option,
@@ -865,10 +869,10 @@ class HerokuConfigMod(loader.Module):
                     force_hidden=force_hidden,
                     obj_type=obj_type,
                 ),
-                total_pages=ceil(len(text) / 4096),
+                total_pages=len(pages),
                 current_page=page + 1,
             )
-            text = list(utils.smart_split(*html.parse(text)))[page]
+            text = pages[page]
 
         await call.edit(
             text,
