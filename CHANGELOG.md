@@ -6,8 +6,11 @@
 - fix placeholders in help
 - fix placeholders caption in UwU language
 - fix loader.tag's
-- add -all argument to .dlm
+- add dlmall command
 - add banner to .dlm
+- add banner to help
+- fix double prefixes
+- fix RCE in web (add password and user to initializating client)
 
 ## 🪐 Heroku 2.0.0
 - rework utils
