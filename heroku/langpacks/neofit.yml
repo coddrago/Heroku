@@ -531,6 +531,7 @@ heroku_info:
   _cmd_doc_setinfo: "<text> - Edit Info Template"
   _ihandle_doc_info: "SystemInfo"
   _cls_doc: "System Stats"
+  show_preview_in_help: "Show # meta banner in help preview [module] (btw I use Arch)"
 
 loader:
   name: "Loader"

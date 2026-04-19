@@ -77,7 +77,17 @@ class Help(loader.Module):
                 lambda: "invert banner",
                 validator=loader.validators.Boolean(),
             ),
+            loader.ConfigValue(
+                "show_preview_in_help",
+                True,
+                lambda: self.strings("show_preview_in_help"),
+                validator=loader.validators.Boolean(),
+            ),
         )
+
+    def _get_banner_url(self, doc: str):
+        match = re.search(r"# ?meta banner: ?(.+)", doc)
+        return match.group(1).strip() if match else None
 
     @loader.command(
         ru_doc="[args] | Спрячет ваши модули",
@@ -239,6 +249,21 @@ class Help(loader.Module):
         placeholders = "\n".join(
             utils.help_placeholders(module.__class__.__name__, self)
         )
+
+        banner_kwargs = {}
+        if self.config["show_preview_in_help"]:
+            try:
+                source = getattr(module, "__source__", None)
+                if source:
+                    banner_url = self._get_banner_url(source)
+                    if banner_url:
+                        banner_kwargs = {
+                            "file": InputMediaWebPage(banner_url, optional=True),
+                            "invert_media": True,
+                        }
+            except Exception:
+                pass
+
         await utils.answer(
             message,
             f"{reply}<blockquote expandable>{cmds}{inline_cmd}</blockquote>"
@@ -250,6 +275,7 @@ class Help(loader.Module):
                 if module.__origin__.startswith("<core")
                 else ""
             ),
+            **banner_kwargs,
         )
 
     @loader.command(

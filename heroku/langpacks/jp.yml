@@ -531,6 +531,7 @@ heroku_info:
   _cmd_doc_setinfo: "<text> - .info のテキストを変更します"
   _ihandle_doc_info: "ユーザーボット情報を送信します"
   _cls_doc: "ユーザーボット情報を表示します"
+  show_preview_in_help: "helpコマンドのプレビューに # meta banner を表示 [module]"
 
 loader:
   name: "Loader"

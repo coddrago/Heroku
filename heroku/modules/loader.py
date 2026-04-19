@@ -205,26 +205,6 @@ class LoaderMod(loader.Module):
 
         if args := utils.get_args(message):
             match args:
-                case [single] if single.lstrip("-").lower() == "all":
-                    repos = [self.config["MODULES_REPO"]] + self.config[
-                        "ADDITIONAL_REPOS"
-                    ]
-                    repos = [r for r in repos if r.startswith("http")]
-                    buttons = [
-                        [
-                            {
-                                "text": self._repo_to_label(repo),
-                                "callback": self._inline__install_all_from_repo,
-                                "args": (repo,),
-                            }
-                        ]
-                        for repo in repos
-                    ]
-                    await self.inline.form(
-                        self.strings("choose_repo"),
-                        message,
-                        reply_markup=buttons,
-                    )
                 case [single]:
                     args = single
                     await utils.answer(message, self.strings("finding_module_in_repos"))
@@ -286,6 +266,26 @@ class LoaderMod(loader.Module):
                     for repo, mods in (await self.get_repo_list()).items()
                 ],
             )
+
+    @loader.command()
+    async def dlmall(self, message: Message):
+        repos = [self.config["MODULES_REPO"]] + self.config["ADDITIONAL_REPOS"]
+        repos = [r for r in repos if r.startswith("http")]
+        buttons = [
+            [
+                {
+                    "text": self._repo_to_label(repo),
+                    "callback": self._inline__install_all_from_repo,
+                    "args": (repo,),
+                }
+            ]
+            for repo in repos
+        ]
+        await self.inline.form(
+            self.strings("choose_repo"),
+            message,
+            reply_markup=buttons,
+        )
 
     async def _inline__install_all_from_repo(
         self,
