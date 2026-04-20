@@ -253,6 +253,21 @@ class Utils(InlineUnit):
     generate_markup = _generate_markup
 
     async def _close_unit_handler(self: "InlineManager", call: InlineCall):
+        if call._units is None:
+            logger.error(
+                "call._units is None. Please report this issue to the developers. "
+                "Debug info: %s", call.model_dump_json(),
+            )
+            try:
+                await call.answer(
+                    "❌ The userbot couldn't delete this inline message. "
+                    "See logs for more details."
+                )
+            except Exception:
+                logger.exception("I can't even properly notify the user about the error 😭")
+
+            return
+
         return await self._client.delete_messages(
             call._units.get(call.unit_id).get("chat"),
             call._units.get(call.unit_id).get("message_id"),
