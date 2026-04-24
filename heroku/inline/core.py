@@ -129,7 +129,7 @@ class InlineManager(
         self._name = get_display_name(self._client.heroku_me)
 
         if not ignore_token_checks:
-            is_token_asserted = await self.assert_token()
+            is_token_asserted = await self._assert_token()
             if not is_token_asserted:
                 self.init_complete = False
                 return
@@ -148,7 +148,7 @@ class InlineManager(
             self.bot_id = bot_me.id
         except TelegramUnauthorizedError:
             logger.critical("Token expired, revoking...")
-            return await self.dp_revoke_token(False)
+            return await self._dp_revoke_token(False)
 
         try:
             m = await self._client.send_message(self.bot_username, "/start heroku init")
@@ -230,7 +230,7 @@ class InlineManager(
         )
 
         old = self.bot.get_updates
-        revoke = self.dp_revoke_token
+        revoke = self._dp_revoke_token
 
         async def new(*args, **kwargs):
             nonlocal revoke, old
