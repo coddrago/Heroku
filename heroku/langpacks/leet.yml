@@ -221,6 +221,9 @@ heroku_web:
   request_code: "🔃 R3qu357 7h3 c0d3 4g41n"
   code_expired: "7h3 c0d3 h45 3xp1r3d."
 
+  switch_confirm: "⚠️ <b>4r3 y0u 5ur3 y0u w4n7 70 7r4n5f3r 7h15 u53rb07 70 4n07h3r 4cc0un7?</b>\nY0ur curr3n7 535510n w1ll b3 cl053d."
+  switch_insecure: "🚫 <b>5w17ch 4cc0un7 f41l3d:</b> 1nl1n3 m3nu un4v41l4bl3. 7yp3 <code>{}switchacc force_insecure</code> 70 f0rc3."
+  _cmd_doc_switchacc: "7r4n5f3r u53rb07 70 4n07h3r 73l3gr4m 4cc0un7 v14 1nl1n3 4u7h"
 heroku_backup:
   period: "⌚️ <b>7h3 un17 «ALPHA»</b> cr34735 r3gul4r b4ckup5. 7h353 s3771ng5 c4n b3 ch4ng3d l473r.\n\nPlz s3l3c7 7h3 b4ckup fr3qu3ncy\n\n<b>🚫 17 15 7hu5 1mp0551bl3 2 r3570r3 m0d5 d0wnl04d3d fr0m f1l35 w17h .lm cmd! B3 c4r3ful & d0 .backupmods b4 r3570r1ng.</b>"
   saved: "✅ 7h3 p3r10d1c17y 15 s4v3d! 17 c4n b3 ch4ng3d w17h <code>{prefix}set_backup_period</code>"

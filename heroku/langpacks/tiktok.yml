@@ -207,6 +207,9 @@ heroku_web:
   request_code: "🔃 Дай код еще раз"
   code_expired: "Код протух."
 
+  switch_confirm: "⚠️ <b>Точно переносим бота на другой акк?</b>\nТекущая сессия рипнется."
+  switch_insecure: "🚫 <b>Перенос не стартанул:</b> нет инлайна. Пиши <code>{}switchacc force_insecure</code> если уверен."
+  _cmd_doc_switchacc: "Перенести юзербота на другой Telegram-аккаунт"
 heroku_backup:
   period: "⌚️ <b>Юнит «ALPHA»</b> делает бэкапы (сейвы). Можно настроить.\n\nВыбери как часто сейвиться\n\n<b>🚫 Модули из файлов (.lm) так не восстановятся! Делай .backupmods перед этим.</b>"
   saved: "✅ Запомнил! Поменять можно через <code>{prefix}set_backup_period</code>"

@@ -207,6 +207,9 @@ heroku_web:
   code_expired: "Der Code ist abgelaufen."
   _cmd_doc_weburl: "Öffnet einen Tunnel zur Heroku-Weboberfläche"
 
+  switch_confirm: "⚠️ <b>Möchten Sie diesen Userbot wirklich auf ein anderes Konto übertragen?</b>\nIhre aktuelle Sitzung wird geschlossen."
+  switch_insecure: "🚫 <b>Kontoübertragung fehlgeschlagen:</b> Inline-Menü nicht verfügbar. Geben Sie <code>{}switchacc force_insecure</code> ein, um es zu erzwingen."
+  _cmd_doc_switchacc: "Userbot über Inline-Auth auf ein anderes Telegram-Konto übertragen"
 heroku_backup:
   period: "⌚️ <b>Die Unit «ALPHA»</b> erstellt regelmäßig Backups. Diese Einstellungen können später geändert werden.\n\nBitte wählen Sie die Backup-Häufigkeit\n\n<b>🚫 Es ist daher nicht möglich, Module, die mit dem Befehl .lm aus Dateien heruntergeladen wurden, wiederherzustellen! Seien Sie vorsichtig und führen Sie vor der Wiederherstellung .backupmods aus.</b>"
   saved: "✅ Die Periodizität ist gespeichert! Sie kann mit <code>{prefix}set_backup_period</code> geändert werden."

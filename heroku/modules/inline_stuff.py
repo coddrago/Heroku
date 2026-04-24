@@ -60,7 +60,7 @@ class InlineStuff(loader.Module):
         )
 
     async def _check_bot(self, username: str) -> bool:
-        if await self.inline.check_bot(username):
+        if await self.inline._check_bot(username):
             return True
 
         try:

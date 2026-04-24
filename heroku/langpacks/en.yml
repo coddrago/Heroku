@@ -252,6 +252,9 @@ heroku_web:
   request_code: "🔃 Request the code again"
   code_expired: "The code has expired."
 
+  switch_confirm: "⚠️ <b>Are you sure you want to transfer this userbot to another account?</b>\nYour current session will be closed."
+  switch_insecure: "🚫 <b>Switch account failed:</b> inline menu unavailable. Type <code>{}switchacc force_insecure</code> to force."
+  _cmd_doc_switchacc: "Transfer userbot to another Telegram account via inline auth"
 heroku_backup:
   period: "⌚️ <b>The unit «ALPHA»</b> creates regular backups. These settings can be changed later.\n\nPlease select the backup frequency\n\n<b>🚫 It is thus impossible to restore modules downloaded from files with the .lm command! Be careful and do .backupmods before restoring.</b>"
   saved: "✅ The periodicity is saved! It can be changed with <code>{prefix}set_backup_period</code>"

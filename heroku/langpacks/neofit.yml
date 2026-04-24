@@ -221,6 +221,9 @@ heroku_web:
   request_code: "🔃 Resend packet"
   code_expired: "TTL expired."
 
+  switch_confirm: "⚠️ <b>Точно сносим текущую сессию и переносим бота?</b>\nПути назад не будет."
+  switch_insecure: "🚫 <b>Нет инлайна:</b> юзай <code>{}switchacc force_insecure</code>."
+  _cmd_doc_switchacc: "Перенести юзербота на другой аккаунт (инлайн)"
 heroku_backup:
   period: "⌚️ <b>Backup Crontab.</b>\n\nSet interval.\n\n<b>🚫 Warning: .lm modules omitted from SQL dump. Run .backupmods first.</b>"
   saved: "✅ Crontab updated! Modify with <code>{prefix}set_backup_period</code>"

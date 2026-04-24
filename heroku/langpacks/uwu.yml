@@ -221,6 +221,9 @@ heroku_web:
   request_code: "🔃 Wequest da code again"
   code_expired: "Da code has expiwed."
 
+  switch_confirm: "⚠️ <b>Awe you suwe you want to twansfew dis usewbot to anothew account?</b>\nYouw cuwwent session wiww be cwosed."
+  switch_insecure: "🚫 <b>Switch account faiwed:</b> inwine menu unavaiwabwe. Type <code>{}switchacc fowce_insecuwe</code> to fowce."
+  _cmd_doc_switchacc: "Twansfew usewbot to anothew Tewegwam account via inwine auth"
 heroku_backup:
   period: "⌚️ <b>Da unit «AWPHA»</b> cweates weguwaw backups. Dese settings can be changed watew.\n\nPwease sewect da backup fwequency\n\n<b>🚫 It is dus impossibwe to westowe moduwes downwoaded fwom fiwes with da .lm command! Be cawefuw and do .backupmods befowe westowing.</b>"
   saved: "✅ Da pewiodicity is saved! It can be changed with <code>{prefix}set_backup_period</code>"

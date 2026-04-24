@@ -44,6 +44,7 @@ from herokutl.errors import (
     PhoneNumberInvalidError,
     SessionPasswordNeededError,
 )
+from herokutl.errors.rpcerrorlist import YouBlockedUserError
 from herokutl.network.connection import (
     ConnectionTcpFull,
     ConnectionTcpMTProxyRandomizedIntermediate,
@@ -57,8 +58,6 @@ from herokutl.tl.functions.contacts import UnblockRequest
 from . import database, loader, utils, version
 from ._internal import print_banner, restart
 from .dispatcher import CommandDispatcher
-from .inline.token_obtainment import TokenObtainment
-from .inline.utils import Utils as inutils
 from .qr import QRCode
 from .secure import patcher
 from .tl_cache import CustomTelegramClient
@@ -789,33 +788,31 @@ class Heroku:
         client: CustomTelegramClient,
         username: str,
     ) -> bool:
-        url: str = (
-            await client(
-                herokutl.functions.messages.RequestWebViewRequest(
-                    peer="@botfather",
-                    bot="@botfather",
-                    platform="android",
-                    from_bot_menu=False,
-                    url="https://webappinternal.telegram.org/botfather?",
-                )
-            )
-        ).url
-        for _ in range(5):
-            await asyncio.sleep(1.5)
+        username = username.strip("@")
+        async with client.conversation("@BotFather", exclusive=False) as conv:
             try:
-                result = await inutils._get_webapp_session(url)
-            except:
-                continue
-            break
-        else:
-            print("Can't check bot. WebApp is not available now")
-            return False
+                m = await conv.send_message("/token")
+            except YouBlockedUserError:
+                await client(UnblockRequest(id="@BotFather"))
+                m = await conv.send_message("/token")
+            r = await conv.get_response()
 
-        session, _hash = result
-        main_url = url.split("?")[0]
+            await m.delete()
+            await r.delete()
 
-        if await TokenObtainment._check_bot(None, session, main_url, _hash, username):
-            return True
+            if hasattr(r, "reply_markup") and hasattr(r.reply_markup, "rows"):
+                for row in r.reply_markup.rows:
+                    for button in row.buttons:
+                        if username != button.text.strip("@"):
+                            continue
+
+                        m = await conv.send_message("/cancel")
+                        r = await conv.get_response()
+
+                        await m.delete()
+                        await r.delete()
+
+                        return True
 
         try:
             await client.get_entity(f"{username}")
