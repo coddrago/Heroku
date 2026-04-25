@@ -24,7 +24,7 @@ from herokutl.errors import (
     PhoneNumberInvalidError,
     SessionPasswordNeededError,
 )
-from herokutl.sessions import MemorySession
+from herokutl.sessions import MemorySession, SQLiteSession
 from herokutl.tl.custom import Message
 from herokutl.tl.types import User
 from herokutl.utils import parse_phone
@@ -218,13 +218,14 @@ class HerokuWebMod(loader.Module):
         call: typing.Union[Message, InlineCall],
         user: User,
         after_fail: bool = False,
+        is_switch: bool = False,
     ):
         reply_markup = [
             {
                 "text": self.strings("enter_number"),
                 "input": self.strings("your_phone_number"),
                 "handler": self.inline_phone_handler,
-                "args": (user,),
+                "args": (user, is_switch),
             }
         ]
 
@@ -252,16 +253,51 @@ class HerokuWebMod(loader.Module):
             system_lang_code="en-US",
         )
 
-    async def schedule_restart(self, call, client):
+    async def schedule_restart(self, call, client, is_switch: bool = False):
         await utils.answer(call, self.strings("login_successful"))
         # Yeah-yeah, ikr, but it's the only way to restart
         await asyncio.sleep(1)
+        
+        if is_switch:
+            old_id = self.tg_id
+            new_id = (await client.get_me()).id
+            if old_id != new_id:
+                import contextlib, json, time
+                from pathlib import Path
+                
+                # Clone DB
+                old_db_path = Path(main.BASE_PATH) / f"config-{old_id}.json"
+                new_db_path = Path(main.BASE_PATH) / f"config-{new_id}.json"
+                if old_db_path.exists():
+                    with contextlib.suppress(Exception):
+                        old_data = json.loads(old_db_path.read_text(encoding="utf-8"))
+                else:
+                    old_data = dict(self._db)
+                if not isinstance(old_data, dict):
+                    old_data = {}
+                inline_data = old_data.setdefault("heroku.inline", {})
+                if isinstance(inline_data, dict):
+                    inline_data["bot_token"] = None
+                    inline_data["custom_bot"] = False
+                    inline_data.pop("bot_id", None)
+                new_db_path.parent.mkdir(parents=True, exist_ok=True)
+                new_db_path.write_text(json.dumps(old_data, ensure_ascii=False, indent=2, sort_keys=True), encoding="utf-8")
+                
+                # Archive old files
+                base = Path(main.BASE_DIR)
+                suffix = int(time.time())
+                for name in (f"heroku-{old_id}.session", f"heroku-{old_id}.session-journal", f"config-{old_id}.json"):
+                    path = base / name
+                    if path.exists():
+                        with contextlib.suppress(Exception):
+                            path.rename(path.with_name(f"{path.name}.bak-{suffix}"))
+
         await main.heroku.save_client_session(client, delay_restart=False)
         restart()
 
-    async def inline_phone_handler(self, call, data, user):
+    async def inline_phone_handler(self, call, data, user, is_switch: bool = False):
         if not (phone := parse_phone(data)):
-            await self._inline_login(call, user, after_fail=True)
+            await self._inline_login(call, user, after_fail=True, is_switch=is_switch)
             return
 
         client = self._get_client()
@@ -288,6 +324,7 @@ class HerokuWebMod(loader.Module):
                 client,
                 phone,
                 user,
+                is_switch,
             ),
         }
 
@@ -298,7 +335,7 @@ class HerokuWebMod(loader.Module):
             always_allow=[user.id],
         )
 
-    async def inline_code_handler(self, call, data, client, phone, user):
+    async def inline_code_handler(self, call, data, client, phone, user, is_switch: bool = False):
         _code_markup = {
             "text": self.strings("enter_code"),
             "input": self.strings("login_code"),
@@ -307,6 +344,7 @@ class HerokuWebMod(loader.Module):
                 client,
                 phone,
                 user,
+                is_switch,
             ),
         }
         if not data or len(data) != 5:
@@ -339,6 +377,7 @@ class HerokuWebMod(loader.Module):
                         client,
                         phone,
                         user,
+                        is_switch,
                     ),
                 },
             ]
@@ -380,9 +419,9 @@ class HerokuWebMod(loader.Module):
             )
             return
 
-        asyncio.ensure_future(self.schedule_restart(call, client))
+        asyncio.ensure_future(self.schedule_restart(call, client, is_switch=is_switch))
 
-    async def inline_2fa_handler(self, call, data, client, phone, user):
+    async def inline_2fa_handler(self, call, data, client, phone, user, is_switch: bool = False):
         _2fa_markup = {
             "text": self.strings("enter_2fa"),
             "input": self.strings("your_2fa"),
@@ -391,6 +430,7 @@ class HerokuWebMod(loader.Module):
                 client,
                 phone,
                 user,
+                is_switch,
             ),
         }
         if not data:
@@ -420,4 +460,35 @@ class HerokuWebMod(loader.Module):
             )
             return
 
-        asyncio.ensure_future(self.schedule_restart(call, client))
+        asyncio.ensure_future(self.schedule_restart(call, client, is_switch=is_switch))
+
+    @loader.command(
+        ru_doc="<номер> — начать перенос userbot на другой Telegram-аккаунт",
+        en_doc="<phone> — start userbot transfer to another Telegram account",
+        ua_doc="<номер> — почати перенесення userbot на інший Telegram-акаунт",
+        de_doc="<nummer> — Userbot-Transfer auf ein anderes Telegram-Konto starten",
+        jp_doc="<電話番号> — 別アカウントへのUserbot移行を開始",
+    )
+    async def switchacc(self, message: Message):
+        user = await self._client.get_entity(self.tg_id)
+        if "force_insecure" in message.raw_text.lower():
+            await self._inline_login(message, user, is_switch=True)
+            return
+            
+        try:
+            if not await self.inline.form(
+                self.strings("switch_confirm"),
+                message=message,
+                reply_markup=[
+                    {
+                        "text": self.strings("btn_yes"),
+                        "callback": self._inline_login,
+                        "args": (user, False, True),
+                    },
+                    {"text": self.strings("btn_no"), "action": "close"},
+                ],
+                photo="",
+            ):
+                raise Exception
+        except Exception:
+            await utils.answer(message, self.strings("switch_insecure").format(self.get_prefix()))
