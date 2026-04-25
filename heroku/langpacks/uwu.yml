@@ -220,6 +220,11 @@ heroku_web:
   2fa_enabled: "You have two-factow audentication enyabwed. Entew da passwowd."
   request_code: "🔃 Wequest da code again"
   code_expired: "Da code has expiwed."
+  invalid_code_digits: "Da code must contain digits onwy. Pwease twy again."
+  switch_confirm: "⚠️ <b>Twansfew dis usewbot to anothew Tewegwam account?</b>\nDa cuwwent session wiww be awchived, config moved, and inwine bot data wecweated fow da nyew account."
+  switch_insecure: "🚫 <b>Switch account faiwed:</b> inwine menu unavaiwabwe. Type <code>{}switchacc force_insecure</code> to fowce."
+  switch_failed: "🚫 <b>Switch account faiwed:</b> <code>{}</code>"
+  _cmd_doc_switchacc: "Twansfew usewbot to anothew Tewegwam account"
 
 heroku_backup:
   period: "⌚️ <b>Da unit «AWPHA»</b> cweates weguwaw backups. Dese settings can be changed watew.\n\nPwease sewect da backup fwequency\n\n<b>🚫 It is dus impossibwe to westowe moduwes downwoaded fwom fiwes with da .lm command! Be cawefuw and do .backupmods befowe westowing.</b>"

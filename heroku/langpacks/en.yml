@@ -251,6 +251,11 @@ heroku_web:
   2fa_enabled: "You have two-factor authentication enabled. Enter the password."
   request_code: "🔃 Request the code again"
   code_expired: "The code has expired."
+  invalid_code_digits: "The code must contain digits only. Please try again."
+  switch_confirm: "⚠️ <b>Transfer this userbot to another Telegram account?</b>\nThe current session will be archived, config will be moved, and inline bot data will be recreated for the new account."
+  switch_insecure: "🚫 <b>Account transfer failed:</b> inline menu is unavailable. Type <code>{}switchacc force_insecure</code> to force."
+  switch_failed: "🚫 <b>Account transfer failed:</b> <code>{}</code>"
+  _cmd_doc_switchacc: "Transfer userbot to another Telegram account"
 
 heroku_backup:
   period: "⌚️ <b>The unit «ALPHA»</b> creates regular backups. These settings can be changed later.\n\nPlease select the backup frequency\n\n<b>🚫 It is thus impossible to restore modules downloaded from files with the .lm command! Be careful and do .backupmods before restoring.</b>"
