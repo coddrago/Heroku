@@ -220,6 +220,11 @@ heroku_web:
   2fa_enabled: "2段階認証が有効になっています。パスワードを入力してください。"
   request_code: "🔃 コードを再リクエスト"
   code_expired: "コードの有効期限が切れました。"
+  invalid_code_digits: "コードは数字のみで入力してください。もう一度お試しください。"
+  switch_confirm: "⚠️ <b>このUserbotを別のTelegramアカウントへ移行しますか？</b>\n現在のセッションはアーカイブされ、設定は移行され、inline botデータは新しいアカウント用に再作成されます。"
+  switch_insecure: "🚫 <b>アカウント移行に失敗しました:</b> インラインメニューが利用できません。強制するには <code>{}switchacc force_insecure</code> と入力してください。"
+  switch_failed: "🚫 <b>アカウント移行に失敗しました:</b> <code>{}</code>"
+  _cmd_doc_switchacc: "Userbotを別のTelegramアカウントへ移行する"
 
 heroku_backup:
   period: "⌚️ <b>ユニット «ALPHA»</b> は定期的なバックアップを作成します。これらの設定は後で変更できます。\n\nバックアップの頻度を選択してください\n\n<b>🚫 これにより、.lm コマンドでファイルからダウンロードされたモジュールを復元することは不可能になります！注意してください。復元する前に .backupmods を行ってください。</b>"

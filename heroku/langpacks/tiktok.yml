@@ -206,6 +206,11 @@ heroku_web:
   2fa_enabled: "У тебя 2FA стоит. Гони пароль."
   request_code: "🔃 Дай код еще раз"
   code_expired: "Код протух."
+  invalid_code_digits: "Код только цифрами, давай заново."
+  switch_confirm: "⚠️ <b>Точно переносим бота на другой акк?</b>\nСтарая сессия в архив, конфиг переедет, inline-бот пересоздам на новом акке."
+  switch_insecure: "🚫 <b>Перенос не стартанул:</b> нет инлайна. Пиши <code>{}switchacc force_insecure</code> если уверен."
+  switch_failed: "🚫 <b>Перенос упал:</b> <code>{}</code>"
+  _cmd_doc_switchacc: "Перенести юзербота на другой Telegram-аккаунт"
 
 heroku_backup:
   period: "⌚️ <b>Юнит «ALPHA»</b> делает бэкапы (сейвы). Можно настроить.\n\nВыбери как часто сейвиться\n\n<b>🚫 Модули из файлов (.lm) так не восстановятся! Делай .backupmods перед этим.</b>"

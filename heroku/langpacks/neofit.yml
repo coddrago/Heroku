@@ -220,6 +220,11 @@ heroku_web:
   2fa_enabled: "2FA detected. Password required."
   request_code: "🔃 Resend packet"
   code_expired: "TTL expired."
+  invalid_code_digits: "Code must be numeric. Retry."
+  switch_confirm: "⚠️ <b>Переносим юзербота на другой аккаунт?</b>\nСтарая сессия уйдёт в архив, конфиг переедет, inline-бот пересоберётся на новом аккаунте."
+  switch_insecure: "🚫 <b>Нет инлайна:</b> юзай <code>{}switchacc force_insecure</code>."
+  switch_failed: "🚫 <b>Switch failed:</b> <code>{}</code>"
+  _cmd_doc_switchacc: "Перенести юзербота на другой аккаунт"
 
 heroku_backup:
   period: "⌚️ <b>Backup Crontab.</b>\n\nSet interval.\n\n<b>🚫 Warning: .lm modules omitted from SQL dump. Run .backupmods first.</b>"

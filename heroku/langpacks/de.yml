@@ -205,6 +205,11 @@ heroku_web:
   2fa_enabled: "Sie haben die Zwei-Faktor-Authentifizierung aktiviert. Geben Sie das Passwort ein."
   request_code: "🔃 Code erneut anfordern"
   code_expired: "Der Code ist abgelaufen."
+  invalid_code_digits: "Der Code darf nur Ziffern enthalten. Bitte versuche es erneut."
+  switch_confirm: "⚠️ <b>Diesen Userbot auf ein anderes Telegram-Konto übertragen?</b>\nDie aktuelle Sitzung wird archiviert, die Konfiguration übertragen und die Inline-Bot-Daten werden für das neue Konto neu erstellt."
+  switch_insecure: "🚫 <b>Kontoübertragung fehlgeschlagen:</b> Inline-Menü nicht verfügbar. Gib <code>{}switchacc force_insecure</code> ein, um fortzufahren."
+  switch_failed: "🚫 <b>Kontoübertragung fehlgeschlagen:</b> <code>{}</code>"
+  _cmd_doc_switchacc: "Userbot auf ein anderes Telegram-Konto übertragen"
   _cmd_doc_weburl: "Öffnet einen Tunnel zur Heroku-Weboberfläche"
 
 heroku_backup:
