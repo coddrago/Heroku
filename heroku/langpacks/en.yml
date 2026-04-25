@@ -376,7 +376,8 @@ settings:
   switch_invalid_phone: "🚫 <b>Invalid phone number. Use international format, e.g. +15551234567</b>"
   switch_send_code_failed: "🚫 <b>Failed to request login code:</b> <code>{}</code>"
   switch_code_sent: "✅ <b>Code sent to</b> <code>{phone}</code>. Enter it below."
-  switch_applied_restart: "✅ <b>Account transfer completed.</b> <b>New account id:</b> <code>{}</code>\n<b>Restarting...</b>"
+  switch_applied_restart: "✅ <b>Account transfer completed.</b> <b>New account id:</b> <code>{}</code>
+<b>Restarting...</b>"
   switch_no_pending: "🚫 <b>No pending account transfer session</b>"
   switch_invalid_code: "🚫 <b>Invalid or expired login code</b>"
   switch_need_password: "🔐 <b>2FA is enabled. Enter password below.</b>"
