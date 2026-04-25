@@ -331,7 +331,9 @@ class HerokuWebMod(loader.Module):
     def _switch_loaded_modules(self, old_id: int, new_id: int, suffix: int) -> list:
         moved = []
         for path in LOADED_MODULES_PATH.glob(f"*_{old_id}.py"):
-            target = path.with_name(path.name.removesuffix(f"_{old_id}.py") + f"_{new_id}.py")
+            target = path.with_name(
+                path.name.removesuffix(f"_{old_id}.py") + f"_{new_id}.py"
+            )
             backup = None
             if target.exists():
                 backup = self._archive_identity_file(target, suffix)
@@ -405,7 +407,9 @@ class HerokuWebMod(loader.Module):
             try:
                 self._restore_loaded_modules(moved_modules)
             except Exception:
-                logger.exception("Failed to restore loaded modules after switch failure")
+                logger.exception(
+                    "Failed to restore loaded modules after switch failure"
+                )
 
             for original, backup in reversed(archived):
                 try:
@@ -481,13 +485,7 @@ class HerokuWebMod(loader.Module):
         )
 
     async def inline_code_handler(
-        self,
-        call,
-        data,
-        client,
-        phone,
-        user,
-        is_switch: bool = False,
+        self, call, data, client, phone, user, is_switch: bool = False
     ):
         _code_markup = {
             "text": self.strings("enter_code"),
@@ -572,21 +570,9 @@ class HerokuWebMod(loader.Module):
             )
             return
 
-        asyncio.ensure_future(
-            self.schedule_restart(call, client, is_switch=is_switch)
-        )
+        asyncio.ensure_future(self.schedule_restart(call, client, is_switch=is_switch))
 
-    @loader.command(
-        ru_doc="перенести userbot на другой Telegram-аккаунт",
-        en_doc="transfer userbot to another Telegram account",
-        ua_doc="перенести userbot на інший Telegram-акаунт",
-        de_doc="Userbot auf ein anderes Telegram-Konto übertragen",
-        jp_doc="Userbotを別のTelegramアカウントへ移行する",
-        neofit_doc="перенести юзербота на другой аккаунт",
-        tiktok_doc="перенести юзербота на другой акк",
-        leet_doc="7r4n5f3r u53rb07 70 4n07h3r 4cc0un7",
-        uwu_doc="twansfew usewbot to anothew Tewegwam account",
-    )
+    @loader.command()
     async def switchacc(self, message: Message):
         if "JAMHOST" in os.environ or "LAVHOST" in os.environ:
             await utils.answer(message, self.strings["host_denied"])
@@ -622,13 +608,7 @@ class HerokuWebMod(loader.Module):
             )
 
     async def inline_2fa_handler(
-        self,
-        call,
-        data,
-        client,
-        phone,
-        user,
-        is_switch: bool = False,
+        self, call, data, client, phone, user, is_switch: bool = False
     ):
         _2fa_markup = {
             "text": self.strings("enter_2fa"),
@@ -668,6 +648,4 @@ class HerokuWebMod(loader.Module):
             )
             return
 
-        asyncio.ensure_future(
-            self.schedule_restart(call, client, is_switch=is_switch)
-        )
+        asyncio.ensure_future(self.schedule_restart(call, client, is_switch=is_switch))
