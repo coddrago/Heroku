@@ -11,12 +11,29 @@
 # 🔑 https://www.gnu.org/licenses/agpl-3.0.html
 
 import contextlib
+import json
+import os
+import time
+from pathlib import Path
+
 import herokutl
 from herokutl.extensions.html import CUSTOM_EMOJIS
+from herokutl.errors import (
+    FloodWaitError,
+    PasswordHashInvalidError,
+    PhoneCodeExpiredError,
+    PhoneCodeInvalidError,
+    PhoneNumberInvalidError,
+    SessionPasswordNeededError,
+)
+from herokutl.sessions import MemorySession, SQLiteSession
 from herokutl.tl.types import Message, User
+from herokutl.utils import parse_phone
 
 from .. import loader, main, utils, version
+from .._internal import restart
 from ..inline.types import InlineCall
+from ..tl_cache import CustomTelegramClient
 
 
 @loader.tds
@@ -26,6 +43,7 @@ class CoreMod(loader.Module):
     strings = {"name": "Settings"}
 
     def __init__(self):
+        self._switch_sessions = {}
         self.config = loader.ModuleConfig(
             loader.ConfigValue(
                 "allow_nonstandart_prefixes",
@@ -529,3 +547,352 @@ class CoreMod(loader.Module):
                 self.strings(f"{platform}_install"),
                 reply_markup=self._markup,
             )
+
+    def _switch_owner_key(self, message: Message) -> int:
+        return message.sender_id or self.tg_id
+
+    async def _cleanup_switch_state(self, key: int):
+        state = self._switch_sessions.pop(key, None)
+        if not state:
+            return
+
+        client = state.get("client")
+        if client:
+            with contextlib.suppress(Exception):
+                await client.disconnect()
+
+    @staticmethod
+    def _dump_json(path: Path, obj: dict):
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(
+            json.dumps(obj, ensure_ascii=False, indent=2, sort_keys=True),
+            encoding="utf-8",
+        )
+
+    def _clone_db_for_new_account(self, old_id: int, new_id: int):
+        old_db_path = Path(main.BASE_PATH) / f"config-{old_id}.json"
+        new_db_path = Path(main.BASE_PATH) / f"config-{new_id}.json"
+
+        if old_db_path.exists():
+            with contextlib.suppress(Exception):
+                old_data = json.loads(old_db_path.read_text(encoding="utf-8"))
+        else:
+            old_data = dict(self._db)
+
+        if not isinstance(old_data, dict):
+            old_data = {}
+
+        inline_data = old_data.setdefault("heroku.inline", {})
+        if isinstance(inline_data, dict):
+            inline_data["bot_token"] = None
+            inline_data["custom_bot"] = False
+            inline_data.pop("bot_id", None)
+
+        self._dump_json(new_db_path, old_data)
+
+    @staticmethod
+    def _archive_path(path: Path):
+        if not path.exists():
+            return
+
+        suffix = int(time.time())
+        backup = path.with_name(f"{path.name}.bak-{suffix}")
+        path.rename(backup)
+
+    def _archive_old_account_files(self, old_id: int):
+        base = Path(main.BASE_DIR)
+        for name in (
+            f"heroku-{old_id}.session",
+            f"heroku-{old_id}.session-journal",
+            f"config-{old_id}.json",
+        ):
+            with contextlib.suppress(Exception):
+                self._archive_path(base / name)
+
+    @staticmethod
+    def _save_session_from_client(client: CustomTelegramClient, telegram_id: int):
+        session = SQLiteSession(os.path.join(main.BASE_DIR, f"heroku-{telegram_id}"))
+        session.set_dc(
+            client.session.dc_id,
+            client.session.server_address,
+            client.session.port,
+        )
+        session.auth_key = client.session.auth_key
+        session.save()
+
+    def _switch_client(self) -> CustomTelegramClient:
+        return CustomTelegramClient(
+            MemorySession(),
+            main.heroku.api_token.ID,
+            main.heroku.api_token.HASH,
+            connection=main.heroku.conn,
+            proxy=main.heroku.proxy,
+            connection_retries=None,
+            device_model=main.get_app_name(),
+            system_version=main.generate_random_system_version(),
+            app_version=".".join(map(str, version.__version__)) + " x64",
+            lang_code="en",
+            system_lang_code="en-US",
+        )
+
+    async def _switch_start_phone(self, call, phone: str, owner_id: int, old_id: int):
+        await self._cleanup_switch_state(owner_id)
+        client = self._switch_client()
+        await client.connect()
+
+        try:
+            await client.send_code_request(phone)
+        except PhoneNumberInvalidError:
+            await client.disconnect()
+            await utils.answer(call, self.strings("switch_invalid_phone"))
+            return
+        except FloodWaitError as e:
+            await client.disconnect()
+            await utils.answer(
+                call,
+                self.strings("switch_send_code_failed").format(f"FloodWait({e.seconds})"),
+            )
+            return
+        except Exception as e:
+            await client.disconnect()
+            await utils.answer(
+                call,
+                self.strings("switch_send_code_failed").format(type(e).__name__),
+            )
+            return
+
+        self._switch_sessions[owner_id] = {
+            "client": client,
+            "phone": phone,
+            "old_id": old_id,
+        }
+
+        await utils.answer(
+            call,
+            self.strings("switch_code_sent").format(phone=utils.escape_html(phone)),
+            reply_markup={
+                "text": self.strings("switch_enter_code_btn"),
+                "input": self.strings("switch_enter_code_input"),
+                "handler": self._inline_switch_code,
+                "args": (owner_id,),
+            },
+            always_allow=[owner_id],
+        )
+
+    async def _switch_finalize(self, call, owner_id: int):
+        state = self._switch_sessions.get(owner_id)
+        if not state:
+            await utils.answer(call, self.strings("switch_no_pending"))
+            return
+
+        client = state["client"]
+        me = await client.get_me()
+        old_id = state.get("old_id", self.tg_id)
+        new_id = me.id
+
+        if old_id == new_id:
+            await self._cleanup_switch_state(owner_id)
+            await utils.answer(call, self.strings("switch_same_account"))
+            return
+
+        try:
+            self._save_session_from_client(client, new_id)
+            self._clone_db_for_new_account(old_id, new_id)
+            self._archive_old_account_files(old_id)
+        except Exception as e:
+            await utils.answer(
+                call,
+                self.strings("switch_apply_failed").format(type(e).__name__),
+            )
+            return
+
+        await self._cleanup_switch_state(owner_id)
+        await utils.answer(
+            call,
+            self.strings("switch_applied_restart").format(new_id),
+            reply_markup={"text": self.strings("cancel"), "action": "close"},
+        )
+        restart()
+
+    async def _inline_switch_phone(self, call, data, owner_id: int, old_id: int):
+        phone = parse_phone(data)
+        if not phone:
+            await utils.answer(
+                call,
+                self.strings("switch_invalid_phone"),
+                reply_markup={
+                    "text": self.strings("switch_enter_phone_btn"),
+                    "input": self.strings("switch_enter_phone_input"),
+                    "handler": self._inline_switch_phone,
+                    "args": (owner_id, old_id),
+                },
+                always_allow=[owner_id],
+            )
+            return
+
+        await self._switch_start_phone(call, phone, owner_id, old_id)
+
+    async def _inline_switch_code(self, call, data, owner_id: int):
+        state = self._switch_sessions.get(owner_id)
+        if not state:
+            await utils.answer(call, self.strings("switch_no_pending"))
+            return
+
+        code = "".join(ch for ch in (data or "") if ch.isdigit())
+        if len(code) != 5:
+            await utils.answer(
+                call,
+                self.strings("switch_invalid_code"),
+                reply_markup={
+                    "text": self.strings("switch_enter_code_btn"),
+                    "input": self.strings("switch_enter_code_input"),
+                    "handler": self._inline_switch_code,
+                    "args": (owner_id,),
+                },
+                always_allow=[owner_id],
+            )
+            return
+
+        client = state["client"]
+        phone = state["phone"]
+
+        try:
+            await client.sign_in(phone, code=code)
+        except SessionPasswordNeededError:
+            await utils.answer(
+                call,
+                self.strings("switch_need_password"),
+                reply_markup={
+                    "text": self.strings("switch_enter_password_btn"),
+                    "input": self.strings("switch_enter_password_input"),
+                    "handler": self._inline_switch_2fa,
+                    "args": (owner_id,),
+                },
+                always_allow=[owner_id],
+            )
+            return
+        except (PhoneCodeInvalidError, PhoneCodeExpiredError):
+            await utils.answer(
+                call,
+                self.strings("switch_invalid_code"),
+                reply_markup={
+                    "text": self.strings("switch_enter_code_btn"),
+                    "input": self.strings("switch_enter_code_input"),
+                    "handler": self._inline_switch_code,
+                    "args": (owner_id,),
+                },
+                always_allow=[owner_id],
+            )
+            return
+        except FloodWaitError as e:
+            await utils.answer(
+                call,
+                self.strings("switch_signin_failed").format(f"FloodWait({e.seconds})"),
+            )
+            return
+        except Exception as e:
+            await utils.answer(
+                call,
+                self.strings("switch_signin_failed").format(type(e).__name__),
+            )
+            return
+
+        await self._switch_finalize(call, owner_id)
+
+    async def _inline_switch_2fa(self, call, data, owner_id: int):
+        state = self._switch_sessions.get(owner_id)
+        if not state:
+            await utils.answer(call, self.strings("switch_no_pending"))
+            return
+
+        password = (data or "").strip()
+        if not password:
+            await utils.answer(
+                call,
+                self.strings("switch_password_required"),
+                reply_markup={
+                    "text": self.strings("switch_enter_password_btn"),
+                    "input": self.strings("switch_enter_password_input"),
+                    "handler": self._inline_switch_2fa,
+                    "args": (owner_id,),
+                },
+                always_allow=[owner_id],
+            )
+            return
+
+        client = state["client"]
+        phone = state["phone"]
+        try:
+            await client.sign_in(phone, password=password)
+        except PasswordHashInvalidError:
+            await utils.answer(
+                call,
+                self.strings("switch_invalid_password"),
+                reply_markup={
+                    "text": self.strings("switch_enter_password_btn"),
+                    "input": self.strings("switch_enter_password_input"),
+                    "handler": self._inline_switch_2fa,
+                    "args": (owner_id,),
+                },
+                always_allow=[owner_id],
+            )
+            return
+        except FloodWaitError as e:
+            await utils.answer(
+                call,
+                self.strings("switch_signin_failed").format(f"FloodWait({e.seconds})"),
+            )
+            return
+        except Exception as e:
+            await utils.answer(
+                call,
+                self.strings("switch_signin_failed").format(type(e).__name__),
+            )
+            return
+
+        await self._switch_finalize(call, owner_id)
+
+    @loader.command(
+        ru_doc="[номер] — перенос аккаунта одной командой через inline-ввод кода/2FA",
+        en_doc="[phone] — one-command account transfer via inline code/2FA flow",
+        ua_doc="[номер] — перенесення акаунта однією командою через inline-ввід коду/2FA",
+        de_doc="[nummer] — Ein-Befehl-Kontotransfer über Inline-Code/2FA-Flow",
+        jp_doc="[電話番号] — inlineコード/2FAで1コマンド移行",
+    )
+    async def switchacc(self, message: Message):
+        owner_id = self._switch_owner_key(message)
+        old_id = self.tg_id
+        args = utils.get_args_raw(message)
+        phone = parse_phone(args) if args else None
+
+        if phone:
+            await self._switch_start_phone(message, phone, owner_id, old_id)
+            return
+
+        await utils.answer(
+            message,
+            self.strings("switch_enter_phone"),
+            reply_markup={
+                "text": self.strings("switch_enter_phone_btn"),
+                "input": self.strings("switch_enter_phone_input"),
+                "handler": self._inline_switch_phone,
+                "args": (owner_id, old_id),
+            },
+            always_allow=[owner_id],
+        )
+
+    @loader.command(
+        ru_doc="отменить незавершенный перенос аккаунта",
+        en_doc="cancel pending account transfer",
+        ua_doc="скасувати незавершене перенесення акаунта",
+        de_doc="ausstehenden Kontotransfer abbrechen",
+        jp_doc="保留中のアカウント移行をキャンセル",
+    )
+    async def switchcancel(self, message: Message):
+        key = self._switch_owner_key(message)
+        if key not in self._switch_sessions:
+            await utils.answer(message, self.strings("switch_no_pending"))
+            return
+
+        await self._cleanup_switch_state(key)
+        await utils.answer(message, self.strings("switch_cancelled"))
