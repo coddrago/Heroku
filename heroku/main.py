@@ -399,6 +399,7 @@ def parse_arguments() -> dict:
     )
     parser.add_argument("--phone", "-p", action="append")
     parser.add_argument("--no-web", dest="disable_web", action="store_true")
+    parser.add_argument("--no-web-auth", dest="disable_web_auth", action="store_true")
     parser.add_argument(
         "--qr-login",
         dest="qr_login",
@@ -612,7 +613,7 @@ class Heroku:
             api_token=self.api_token,
             proxy=self.proxy,
             connection=self.conn,
-            first_start=not self.clients,
+            first_start = True if not self.clients and not getattr(self.arguments, "disable_web_auth", False) else False
         )
 
     async def _get_token(self):
