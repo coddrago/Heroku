@@ -155,7 +155,7 @@ python3 -m heroku
 <details>
 <summary><b>🌘 HikkaHost</b></summary>
   
-  1. Go to [@hikkahost_bot](https://.me/hikkahost_bot)
+  1. Go to [@hikkahost_bot](https://t.me/hikkahost_bot)
   2. Press "Install"
   3. Choose "🪐 Heroku"
   And continue installation.
