@@ -9,6 +9,9 @@ services:
     restart: unless-stopped
     ports:
       - "${EXTERNAL_PORT:-8080}:8080"
+    stdin_open: true
+    tty: true
+    init: true
 
 volumes:
   worker:
