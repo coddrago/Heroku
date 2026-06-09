@@ -41,7 +41,7 @@ from herokutl.tl.types import (
     UserFull,
 )
 
-from . import version
+from . import version, utils
 from ._reference_finder import replace_all_refs
 from .inline.types import (
     BotInlineCall,
@@ -1036,6 +1036,44 @@ def _get_members(
             and getattr(getattr(mod, method_name), attribute, False)
         )
     }
+
+
+class ModuleArguments:
+    def __init__(self, text: str):
+        self.raw = text
+        if len(args := text.split(maxsplit=1)) <= 1:
+            self._args = args[-1]
+        else:
+            self._args = ""
+
+    @property
+    def args(self):
+        """Get arguments list"""
+        return utils.get_args(self.raw)
+    
+    @property
+    def args_html(self):
+        """Get the parameters to the command as string with HTML (not split)"""
+        return utils.get_args_html(self.raw)
+    
+    @property
+    def args_int(self):
+        """Get arguments as integers"""
+        return utils.get_args_int(self.raw)
+
+    @property
+    def args_bool(self):
+        """Get arguments as booleans (true/false, yes/no, 1/0)"""
+        return utils.get_args_bool(self.raw)
+    
+    def args_split_by(self, separator = " "):
+        return utils.get_args_split_by(self.raw, separator=separator)
+
+    def __iter__(self):
+        return iter(self._args.split())
+
+    def __str__(self):
+        return self._args
 
 
 class CacheRecordEntity:
