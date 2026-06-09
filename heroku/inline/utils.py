@@ -408,12 +408,11 @@ class Utils(InlineUnit):
             chat_id = chat_id or unit.get("chat")
             message_id = message_id or unit.get("message_id")
 
-        if not chat_id or not message_id:
-            inline_message_id = (
-                inline_message_id
-                or unit.get("inline_message_id", False)
-                or getattr(query, "inline_message_id", None)
-            )
+        inline_message_id = (
+            inline_message_id
+            or unit.get("inline_message_id", False)
+            or getattr(query, "inline_message_id", None)
+        )
 
         if not chat_id and not message_id and not inline_message_id:
             logger.warning(
