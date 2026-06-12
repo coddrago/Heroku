@@ -493,7 +493,27 @@ class Utils(InlineUnit):
                 logger.info("Sleeping %ss on Telethon FloodWait...", e.seconds)
                 await asyncio.sleep(e.seconds)
                 return await self._edit_unit(**utils.get_kwargs())
-            except RPCError:
+            except RPCError as e:
+                logger.warning(
+                    "RPCError while editing inline message via inline_message_id: %s. "
+                    "Attempting fallback via chat_id + message_id...",
+                    e,
+                )
+                if inline_message_id and chat_id and message_id:
+                    with contextlib.suppress(Exception):
+                        await self._bot_client.edit_message(
+                            chat_id,
+                            message_id,
+                            text,
+                            parse_mode="HTML",
+                            link_preview=not disable_web_page_preview,
+                            buttons=self.generate_markup(
+                                reply_markup
+                                if isinstance(reply_markup, list)
+                                else unit.get("buttons", [])
+                            ),
+                        )
+                        return True
                 if query:
                     with contextlib.suppress(Exception):
                         await query.answer()

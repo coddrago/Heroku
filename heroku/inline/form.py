@@ -19,6 +19,7 @@ import time
 import traceback
 import typing
 from collections.abc import Callable
+import asyncio
 from asyncio import Event
 from urllib.parse import urlparse
 
@@ -394,6 +395,8 @@ class Form(InlineUnit):
         if needs_premium_emoji_pre_edit or not isinstance(
             base_reply_markup, Placeholder
         ):
+            if needs_premium_emoji_pre_edit:
+                await asyncio.sleep(0.3)
             await msg.edit(
                 text,
                 reply_markup=(
