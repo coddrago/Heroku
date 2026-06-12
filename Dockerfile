@@ -34,7 +34,7 @@ RUN git clone https://github.com/coddrago/Heroku /data/Heroku
 
 WORKDIR /data/Heroku
 
-ARG HEROKU_REF=beta
+ARG HEROKU_REF=master
 RUN git fetch origin "${HEROKU_REF}" && git checkout "${HEROKU_REF}" && git pull origin "${HEROKU_REF}"
 
 RUN pip install --no-cache-dir --no-warn-script-location --disable-pip-version-check --upgrade -r requirements.txt
