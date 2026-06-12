@@ -40,7 +40,7 @@ class CoreMod(loader.Module):
         )
 
     async def client_ready(self):
-        self._markup = utils.chunks(
+        self._markup = lambda: utils.chunks(
             [
                 {
                     "text": self.strings[platform],
@@ -649,7 +649,7 @@ class CoreMod(loader.Module):
             await self.inline.form(
                 self.strings["choose_installation"],
                 message,
-                reply_markup=self._markup,
+                reply_markup=self._markup(),
                 photo="https://raw.githubusercontent.com/coddrago/assets/refs/heads/main/heroku/heroku_installation.png",
             )
         ):
@@ -677,5 +677,5 @@ class CoreMod(loader.Module):
             await utils.answer(
                 call,
                 self.strings[f"{platform}_install"],
-                reply_markup=self._markup,
+                reply_markup=self._markup(),
             )
