@@ -11,7 +11,9 @@ import functools
 import logging
 import random
 import signal
+import sys
 import typing
+import warnings
 
 import herokutl
 from herokutl import hints
@@ -28,6 +30,25 @@ from ..types import ListLike
 
 parser = herokutl.utils.sanitize_parse_mode("html")
 logger = logging.getLogger(__name__)
+
+
+def ensure_child_watcher():
+    """Ensure the active asyncio policy can spawn subprocesses."""
+    if sys.platform == "win32" or sys.version_info >= (3, 14):
+        return
+
+    with warnings.catch_warnings():
+        # get_child_watcher() is deprecated on 3.12/3.13; we use it knowingly.
+        warnings.simplefilter("ignore", DeprecationWarning)
+        try:
+            asyncio.get_event_loop_policy().get_child_watcher()
+            return
+        except NotImplementedError:
+            pass
+
+        asyncio.set_event_loop_policy(asyncio.DefaultEventLoopPolicy())
+        with contextlib.suppress(RuntimeError):
+            asyncio.set_event_loop(asyncio.get_running_loop())
 
 custom_placeholders = {}
 

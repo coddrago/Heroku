@@ -538,6 +538,7 @@ class LoaderMod(loader.Module):
             *requirements,
         ]
 
+        utils.ensure_child_watcher()
         try:
             pip = await asyncio.create_subprocess_exec(
                 *cmd,
@@ -611,6 +612,7 @@ class LoaderMod(loader.Module):
             if not is_root and shutil.which("sudo"):
                 cmd = ["sudo", *cmd]
 
+            utils.ensure_child_watcher()
             proc = await asyncio.create_subprocess_exec(
                 *cmd,
                 stdout=asyncio.subprocess.PIPE,

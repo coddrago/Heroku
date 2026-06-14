@@ -850,6 +850,7 @@ class UpdaterMod(loader.Module):
 
     async def rollback_confirm(self, call: InlineCall, number: int):
         await utils.answer(call, self.strings["rollback_process"].format(num=number))
+        utils.ensure_child_watcher()
         await asyncio.create_subprocess_shell(
             f"git reset --hard HEAD~{number}", stdout=asyncio.subprocess.PIPE
         )

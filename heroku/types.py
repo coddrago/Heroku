@@ -547,6 +547,7 @@ class Module:
             if not requirements or _did_requirements:
                 _raise(e)
 
+            utils.ensure_child_watcher()
             pip = await asyncio.create_subprocess_exec(
                 sys.executable,
                 "-m",

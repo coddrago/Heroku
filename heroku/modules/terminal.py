@@ -721,6 +721,7 @@ class TerminalMod(loader.Module):
 
     async def _run_inline(self, cmd: str, editor: InlineMessageEditor):
         shell = os.environ.get("SHELL", "/bin/sh")
+        utils.ensure_child_watcher()
 
         try:
             sproc = await asyncio.create_subprocess_exec(
@@ -773,6 +774,7 @@ class TerminalMod(loader.Module):
             return
 
         shell = os.environ.get("SHELL", "/bin/sh")
+        utils.ensure_child_watcher()
 
         try:
             sproc = await asyncio.create_subprocess_exec(
