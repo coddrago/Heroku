@@ -565,7 +565,7 @@ class TerminalMod(loader.Module):
         user_command = utils.get_args_raw(message)
         reply = await message.get_reply_message()
 
-        if not user_command and reply and reply.text:
+        if not user_command and reply and reply.message:
             user_command = reply.message
 
         if self._is_dangerous(user_command):
