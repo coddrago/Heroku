@@ -109,7 +109,6 @@ class Evaluator(loader.Module):
                 + (
                     self.strings["print_outp"].format(
                         "python",
-                        print_output,
                         utils.escape_html(self.censor(print_output)),
                     )
                     if print_output
@@ -148,7 +147,6 @@ class Evaluator(loader.Module):
                 + (
                     self.strings["print_outp"].format(
                         "python",
-                        print_output,
                         utils.escape_html(self.censor(print_output)),
                     )
                     if print_output
