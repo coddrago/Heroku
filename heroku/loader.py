@@ -785,6 +785,9 @@ class Modules:
             source_data if source_data else inspect.getsource(ret.__class__)
         )
 
+        if not hasattr(ret, "name"):
+            ret.name = ret.strings["name"]
+
         await self.complete_registration(ret)
 
         cls_name = ret.__class__.__name__
