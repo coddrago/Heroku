@@ -41,7 +41,6 @@ from herokutl.tl.types import Channel, InputMediaWebPage
 
 from .. import loader, main, utils
 from .._local_storage import RemoteStorage
-from ..compat import geek
 from ..inline.types import InlineCall
 from ..types import CoreOverwriteError, CoreUnloadError
 
@@ -809,7 +808,6 @@ class LoaderMod(loader.Module):
             uid = name.replace("%", "%%").replace(".", "%d")
 
         module_name = f"heroku.modules.{uid}"
-        doc = geek.compat(doc)
 
         async def restart_inline(call: InlineCall):
             await call.edit(self.strings["requirements_restarted"])
