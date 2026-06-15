@@ -23,6 +23,7 @@ from herokutl.errors.rpcerrorlist import (
     AccessTokenExpiredError,
     AccessTokenInvalidError,
     AuthKeyUnregisteredError,
+    FloodWaitError,
     InputUserDeactivatedError,
     UserIsBlockedError,
     YouBlockedUserError,
@@ -237,6 +238,14 @@ class InlineManager(
         ):
             logger.critical("Token expired, revoking...")
             return await self._dp_revoke_token(False)
+        except FloodWaitError as e:
+            logger.error(
+                "Inline bot authorization flood wait: %ss. "
+                "Inline manager initialization skipped for this run.",
+                e.seconds,
+            )
+            self.init_complete = False
+            return False
 
         result = await self._ping_bot(after_break)
         if result is not True:
@@ -281,7 +290,9 @@ class InlineManager(
         after_break: bool = False,
     ) -> bool:
         try:
-            await self.bot(SetTypingRequest(self._client.tg_id, SendMessageTypingAction()))
+            await self.bot(
+                SetTypingRequest(self._client.tg_id, SendMessageTypingAction())
+            )
             return True
         except UserIsBlockedError:
             await self._client(UnblockRequest(id=self.bot_id))

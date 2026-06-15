@@ -388,21 +388,29 @@ class Utils(InlineUnit):
             logger.error("You passed two or more exclusive parameters simultaneously")
             return False
 
+        pending_unit_update = {}
+
         if unit_id is not None and unit_id in self._units:
             unit = self._units[unit_id]
 
-            unit["buttons"] = reply_markup
+            pending_unit_update["buttons"] = reply_markup
+            if text is not None:
+                pending_unit_update["text"] = text
 
             if isinstance(force_me, bool):
-                unit["force_me"] = force_me
+                pending_unit_update["force_me"] = force_me
 
             if isinstance(disable_security, bool):
-                unit["disable_security"] = disable_security
+                pending_unit_update["disable_security"] = disable_security
 
             if isinstance(always_allow, list):
-                unit["always_allow"] = always_allow
+                pending_unit_update["always_allow"] = always_allow
         else:
             unit = {}
+
+        def commit_unit_update():
+            if unit_id is not None and unit_id in self._units:
+                self._units[unit_id].update(pending_unit_update)
 
         if unit:
             chat_id = chat_id or unit.get("chat")
@@ -467,6 +475,7 @@ class Utils(InlineUnit):
             except Exception:
                 return False
 
+            commit_unit_update()
             return True
 
         if media is None and text is None:
@@ -488,6 +497,7 @@ class Utils(InlineUnit):
                     ),
                 )
             except MessageNotModifiedError:
+                commit_unit_update()
                 return True
             except FloodWaitError as e:
                 logger.info("Sleeping %ss on Telethon FloodWait...", e.seconds)
@@ -513,12 +523,14 @@ class Utils(InlineUnit):
                                 else unit.get("buttons", [])
                             ),
                         )
+                        commit_unit_update()
                         return True
                 if query:
                     with contextlib.suppress(Exception):
                         await query.answer()
                 return False
             else:
+                commit_unit_update()
                 return True
 
         try:
@@ -546,6 +558,7 @@ class Utils(InlineUnit):
                 )
             return False
         else:
+            commit_unit_update()
             return True
 
     async def _delete_unit_message(

@@ -397,14 +397,18 @@ class Form(InlineUnit):
         ):
             if needs_premium_emoji_pre_edit:
                 await asyncio.sleep(0.3)
-            await msg.edit(
+            if not await msg.edit(
                 text,
                 reply_markup=(
                     base_reply_markup
                     if not isinstance(base_reply_markup, Placeholder)
                     else reply_markup
                 ),
-            )
+            ):
+                with contextlib.suppress(Exception):
+                    await msg.delete()
+                await self._unload_unit(unit_id)
+                return False
 
         return msg
 

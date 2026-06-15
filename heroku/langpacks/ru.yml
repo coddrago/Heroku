@@ -374,7 +374,7 @@ heroku_config:
   category_uncategorized: "\n<b>▫️ Прочее</b>"
   configuring_option: "<tg-emoji emoji-id=5341715473882955310>⚙️</tg-emoji> <b>Управление параметром</b> <code>{}</code> <b>модуля</b> <code>{}</code>\n<i>ℹ️ {}</i>\n\n<b>Стандартное: {}</b>\n\n<b>Текущее: {}</b>\n\n{}"
   configuring_option_lib: "<tg-emoji emoji-id=5431736674147114227>📦</tg-emoji> <b>Управление параметром</b> <code>{}</code> <b>библиотеки</b> <code>{}</code>\n<i>ℹ️ {}</i>\n\n<b>Стандартное: {}</b>\n\n<b>Текущее: {}</b>\n\n{}"
-  option_saved: "<tg-emoji emoji-id=5318933532825888187><tg-emoji emoji-id=5341715473882955310>⚙️</tg-emoji></tg-emoji> <b>Параметр</b> <code>{}</code> <b>модуля</b> <code>{}</code><b> сохранен!</b>\n<b>Текущее: {}</b>"
+  option_saved: "<tg-emoji emoji-id=5341715473882955310>⚙️</tg-emoji> <b>Параметр</b> <code>{}</code> <b>модуля</b> <code>{}</code><b> сохранен!</b>\n<b>Текущее: {}</b>"
   option_saved_lib: "<tg-emoji emoji-id=5431736674147114227>📦</tg-emoji> <b>Параметр</b> <code>{}</code> <b>библиотеки</b> <code>{}</code><b> сохранен!</b>\n<b>Текущее: {}</b>"
   option_reset: "<tg-emoji emoji-id=5318933532825888187>♻️</tg-emoji> <b>Параметр</b> <code>{}</code> <b>модуля</b> <code>{}</code><b> сброшен до значения по умолчанию</b>\n<b>Текущее: {}</b>"
   option_reset_lib: "<tg-emoji emoji-id=5318933532825888187>♻️</tg-emoji> <b>Параметр</b> <code>{}</code> <b>библиотеки</b> <code>{}</code><b> сброшен до значения по умолчанию</b>\n<b>Текущее: {}</b>"

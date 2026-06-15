@@ -248,12 +248,18 @@ class List(InlineUnit):
                 await status_message.delete()
 
         if first_page_needs_premium_emoji_pre_edit:
-            await self._bot_client.edit_message(
-                self._units[unit_id]["inline_message_id"],
-                self.sanitise_text(self._units[unit_id]["strings"][0]),
-                parse_mode="HTML",
-                buttons=self._list_markup(unit_id),
-            )
+            try:
+                await self._bot_client.edit_message(
+                    self._units[unit_id]["inline_message_id"],
+                    self.sanitise_text(self._units[unit_id]["strings"][0]),
+                    parse_mode="HTML",
+                    buttons=self._list_markup(unit_id),
+                )
+            except Exception:
+                logger.exception("Can't apply premium emoji pre-edit for list")
+                await self._delete_unit_message(unit_id=unit_id)
+                await self._unload_unit(unit_id)
+                return False
 
         return InlineMessage(self, unit_id, self._units[unit_id]["inline_message_id"])
 

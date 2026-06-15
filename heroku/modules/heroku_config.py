@@ -112,6 +112,16 @@ class HerokuConfigMod(loader.Module):
             else self.hide_value(self.lookup(mod).config[option])
         )
 
+    def _get_inline_value(self, mod: str, option: str, limit: int = 2500) -> str:
+        value = self._get_value(mod, option)
+        if len(value) <= limit:
+            return value
+
+        plain = utils.remove_html(value)
+        suffix = "\n... <i>значение обрезано для inline-сообщения</i>"
+        plain_limit = max(0, limit - len(suffix) - len("<b><code></code></b>"))
+        return f"<b><code>{utils.escape_html(plain[:plain_limit])}</code></b>{suffix}"
+
     def _guess_back_to_page(
         self,
         mod: str,
@@ -152,7 +162,7 @@ class HerokuConfigMod(loader.Module):
             ].format(
                 utils.escape_html(option),
                 utils.escape_html(mod),
-                self._get_value(mod, option),
+                self._get_inline_value(mod, option),
             ),
             reply_markup=[
                 [
@@ -189,7 +199,7 @@ class HerokuConfigMod(loader.Module):
             ].format(
                 utils.escape_html(option),
                 utils.escape_html(mod),
-                self._get_value(mod, option),
+                self._get_inline_value(mod, option),
             ),
             reply_markup=[
                 [
@@ -372,7 +382,7 @@ class HerokuConfigMod(loader.Module):
             ].format(
                 utils.escape_html(option),
                 utils.escape_html(mod),
-                self._get_value(mod, option),
+                self._get_inline_value(mod, option),
             ),
             reply_markup=[
                 [
@@ -442,7 +452,7 @@ class HerokuConfigMod(loader.Module):
             ].format(
                 utils.escape_html(option),
                 utils.escape_html(mod),
-                self._get_value(mod, option),
+                self._get_inline_value(mod, option),
             ),
             reply_markup=[
                 [
@@ -560,7 +570,7 @@ class HerokuConfigMod(loader.Module):
             ].format(
                 utils.escape_html(option),
                 utils.escape_html(mod),
-                self._get_value(mod, option),
+                self._get_inline_value(mod, option),
             ),
             reply_markup=[
                 [
@@ -982,7 +992,7 @@ class HerokuConfigMod(loader.Module):
         grouped = module.config.grouped_options()
 
         def fmt_value(option: str) -> str:
-            value = self._get_value(mod, option)
+            value = self._get_inline_value(mod, option)
             if len(value) >= 200:
                 value = list(utils.smart_split(*html.parse(value), 200))[0] + "..."
             return value
@@ -1176,7 +1186,11 @@ class HerokuConfigMod(loader.Module):
             if not hasattr(mod, "config") or not mod.config:
                 continue
             try:
-                mod_name = mod.strings("name") if callable(mod.strings) else mod.__class__.__name__
+                mod_name = (
+                    mod.strings("name")
+                    if callable(mod.strings)
+                    else mod.__class__.__name__
+                )
             except Exception:
                 mod_name = mod.__class__.__name__
 
