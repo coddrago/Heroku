@@ -24,18 +24,21 @@ from herokutl.errors.rpcerrorlist import (
     AccessTokenInvalidError,
     AuthKeyUnregisteredError,
     InputUserDeactivatedError,
+    UserIsBlockedError,
     YouBlockedUserError,
 )
 from herokutl.sessions import MemorySession
 from herokutl.tl.functions.contacts import UnblockRequest
 from herokutl.tl.functions.messages import (
     GetDialogFiltersRequest,
+    SetTypingRequest,
     UpdateDialogFilterRequest,
 )
 from herokutl.tl.types import (
     DialogFilter,
     InputPeerUser,
     Message,
+    SendMessageTypingAction,
     UpdateBotChatBoost,
     UpdateBotChatInviteRequester,
     UpdateBotInlineSend,
@@ -235,30 +238,9 @@ class InlineManager(
             logger.critical("Token expired, revoking...")
             return await self._dp_revoke_token(False)
 
-        try:
-            m = await self._client.send_message(self.bot_username, "/start heroku init")
-        except (InputUserDeactivatedError, ValueError):
-            self._db.set("heroku.inline", "bot_token", None)
-            self._token = False
-
-            if not after_break:
-                return await self.register_manager(True)
-
-            self.init_complete = False
-            return False
-        except YouBlockedUserError:
-            await self._client(UnblockRequest(id=self.bot_username))
-            try:
-                m = await self._client.send_message(
-                    self.bot_username, "/start heroku init"
-                )
-            except Exception:
-                logger.critical("Can't unblock users bot", exc_info=True)
-                return False
-        except Exception:
-            self.init_complete = False
-            logger.critical("Initialization of inline manager failed!", exc_info=True)
-            return False
+        result = await self._ping_bot(after_break)
+        if result is not True:
+            return result
 
         _folders = await self._client(GetDialogFiltersRequest())
         for folder in _folders.filters:
@@ -292,9 +274,48 @@ class InlineManager(
                 )
                 break
 
-        await self._client.delete_messages(self.bot_username, m)
-
         self._cleaner_task = asyncio.ensure_future(self._cleaner())
+
+    async def _ping_bot(
+        self,
+        after_break: bool = False,
+    ) -> bool:
+        try:
+            await self.bot(SetTypingRequest(self._client.tg_id, SendMessageTypingAction()))
+            return True
+        except UserIsBlockedError:
+            await self._client(UnblockRequest(id=self.bot_id))
+            return True
+        except Exception:
+            pass
+
+        try:
+            m = await self._client.send_message(self.bot_username, "/start heroku init")
+        except (InputUserDeactivatedError, ValueError):
+            self._db.set("heroku.inline", "bot_token", None)
+            self._token = False
+
+            if not after_break:
+                return await self.register_manager(True)
+
+            self.init_complete = False
+            return False
+        except YouBlockedUserError:
+            await self._client(UnblockRequest(id=self.bot_username))
+            try:
+                m = await self._client.send_message(
+                    self.bot_username, "/start heroku init"
+                )
+            except Exception:
+                logger.critical("Can't unblock users bot", exc_info=True)
+                return False
+        except Exception:
+            self.init_complete = False
+            logger.critical("Initialization of inline manager failed!", exc_info=True)
+            return False
+
+        await self._client.delete_messages(self.bot_username, m)
+        return True
 
     async def _stop(self):
         """Stop the bot"""
