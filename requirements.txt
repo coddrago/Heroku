@@ -2,7 +2,7 @@ herokutl==2.0.5
 pyaes
 aiofile==3.8.1
 aiofiles==24.1.0
-gitpython==3.1.2
+gitpython==3.1.50
 deep-translator
 meval==2.5
 aiohttp==3.13.5
