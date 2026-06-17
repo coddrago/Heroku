@@ -35,7 +35,7 @@ from herokutl.tl.tlobject import TLObject
 
 from . import main, security, utils, validators
 from .database import Database
-from .inline.core import InlineManager
+from .inline.core import BotUpdateType, InlineManager
 from .translations import Strings, Translator
 from .types import (
     Command,
@@ -543,7 +543,7 @@ def raw_handler(*updates: TLObject):
     return inner
 
 
-def need_update(*update_types: str):
+def need_update(*update_types: BotUpdateType):
     """
     Decorator that marks a method as a handler for Telegram Bot API update types
     The method will be registered in the inline bot's dispatcher when the module loads, and unregistered when the module unloads.

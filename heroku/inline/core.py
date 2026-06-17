@@ -73,8 +73,28 @@ logger = logging.getLogger(__name__)
 if typing.TYPE_CHECKING:
     from ..loader import Modules
 
+BotUpdateType = typing.Literal[
+    "message",
+    "edited_message",
+    "channel_post",
+    "edited_channel_post",
+    "inline_query",
+    "callback_query",
+    "chosen_inline_result",
+    "shipping_query",
+    "pre_checkout_query",
+    "poll",
+    "poll_answer",
+    "my_chat_member",
+    "chat_member",
+    "chat_join_request",
+    "message_reaction",
+    "message_reaction_count",
+    "chat_boost",
+    "removed_chat_boost",
+]
 
-_BOT_UPDATE_EVENTS: dict[str, typing.Callable[[], object]] = {
+_BOT_UPDATE_EVENTS: dict[BotUpdateType, typing.Callable[[], object]] = {
     # Default updates
     "message": lambda: events.NewMessage(),
     "edited_message": lambda: events.MessageEdited(),
