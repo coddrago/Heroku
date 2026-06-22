@@ -965,10 +965,9 @@ class Heroku:
             else:
                 import git
 
-                repo = git.Repo()
-
-                build = utils.get_git_hash()
-                diff = repo.git.log([f"HEAD..origin/{version.branch}", "--oneline"])
+                with git.Repo() as repo:
+                    build = repo.head.commit.hexsha
+                    diff = repo.git.log([f"HEAD..origin/{version.branch}", "--oneline"])
                 upd = "Update required" if diff else "Up-to-date"
             pref = client.heroku_db.get("heroku.main", "command_prefix", None)
 

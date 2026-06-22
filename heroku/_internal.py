@@ -124,8 +124,8 @@ def get_branch_name(repo_path):
     try:
         import git
 
-        repo = git.Repo(path=repo_path)
-        branch_name = repo.active_branch.name
+        with git.Repo(path=repo_path) as repo:
+            branch_name = repo.active_branch.name
     except Exception:
         pass
 
@@ -166,9 +166,9 @@ def reset_to_master(repo_path):
     try:
         import git
 
-        repo = git.Repo(path=repo_path)
-        repo.head.reset(index=True, working_tree=True)
-        repo.heads.master.checkout(force=True)
+        with git.Repo(path=repo_path) as repo:
+            repo.head.reset(index=True, working_tree=True)
+            repo.heads.master.checkout(force=True)
     except Exception:
         try:
             subprocess.run(

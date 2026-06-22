@@ -926,7 +926,7 @@ class LoaderMod(loader.Module):
                         await utils.answer(
                             message,
                             (
-                                "<tg-emoji emoji-id=5454225457916420314>😖</tg-emoji>"
+                                "<tg-emoji emoji-id=5287372146039861774>❌</tg-emoji>"
                                 f" <b>{utils.escape_html(str(e))}</b>"
                             ),
                         )
@@ -1018,7 +1018,7 @@ class LoaderMod(loader.Module):
                         await utils.answer(
                             message,
                             (
-                                "<tg-emoji emoji-id=5454225457916420314>😖</tg-emoji>"
+                                "<tg-emoji emoji-id=5287372146039861774>❌</tg-emoji>"
                                 f" <b>{utils.escape_html(str(e))}</b>"
                             ),
                         )
@@ -1049,7 +1049,7 @@ class LoaderMod(loader.Module):
                     await utils.answer(
                         message,
                         (
-                            "<tg-emoji emoji-id=5454225457916420314>😖</tg-emoji>"
+                            "<tg-emoji emoji-id=5287372146039861774>❌</tg-emoji>"
                             f" <b>{utils.escape_html(str(e))}</b>"
                         ),
                     )

@@ -83,6 +83,17 @@ def config_placeholders():
         return "\n".join(result)
 
 
+def module_placeholders(module_name: str) -> list[str]:
+    """
+    Return placeholder names registered by module
+    """
+    result = []
+    for placeholder_name, placeholder_data in custom_placeholders.items():
+        if placeholder_data.get("module_name") == module_name:
+            result.append(placeholder_name)
+    return result
+
+
 def help_placeholders(module_name, self):
     """
     Return placeholders list for help

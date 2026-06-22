@@ -14,6 +14,7 @@
 import ast
 import asyncio
 import contextlib
+import errno
 import json
 import logging
 import os
@@ -53,9 +54,14 @@ class UpdaterMod(loader.Module):
     """Updates itself, tracks latest Heroku releases, and notifies you, if update is required"""
 
     strings = {"name": "Updater"}
+    _GIT_FETCH_INTERVAL = 300
+    _EMFILE_FETCH_BACKOFF = 900
 
     def __init__(self):
         self._notified = None
+        self._last_emfile_warning = 0.0
+        self._last_git_fetch = 0.0
+        self._git_fetch_backoff_until = 0.0
         self.config = loader.ModuleConfig(
             loader.ConfigValue(
                 "GIT_ORIGIN_URL",
@@ -89,31 +95,87 @@ class UpdaterMod(loader.Module):
         await self.inline.bot(call.answer(text, show_alert=True))
         await call.delete()
 
-    def get_changelog(self) -> str:
+    @staticmethod
+    def _is_emfile_error(error: BaseException) -> bool:
+        current: BaseException | None = error
+        while current is not None:
+            if isinstance(current, OSError) and current.errno == errno.EMFILE:
+                return True
+
+            current = current.__cause__ or current.__context__
+
+        return False
+
+    def _log_git_poll_error(self, error: Exception):
+        if self._is_emfile_error(error):
+            now = time.monotonic()
+            self._git_fetch_backoff_until = max(
+                self._git_fetch_backoff_until,
+                now + self._EMFILE_FETCH_BACKOFF,
+            )
+            if now - self._last_emfile_warning >= 300:
+                logger.warning(
+                    "Failed to build changelog: too many open files; "
+                    "pausing remote fetch attempts"
+                )
+                self._last_emfile_warning = now
+        else:
+            logger.exception("Failed to build changelog")
+
+    def _format_changelog(self, commits: list[typing.Any]) -> str:
+        entries = []
+        for commit in commits[:10]:
+            message = commit.message
+            if isinstance(message, bytes):
+                message = message.decode(errors="replace")
+
+            title = message.splitlines()[0] if message.splitlines() else commit.hexsha
+            entries.append(
+                f"<b>{commit.hexsha[:7]}</b>:" f" <i>{utils.escape_html(title)}</i>"
+            )
+
+        res = "\n".join(entries)
+
+        if len(commits) > 10:
+            res += self.strings["more"].format(len(commits) - 10)
+
+        return res
+
+    def _get_update_state(self) -> tuple[str, str, str | typing.Literal[False]]:
+        with git.Repo() as repo:
+            origin = repo.remote("origin")
+            now = time.monotonic()
+            if now >= self._git_fetch_backoff_until:
+                if now - self._last_git_fetch >= self._GIT_FETCH_INTERVAL:
+                    logger.debug("Fetching changelog from %s", origin.url)
+                    origin.fetch(kill_after_timeout=60)
+                    self._last_git_fetch = now
+            else:
+                logger.debug(
+                    "Skipping changelog fetch for %.0f more seconds after EMFILE",
+                    self._git_fetch_backoff_until - now,
+                )
+
+            current = repo.head.commit.hexsha
+            latest = next(
+                repo.iter_commits(f"origin/{version.branch}", max_count=1)
+            ).hexsha
+            commits = [*repo.iter_commits(f"HEAD..origin/{version.branch}")]
+
+            return (
+                current,
+                latest,
+                self._format_changelog(commits) if commits else False,
+            )
+
+    def get_changelog(self) -> str | typing.Literal[False]:
         if NO_GIT:
             return False
         try:
-            with git.Repo() as repo:
-                origin = repo.remote("origin")
-                logger.debug("Fetching changelog from %s", origin.url)
-                origin.fetch()
-
-                if not (diff := [*repo.iter_commits(f"HEAD..origin/{version.branch}")]):
-                    return False
-        except Exception:
-            logger.exception("Failed to build changelog")
+            return self._get_update_state()[2]
+        except Exception as e:
+            self._log_git_poll_error(e)
             return False
-
-        res = "\n".join(
-            f"<b>{commit.hexsha[:7]}</b>:"
-            f" <i>{utils.escape_html(commit.message.splitlines()[0])}</i>"
-            for commit in diff[:10]
-        )
-
-        if diff.count("\n") >= 10:
-            res += self.strings["more"].format(len(diff) - 10)
-
-        return res
 
     def get_latest(self) -> str:
         if NO_GIT:
@@ -156,12 +218,16 @@ class UpdaterMod(loader.Module):
     async def poller(self):
         if NO_GIT:
             return
-        if (
-            self.config["disable_notifications"] and not self.config["autoupdate"]
-        ) or not self.get_changelog():
+        try:
+            current, self._pending, changelog = self._get_update_state()
+        except Exception as e:
+            self._log_git_poll_error(e)
             return
 
-        self._pending = self.get_latest()
+        if (
+            self.config["disable_notifications"] and not self.config["autoupdate"]
+        ) or not changelog:
+            return
 
         if (
             self.get("ignore_permanent", False)
@@ -170,7 +236,7 @@ class UpdaterMod(loader.Module):
             await asyncio.sleep(60)
             return
 
-        if self._pending not in {utils.get_git_hash(), self._notified}:
+        if self._pending not in {current, self._notified}:
             if not self.config["autoupdate"]:
                 manual_update = True
             else:
@@ -200,13 +266,13 @@ class UpdaterMod(loader.Module):
                     self.tg_id,
                     "https://raw.githubusercontent.com/coddrago/assets/refs/heads/main/heroku/updated.png",
                     caption=self.strings["update_required"].format(
-                        utils.get_git_hash()[:6],
+                        current[:6],
                         '<a href="https://github.com/coddrago/Heroku/compare/{}...{}">{}</a>'.format(
-                            utils.get_git_hash()[:12],
-                            self.get_latest()[:12],
-                            self.get_latest()[:6],
+                            current[:12],
+                            self._pending[:12],
+                            self._pending[:6],
                         ),
-                        self.get_changelog(),
+                        changelog,
                     ),
                     reply_markup=self._markup(),
                 )
@@ -223,11 +289,11 @@ class UpdaterMod(loader.Module):
                     self.tg_id,
                     "https://raw.githubusercontent.com/coddrago/assets/refs/heads/main/heroku/updated.png",
                     caption=self.strings["autoupdate_notifier"].format(
-                        self.get_latest()[:6],
-                        self.get_changelog(),
+                        self._pending[:6],
+                        changelog,
                         '<a href="https://github.com/coddrago/Heroku/compare/{}...{}">{}</a>'.format(
-                            utils.get_git_hash()[:12],
-                            self.get_latest()[:12],
+                            current[:12],
+                            self._pending[:12],
                             "🔎 diff",
                         ),
                     ),
@@ -494,7 +560,7 @@ class UpdaterMod(loader.Module):
             return
         try:
             args = utils.get_args_raw(message)
-            current = utils.get_git_hash()
+            current = utils.get_git_hash() or ""
             with git.Repo() as repo:
                 upcoming = next(
                     repo.iter_commits(f"origin/{version.branch}", max_count=1)

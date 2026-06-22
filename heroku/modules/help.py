@@ -360,10 +360,13 @@ class Help(loader.Module):
             except KeyError:
                 name = getattr(mod, "name", "ERROR")
 
+            placeholders = utils.module_placeholders(mod.__class__.__name__)
+
             if (
                 not getattr(mod, "commands", None)
                 and not getattr(mod, "inline_handlers", None)
                 and not getattr(mod, "callback_handlers", None)
+                and not placeholders
             ):
                 no_commands_ += [
                     "\n{} <code>{}</code>".format(self.config["empty_emoji"], name)
@@ -422,7 +425,14 @@ class Help(loader.Module):
                 else:
                     tmp += f" | 🤖 {cmd}"
 
-            if commands or icommands:
+            for placeholder in placeholders:
+                if first:
+                    tmp += f": ( {{{placeholder}}}"
+                    first = False
+                else:
+                    tmp += f" | {{{placeholder}}}"
+
+            if commands or icommands or placeholders:
                 tmp += " )"
                 if core:
                     core_ += [tmp]

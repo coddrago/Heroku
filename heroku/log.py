@@ -559,24 +559,23 @@ async def check_branch(me_id: int, allowed_ids: list, self):
     repo_path = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 
     try:
-        repo = git.Repo(path=repo_path)
+        with git.Repo(path=repo_path) as repo:
+            if me_id in allowed_ids:
+                return
+
+            branch_name = get_branch_name(repo_path)
+            is_ancestor = check_commit_ancestor(repo, branch_name)
+            if is_ancestor:
+                return
     except Exception:
         return
 
-    if me_id in allowed_ids:
-        return
-    else:
-        branch_name = get_branch_name(repo_path)
-        is_ancestor = check_commit_ancestor(repo, branch_name)
-        if is_ancestor:
-            return
-        else:
-            try:
-                reset_to_master(repo_path)
-                restore_worktree(repo_path)
-                self.client.log_out()
-            except Exception:
-                pass
+    try:
+        reset_to_master(repo_path)
+        restore_worktree(repo_path)
+        self.client.log_out()
+    except Exception:
+        pass
 
     restart()
 
