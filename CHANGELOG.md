@@ -1,5 +1,6 @@
 # Heroku Changelog
 ## 🪐 Heroku 2.1.0
+
 - fix security check in help
 - fix blockquote in config and info
 - add pip packages backup to backupall
@@ -21,10 +22,6 @@
 - add -n and --nonick argument to owneradd
 - add ubstop inline confirmation
 - add -f and --force argument to ubstop
-- fix restoreall response when backup contains pip-backup
-- add dependencies restore from pip-backup files
-- skip failed backup dependencies during restore
-- fix pip-backup handling inside mods.zip
 - migrate inline bot from aiogram to HerokuTL
 - add support for receiving Bot API update types in the inline bot
 - add inline terminal input continuation
@@ -48,8 +45,27 @@
 - simplify config option formatting and category parameter display
 - remove HerokuPluginSecurity
 - fix requirements installation on startup
+- add fuzzy search in config
+- add pagination in config
+- add language aliases for Ukrainian and Japanese
+- refactor inline initialization
+- remove GeekTG compatibility layer
+- remove dead code 
+- fix chosen inline message edit
+- fix child watcher
+- fix terminal reply getting logic
+- fix print() censor in .e command
+- fix missing module.name attribute
+- fix buttons language
+- fix callable type annotation
+- fix argument of type 'bool' is not iterable exception in inline events
+- fix update banner display logic
+- fix BotFather bot name in UwU strings
+- fix m.delete fallback
+- improve bot update type handling (IDE hints)
 
 ## 🪐 Heroku 2.0.0
+
 - rework utils
 - add prefix to start message
 - fix create bot
@@ -166,6 +182,7 @@
 - improve logging logic
 
 ## 🪐 Heroku 1.7.2
+
 - added autoupdate
 - updated heroku-tl to 1.7.2
 - fix folder bug
@@ -202,6 +219,7 @@
 - fix banner in .presets command
 
 ## 🪐 Heroku 1.7.1
+
 - fixed bug with web 
 - fixed bug with executor
 - fixed bug with presets command
