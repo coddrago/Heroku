@@ -161,18 +161,6 @@ python3 -m heroku
 
 </details>
 
-<details>
-<summary><b>⬇️ Lavhost</b></summary>
-
-To install, just go to [@lavhostbot](https://t.me/lavhostbot) and follow these steps:
-
-1. Enter the command `/buy`, select and pay the invoice
-2. Send the payment receipt if required
-3. After payment confirmation, type `/install` and select Heroku
-4. Follow the bot's instructions
-
-</details>
-
 
 
 ## Additional Features

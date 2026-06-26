@@ -11,7 +11,6 @@
 # 🔑 https://www.gnu.org/licenses/agpl-3.0.html
 
 import logging
-import os
 
 from .. import loader, translations, utils
 from ..inline.types import BotInlineCall
@@ -26,15 +25,10 @@ class Quickstart(loader.Module):
     strings = {"name": "Quickstart"}
 
     async def client_ready(self):
-        self.text = (
-            lambda: self.strings["base"].format(
-                utils.get_platform_emoji()
-                if self.client.heroku_me.premium is True
-                else "Heroku"
-            )
-            + (
-                "\n" + (self.strings["lavhost"] if "LAVHOST" in os.environ else "")
-            ).rstrip()
+        self.text = lambda: self.strings["base"].format(
+            utils.get_platform_emoji()
+            if self.client.heroku_me.premium is True
+            else "Heroku"
         )
 
         try:

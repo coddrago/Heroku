@@ -60,21 +60,16 @@ def restart():
 
     print("🔄 Restarting...")
 
-    match True:
-        case _ if "LAVHOST" in os.environ:
-            os.system("lavhost restart")
-            return
-        case _:
-            if "HEROKU_DO_NOT_RESTART" not in os.environ:
-                os.environ["HEROKU_DO_NOT_RESTART"] = "1"
-            else:
-                os.environ["HEROKU_DO_NOT_RESTART2"] = "1"
+    if "HEROKU_DO_NOT_RESTART" not in os.environ:
+        os.environ["HEROKU_DO_NOT_RESTART"] = "1"
+    else:
+        os.environ["HEROKU_DO_NOT_RESTART2"] = "1"
 
-            if "DOCKER" in os.environ or sys.platform == "win32":
-                atexit.register(get_startup_callback())
-            else:
-                signal.signal(signal.SIGTERM, get_startup_callback())
-            die()
+    if "DOCKER" in os.environ or sys.platform == "win32":
+        atexit.register(get_startup_callback())
+    else:
+        signal.signal(signal.SIGTERM, get_startup_callback())
+    die()
 
 
 def print_banner(banner: str):

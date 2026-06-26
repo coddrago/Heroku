@@ -49,7 +49,7 @@ class HerokuWebMod(loader.Module):
 
     @loader.command()
     async def addacc(self, message: Message):
-        if "JAMHOST" in os.environ or "LAVHOST" in os.environ:
+        if "JAMHOST" in os.environ:
             await utils.answer(message, self.strings["host_denied"])
             return
 
@@ -468,7 +468,7 @@ class HerokuWebMod(loader.Module):
 
     @loader.command()
     async def switchacc(self, message: Message):
-        if "JAMHOST" in os.environ or "LAVHOST" in os.environ:
+        if "JAMHOST" in os.environ:
             await utils.answer(message, self.strings["host_denied"])
             return
 

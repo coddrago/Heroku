@@ -16,7 +16,6 @@ parser = herokutl.utils.sanitize_parse_mode("html")
 logger = logging.getLogger(__name__)
 
 IS_DOCKER = "DOCKER" in os.environ
-IS_LAVHOST = "LAVHOST" in os.environ
 IS_HIKKAHOST = "HIKKAHOST" in os.environ
 IS_MACOS = "com.apple" in os.environ.get("PATH", "")
 IS_USERLAND = "userland" in os.environ.get("USER", "")
@@ -64,9 +63,6 @@ def get_named_platform() -> str:
         case _ if IS_DOCKER:
             return "Docker"
 
-        case _ if IS_LAVHOST:
-            return f"lavHost {os.environ['LAVHOST']}"
-
         case _:
             return "VDS"
 
@@ -108,9 +104,6 @@ def get_named_platform_emoji() -> str:
         case _ if IS_DOCKER:
             return "🐳 "
 
-        case _ if IS_LAVHOST:
-            return "✌️ "
-
         case _:
             return "💎 "
 
@@ -137,9 +130,6 @@ def get_platform_emoji() -> str:
 
         case _ if IS_USERLAND:
             return BASE.format(5458877818031077824)
-
-        case _ if IS_LAVHOST:
-            return BASE.format(5352753797531721191)
 
         case _ if IS_DOCKER:
             return BASE.format(5352678227582152630)

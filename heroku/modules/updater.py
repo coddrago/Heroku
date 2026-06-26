@@ -488,10 +488,6 @@ class UpdaterMod(loader.Module):
             if client is not message.client:
                 await client.disconnect()
 
-        if "LAVHOST" in os.environ:
-            await self.client.send_message("lavhostbot", "🔄 Restart")
-            return
-
         await message.client.disconnect()
         restart()
 
@@ -616,20 +612,6 @@ class UpdaterMod(loader.Module):
             os.system(f"cd {utils.get_base_dir()} && cd .. && git reset --hard HEAD")
 
         try:
-            if "LAVHOST" in os.environ:
-                msg_obj = await utils.answer(
-                    msg_obj,
-                    self.strings["restarting_caption"].format(
-                        utils.get_platform_emoji()
-                        if self._client.heroku_me.premium
-                        else "Heroku"
-                    ),
-                )
-                await self.process_restart_message(msg_obj)
-                self.set("restart_ts", time.time())
-                await self.client.send_message("lavhostbot", "/update")
-                return
-
             with contextlib.suppress(Exception):
                 msg_obj = await utils.answer(msg_obj, self.strings["downloading"])
 
@@ -928,10 +910,7 @@ class UpdaterMod(loader.Module):
             self.strings["ub_stop"].format(emoji=utils.get_platform_emoji()),
         )
 
-        if "LAVHOST" in os.environ:
-            await self.client.send_message("lavhostbot", "⏹️ Stop")
-        else:
-            exit()
+        exit()
 
     @loader.command()
     async def ubstop(self, message: Message):

@@ -52,7 +52,6 @@ class CoreMod(loader.Module):
                     "wsl",
                     "userland",
                     "hikkahost",
-                    "lavhost",
                 ]
             ],
             2,
@@ -669,8 +668,6 @@ class CoreMod(loader.Module):
                 await utils.answer(message, self.strings["userland_install"])
             case _ if "-hh" in args:
                 await utils.answer(message, self.strings["hikkahost_install"])
-            case _ if "-lh" in args:
-                await utils.answer(message, self.strings["lavhost_install"])
 
     async def _inline__choose__installation(self, call: InlineCall, platform: str):
         with contextlib.suppress(Exception):

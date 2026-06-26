@@ -159,18 +159,6 @@ sudo apt update && sudo apt upgrade -y && sudo apt install python3 git python3-p
 
 </details>
 
-<details>
-<summary><b>⬇️ Lavhost</b></summary>
-
-Для установки просто перейдите в [@lavhostbot](https://t.me/lavhostbot) и выполните следующие шаги:
-
-1. Введите команду `/buy`, выберите и оплатите счет
-2. Отправьте квитанцию об оплате, если потребуется
-3. После подтверждения оплаты введите `/install` и выберите Heroku
-4. Следуйте инструкциям бота
-
-</details>
-
 
 
 ## Дополнительные функции
