@@ -119,10 +119,10 @@ class InlineStuff(loader.Module):
                     caption=self.strings["this_is_heroku"].format(
                         (
                             "<tg-emoji emoji-id=5463379725441341739>🪐</tg-emoji>"
-                            if self._client.heroku_me.premium
+                            if self._client.heroku_me.premium is True
                             else "🪐"
                         ),
-                        utils.get_platform_emoji() if self._client else "Heroku",
+                        utils.get_platform_emoji() if self._client.heroku_me.premium is True else "Heroku",
                     ),
                     reply_markup=self.inline.generate_markup(
                         markup_obj=[
