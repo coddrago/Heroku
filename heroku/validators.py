@@ -16,14 +16,14 @@ import typing
 from collections.abc import Callable
 
 import grapheme
-from emoji import get_emoji_unicode_dict
+import emoji
 
 from . import utils
 from .translations import SUPPORTED_LANGUAGES, translator
 
 ConfigAllowedTypes = typing.Union[tuple, list, str, int, bool, None]
 
-ALLOWED_EMOJIS = set(get_emoji_unicode_dict("en").values())
+ALLOWED_EMOJIS = set(emoji.EMOJI_DATA.keys())
 
 
 class ValidationError(Exception):

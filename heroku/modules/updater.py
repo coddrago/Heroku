@@ -99,7 +99,7 @@ class UpdaterMod(loader.Module):
     def _is_emfile_error(error: BaseException) -> bool:
         current: BaseException | None = error
         while current is not None:
-            if isinstance(current, OSError) and current.errno == errno.EMFILE:
+            if isinstance(current, OSError) and current.errno in (errno.EMFILE, errno.EAGAIN):
                 return True
 
             current = current.__cause__ or current.__context__
@@ -148,7 +148,13 @@ class UpdaterMod(loader.Module):
             if now >= self._git_fetch_backoff_until:
                 if now - self._last_git_fetch >= self._GIT_FETCH_INTERVAL:
                     logger.debug("Fetching changelog from %s", origin.url)
-                    origin.fetch(kill_after_timeout=60)
+                    subprocess.run(
+                        ["git", "fetch", "--quiet", "origin"],
+                        cwd=repo.working_dir,
+                        timeout=60,
+                        capture_output=True,
+                        check=False,
+                    )
                     self._last_git_fetch = now
             else:
                 logger.debug(
