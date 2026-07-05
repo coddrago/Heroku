@@ -658,6 +658,7 @@ loader:
   _cmd_doc_dlmall: 1n574ll 4ll m0dul35 fr0m 53l3c73d r3p0
   _cmd_doc_ml: <m0dul3> - 53nd m0dul3 45 4 f1l3
   result: "<tg-emoji emoji-id=5337183664630709422>🔎</tg-emoji> <b>534rch r35ul7 f0r</b> <code>{query}</code>\n\n<tg-emoji emoji-id=5258270535710317499>📦</tg-emoji> <b>{name}</b> by <b>{dev}</b>\n<tg-emoji emoji-id=5879813604068298387>ℹ️</tg-emoji> <i>{cls_doc}</i>\n<tg-emoji emoji-id=5372981976804366741>🤖</tg-emoji> <b>C0mm4nd5:</b>\n{commands}\n\n<tg-emoji emoji-id=5188377234380954537>🪐</tg-emoji> <code>{prefix}dlmod {mhash}</code>"
+  verify_required: "<tg-emoji emoji-id=5188463524568926712>⚠️</tg-emoji> <b>70 unl0ck 7h3 4b1l17y 70 1n574ll 7h1rd-p4r7y m0dul35, c0mpl373 7h3 7357 1n <a href=\"https://t.me/{}?start=lm_verify\">y0ur b07</a></b>"
 translations:
   name: "7r4n5l4710n5"
   lang_saved: "{} <b>L4ngu4g3 54v3d!</b>"
@@ -788,3 +789,32 @@ heroku_plugin_security:
   no_hash: <tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>Y0u mu57 5p3c1fy 4 m0dul3 n4m3</b>
   hash_not_found: <tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>M0dul3 w17h 7h15 n4m3 n07 f0und</b>
   hash_not_found_suggest: <tg-emoji emoji-id=5312383351217201533>⚠️</tg-emoji> <b>N0 m47ch35. Cl05357:</b> <code>{}</code>
+loader_restrictor:
+  q1: "Wh47 c4n 4ny m0dul3 y0u 1n574ll 4c7u4lly d0?"
+  q1_ans1: "3x4c7ly wh47 175 d35cr1p710n 54y5 - n07h1ng m0r3"
+  q1_ans2: "R34d m3554g35 0nly 1n 7h3 ch47 wh3r3 17 w45 c4ll3d"
+  q1_ans3: "4c7 0nly wh3n y0u 3xpl1c17ly c4ll 175 c0mm4nd"
+  q1_ans4: "7h3 54m3 45 y0u 1n 73l3gr4m, 4nd m0r3: 53nd1ng g1f75, d3l371ng y0ur 4cc0un7"
+  q1_hint: "4l7h0ugh 7h3 u53rb07 h45 b451c pr073c710n 4g41n57 d4ng3r0u5 r3qu3575, 4 m0dul3 c4n 571ll g41n full c0n7r0l 0f y0ur 4cc0un7"
+  q2: "4 57r4ng3r m3554g35 y0u 4nd 45k5 y0u 70 7357 7h31r m0dul3. Wh47 d0 y0u d0?"
+  q2_ans1: "5ur3, why n07 h3lp 7h3m?"
+  q2_ans2: "Ch3ck 7h3 c0d3 my53lf/w17h 41. 1f un5ur3, r3p0r7 w17h #ch3ck_5c4m"
+  q2_ans3: "45k 7h3 4u7h0r 1f 17'5 54f3 4nd 74k3 7h31r w0rd f0r 17"
+  q2_ans4: "1n574ll 17 0n 4n07h3r 4cc0un7 70 7357 17 - 7h47'5 54f3r"
+  q2_hint: "4ny m0dul3 n07 fr0m 0ff1c14l d3v3l0p3r ch4nn3l5 5h0uld b3 ch3ck3d f0r d4ng3r0u5 c0d3. D0n'7 pu7 y0ur53lf 47 r15k!"
+  q3: "C4n 4 m0dul3 w0rk w17h 7h3 f1l35 4nd 5y573m 0f 7h3 53rv3r/h0571ng, n07 ju57 73l3gr4m?"
+  q3_ans1: "N0, 4 m0dul3 0nly w0rk5 1n51d3 73l3gr4m 4nd c4n'7 533 07h3r f1l35"
+  q3_ans2: "0nly 1f 17 h45 4 53p4r473 p3rm15510n fr0m 73l3gr4m"
+  q3_ans3: "Y35 - 4 m0dul3 15 p4r7 0f 7h3 u53rb07: 17 c4n r34d, ch4ng3, d3l373 f1l35"
+  q3_ans4: "0nly ph0705 4nd v1d305 fr0m 73l3gr4m"
+  q3_hint: "7h3 u53rb07 15 4 Py7h0n pr0gr4m runn1ng 0n y0ur 53rv3r. 4 m0dul3 15 p4r7 0f 7h47 54m3 pr0gr4m, w17h 7h3 54m3 r1gh75"
+  q4: "W0uld y0u n071c3 1f 4 m0dul3 574r73d 4c71ng w17h0u7 y0ur p3rm15510n (d474 7h3f7, 37c.)?"
+  q4_ans1: "Y35, 73l3gr4m w0uld 1mm3d1473ly n071fy m3 4b0u7 5u5p1c10u5 4c71v17y"
+  q4_ans2: "Y35, 1'd n071c3 5u5p1c10u5 l0g5 fr0m 7h3 m0dul3"
+  q4_ans3: "N0, bu7 7h3 u53rb07'5 b451c pr073c710n 5h0uld c47ch 5uch 4c71v17y"
+  q4_ans4: "N07 n3c3554r1ly - 4 m0dul3 c4n 4c7 1nv151bly, w17h0u7 4ny n071f1c4710n5, un71l 17'5 700 l473"
+  q4_hint: "5734l7h 15 7h3 m41n d4ng3r 0f m4l1c10u5 m0dul35: w17h0u7 ch3ck1ng 7h3 c0d3 b3f0r3h4nd, y0u m1gh7 51mply n07 n071c3 4 pr0bl3m un71l 17'5 700 l473"
+  timeout: "<tg-emoji emoji-id=5447644880824181073>⚠️</tg-emoji> <b>Y0u d1dn'7 4n5w3r 4ll 7h3 qu35710n5 1n 71m3. Y0u c4n 7ry 4g41n by 53nd1ng</b> <code>/start lm_verify</code>"
+  failed: "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>Wr0ng 4n5w3r. 70 unl0ck 7h1rd-p4r7y m0dul3 1n574ll4710n, 7ry 4g41n by 53nd1ng</b> <code>/start lm_verify</code>"
+  already_passed: "<tg-emoji emoji-id=5118861066981344121>✅</tg-emoji> <b>Y0u'v3 4lr34dy p4553d 7h3 ch3ck - 7h1rd-p4r7y m0dul3 1n574ll4710n 15 unl0ck3d</b>"
+  unlocked: "<tg-emoji emoji-id=5118861066981344121>✅</tg-emoji> <b>Ch3ck p4553d, 7h1rd-p4r7y m0dul3 1n574ll4710n 15 unl0ck3d</b>"

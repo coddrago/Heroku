@@ -311,6 +311,8 @@ class LoaderMod(loader.Module):
             result = await self.download_and_install(full_url)
             if result != MODULE_LOADING_SUCCESS:
                 not_installed.append(link.split("/")[-1])
+            if result == MODULE_LOADING_FORBIDDEN:
+                break
 
         installed_count = len(links) - len(not_installed)
 
@@ -454,6 +456,9 @@ class LoaderMod(loader.Module):
                 blob_link=blob_link,
                 _raise_install_errors=True,
             )
+
+            if installed == MODULE_LOADING_FORBIDDEN:
+                return MODULE_LOADING_FORBIDDEN
 
             if not installed:
                 raise ModuleInstallError(f"Module {module_name} was not installed")
@@ -648,6 +653,18 @@ class LoaderMod(loader.Module):
         _raise_install_errors: bool = False,
     ) -> bool:
         module_label = name or origin
+
+        if not self.lookup("LoaderRestrictor").get("passed", False):
+            logger.warning(
+                "Module %s was not loaded because the safety check was not passed",
+                module_label,
+            )
+            if isinstance(message, Message):
+                await utils.answer(
+                    message,
+                    self.strings["verify_required"].format(self.inline.bot_username),
+                )
+            return MODULE_LOADING_FORBIDDEN
 
         if any(
             line.replace(" ", "") == "#scope:ffmpeg" for line in doc.splitlines()

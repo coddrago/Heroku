@@ -659,6 +659,7 @@ loader:
   _cmd_doc_dlmall: Instaww aww moduwes fwom sewected wepositowy
   _cmd_doc_ml: <moduwe> - Send moduwe as a fiwe
   result: "<tg-emoji emoji-id=5337183664630709422>🔎</tg-emoji> <b>Seawch wesuwt fow</b> <code>{query}</code>\n\n<tg-emoji emoji-id=5258270535710317499>📦</tg-emoji> <b>{name}</b> by <b>{dev}</b>\n<tg-emoji emoji-id=5879813604068298387>ℹ️</tg-emoji> <i>{cls_doc}</i>\n<tg-emoji emoji-id=5372981976804366741>🤖</tg-emoji> <b>Commands:</b>\n{commands}\n\n<tg-emoji emoji-id=5188377234380954537>🪐</tg-emoji> <code>{prefix}dlmod {mhash}</code>"
+  verify_required: "<tg-emoji emoji-id=5188463524568926712>⚠️</tg-emoji> <b>To unwock de abiwity to instaww diwd-pawty moduwes, compwete de test in <a href=\"https://t.me/{}?start=lm_verify\">youw bot</a></b>"
 translations:
   name: "Twanswations"
   lang_saved: "{} <b>Wangwuage saved!</b>"
@@ -790,3 +791,33 @@ heroku_plugin_security:
   no_hash: <tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>You must specify a moduwe name</b>
   hash_not_found: <tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>Moduwe with this name nyot found</b>
   hash_not_found_suggest: <tg-emoji emoji-id=5312383351217201533>⚠️</tg-emoji> <b>No matches. Cwosest:</b> <code>{}</code>
+
+loader_restrictor:
+  q1: "What can any moduwe you instaww actuawwy do?"
+  q1_ans1: "Exactwy what its descwiption says - nyoding mowe"
+  q1_ans2: "Wead messages onwy in de chat whewe it was cawwed"
+  q1_ans3: "Act onwy when you expwicitwy caww its command"
+  q1_ans4: "De same as you in Tewegwam, and mowe: sending gifts, deweting youw account"
+  q1_hint: "Awdough de usewbot has basic pwotection against dangewous wequests, a moduwe can stiww gain fuww contwow of youw account"
+  q2: "A stwangew messages you and asks you to test deiw moduwe. What do you do?"
+  q2_ans1: "Suwe, why nyot hewp dem?"
+  q2_ans2: "Check de code mysewf/wid AI. If unsuwe, wepowt wid #check_scam"
+  q2_ans3: "Ask de audow if it's safe and take deiw wowd fow it"
+  q2_ans4: "Instaww it on anyodew account to test it - dat's safew"
+  q2_hint: "Any moduwe nyot fwom officiaw devewopew channyews shouwd be checked fow dangewous code. Don't put youwsewf at wisk!"
+  q3: "Can a moduwe wowk wid de fiwes and system of de sewvew/hosting, nyot just Tewegwam?"
+  q3_ans1: "NYo, a moduwe onwy wowks inside Tewegwam and can't see odew fiwes"
+  q3_ans2: "Onwy if it has a sepawate pewmission fwom Tewegwam"
+  q3_ans3: "Yes - a moduwe is pawt of de usewbot: it can wead, change, dewete fiwes"
+  q3_ans4: "Onwy photos and videos fwom Tewegwam"
+  q3_hint: "De usewbot is a Pydon pwogwam wunnying on youw sewvew. A moduwe is pawt of dat same pwogwam, wid de same wights"
+  q4: "Wouwd you nyotice if a moduwe stawted acting widout youw pewmission (data deft, etc.)?"
+  q4_ans1: "Yes, Tewegwam wouwd immediatewy nyotify me about suspicious activity"
+  q4_ans2: "Yes, I'd nyotice suspicious wogs fwom de moduwe"
+  q4_ans3: "NYo, but de usewbot's basic pwotection shouwd catch such activity"
+  q4_ans4: "NYot nyecessawiwy - a moduwe can act invisibwy, widout any nyotifications, untiw it's too wate"
+  q4_hint: "Steawd is de main dangew of mawicious moduwes: widout checking de code befowehand, you might simpwy nyot nyotice a pwobwem untiw it's too wate"
+  timeout: "<tg-emoji emoji-id=5447644880824181073>⚠️</tg-emoji> <b>You didn't answew aww de questions in time. You can twy again by sending</b> <code>/start lm_verify</code>"
+  failed: "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>Wwong answew. To unwock diwd-pawty moduwe instawwation, twy again by sending</b> <code>/start lm_verify</code>"
+  already_passed: "<tg-emoji emoji-id=5118861066981344121>✅</tg-emoji> <b>You've awweady passed de check - diwd-pawty moduwe instawwation is unwocked</b>"
+  unlocked: "<tg-emoji emoji-id=5118861066981344121>✅</tg-emoji> <b>Check passed, diwd-pawty moduwe instawwation is unwocked</b>"
