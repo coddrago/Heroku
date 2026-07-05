@@ -61,7 +61,7 @@ def wipe_data():
         "*.session-journal",
         "api_token.txt",
     )
-    dirs = ("loaded_modules",)
+    dirs = ("loaded_modules", "sessions")
     removed = 0
 
     for pattern in patterns:

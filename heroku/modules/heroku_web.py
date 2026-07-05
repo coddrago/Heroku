@@ -212,7 +212,7 @@ class HerokuWebMod(loader.Module):
         client: CustomTelegramClient,
         new_id: int,
     ) -> None:
-        session = SQLiteSession(os.path.join(main.BASE_DIR, f"heroku-{new_id}"))
+        session = SQLiteSession(os.path.join(main.SESSIONS_DIR, f"heroku-{new_id}"))
         session.set_dc(
             client.session.dc_id,
             client.session.server_address,
@@ -258,7 +258,7 @@ class HerokuWebMod(loader.Module):
             return
 
         suffix = int(time.time())
-        base = Path(main.BASE_DIR)
+        base = Path(main.SESSIONS_DIR)
         old_session = base / f"heroku-{old_id}.session"
         old_journal = base / f"heroku-{old_id}.session-journal"
         old_config = Path(main.BASE_PATH) / f"config-{old_id}.json"

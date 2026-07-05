@@ -22,6 +22,7 @@ import json
 import logging
 import os
 import random
+import shutil
 import signal
 import sqlite3
 import string
@@ -72,6 +73,7 @@ BASE_DIR = (
 
 BASE_PATH = Path(BASE_DIR)
 CONFIG_PATH = BASE_PATH / "config.json"
+SESSIONS_DIR = os.path.join(BASE_DIR, "sessions")
 _CONFIG_CACHE: dict | None = None
 _CONFIG_MTIME_NS: int | None = None
 
@@ -488,7 +490,7 @@ class Heroku:
     """Main userbot instance, which can handle multiple clients"""
 
     def __init__(self):
-        global BASE_DIR, BASE_PATH, CONFIG_PATH
+        global BASE_DIR, BASE_PATH, CONFIG_PATH, SESSIONS_DIR
         self.omit_log = False
         self.arguments = parse_arguments()
         if self.arguments.no_git:
@@ -497,6 +499,7 @@ class Heroku:
             BASE_DIR = self.arguments.data_root
             BASE_PATH = Path(BASE_DIR)
             CONFIG_PATH = BASE_PATH / "config.json"
+            SESSIONS_DIR = os.path.join(BASE_DIR, "sessions")
         try:
             self.loop = asyncio.get_running_loop()
 
@@ -506,6 +509,7 @@ class Heroku:
 
         self.clients = SuperList()
         self.ready = asyncio.Event()
+        self._migrate_sessions()
         self._read_sessions()
         self._get_api_token()
         self._get_proxy()
@@ -550,10 +554,34 @@ class Heroku:
         }
         self.conn = ConnectionTcpFull
 
+    def _migrate_sessions(self):
+        os.makedirs(SESSIONS_DIR, exist_ok=True)
+
+        with os.scandir(BASE_DIR) as entries:
+            legacy = [
+                entry
+                for entry in entries
+                if entry.is_file()
+                and entry.name.startswith("heroku-")
+                and ".session" in entry.name
+            ]
+
+        for entry in legacy:
+            target = os.path.join(SESSIONS_DIR, entry.name)
+            if os.path.exists(target):
+                continue
+
+            try:
+                shutil.move(entry.path, target)
+            except OSError:
+                logging.exception(
+                    "Failed to migrate legacy session file %s", entry.path
+                )
+
     def _read_sessions(self):
         """Gets sessions from environment and data directory"""
         self.sessions = []
-        with os.scandir(BASE_DIR) as entries:
+        with os.scandir(SESSIONS_DIR) as entries:
             self.sessions += [
                 SQLiteSession(entry.path.rsplit(".session", maxsplit=1)[0])
                 for entry in entries
@@ -628,7 +656,7 @@ class Heroku:
 
         session = SQLiteSession(
             os.path.join(
-                BASE_DIR,
+                SESSIONS_DIR,
                 f"heroku-{telegram_id}",
             )
         )

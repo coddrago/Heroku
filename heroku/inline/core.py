@@ -15,6 +15,7 @@
 import asyncio
 import contextlib
 import logging
+import os
 import time
 import typing
 
@@ -28,7 +29,7 @@ from herokutl.errors.rpcerrorlist import (
     UserIsBlockedError,
     YouBlockedUserError,
 )
-from herokutl.sessions import MemorySession
+from herokutl.sessions import SQLiteSession
 from herokutl.tl.functions.contacts import UnblockRequest
 from herokutl.tl.functions.messages import (
     GetDialogFiltersRequest,
@@ -54,7 +55,7 @@ from herokutl.tl.types import (
 )
 from herokutl.utils import get_display_name
 
-from .. import utils
+from .. import main, utils
 from ..database import Database
 from ..tl_cache import CustomTelegramClient
 from ..translations import Translator
@@ -211,6 +212,29 @@ class InlineManager(
         for handler_id, (update_type, handler) in self._bot_update_handlers.items():
             self._attach_custom_handler(handler_id, update_type, handler)
 
+    def _cleanup_stale_bot_sessions(self, bot_uid: str):
+        prefix = f"heroku-{self._me}-bot-"
+        keep_stem = f"{prefix}{bot_uid}"
+
+        try:
+            entries = list(os.scandir(main.SESSIONS_DIR))
+        except FileNotFoundError:
+            return
+
+        for entry in entries:
+            if not entry.is_file() or not entry.name.startswith(prefix):
+                continue
+
+            if entry.name.split(".session", 1)[0] == keep_stem:
+                continue
+
+            try:
+                os.remove(entry.path)
+            except OSError:
+                logger.exception(
+                    "Failed to remove stale bot session file %s", entry.path
+                )
+
     async def register_manager(
         self,
         after_break: bool = False,
@@ -236,8 +260,12 @@ class InlineManager(
 
         self.init_complete = True
 
+        bot_uid = self._token.split(":", 1)[0]
+        self._cleanup_stale_bot_sessions(bot_uid)
         self._bot_client = TelegramClient(
-            MemorySession(),
+            SQLiteSession(
+                os.path.join(main.SESSIONS_DIR, f"heroku-{self._me}-bot-{bot_uid}")
+            ),
             self._client.api_id,
             self._client.api_hash,
             receive_updates=True,
