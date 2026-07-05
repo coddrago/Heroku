@@ -821,3 +821,5 @@ loader_restrictor:
   failed: "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>Wwong answew. To unwock diwd-pawty moduwe instawwation, twy again by sending</b> <code>/start lm_verify</code>"
   already_passed: "<tg-emoji emoji-id=5118861066981344121>✅</tg-emoji> <b>You've awweady passed de check - diwd-pawty moduwe instawwation is unwocked</b>"
   unlocked: "<tg-emoji emoji-id=5118861066981344121>✅</tg-emoji> <b>Check passed, diwd-pawty moduwe instawwation is unwocked</b>"
+  unlock_prompt: "<tg-emoji emoji-id=5447644880824181073>⚠️</tg-emoji> <b>To unwock diwd-pawty moduwe instawwation, compwete a showt check</b>"
+  unlock_prompt_btn: "Take de check"

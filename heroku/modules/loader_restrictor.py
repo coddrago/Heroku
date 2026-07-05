@@ -22,7 +22,7 @@ from herokutl.tl.types import (
 from herokutl.tl.custom import Message
 
 from .. import loader
-from ..inline.types import BotInlineMessage
+from ..inline.types import BotInlineCall, BotInlineMessage
 
 logger = logging.getLogger(__name__)
 
@@ -68,6 +68,26 @@ class LoaderRestrictor(loader.Module):
 
     async def client_ready(self):
         self.poll: PollStatus | None = None
+
+        if not self.get("passed", False):
+            await self.inline.bot.send_message(
+                self.client.tg_id,
+                self.strings["unlock_prompt"],
+                reply_markup=self.inline.generate_markup(
+                    [
+                        [
+                            {
+                                "text": self.strings["unlock_prompt_btn"],
+                                "callback": self._unlock_prompt_callback,
+                            }
+                        ]
+                    ]
+                ),
+            )
+
+    async def _unlock_prompt_callback(self, call: BotInlineCall):
+        await call.delete()
+        await self._start_quiz()
 
     def _build_poll(self, poll_step: PollStep) -> InputMediaPoll:
         poll = Poll(

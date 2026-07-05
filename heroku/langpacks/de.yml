@@ -806,3 +806,5 @@ loader_restrictor:
   failed: "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>Falsche Antwort. Um die Installation von Drittanbietermodulen freizuschalten, versuchen Sie es erneut, indem Sie</b> <code>/start lm_verify</code> senden."
   already_passed: "<tg-emoji emoji-id=5118861066981344121>✅</tg-emoji> <b>Sie haben die Prüfung bereits bestanden – die Installation von Drittanbietermodulen ist freigeschaltet</b>"
   unlocked: "<tg-emoji emoji-id=5118861066981344121>✅</tg-emoji> <b>Prüfung bestanden, Drittanbieter-Modulinstallation ist freigeschaltet</b>"
+  unlock_prompt: "<tg-emoji emoji-id=5447644880824181073>⚠️</tg-emoji> <b>Um die Installation von Drittanbietermodulen freizuschalten, führen Sie eine kurze Überprüfung durch</b>"
+  unlock_prompt_btn: "Nimm den Scheck"

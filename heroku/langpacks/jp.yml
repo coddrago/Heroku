@@ -844,3 +844,5 @@ loader_restrictor:
   failed: "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>間違った答えです。サードパーティ モジュールのインストールのロックを解除するには、</b> <code>/start lm_verify</code> を送信して再試行してください。"
   already_passed: "<tg-emoji emoji-id=5118861066981344121>✅</tg-emoji> <b>すでにチェックに合格しています - サードパーティ モジュールのインストールはロック解除されています</b>"
   unlocked: "<tg-emoji emoji-id=5118861066981344121>✅</tg-emoji> <b>チェックに合格し、サードパーティ モジュールのインストールのロックが解除されました</b>"
+  unlock_prompt: "<tg-emoji emoji-id=5447644880824181073>⚠️</tg-emoji> <b>サードパーティ モジュールのインストールのロックを解除するには、簡単なチェックを完了してください</b>"
+  unlock_prompt_btn: "小切手を受け取ります"

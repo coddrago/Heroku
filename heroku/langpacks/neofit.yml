@@ -823,3 +823,5 @@ loader_restrictor:
   failed: "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>AssertionError: wrong answer. To unlock third-party installs, retry:</b> <code>/start lm_verify</code>"
   already_passed: "<tg-emoji emoji-id=5118861066981344121>✅</tg-emoji> <b>Check already passed - third-party install permission granted</b>"
   unlocked: "<tg-emoji emoji-id=5118861066981344121>✅</tg-emoji> <b>Check passed, third-party install permission granted</b>"
+  unlock_prompt: "<tg-emoji emoji-id=5447644880824181073>⚠️</tg-emoji> <b>PermissionError: third-party module installs locked. Run the check to resolve</b>"
+  unlock_prompt_btn: "Run check()"

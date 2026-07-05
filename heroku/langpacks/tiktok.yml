@@ -805,3 +805,5 @@ loader_restrictor:
   failed: "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>Мимо. Чтобы разлочить установку модулей - заново,</b> <code>/start lm_verify</code>"
   already_passed: "<tg-emoji emoji-id=5118861066981344121>✅</tg-emoji> <b>Тест уже сдан, установка модулей разлочена</b>"
   unlocked: "<tg-emoji emoji-id=5118861066981344121>✅</tg-emoji> <b>Тест сдан, установка модулей разлочена</b>"
+  unlock_prompt: "<tg-emoji emoji-id=5447644880824181073>⚠️</tg-emoji> <b>Чтобы разлочить установку сторонних модулей, пройди короткий тест</b>"
+  unlock_prompt_btn: "Давай"

@@ -818,3 +818,5 @@ loader_restrictor:
   failed: "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>Wr0ng 4n5w3r. 70 unl0ck 7h1rd-p4r7y m0dul3 1n574ll4710n, 7ry 4g41n by 53nd1ng</b> <code>/start lm_verify</code>"
   already_passed: "<tg-emoji emoji-id=5118861066981344121>✅</tg-emoji> <b>Y0u'v3 4lr34dy p4553d 7h3 ch3ck - 7h1rd-p4r7y m0dul3 1n574ll4710n 15 unl0ck3d</b>"
   unlocked: "<tg-emoji emoji-id=5118861066981344121>✅</tg-emoji> <b>Ch3ck p4553d, 7h1rd-p4r7y m0dul3 1n574ll4710n 15 unl0ck3d</b>"
+  unlock_prompt: "<tg-emoji emoji-id=5447644880824181073>⚠️</tg-emoji> <b>70 unl0ck 7h1rd-p4r7y m0dul3 1n574ll4710n, c0mpl373 4 5h0r7 ch3ck</b>"
+  unlock_prompt_btn: "74k3 7h3 ch3ck"

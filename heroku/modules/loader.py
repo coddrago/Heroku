@@ -206,8 +206,20 @@ class LoaderMod(loader.Module):
             return f"{parts[0]}/{parts[1]}"
         return repo
 
+    async def _check_pass(self, message: Message | InlineCall) -> bool:
+        if self.lookup("LoaderRestrictor").get("passed", False):
+            return False
+
+        await utils.answer(
+            message,
+            self.strings["verify_required"].format(self.inline.bot_username),
+        )
+        return True
+
     @loader.command(alias="dlm")
     async def dlmod(self, message: Message, force_pm: bool = False):
+        if await self._check_pass(message):
+            return
 
         if args := utils.get_args(message):
             match args:
@@ -273,6 +285,9 @@ class LoaderMod(loader.Module):
 
     @loader.command()
     async def dlmall(self, message: Message):
+        if await self._check_pass(message):
+            return
+
         repos = [self.config["MODULES_REPO"]] + self.config["ADDITIONAL_REPOS"]
         repos = [r for r in repos if r.startswith("http")]
         buttons = [
@@ -311,8 +326,6 @@ class LoaderMod(loader.Module):
             result = await self.download_and_install(full_url)
             if result != MODULE_LOADING_SUCCESS:
                 not_installed.append(link.split("/")[-1])
-            if result == MODULE_LOADING_FORBIDDEN:
-                break
 
         installed_count = len(links) - len(not_installed)
 
@@ -457,9 +470,6 @@ class LoaderMod(loader.Module):
                 _raise_install_errors=True,
             )
 
-            if installed == MODULE_LOADING_FORBIDDEN:
-                return MODULE_LOADING_FORBIDDEN
-
             if not installed:
                 raise ModuleInstallError(f"Module {module_name} was not installed")
 
@@ -475,11 +485,16 @@ class LoaderMod(loader.Module):
         path_: str,
         mode: str,
     ):
+        if await self._check_pass(call):
+            return
 
         await self.load_module(doc, call, origin=path_ or "<string>", save_fs=True)
 
     @loader.command(alias="lm")
     async def loadmod(self, message: Message):
+        if await self._check_pass(message):
+            return
+
         msg = message if message.file else (await message.get_reply_message())
 
         if msg is None or msg.media is None:
@@ -653,18 +668,6 @@ class LoaderMod(loader.Module):
         _raise_install_errors: bool = False,
     ) -> bool:
         module_label = name or origin
-
-        if not self.lookup("LoaderRestrictor").get("passed", False):
-            logger.warning(
-                "Module %s was not loaded because the safety check was not passed",
-                module_label,
-            )
-            if isinstance(message, Message):
-                await utils.answer(
-                    message,
-                    self.strings["verify_required"].format(self.inline.bot_username),
-                )
-            return MODULE_LOADING_FORBIDDEN
 
         if any(
             line.replace(" ", "") == "#scope:ffmpeg" for line in doc.splitlines()

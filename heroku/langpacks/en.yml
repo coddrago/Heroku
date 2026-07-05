@@ -724,6 +724,8 @@ loader_restrictor:
   timeout: "<tg-emoji emoji-id=5447644880824181073>⚠️</tg-emoji> <b>You didn't answer all the questions in time. You can try again by sending</b> <code>/start lm_verify</code>"
   failed: "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>Wrong answer. To unlock third-party module installation, try again by sending</b> <code>/start lm_verify</code>"
   already_passed: "<tg-emoji emoji-id=5118861066981344121>✅</tg-emoji> <b>You've already passed the check - third-party module installation is unlocked</b>"
+  unlock_prompt: "<tg-emoji emoji-id=5447644880824181073>⚠️</tg-emoji> <b>To unlock third-party module installation, complete a short check</b>"
+  unlock_prompt_btn: "Take the check"
   unlocked: "<tg-emoji emoji-id=5118861066981344121>✅</tg-emoji> <b>Check passed, third-party module installation is unlocked</b>"
 translations:
   name: "Translations"
