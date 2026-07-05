@@ -588,6 +588,7 @@ class Heroku:
                 if entry.is_file()
                 and entry.name.startswith("heroku-")
                 and entry.name.endswith(".session")
+                and "-bot-" not in entry.name
             ]
 
     def _get_api_token(self):
