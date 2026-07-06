@@ -214,6 +214,8 @@ class LoaderMod(loader.Module):
 
                         if result == MODULE_LOADING_FAILED:
                             not_installed.append(arg)
+                        elif result == MODULE_LOADING_FORBIDDEN:
+                            break
                     await utils.answer(
                         message,
                         "{} modules was installed.\n\nModules <code>{}</code> cannot be installed because they are not available in the repo".format(
@@ -360,13 +362,15 @@ class LoaderMod(loader.Module):
 
                 return MODULE_LOADING_FAILED
 
-            await self.load_module(
+            if await self.load_module(
                 r,
                 message,
                 module_name,
                 url,
                 blob_link=blob_link,
-            )
+            ) == MODULE_LOADING_FORBIDDEN:
+                return MODULE_LOADING_FORBIDDEN
+
             return MODULE_LOADING_SUCCESS
         except Exception:
             logger.exception("Failed to load %s", module_name)
@@ -544,6 +548,18 @@ class LoaderMod(loader.Module):
         did_requires: bool = False,
         did_packages: bool = False,
     ):
+        if not self.lookup("LoaderRestrictor").get("passed", False):
+            logger.warning(
+                "Module %s was not loaded because the safety check was not passed",
+                name or origin,
+            )
+            if isinstance(message, Message):
+                await utils.answer(
+                    message,
+                    self.strings["verify_required"].format(self.inline.bot_username),
+                )
+            return MODULE_LOADING_FORBIDDEN
+
         if any(
             line.replace(" ", "") == "#scope:ffmpeg" for line in doc.splitlines()
         ) and os.system("ffmpeg -version 1>/dev/null 2>/dev/null"):

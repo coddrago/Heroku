@@ -23,6 +23,7 @@ import json
 import logging
 import os
 import random
+import shutil
 import signal
 import socket
 import sqlite3
@@ -75,6 +76,7 @@ BASE_DIR = (
 
 BASE_PATH = Path(BASE_DIR)
 CONFIG_PATH = BASE_PATH / "config.json"
+SESSIONS_DIR = os.path.join(BASE_DIR, "sessions")
 
 # fmt: off
 LATIN_MOCK = [
@@ -484,7 +486,7 @@ class Heroku:
     """Main userbot instance, which can handle multiple clients"""
 
     def __init__(self):
-        global BASE_DIR, BASE_PATH, CONFIG_PATH
+        global BASE_DIR, BASE_PATH, CONFIG_PATH, SESSIONS_DIR
         self.omit_log = False
         self.arguments = parse_arguments()
         if self.arguments.no_git:
@@ -493,6 +495,7 @@ class Heroku:
             BASE_DIR = self.arguments.data_root
             BASE_PATH = Path(BASE_DIR)
             CONFIG_PATH = BASE_PATH / "config.json"
+            SESSIONS_DIR = os.path.join(BASE_DIR, "sessions")
         try:
             self.loop = asyncio.get_running_loop()
 
@@ -502,9 +505,34 @@ class Heroku:
 
         self.clients: list[CustomClient] = SuperList()
         self.ready = asyncio.Event()
+        self._migrate_sessions()
         self._read_sessions()
         self._get_api_token()
         self._get_proxy()
+
+    def _migrate_sessions(self):
+        os.makedirs(SESSIONS_DIR, exist_ok=True)
+
+        with os.scandir(BASE_DIR) as entries:
+            legacy = [
+                entry
+                for entry in entries
+                if entry.is_file()
+                and entry.name.startswith("heroku-")
+                and entry.name.endswith(".session")
+            ]
+
+        for entry in legacy:
+            target = os.path.join(SESSIONS_DIR, entry.name)
+            if os.path.exists(target):
+                continue
+
+            try:
+                shutil.move(entry.path, target)
+            except OSError:
+                logging.exception(
+                    "Failed to migrate legacy session file %s", entry.path
+                )
 
     def _get_proxy(self):
         """
@@ -542,7 +570,7 @@ class Heroku:
             session.rsplit(".session", maxsplit=1)[0]
             for session in filter(
                 lambda f: (f.startswith("heroku-") or f.startswith("hikka-")) and f.endswith(".session"),
-                os.listdir(BASE_DIR),
+                os.listdir(SESSIONS_DIR),
             )
         ]
 
@@ -634,6 +662,7 @@ class Heroku:
 
         session = f"heroku-{telegram_id}"
         init_kwargs = client._export_init_kwargs()
+        init_kwargs["workdir"] = SESSIONS_DIR
         session_str = await client.export_session_string()
 
         cli = CustomClient(
@@ -911,7 +940,7 @@ class Heroku:
                     self.api_token.ID,
                     self.api_token.HASH,
                     proxy=self.proxy,
-                    workdir=BASE_PATH,
+                    workdir=SESSIONS_DIR,
                     device_model=get_app_name(),
                     system_version=generate_random_system_version(),
                     app_version=".".join(map(str, __version__)) + " x64",
