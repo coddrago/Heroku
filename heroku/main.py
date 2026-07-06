@@ -640,7 +640,10 @@ class Heroku:
             **init_kwargs
         )
 
-        await client.disconnect()
+        if client.is_initialized:
+            await client.stop()
+        elif client.is_connected:
+            await client.disconnect()
 
         storage = SQLiteStringStorage(cli)
         await storage.import_session_string(session_str)
@@ -719,17 +722,6 @@ class Heroku:
         client.tg_id = telegram_id
         client.hikka_me = me
         client.heroku_me = me
-
-        await client.stop()
-
-        # storage clearing bug workaround
-        is_bot = False
-        await client.storage.user_id(telegram_id)
-        await client.storage.is_bot(is_bot)
-
-        res = await client.connect()
-        if not res:
-            raise RuntimeError()
 
         db = database.Database(client)
         await db.init()
