@@ -754,13 +754,42 @@ class UpdaterMod(loader.Module):
         await asyncio.create_subprocess_shell(f'git reset --hard HEAD~{number}', stdout=asyncio.subprocess.PIPE)
         await self.restart_common(call)
 
+    async def ubstop_func(self, call: typing.Union[Message, InlineCall]):
+        await utils.answer(
+            call,
+            self.strings["ub_stop"].format(emoji=utils.get_platform_emoji()),
+        )
+
+        if "LAVHOST" in os.environ:
+            await self.client.send_message("lavhostbot", "⏹ Stop")
+        else:
+            exit()
+
     @loader.command()
     async def ubstop(self, message: Message):
         """| stops your userbot"""
 
-        if "LAVHOST" in os.environ:
-            await utils.answer(message, self.strings["ub_stop"].format(emoji=utils.get_platform_emoji()))
-            await self.client.send_message("lavhostbot", "⏹ Stop")
-        else:
-            await utils.answer(message, self.strings["ub_stop"].format(emoji=utils.get_platform_emoji()))
-            exit()
+        args = utils.get_args(message)
+        if "-f" in args or "--force" in args:
+            await self.ubstop_func(message)
+            return
+
+        await self.inline.form(
+            message=message,
+            text=self.strings["stop_ub_confirm"].format(
+                utils.get_platform_emoji()
+                if self.client.heroku_me.is_premium
+                else "Heroku"
+            ),
+            reply_markup=[
+                [
+                    {
+                        "text": "✅",
+                        "callback": self.ubstop_func,
+                        "style": "primary",
+                    },
+                ],
+                [{"text": "❌", "action": "close", "style": "primary"}],
+            ],
+            silent=True,
+        )

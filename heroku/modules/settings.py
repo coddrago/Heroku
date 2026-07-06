@@ -271,6 +271,18 @@ class CoreMod(loader.Module):
 
         alias, cmd, *rest = args
         rest = " ".join(rest) if rest else None
+        alias = alias.lower().strip()
+
+        if alias in self.allmodules.aliases:
+            await utils.answer(
+                message,
+                self.strings("alias_exists").format(
+                    alias=utils.escape_html(alias),
+                    command=utils.escape_html(self.allmodules.aliases[alias]),
+                ),
+            )
+            return
+
         if self.allmodules.add_alias(alias, cmd, rest):
             self.set(
                 "aliases",

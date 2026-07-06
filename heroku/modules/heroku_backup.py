@@ -16,7 +16,9 @@ import datetime
 import io
 import logging
 import os
-import re 
+import re
+import sys
+import tempfile
 import time
 import zipfile
 import orjson
@@ -68,6 +70,55 @@ class HerokuBackupMod(loader.Module):
             )
 
         self._content_channel_id = await utils.wait_for_content_channel(self._db)
+
+    async def _install_reqs(self, reqs: bytes):
+        options = []
+        requirements = []
+
+        for line in reqs.decode(errors="ignore").splitlines():
+            line = line.strip()
+            if not line or line.startswith("#"):
+                continue
+
+            if line.startswith("--") or line.startswith("-i "):
+                options.append(line)
+                continue
+
+            requirements.append(line)
+
+        installed = 0
+        failed = []
+
+        for requirement in requirements:
+            fd, temp_file = tempfile.mkstemp(prefix="reqs_", suffix=".txt")
+            try:
+                with os.fdopen(fd, "w", encoding="utf-8") as f:
+                    f.write("\n".join([*options, requirement, ""]))
+
+                proc = await asyncio.create_subprocess_exec(
+                    sys.executable,
+                    "-m",
+                    "pip",
+                    "install",
+                    "-r",
+                    temp_file,
+                    stdout=asyncio.subprocess.PIPE,
+                    stderr=asyncio.subprocess.PIPE,
+                )
+                await proc.communicate()
+
+                if proc.returncode:
+                    failed.append(requirement)
+                else:
+                    installed += 1
+            except Exception:
+                logger.exception("Unable to install backup requirement %s", requirement)
+                failed.append(requirement)
+            finally:
+                if os.path.exists(temp_file):
+                    os.remove(temp_file)
+
+        return installed, failed
 
     async def _set_backup_period(self, call: BotInlineCall, value: int):
         if not value:
@@ -226,6 +277,10 @@ class HerokuBackupMod(loader.Module):
                         for name in modzip.namelist():
                             if name == "db_mods.json":
                                 continue
+                            if name.startswith("pip-backup-") and name.endswith(".txt"):
+                                await self._install_reqs(modzip.read(name))
+                                continue
+
                             path = loader.LOADED_MODULES_PATH / Path(name).name
                             with modzip.open(name, "r") as module:
                                 path.write_bytes(module.read())
@@ -528,6 +583,7 @@ class HerokuBackupMod(loader.Module):
             await utils.answer(message, self.strings("reply_to_file"))
             return
 
+        status_message = await utils.answer(message, self.strings("restoring_backup"))
         file = await reply.download(in_memory=True)
         try:
             zipfile_bytes = io.BytesIO(file)
@@ -555,13 +611,17 @@ class HerokuBackupMod(loader.Module):
                         for name in modzip.namelist():
                             if name == "db_mods.json":
                                 continue
+                            if name.startswith("pip-backup-") and name.endswith(".txt"):
+                                await self._install_reqs(modzip.read(name))
+                                continue
+
                             path = loader.LOADED_MODULES_PATH / Path(name).name
                             with modzip.open(name, "r") as module:
                                 path.write_bytes(module.read())
-        except Exception as e:
+        except Exception:
             logger.exception("Restore all failed")
-            await utils.answer(message, self.strings["reply_to_file"])
+            await utils.answer(status_message, self.strings["reply_to_file"])
             return
 
-        await utils.answer(message, self.strings["all_restored"])
+        await utils.answer(status_message, self.strings["all_restored"])
         await self.invoke("restart", "-f", peer=message.peer_id)
