@@ -12,6 +12,7 @@
 
 import asyncio
 import collections
+import copy
 import inspect
 import json
 import logging
@@ -310,6 +311,15 @@ class Database(dict):
         key: str,
         default: typing.Optional[JSONSerializable] = None,
     ) -> JSONSerializable:
+        """Get database key snapshot"""
+        return copy.deepcopy(self._get_raw(owner, key, default))
+
+    def _get_raw(
+        self,
+        owner: str,
+        key: str,
+        default: typing.Optional[JSONSerializable] = None,
+    ) -> JSONSerializable:
         """Get database key"""
         try:
             return self[owner][key]
@@ -405,7 +415,7 @@ class Database(dict):
         item_type: typing.Optional[typing.Any] = None,
     ) -> typing.Union[JSONSerializable, PointerList, PointerDict]:
         """Get a pointer to database key"""
-        value = self.get(owner, key, default)
+        value = self._get_raw(owner, key, default)
         mapping = {
             list: PointerList,
             dict: PointerDict,
@@ -417,7 +427,7 @@ class Database(dict):
             None,
         )
 
-        if (current_value := self.get(owner, key, None)) and type(
+        if (current_value := self._get_raw(owner, key, None)) and type(
             current_value
         ) is not type(default):
             raise ValueError(
@@ -431,7 +441,7 @@ class Database(dict):
 
         if item_type is not None:
             if isinstance(value, list):
-                for item in self.get(owner, key, default):
+                for item in self._get_raw(owner, key, default):
                     if not isinstance(item, dict):
                         raise ValueError(
                             "Item type can only be specified for dedicated keys and"
@@ -443,7 +453,7 @@ class Database(dict):
                     item_type,
                 )
             if isinstance(value, dict):
-                for item in self.get(owner, key, default).values():
+                for item in self._get_raw(owner, key, default).values():
                     if not isinstance(item, dict):
                         raise ValueError(
                             "Item type can only be specified for dedicated keys and"
