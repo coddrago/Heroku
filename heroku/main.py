@@ -618,6 +618,7 @@ class Heroku:
         client: CustomClient,
         *,
         delay_restart: bool = False,
+        restart_process: bool = True,
     ):
         if hasattr(client, "tg_id"):
             telegram_id = client.tg_id
@@ -639,6 +640,11 @@ class Heroku:
             session,
             **init_kwargs
         )
+        cli.parser = PatchedParser(cli)
+        cli._tg_id = telegram_id
+        cli.tg_id = telegram_id
+        cli.hikka_me = client.hikka_me
+        cli.heroku_me = client.heroku_me
 
         if client.is_initialized:
             await client.stop()
@@ -651,7 +657,7 @@ class Heroku:
 
         await cli.connect()
 
-        if not delay_restart:
+        if not delay_restart and restart_process:
             logging.info("restart")
             restart()
 
@@ -690,6 +696,9 @@ class Heroku:
         if delay_restart:
             await cli.disconnect()
             await asyncio.sleep(3600)  # Will be restarted from web anyway
+            return None
+
+        return cli
 
     async def _web_banner(self):
         """Shows web banner"""
@@ -723,23 +732,8 @@ class Heroku:
         client.hikka_me = me
         client.heroku_me = me
 
-        db = database.Database(client)
-        await db.init()
-
-        while (bot := input("You can enter a custom bot username or leave it empty and Heroku will generate a random one: ")):
-            try:
-                if await self._check_bot(client, bot):
-                    db.set("heroku.inline", "custom_bot", bot)
-                    print("Bot username saved!")
-                    break
-                else:
-                    print("Bot username is occupied. Try again or leave it empty")
-                    continue
-            except Exception:
-                print("Something went wrong")
-
-        await self.save_client_session(client)
-        self.clients += [client]
+        cli = await self.save_client_session(client, restart_process=False)
+        self.clients += [cli]
         return True
 
     async def _check_bot(
@@ -890,7 +884,7 @@ class Heroku:
 
             print_banner("success.txt")
             print("\033[0;92mLogged in successfully!\033[0m")
-            cli = await self.save_client_session(client)
+            cli = await self.save_client_session(client, restart_process=False)
             self.clients += [cli]
             return True
 
@@ -1147,7 +1141,7 @@ class Heroku:
             not self.clients and not self.sessions or not await self._init_clients()
         ) and not (inital_web := await self._initial_setup()):
             return
-        if inital_web:
+        if inital_web and self.web:
             async def scheduled_web_stop():
                 await asyncio.sleep(delay=120)
                 await self.web.stop()
