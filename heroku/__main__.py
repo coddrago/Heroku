@@ -18,6 +18,10 @@ import os
 import subprocess
 import sys
 
+if sys.stdout.encoding and sys.stdout.encoding.lower() != "utf-8":
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+    sys.stderr.reconfigure(encoding="utf-8", errors="replace")
+
 from ._internal import restart
 
 if "--no-git" in sys.argv:
