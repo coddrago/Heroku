@@ -24,6 +24,10 @@ import pyrogram
 from pyrogram.errors import MessageEmpty, MessageNotModified, MessageTooLong
 
 from .. import loader, utils
+from ..inline.types import InlineMessage
+
+BANNER_OK = "https://x0.at/grz4.jpg"
+BANNER_BAD = "https://x0.at/4AAH.jpg"
 
 logger = logging.getLogger(__name__)
 
@@ -293,6 +297,70 @@ class RawMessageEditor(SudoMessageEditor):
                 logger.error(text)
 
 
+class InlineMessageEditor:
+    """Streams command output into an inline form via form.edit()"""
+
+    def __init__(self, form, command: str, strings, config, reply_markup=None):
+        self.form = form
+        self.command = command
+        self.stdout = ""
+        self.stderr = ""
+        self.rc = None
+        self.strings = strings
+        self.config = config
+        self.reply_markup = reply_markup
+        self.start_time = time.time()
+        self.process = None
+
+    def reset(self, command: str):
+        self.command = command
+        self.stdout = ""
+        self.stderr = ""
+        self.rc = None
+        self.start_time = time.time()
+        self.process = None
+
+    def update_process(self, process):
+        self.process = process
+
+    async def update_stdout(self, stdout):
+        self.stdout = stdout
+        await self.redraw()
+
+    async def update_stderr(self, stderr):
+        self.stderr = stderr
+        await self.redraw()
+
+    async def redraw(self):
+        text = self.strings("running").format(utils.escape_html(self.command))
+
+        if self.rc is not None:
+            text += self.strings("finished").format(utils.escape_html(str(self.rc)))
+
+        text += self.strings("stdout")
+        text += utils.escape_html(self.stdout[max(len(self.stdout) - 2048, 0) :])
+        stderr = utils.escape_html(self.stderr[max(len(self.stderr) - 1024, 0) :])
+        text += (self.strings("stderr") + stderr) if stderr else ""
+        text += self.strings("end")
+
+        if self.rc is not None:
+            exec_time = time.time() - self.start_time
+            text += self.strings("time_exec").format(round(exec_time, 2))
+
+        reply_markup = (
+            self.reply_markup(self)
+            if callable(self.reply_markup)
+            else self.reply_markup
+        )
+
+        with contextlib.suppress(Exception):
+            await self.form.edit(text, reply_markup=reply_markup)
+
+    async def cmd_ended(self, rc):
+        self.rc = rc
+        await self.redraw()
+
+
 @loader.tds
 class TerminalMod(loader.Module):
     """Runs commands"""
@@ -341,6 +409,222 @@ class TerminalMod(loader.Module):
             ),
         )
         self.activecmds = {}
+        self._inline_pending: dict[str, str] = {}
+        self._inline_sessions: dict[str, InlineMessageEditor] = {}
+
+    def _build_inline_exec_markup(self, uid: typing.Optional[str] = None) -> list:
+        if not uid:
+            return []
+
+        return [
+            [
+                {
+                    "text": self.strings("btn_execute"),
+                    "data": f"terminal/exec/{uid}",
+                }
+            ]
+        ]
+
+    def _build_inline_continue_markup(
+        self,
+        editor: InlineMessageEditor,
+        session_uid: str,
+    ) -> list:
+        if editor.rc is None:
+            return []
+
+        return [
+            [
+                {
+                    "text": self.strings("btn_continue"),
+                    "input": self.strings("btn_continue"),
+                    "handler": self.inline__continue_input,
+                    "args": (session_uid,),
+                }
+            ]
+        ]
+
+    def _register_inline_session(self, session_uid: str, inline_message_id: str):
+        self.inline._units[session_uid] = {
+            "type": "form",
+            "text": self.strings("exec_running"),
+            "buttons": [],
+            "caller": None,
+            "chat": None,
+            "message_id": None,
+            "top_msg_id": None,
+            "uid": session_uid,
+            "inline_message_id": inline_message_id,
+        }
+
+    @staticmethod
+    def _short_cmd(cmd: str) -> str:
+        return cmd[:15] + "..." if len(cmd) > 15 else cmd
+
+    @loader.inline_handler()
+    async def exec_inline_handler(self, query):
+        """Execute terminal command via inline"""
+        raw = (query.args or "").strip()
+
+        if not raw:
+            return {
+                "title": self.strings("inline_hint"),
+                "description": self.strings("inline_hint_desc"),
+                "message": self.strings("inline_hint"),
+                "thumb": BANNER_OK,
+            }
+
+        if self._is_dangerous(raw):
+            return {
+                "title": self.strings("inline_hint"),
+                "description": self._short_cmd(raw),
+                "message": self.strings("dangerous_command").format(
+                    utils.escape_html(raw)
+                ),
+                "thumb": BANNER_BAD,
+            }
+
+        uid = utils.rand(8)
+        self._inline_pending[uid] = raw
+
+        return {
+            "title": self.strings("inline_hint"),
+            "description": self._short_cmd(raw),
+            "message": self.strings("exec_confirm").format(utils.escape_html(raw)),
+            "thumb": BANNER_OK,
+            "reply_markup": self._build_inline_exec_markup(uid),
+        }
+
+    @loader.callback_handler()
+    async def exec_callback(self, call):
+        if not call.data.startswith("terminal/exec/"):
+            return
+
+        uid = call.data.split("/")[2]
+        cmd = self._inline_pending.pop(uid, None)
+
+        if not cmd:
+            await call.answer("Command not found or already executed", show_alert=True)
+            return
+
+        if self._is_dangerous(cmd):
+            await call.answer(
+                self.strings("dangerous_command").format(cmd),
+                show_alert=True,
+            )
+            return
+
+        self._register_inline_session(uid, call.inline_message_id)
+
+        form = InlineMessage(
+            inline_manager=self.inline,
+            unit_id=uid,
+            inline_message_id=call.inline_message_id,
+        )
+
+        await form.edit(self.strings("exec_running"))
+
+        editor = InlineMessageEditor(
+            form=form,
+            command=cmd,
+            strings=self.strings,
+            config=self.config,
+            reply_markup=lambda current_editor: self._build_inline_continue_markup(
+                current_editor,
+                uid,
+            ),
+        )
+        self._inline_sessions[uid] = editor
+
+        asyncio.ensure_future(self._run_inline(cmd, editor))
+
+    async def inline__continue_input(self, call, query: str, session_uid: str):
+        editor = self._inline_sessions.get(session_uid)
+
+        if not editor:
+            return
+
+        query = query.strip()
+        if not query:
+            return
+
+        cmd = f"{editor.command} {query}".strip()
+
+        if self._is_dangerous(cmd):
+            await editor.form.edit(
+                self.strings("dangerous_command").format(utils.escape_html(cmd)),
+                reply_markup=self._build_inline_continue_markup(editor, session_uid),
+            )
+            return
+
+        editor.reset(cmd)
+        await editor.form.edit(self.strings("exec_running"))
+        asyncio.ensure_future(self._run_inline(cmd, editor))
+
+    async def _run_inline(self, cmd: str, editor: InlineMessageEditor):
+        shell = os.environ.get("SHELL", "/bin/sh")
+
+        try:
+            sproc = await asyncio.create_subprocess_exec(
+                shell,
+                "-c",
+                cmd,
+                stdin=asyncio.subprocess.PIPE,
+                stdout=asyncio.subprocess.PIPE,
+                stderr=asyncio.subprocess.PIPE,
+                cwd=utils.get_base_dir(),
+                preexec_fn=os.setsid,
+            )
+        except Exception as e:
+            with contextlib.suppress(Exception):
+                await editor.form.edit(
+                    self.strings("exec_error").format(utils.escape_html(str(e)))
+                )
+            return
+
+        editor.update_process(sproc)
+        await editor.redraw()
+
+        await asyncio.gather(
+            read_stream(
+                editor.update_stdout,
+                sproc.stdout,
+                self.config["FLOOD_WAIT_PROTECT"],
+            ),
+            read_stream(
+                editor.update_stderr,
+                sproc.stderr,
+                self.config["FLOOD_WAIT_PROTECT"],
+            ),
+        )
+
+        await editor.cmd_ended(await sproc.wait())
+
+    def _find_inline_editor_by_message(self, message) -> typing.Optional[InlineMessageEditor]:
+        text = getattr(message, "text", "") or ""
+        running_editors = [
+            editor
+            for editor in self._inline_sessions.values()
+            if editor.process and editor.rc is None
+        ]
+
+        if not running_editors:
+            return None
+
+        matched_editors = [
+            editor
+            for editor in running_editors
+            if editor.command and editor.command in text
+        ]
+
+        if len(matched_editors) == 1:
+            return matched_editors[0]
+
+        via_bot_id = getattr(getattr(message, "via_bot", None), "id", None)
+        if len(running_editors) == 1 and via_bot_id in {self.inline.bot_id, None}:
+            return running_editors[0]
+
+        return None
 
     @loader.command()
     async def terminalcmd(self, message):
@@ -426,17 +710,26 @@ class TerminalMod(loader.Module):
             await utils.answer(message, self.strings("what_to_kill"))
             return
 
-        if hash_msg(message.reply_to_message) in self.activecmds:
-            try:
-                kill_pids = self.activecmds[hash_msg(message.reply_to_message)] 
-                if "-f" not in utils.get_args_raw(message):
-                     os.killpg(kill_pids.pid, signal.SIGTERM)
-                else:
-                    os.killpg(kill_pids.pid, signal.SIGKILL)
-            except Exception:
-                logger.exception("Killing process failed")
-                await utils.answer(message, self.strings("kill_fail"))
-            else:
-                await utils.answer(message, self.strings("killed"))
-        else:
+        reply = message.reply_to_message
+        process = self.activecmds.get(hash_msg(reply)) if reply else None
+
+        if process is None:
+            editor = self._find_inline_editor_by_message(reply) if reply else None
+            process = editor.process if editor else None
+
+        if process is None:
             await utils.answer(message, self.strings("no_cmd"))
+            return
+
+        try:
+            signal_type = (
+                signal.SIGKILL
+                if "-f" in utils.get_args_raw(message)
+                else signal.SIGTERM
+            )
+            os.killpg(process.pid, signal_type)
+        except Exception:
+            logger.exception("Killing process failed")
+            await utils.answer(message, self.strings("kill_fail"))
+        else:
+            await utils.answer(message, self.strings("killed"))
