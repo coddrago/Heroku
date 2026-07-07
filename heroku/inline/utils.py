@@ -26,6 +26,7 @@ from urllib.parse import urlparse, unquote
 from pyrogram.types import (
     InlineKeyboardButton,
     InlineKeyboardMarkup,
+    LinkPreviewOptions,
     WebAppInfo,
     InputMediaAnimation,
     InputMediaAudio,
@@ -236,7 +237,7 @@ class Utils(InlineUnit):
     generate_markup = _generate_markup
 
     async def _close_unit_handler(self: "InlineManager", call: InlineCall):
-        return await self._client.delete_messages(call._units.get(call.unit_id).get('chat').id, call._units.get(call.unit_id).get('message_id'))
+        return await self._client.delete_messages(call._units.get(call.unit_id).get('chat'), call._units.get(call.unit_id).get('message_id'))
 
     async def _unload_unit_handler(self: "InlineManager", call: InlineCall):
         await call.unload()
@@ -488,7 +489,7 @@ class Utils(InlineUnit):
                     await self.bot.edit_inline_text(
                         inline_message_id,
                         text,
-                        disable_web_page_preview=disable_web_page_preview,
+                        link_preview_options=LinkPreviewOptions(is_disabled=disable_web_page_preview),
                         reply_markup=self.generate_markup(
                             reply_markup
                             if isinstance(reply_markup, list)
@@ -500,7 +501,7 @@ class Utils(InlineUnit):
                         chat_id,
                         message_id,
                         text,
-                        disable_web_page_preview=disable_web_page_preview,
+                        link_preview_options=LinkPreviewOptions(is_disabled=disable_web_page_preview),
                         reply_markup=self.generate_markup(
                             reply_markup
                             if isinstance(reply_markup, list)
@@ -588,7 +589,7 @@ class Utils(InlineUnit):
             unit_id = call.unit_id
 
         try:
-            await self._client.delete_messages(call._units.get(unit_id).get('chat').id, call._units.get(unit_id).get('message_id'))
+            await self._client.delete_messages(call._units.get(unit_id).get('chat'), call._units.get(unit_id).get('message_id'))
         except Exception:
             return False
 
