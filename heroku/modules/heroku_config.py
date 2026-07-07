@@ -903,58 +903,179 @@ class HerokuConfigMod(loader.Module):
             ],
         )
 
+    def _get_category_doc(self, instance, category: str) -> str:
+        cat_obj = getattr(instance.config, "_categories", {}).get(category)
+        return cat_obj.getdoc() if cat_obj else ""
+
+    def _fmt_config_value(self, mod: str, param: str) -> str:
+        value = self._get_value(mod, param)
+        return (
+            value
+            if len(value) < 200
+            else list(utils.smart_split(*html.parse(value), 200))[0] + "..."
+        )
+
     async def inline__configure(
         self,
         call: InlineCall,
         mod: str,
         obj_type: typing.Union[bool, str] = False,
         folder: typing.Optional[str] = None,
+        category: typing.Optional[str] = None,
     ):
-        direct = []
-        for param in self.lookup(mod).config:
-            config_value = self.lookup(mod).config._config.get(param)
-            if folder is None:
-                if not config_value or not hasattr(config_value, 'folder') or not config_value.folder:
-                    direct.append(param)
+        module = self.lookup(mod)
+        grouped = module.config.grouped_options()
+
+        if folder is not None:
+            direct = list(self.lookup(mod).config)
+            btns = [
+                {
+                    "text": param,
+                    "callback": self.inline__configure_option,
+                    "kwargs": {"obj_type": obj_type, "mod": mod, "config_opt": param},
+                }
+                for param in direct
+            ]
+
+            await call.edit(
+                self.strings(
+                    "configuring_mod" if isinstance(obj_type, bool) else "configuring_lib"
+                ).format(
+                    utils.escape_html(mod),
+                    "\n".join(
+                        [
+                            "▫️ <code>{}</code>: <b>{}</b>".format(
+                                utils.escape_html(param),
+                                self._fmt_config_value(mod, param),
+                            )
+                            for param in direct
+                        ]
+                    ) if direct else "No options",
+                ),
+                reply_markup=list(utils.chunks(btns, 2))
+                + [
+                    [
+                        {
+                            "text": self.strings("back_btn"),
+                            "callback": self.inline__global_config,
+                            "style": "primary",
+                            "kwargs": {"obj_type": obj_type},
+                        },
+                        {
+                            "text": self.strings("close_btn"),
+                            "action": "close",
+                            "style": "danger",
+                        },
+                    ]
+                ],
+            )
+            return
+
+        if category is not None:
+            params = list(grouped.get(category, []))
+            option_lines = [
+                "▫️ <code>{}</code>: <b>{}</b>".format(
+                    utils.escape_html(p), self._fmt_config_value(mod, p)
+                )
+                for p in params
+            ]
+            options_text = "\n".join(option_lines) if option_lines else "No options"
+            cat_doc = self._get_category_doc(module, category)
+
+            btns = [
+                {
+                    "text": param,
+                    "callback": self.inline__configure_option,
+                    "kwargs": {"obj_type": obj_type, "mod": mod, "config_opt": param},
+                }
+                for param in params
+            ]
+
+            await call.edit(
+                self.strings(
+                    "configuring_category" if isinstance(obj_type, bool) else "configuring_category_lib"
+                ).format(
+                    utils.escape_html(mod),
+                    utils.escape_html(category),
+                    utils.escape_html(cat_doc),
+                    options_text,
+                ),
+                reply_markup=list(utils.chunks(btns, 2))
+                + [
+                    [
+                        {
+                            "text": self.strings("back_btn"),
+                            "callback": self.inline__configure,
+                            "args": (mod,),
+                            "style": "primary",
+                            "kwargs": {"obj_type": obj_type},
+                        },
+                        {
+                            "text": self.strings("close_btn"),
+                            "action": "close",
+                            "style": "danger",
+                        },
+                    ]
+                ],
+            )
+            return
+
+        sections = []
+        btns = []
+        for section_name, section_params in grouped.items():
+            if section_name is None:
+                visible = [
+                    p
+                    for p in section_params
+                    if not getattr(module.config._config.get(p), "folder", None)
+                ]
+                if not visible:
+                    continue
+
+                sections.append(
+                    "\n".join(
+                        "▫️ <code>{}</code>: <b>{}</b>".format(
+                            utils.escape_html(p), self._fmt_config_value(mod, p)
+                        )
+                        for p in visible
+                    )
+                )
+                btns += [
+                    {
+                        "text": param,
+                        "callback": self.inline__configure_option,
+                        "kwargs": {"obj_type": obj_type, "mod": mod, "config_opt": param},
+                    }
+                    for param in visible
+                ]
             else:
-                direct.append(param)
-        
-        btns = [
-            {
-                "text": param,
-                "callback": self.inline__configure_option,
-                "kwargs": {"obj_type": obj_type, "mod": mod, "config_opt": param},
-            }
-            for param in direct
-        ]
+                cat_lines = [
+                    "∟ ▫️ <code>{}</code>: <b>{}</b>".format(
+                        utils.escape_html(p), self._fmt_config_value(mod, p)
+                    )
+                    for p in section_params
+                ]
+                cat_text = [
+                    self.strings("category_header").format(utils.escape_html(section_name)),
+                    "<blockquote expandable>" + "\n".join(cat_lines),
+                    "</blockquote>",
+                ]
+                sections.append("\n".join(cat_text))
+                btns.append(
+                    {
+                        "text": f"📂 {section_name}",
+                        "callback": self.inline__configure,
+                        "args": (mod,),
+                        "kwargs": {"obj_type": obj_type, "category": section_name},
+                    }
+                )
+
+        text = "\n".join(sections).lstrip("\n") if sections else "No options"
 
         await call.edit(
             self.strings(
                 "configuring_mod" if isinstance(obj_type, bool) else "configuring_lib"
-            ).format(
-                utils.escape_html(mod),
-                "\n".join(
-                    [
-                        "▫️ <code>{}</code>: <b>{}</b>".format(
-                            utils.escape_html(param),
-                            (
-                                self._get_value(mod, param)
-                                if len(self._get_value(mod, param)) < 200
-                                else (
-                                    list(
-                                        utils.smart_split(
-                                            *html.parse(self._get_value(mod, param)),
-                                            200
-                                            )
-                                        )[0] +
-                                    "..."
-                                    )
-                            ),
-                        )
-                        for param in direct
-                    ]
-                ) if direct else "No options",
-            ),
+            ).format(utils.escape_html(mod), text),
             reply_markup=list(utils.chunks(btns, 2))
             + [
                 [
@@ -965,9 +1086,9 @@ class HerokuConfigMod(loader.Module):
                         "kwargs": {"obj_type": obj_type},
                     },
                     {
-                        "text": self.strings("close_btn"), 
-                        "action": "close", 
-                        "style": "danger"
+                        "text": self.strings("close_btn"),
+                        "action": "close",
+                        "style": "danger",
                     },
                 ]
             ],

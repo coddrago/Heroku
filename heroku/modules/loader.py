@@ -255,6 +255,74 @@ class LoaderMod(loader.Module):
                 ],
             )
 
+    def _repo_to_label(self, repo: str) -> str:
+        parsed = urlparse(repo)
+        parts = [p for p in parsed.path.strip("/").split("/") if p]
+        if len(parts) >= 2:
+            return f"{parts[0]}/{parts[1]}"
+        return repo
+
+    @loader.command()
+    async def dlmall(self, message: Message):
+        repos = [self.config["MODULES_REPO"]] + self.config["ADDITIONAL_REPOS"]
+        repos = [r for r in repos if r.startswith("http")]
+        buttons = [
+            [
+                {
+                    "text": self._repo_to_label(repo),
+                    "callback": self._inline__install_all_from_repo,
+                    "args": (repo,),
+                }
+            ]
+            for repo in repos
+        ]
+        await self.inline.form(
+            self.strings("choose_repo"),
+            message,
+            reply_markup=buttons,
+        )
+
+    async def _inline__install_all_from_repo(
+        self,
+        call: InlineCall,
+        repo: str,
+    ):
+        await call.edit(self.strings("installing_all_from_repo"))
+
+        links = await self._get_repo(repo)
+
+        if not links:
+            await call.edit(self.strings("dlm_all_from_repo_error_nomods"))
+            return
+
+        not_installed = []
+
+        for link in links:
+            full_url = f"{repo.strip('/')}/{link}.py"
+            result = await self.download_and_install(full_url)
+            if result != MODULE_LOADING_SUCCESS:
+                not_installed.append(link.split("/")[-1])
+            elif result == MODULE_LOADING_FORBIDDEN:
+                break
+
+        installed_count = len(links) - len(not_installed)
+
+        if installed_count == 0:
+            await call.edit(self.strings("dlm_all_from_repo_error_nomods"))
+        elif not_installed:
+            failed_list = "\n".join(not_installed)
+            await call.edit(
+                self.strings("dlm_all_from_repo_error_somemods")
+                + "<blockquote expandable>"
+                + failed_list
+                + "</blockquote>"
+            )
+        else:
+            await call.edit(self.strings("installed_all_from_repo"))
+
+        if self.fully_loaded:
+            self.update_modules_in_db()
+
     async def _get_modules_to_load(self):
         todo = self.get("loaded_modules", {})
         logger.debug("Loading modules: %s", todo)

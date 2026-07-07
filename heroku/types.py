@@ -14,6 +14,7 @@
 import ast
 import asyncio
 import base64
+import collections
 import contextlib
 import copy
 import importlib
@@ -1156,10 +1157,21 @@ class StopLoop(Exception):
 class ModuleConfig(dict):
     """Stores config for modules and apparently libraries"""
 
-    def __init__(self, *entries: typing.Union[str, "ConfigValue"]):
-        if all(isinstance(entry, ConfigValue) for entry in entries):
+    def __init__(self, *entries: typing.Union[str, "ConfigValue", "ConfigCategory"]):
+        self._option_categories: dict[str, str] = dict()
+        self._categories: dict[str, "ConfigCategory"] = dict()
+
+        if all(isinstance(entry, (ConfigValue, ConfigCategory)) for entry in entries):
             # New config format processing
-            self._config = {config.option: config for config in entries}
+            self._config = {}
+            for entry in entries:
+                if isinstance(entry, ConfigCategory):
+                    self._categories[entry.name] = entry
+                    for cv in entry:
+                        self._config[cv.option] = cv
+                        self._option_categories[cv.option] = entry.name
+                else:
+                    self._config[entry.option] = entry
         else:
             # Legacy config processing
             keys = []
@@ -1201,6 +1213,19 @@ class ModuleConfig(dict):
     def getdef(self, key: str) -> str:
         """Get the default value by key"""
         return self._config[key].default
+
+    def get_category(self, key: str) -> typing.Optional["ConfigCategory"]:
+        cat_name = self._option_categories.get(key)
+        return self._categories.get(cat_name) if cat_name else None
+
+    def grouped_options(
+        self,
+    ) -> "collections.OrderedDict[str | None, list[str]]":
+        result = collections.OrderedDict()
+        for option in self._config:
+            cat = self._option_categories.get(option)
+            result.setdefault(cat, []).append(option)
+        return result
 
     def __setitem__(self, key: str, value: typing.Any):
         self._config[key].value = value
@@ -1342,6 +1367,30 @@ class ConfigValue:
                 asyncio.ensure_future(wrap(self.on_change))
             else:
                 syncwrap(self.on_change)
+
+
+class ConfigCategory(list):
+    def __init__(
+        self,
+        name: str,
+        *config_values: ConfigValue,
+        doc: typing.Union[typing.Callable[[], str], str, "ConfigValue"] = "No description",
+    ):
+        super().__init__(config_values)
+        self.name = str(name)
+        self.doc = doc
+
+    def getdoc(self) -> str:
+        if callable(self.doc):
+            try:
+                return self.doc()
+            except Exception:
+                return "No description"
+        return self.doc
+
+    @property
+    def _config_values(self) -> tuple:
+        return tuple(self)
 
 
 def _get_members(

@@ -38,12 +38,13 @@ from . import main, security, utils, validators
 from .database import Database
 from .inline.core import InlineManager
 from .translations import Strings, Translator
-from .types import (Command, ConfigValue, CoreOverwriteError, CoreUnloadError,
-                    InlineMessage, JSONSerializable, Library, LibraryConfig,
-                    LoadError, Module, ModuleConfig, SafeAllModulesProxy,
-                    SafeClientProxy, SafeDatabaseProxy, SafeInlineProxy,
-                    SelfSuspend, SelfUnload, StopLoop, StringLoader,
-                    get_callback_handlers, get_commands, get_inline_handlers)
+from .types import (Command, ConfigCategory, ConfigValue, CoreOverwriteError,
+                    CoreUnloadError, InlineMessage, JSONSerializable, Library,
+                    LibraryConfig, LoadError, Module, ModuleConfig,
+                    SafeAllModulesProxy, SafeClientProxy, SafeDatabaseProxy,
+                    SafeInlineProxy, SelfSuspend, SelfUnload, StopLoop,
+                    StringLoader, get_callback_handlers, get_commands,
+                    get_inline_handlers)
 
 if typing.TYPE_CHECKING:
     from .tl_cache import CustomClient
@@ -74,6 +75,7 @@ __all__ = [
     "Strings",
     "Translator",
     "ConfigValue",
+    "ConfigCategory",
     "ModuleConfig",
     "owner",
     "group_owner",
