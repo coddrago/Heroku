@@ -22,12 +22,12 @@ from asyncio import Event
 from urllib.parse import urlparse
 
 import grapheme
-from aiogram.types import (
+from pyrogram.types import (
     InlineQuery,
     InlineQueryResultArticle,
     InlineQueryResultAudio,
+    InlineQueryResultAnimation,
     InlineQueryResultDocument,
-    InlineQueryResultGif,
     InlineQueryResultLocation,
     InlineQueryResultPhoto,
     InlineQueryResultVideo,
@@ -464,7 +464,7 @@ class Form(InlineUnit):
                             caption=form.get("text"),
                             parse_mode="HTML",
                             photo_url=form["photo"],
-                            thumbnail_url=(
+                            thumb_url=(
                                 "https://img.icons8.com/cotton/452/moon-satellite.png"
                             ),
                             reply_markup=self.generate_markup(
@@ -477,13 +477,13 @@ class Form(InlineUnit):
                 case _ if "gif" in form:
                     await inline_query.answer(
                     [
-                        InlineQueryResultGif(
+                        InlineQueryResultAnimation(
                             id=utils.rand(20),
                             title="Heroku",
                             caption=form.get("text"),
                             parse_mode="HTML",
-                            gif_url=form["gif"],
-                            thumbnail_url=(
+                            animation_url=form["gif"],
+                            thumb_url=(
                                 "https://img.icons8.com/cotton/452/moon-satellite.png"
                             ),
                             reply_markup=self.generate_markup(
@@ -503,7 +503,7 @@ class Form(InlineUnit):
                             caption=form.get("text"),
                             parse_mode="HTML",
                             video_url=form["video"],
-                            thumbnail_url=(
+                            thumb_url=(
                                 "https://img.icons8.com/cotton/452/moon-satellite.png"
                             ),
                             mime_type="video/mp4",
@@ -556,8 +556,8 @@ class Form(InlineUnit):
                             caption=form.get("text"),
                             parse_mode="HTML",
                             title=form["audio"].get("title", "Heroku"),
-                            performer=form["audio"].get("performer"),
-                            audio_duration=form["audio"].get("duration"),
+                            performer=form["audio"].get("performer", ""),
+                            audio_duration=form["audio"].get("duration", 0),
                             reply_markup=self.generate_markup(
                                 form["uid"],
                             ),

@@ -19,15 +19,14 @@ import time
 import traceback
 import typing
 
-from aiogram.types import (
+from pyrogram.types import (
     CallbackQuery,
     InlineKeyboardMarkup,
     InlineQuery,
     InlineQueryResultArticle,
     InputTextMessageContent,
 )
-from aiogram.exceptions import TelegramRetryAfter
-from pyrogram.errors import ChatSendInlineForbidden
+from pyrogram.errors import ChatSendInlineForbidden, FloodWait
 # from pyrogram.extensions.html import CUSTOM_EMOJIS
 from pyrogram.types import Message, ReplyParameters
 
@@ -270,9 +269,9 @@ class List(InlineUnit):
         self._units[unit_id]["current_index"] = page
 
         try:
-            await self.bot.edit_message_text(
-                inline_message_id=call.inline_message_id,
-                text=self.sanitise_text(
+            await self.bot.edit_inline_text(
+                call.inline_message_id,
+                self.sanitise_text(
                     self._units[unit_id]["strings"][
                         self._units[unit_id]["current_index"]
                     ]
@@ -280,9 +279,9 @@ class List(InlineUnit):
                 reply_markup=self._list_markup(unit_id),
             )
             await call.answer()
-        except TelegramRetryAfter as e:
+        except FloodWait as e:
             await call.answer(
-                f"Got FloodWait. Wait for {e.retry_after} seconds",
+                f"Got FloodWait. Wait for {e.value} seconds",
                 show_alert=True,
             )
         except Exception:
@@ -291,7 +290,7 @@ class List(InlineUnit):
             return
 
     def _list_markup(self: "InlineManager", unit_id: str) -> InlineKeyboardMarkup:
-        """Generates aiogram markup for `list`"""
+        """Generates markup for `list`"""
         callback = functools.partial(self._list_page, unit_id=unit_id)
         return self.generate_markup(
             self._units[unit_id].get("custom_buttons", [])

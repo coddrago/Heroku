@@ -15,7 +15,7 @@ import logging
 import time
 import typing
 
-from aiogram.types import InlineQuery, InlineQueryResultArticle, InputTextMessageContent
+from pyrogram.types import InlineQuery, InlineQueryResultArticle, InputTextMessageContent
 
 from .. import utils
 from .types import InlineUnit
@@ -150,11 +150,11 @@ class QueryGallery(InlineUnit):
                         parse_mode="HTML",
                         disable_web_page_preview=True,
                     ),
-                    thumbnail_url=photo_url,
+                    thumb_url=photo_url,
                     thumb_width=128,
                     thumb_height=128,
                 )
             ]
 
-        await self.bot(query.answer(result, cache_time=0))
+        await query.answer(result, cache_time=0)
         return True

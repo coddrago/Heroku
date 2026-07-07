@@ -13,11 +13,7 @@
 import logging
 import typing
 
-from aiogram.types import CallbackQuery
-from aiogram.types import InlineQuery as AiogramInlineQuery
-from aiogram.types import InlineQueryResultArticle, InputTextMessageContent
-from aiogram.types import Message as AiogramMessage
-from pydantic import ConfigDict
+from pyrogram.types import InlineQueryResultArticle, InputTextMessageContent
 
 HerokuReplyMarkup = typing.Union[typing.List[typing.List[dict]], typing.List[dict], dict]
 
@@ -28,7 +24,7 @@ if typing.TYPE_CHECKING:
 
 
 class InlineMessage:
-    """Aiogram message, sent via inline bot"""
+    """Message, sent via inline bot"""
 
     def __init__(
         self,
@@ -75,7 +71,7 @@ class InlineMessage:
 
 
 class BotInlineMessage:
-    """Aiogram message, sent through inline bot itself"""
+    """Message, sent through inline bot itself"""
 
     def __init__(
         self,
@@ -93,7 +89,7 @@ class BotInlineMessage:
             {"id": unit_id, **self._units[unit_id]} if unit_id in self._units else {}
         )
 
-    async def edit(self, *args, **kwargs) -> "BotMessage":
+    async def edit(self, *args, **kwargs) -> "BotInlineMessage":
         if "unit_id" in kwargs:
             kwargs.pop("unit_id")
 
@@ -130,24 +126,28 @@ class BotInlineMessage:
         )
 
 
-class InlineCall(CallbackQuery, InlineMessage):
-    """Modified version of classic aiogram `CallbackQuery`"""
-    model_config = ConfigDict(frozen=False)
+class _RawProxyMixin:
+    """
+    Delegates unknown attribute access to the wrapped raw pyrogram object.
+    Unlike aiogram's pydantic models, pyrogram objects are plain, already
+    `client`-bound instances, so their bound methods (`.answer()`,
+    `.edit_message_text()`, ...) work as-is without any rebinding trick.
+    """
+
+    def __getattr__(self, name):
+        return getattr(self._raw, name)
+
+
+class InlineCall(_RawProxyMixin, InlineMessage):
+    """Callback query that came from a message sent via inline mode"""
 
     def __init__(
         self,
-        call: CallbackQuery,
+        call,
         inline_manager: "InlineManager",  # type: ignore  # noqa: F821
         unit_id: str,
     ):
-        dump = call.model_dump()
-        if "result_id" in dump:  # tryung to avoid ValidationError
-            dump["id"] = dump.pop("result_id")
-        dump["chat_instance"] = ""
-        CallbackQuery.__init__(self, **dump)
-
-        self.as_(inline_manager.bot)
-
+        self._raw = call
         self.original_call = call
 
         InlineMessage.__init__(
@@ -158,18 +158,16 @@ class InlineCall(CallbackQuery, InlineMessage):
         )
 
 
-class BotInlineCall(CallbackQuery, BotInlineMessage):
-    """Modified version of classic aiogram `CallbackQuery`"""
-    model_config = ConfigDict(frozen=False)
+class BotInlineCall(_RawProxyMixin, BotInlineMessage):
+    """Callback query that came from a message the bot sent directly"""
 
     def __init__(
         self,
-        call: CallbackQuery,
+        call,
         inline_manager: "InlineManager",  # type: ignore  # noqa: F821
         unit_id: str,
     ):
-        CallbackQuery.__init__(self, **call.model_dump())
-
+        self._raw = call
         self.original_call = call
 
         BotInlineMessage.__init__(
@@ -177,7 +175,7 @@ class BotInlineCall(CallbackQuery, BotInlineMessage):
             inline_manager,
             unit_id,
             call.message.chat.id,
-            call.message.message_id,
+            call.message.id,
         )
 
 
@@ -188,26 +186,15 @@ class InlineUnit:
         """Made just for type specification"""
 
 
-class BotMessage(AiogramMessage):
-    """Modified version of original Aiogram Message"""
+class InlineQuery(_RawProxyMixin):
+    """Wraps a pyrogram `InlineQuery`, adding Heroku's canned error responders"""
 
-    def __init__(self):
-        super().__init__()
-
-
-class InlineQuery(AiogramInlineQuery):
-    """Modified version of original Aiogram InlineQuery"""
-
-    model_config = ConfigDict(frozen=False)
-
-    def __init__(self, inline_query: AiogramInlineQuery):
-        super().__init__(**inline_query.model_dump())
-
+    def __init__(self, inline_query):
+        self._raw = inline_query
         self.inline_query = inline_query
+        query = inline_query.query or ""
         self.args = (
-            self.inline_query.query.split(maxsplit=1)[1]
-            if len(self.inline_query.query.split()) > 1
-            else ""
+            query.split(maxsplit=1)[1] if len(query.split()) > 1 else ""
         )
 
     @staticmethod
@@ -222,7 +209,7 @@ class InlineQuery(AiogramInlineQuery):
                     message_text="😶‍🌫️ <i>There is nothing here...</i>",
                     parse_mode="HTML",
                 ),
-                thumbnail_url=thumbnail_url,
+                thumb_url=thumbnail_url,
                 thumb_width=128,
                 thumb_height=128,
             )

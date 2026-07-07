@@ -23,26 +23,20 @@ import typing
 from copy import deepcopy
 from urllib.parse import urlparse, unquote
 
-from aiogram.types import (
+from pyrogram.types import (
     InlineKeyboardButton,
     InlineKeyboardMarkup,
-    InputFile,
     WebAppInfo,
-    CopyTextButton,
     InputMediaAnimation,
     InputMediaAudio,
     InputMediaDocument,
     InputMediaPhoto,
     InputMediaVideo,
 )
- 
-from aiogram.enums import ButtonStyle
 
-from aiogram.exceptions import (
-    TelegramBadRequest,
-    TelegramAPIError,
-    TelegramRetryAfter,
-)
+from pyrogram.enums import ButtonStyle
+
+from pyrogram.errors import RPCError, FloodWait
 from pyrogram.enums import ClientPlatform
 
 from .. import utils
@@ -70,15 +64,19 @@ BOT_ID_PATTERN = (
 )
 BOT_BASE_PATTERN = re.compile(BOT_ID_PATTERN.format(r"\w*_[0-9a-zA-Z]{6}_bot"))
 
-VALID_BUTTON_STYLES = {"danger", "primary", "success"}
+VALID_BUTTON_STYLES = {
+    "danger": ButtonStyle.DANGER,
+    "primary": ButtonStyle.PRIMARY,
+    "success": ButtonStyle.SUCCESS,
+}
 
 
 class Utils(InlineUnit):
-    def _get_button_style(self, button: dict) -> typing.Optional[str]:
+    def _get_button_style(self, button: dict) -> typing.Optional[ButtonStyle]:
         """Extract and validate button style from button dict"""
         style = button.get("style")
         if style and style in VALID_BUTTON_STYLES:
-            return style
+            return VALID_BUTTON_STYLES[style]
         return None
     
     def _get_button_emoji_id(self, button: dict) -> typing.Optional[str]:
@@ -199,7 +197,7 @@ class Utils(InlineUnit):
                                 btn_kwargs["web_app"] = WebAppInfo(**button["data"])
 
                         case _ if "copy" in button:
-                            btn_kwargs["copy_text"] = CopyTextButton(text=button["copy"])
+                            btn_kwargs["copy_text"] = button["copy"]
 
                         case _ if "switch_inline_query_current_chat" in button:
                             btn_kwargs["switch_inline_query_current_chat"] = button["switch_inline_query_current_chat"]
@@ -422,9 +420,6 @@ class Utils(InlineUnit):
             media = io.BytesIO(media)
             media.name = "upload.mp4"
 
-        if isinstance(media, io.BytesIO):
-            media = InputFile(filename=media)
-
         kind = (
             "file"
             if file
@@ -467,14 +462,17 @@ class Utils(InlineUnit):
 
         if media is None and text is None and reply_markup:
             try:
-                await self.bot.edit_message_reply_markup(
-                    **(
-                        {"inline_message_id": inline_message_id}
-                        if inline_message_id
-                        else {"chat_id": chat_id, "message_id": message_id}
-                    ),
-                    reply_markup=self.generate_markup(reply_markup),
-                )
+                if inline_message_id:
+                    await self.bot.edit_inline_reply_markup(
+                        inline_message_id,
+                        reply_markup=self.generate_markup(reply_markup),
+                    )
+                else:
+                    await self.bot.edit_message_reply_markup(
+                        chat_id=chat_id,
+                        message_id=message_id,
+                        reply_markup=self.generate_markup(reply_markup),
+                    )
             except Exception:
                 return False
 
@@ -486,89 +484,76 @@ class Utils(InlineUnit):
 
         if media is None:
             try:
-                await self.bot.edit_message_text(
-                    text,
-                    **(
-                        {"inline_message_id": inline_message_id}
-                        if inline_message_id
-                        else {"chat_id": chat_id, "message_id": message_id}
-                    ),
-                    disable_web_page_preview=disable_web_page_preview,
-                    reply_markup=self.generate_markup(
-                        reply_markup
-                        if isinstance(reply_markup, list)
-                        else unit.get("buttons", [])
-                    ),
-                )
-            except TelegramBadRequest as e:
-                if "there is no text in the message to edit" not in str(e):
-                    raise
-
-                try:
-                    await self.bot.edit_message_caption(
-                        caption=text,
-                        **(
-                            {"inline_message_id": inline_message_id}
-                            if inline_message_id
-                            else {"chat_id": chat_id, "message_id": message_id}
-                        ),
+                if inline_message_id:
+                    await self.bot.edit_inline_text(
+                        inline_message_id,
+                        text,
+                        disable_web_page_preview=disable_web_page_preview,
                         reply_markup=self.generate_markup(
                             reply_markup
                             if isinstance(reply_markup, list)
                             else unit.get("buttons", [])
                         ),
                     )
-                except Exception:
-                    return False
                 else:
-                    return True
-            except TelegramAPIError as e:
-                if True: # TODO "" in e.message
-                    if query:
-                        with contextlib.suppress(Exception):
-                            await query.answer()
-                elif True: # TODO "" in e.message
+                    await self.bot.edit_message_text(
+                        chat_id,
+                        message_id,
+                        text,
+                        disable_web_page_preview=disable_web_page_preview,
+                        reply_markup=self.generate_markup(
+                            reply_markup
+                            if isinstance(reply_markup, list)
+                            else unit.get("buttons", [])
+                        ),
+                    )
+            except FloodWait as e:
+                logger.info("Sleeping %ss on FloodWait...", e.value)
+                await asyncio.sleep(e.value)
+                return await self._edit_unit(**utils.get_kwargs())
+            except RPCError:
+                if query:
                     with contextlib.suppress(Exception):
                         await query.answer(
                             "I should have edited some message, but it is deleted :("
                         )
 
                 return False
-            except TelegramRetryAfter as e:
-                logger.info("Sleeping %ss on aiogram FloodWait...", e.retry_after)
-                await asyncio.sleep(e.retry_after)
-                return await self._edit_unit(**utils.get_kwargs())
-                
-
-                return False
             else:
                 return True
 
         try:
-            await self.bot.edit_message_media(
-                **(
-                    {"inline_message_id": inline_message_id}
-                    if inline_message_id
-                    else {"chat_id": chat_id, "message_id": message_id}
-                ),
-                media=media,
-                reply_markup=self.generate_markup(
-                    reply_markup
-                    if isinstance(reply_markup, list)
-                    else unit.get("buttons", [])
-                ),
-            )
-        except TelegramRetryAfter as e:
-            logger.info("Sleeping %ss on aiogram FloodWait...", e.retry_after)
-            await asyncio.sleep(e.retry_after)
+            if inline_message_id:
+                await self.bot.edit_inline_media(
+                    inline_message_id,
+                    media=media,
+                    reply_markup=self.generate_markup(
+                        reply_markup
+                        if isinstance(reply_markup, list)
+                        else unit.get("buttons", [])
+                    ),
+                )
+            else:
+                await self.bot.edit_message_media(
+                    chat_id=chat_id,
+                    message_id=message_id,
+                    media=media,
+                    reply_markup=self.generate_markup(
+                        reply_markup
+                        if isinstance(reply_markup, list)
+                        else unit.get("buttons", [])
+                    ),
+                )
+        except FloodWait as e:
+            logger.info("Sleeping %ss on FloodWait...", e.value)
+            await asyncio.sleep(e.value)
             return await self._edit_unit(**utils.get_kwargs())
-        except TelegramAPIError:
-            if True: # TODO
-                with contextlib.suppress(Exception):
-                    await query.answer(
-                        "I should have edited some message, but it is deleted :("
-                    )
-                return False
+        except RPCError:
+            with contextlib.suppress(Exception):
+                await query.answer(
+                    "I should have edited some message, but it is deleted :("
+                )
+            return False
         else:
             return True
 
@@ -582,9 +567,9 @@ class Utils(InlineUnit):
         """Params `self`, `unit_id` are for internal use only, do not try to pass them"""
         if getattr(getattr(call, "message", None), "chat", None):
             try:
-                await self.bot.delete_message(
-                    chat_id=call.message.chat.id,
-                    message_id=call.message.message_id,
+                await self.bot.delete_messages(
+                    call.message.chat.id,
+                    call.message.id,
                 )
             except Exception:
                 return False
@@ -593,7 +578,7 @@ class Utils(InlineUnit):
 
         if chat_id and message_id:
             try:
-                await self.bot.delete_message(chat_id=chat_id, message_id=message_id)
+                await self.bot.delete_messages(chat_id, message_id)
             except Exception:
                 return False
 
