@@ -11,6 +11,7 @@
 # 🔑 https://www.gnu.org/licenses/agpl-3.0.html
 
 import logging
+import typing
 
 from pyrogram.types import Message
 
@@ -54,13 +55,118 @@ class Translations(loader.Module):
             "args": (not is_meme,),
         }
 
+        downloaded_btn = {
+            "text": self.strings("downloaded_langs"),
+            "callback": self._show_downloaded,
+        }
+
         reply_markup.append([back_btn])
+        reply_markup.append([downloaded_btn])
 
         await utils.answer(
             message=message,
             response=self.strings("choose_language"),
             reply_markup=reply_markup,
         )
+
+    def _get_downloaded_langs(self) -> list:
+        langs = self._db.get(translations.__name__, "lang", None)
+        if not langs:
+            return []
+        return [lang for lang in langs.split() if utils.check_url(lang)]
+
+    def _get_non_downloaded_langs(self) -> typing.Optional[str]:
+        langs = self._db.get(translations.__name__, "lang", None)
+        if not langs:
+            return None
+        result = " ".join(lang for lang in langs.split() if not utils.check_url(lang))
+        return result if result else None
+
+    async def _show_downloaded(self, call: InlineCall):
+        downloaded = self._get_downloaded_langs()
+
+        if not downloaded:
+            await call.edit(self.strings("no_downloaded"))
+            return
+
+        reply_markup = [
+            [
+                {
+                    "text": url.split("/")[-1],
+                    "callback": self._confirm_downloaded,
+                    "args": (url,),
+                }
+            ]
+            for url in downloaded
+        ]
+
+        reply_markup.append(
+            [
+                {
+                    "text": self.strings("btn_back"),
+                    "callback": self._choose_language,
+                    "args": (False,),
+                }
+            ]
+        )
+
+        await call.edit(
+            self.strings("choose_downloaded"),
+            reply_markup=reply_markup,
+        )
+
+    async def _confirm_downloaded(self, call: InlineCall, url: str):
+        reply_markup = [
+            [
+                {
+                    "text": self.strings("btn_yes"),
+                    "callback": self._set_downloaded,
+                    "args": (url,),
+                },
+            ],
+            [
+                {
+                    "text": self.strings("btn_cancel"),
+                    "callback": self._cancel_action,
+                },
+            ],
+            [
+                {
+                    "text": self.strings("btn_delete"),
+                    "callback": self._delete_downloaded,
+                    "args": (url,),
+                },
+            ],
+        ]
+
+        await call.edit(
+            self.strings("confirm_lang").format(url),
+            reply_markup=reply_markup,
+        )
+
+    async def _set_downloaded(self, call: InlineCall, url: str):
+        non_downloaded = self._get_non_downloaded_langs()
+        new_lang = f"{non_downloaded} {url}" if non_downloaded else url
+        self._db.set(translations.__name__, "lang", new_lang)
+        await self.allmodules.reload_translations()
+        await call.edit(self.strings("lang_saved").format(url.split("/")[-1]))
+
+    async def _cancel_action(self, call: InlineCall):
+        await call.edit(self.strings("action_cancelled"))
+
+    async def _delete_downloaded(self, call: InlineCall, url: str):
+        downloaded = [lang for lang in self._get_downloaded_langs() if lang != url]
+        non_downloaded = self._get_non_downloaded_langs()
+
+        parts = []
+        if non_downloaded:
+            parts.append(non_downloaded)
+        parts.extend(downloaded)
+
+        new_lang = " ".join(parts) if parts else None
+        self._db.set(translations.__name__, "lang", new_lang)
+        await self.allmodules.reload_translations()
+        await call.edit(self.strings("lang_deleted"))
 
     def _get_flag(self, lang: str) -> str:
         emoji_flags = {
