@@ -15,16 +15,19 @@
 import asyncio
 import contextlib
 import logging
+import os
 import time
 import typing
 
 from pyrogram import Client
-from pyrogram.enums import ChatType, ParseMode
+from pyrogram.enums import ChatAction, ChatType, ParseMode
 from pyrogram.errors import (
     AccessTokenExpired,
     AccessTokenInvalid,
     AuthKeyUnregistered,
+    FloodWait,
     InputUserDeactivated,
+    UserIsBlocked,
     YouBlockedUser,
 )
 from pyrogram.handlers import (
@@ -152,6 +155,32 @@ class InlineManager(
 
             await asyncio.sleep(5)
 
+    def _cleanup_stale_bot_sessions(self, bot_uid: str):
+        """Removes leftover bot session files from a previous/different bot token"""
+        from .. import main
+
+        prefix = f"heroku-{self._me}-bot-"
+        keep_stem = f"{prefix}{bot_uid}"
+
+        try:
+            entries = list(os.scandir(main.SESSIONS_DIR))
+        except FileNotFoundError:
+            return
+
+        for entry in entries:
+            if not entry.is_file() or not entry.name.startswith(prefix):
+                continue
+
+            if entry.name.split(".session", 1)[0] == keep_stem:
+                continue
+
+            try:
+                os.remove(entry.path)
+            except OSError:
+                logger.exception(
+                    "Failed to remove stale bot session file %s", entry.path
+                )
+
     async def register_manager(
         self,
         after_break: bool = False,
@@ -180,6 +209,7 @@ class InlineManager(
         self.init_complete = True
 
         bot_uid = self._token.split(":", 1)[0]
+        self._cleanup_stale_bot_sessions(bot_uid)
         self.bot = Client(
             name=f"heroku-{self._me}-bot-{bot_uid}",
             api_id=self._client.api_id,
@@ -194,35 +224,22 @@ class InlineManager(
         except (AccessTokenExpired, AccessTokenInvalid, AuthKeyUnregistered):
             logger.critical("Token expired, revoking...")
             return await self.dp_revoke_token(False)
+        except FloodWait as e:
+            logger.error(
+                "Inline bot authorization flood wait: %ss. "
+                "Inline manager initialization skipped for this run.",
+                e.value,
+            )
+            self.init_complete = False
+            return False
 
         bot_me = await self.bot.get_me()
         self.bot_username = bot_me.username
         self.bot_id = bot_me.id
 
-        try:
-            m = await self._client.send_message(self.bot_username, "/start heroku init")
-        except (InputUserDeactivated, ValueError):
-            self._db.set("heroku.inline", "bot_token", None)
-            self._token = False
-
-            if not after_break:
-                return await self.register_manager(True)
-
-            self.init_complete = False
-            return False
-        except YouBlockedUser:
-            await self._client.unblock_user(self.bot_username)
-            try:
-                m = await self._client.send_message(
-                    self.bot_username, "/start heroku init"
-                )
-            except Exception:
-                logger.critical("Can't unblock users bot", exc_info=True)
-                return False
-        except Exception:
-            self.init_complete = False
-            logger.critical("Initialization of inline manager failed!", exc_info=True)
-            return False
+        result = await self._ping_bot(after_break)
+        if result is not True:
+            return result
 
         _folders = await self._client.get_folders()
         for folder in _folders:
@@ -252,11 +269,52 @@ class InlineManager(
                     color=color,
                 )
 
-
-        await self._client.delete_messages(self.bot_username, m.id)
-
         self._register_builtin_handlers()
         self._cleaner_task = asyncio.ensure_future(self._cleaner())
+
+    async def _ping_bot(self, after_break: bool = False) -> bool:
+        """
+        Cheaply verify the bot can reach the owner via a typing action, only
+        falling back to sending (and deleting) an actual /start message if
+        that fails - avoids leaving a visible message in the chat on every
+        boot.
+        """
+        try:
+            await self.bot.send_chat_action(self._client.tg_id, ChatAction.TYPING)
+            return True
+        except (UserIsBlocked, YouBlockedUser):
+            await self._client.unblock_user(self.bot_username)
+            return True
+        except Exception:
+            pass
+
+        try:
+            m = await self._client.send_message(self.bot_username, "/start heroku init")
+        except (InputUserDeactivated, ValueError):
+            self._db.set("heroku.inline", "bot_token", None)
+            self._token = False
+
+            if not after_break:
+                return await self.register_manager(True)
+
+            self.init_complete = False
+            return False
+        except YouBlockedUser:
+            await self._client.unblock_user(self.bot_username)
+            try:
+                m = await self._client.send_message(
+                    self.bot_username, "/start heroku init"
+                )
+            except Exception:
+                logger.critical("Can't unblock users bot", exc_info=True)
+                return False
+        except Exception:
+            self.init_complete = False
+            logger.critical("Initialization of inline manager failed!", exc_info=True)
+            return False
+
+        await self._client.delete_messages(self.bot_username, m.id)
+        return True
 
     def _register_bot_handler(
         self,
