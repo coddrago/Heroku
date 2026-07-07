@@ -149,5 +149,5 @@ class Quickstart(loader.Module):
         self._db.set(translations.__name__, "lang", lang)
         await self.allmodules.reload_translations()
 
-        await self.inline.bot(call.answer(self.strings("language_saved")))
+        await call.answer(self.strings("language_saved"))
         await call.edit(text=self.text(), reply_markup=self.mark())

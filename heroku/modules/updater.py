@@ -72,12 +72,12 @@ class UpdaterMod(loader.Module):
         self.set("autoupdate", True)
         if not state:
             self.config["autoupdate"] = False
-            await self.inline.bot(call.answer(self.strings("autoupdate_off").format(prefix=self.get_prefix())))
+            await call.answer(self.strings("autoupdate_off").format(prefix=self.get_prefix()))
             return
 
         self.config["autoupdate"] = True
 
-        await self.inline.bot(call.answer(self.strings("autoupdate_on")))
+        await call.answer(self.strings("autoupdate_on"))
 
     def get_changelog(self) -> str:
         if NO_GIT:
@@ -85,7 +85,13 @@ class UpdaterMod(loader.Module):
         try:
             with git.Repo() as repo:
                 for remote in repo.remotes:
-                    remote.fetch()
+                    subprocess.run(
+                        ["git", "fetch", "--quiet", remote.name],
+                        cwd=repo.working_dir,
+                        timeout=60,
+                        capture_output=True,
+                        check=False,
+                    )
 
                 if not (
                     diff := [*repo.iter_commits(f"HEAD..origin/{version.branch}")]
@@ -241,7 +247,7 @@ class UpdaterMod(loader.Module):
 
         if call.data == "heroku/ignore_upd":
             self.set("ignore_permanent", self.get_latest())
-            await self.inline.bot(call.answer(self.strings("latest_disabled")))
+            await call.answer(self.strings("latest_disabled"))
             return
 
         await self._delete_all_upd_messages()
