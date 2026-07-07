@@ -306,7 +306,7 @@ class Presets(loader.Module):
             ],
         )
 
-    async def aiogram_watcher(self, message: BotInlineMessage):
+    async def bot_watcher(self, message: BotInlineMessage):
         if message.text != "/presets" or message.from_user.id != self._client.tg_id:
             return
 

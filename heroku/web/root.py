@@ -23,7 +23,7 @@ import time
 
 import aiohttp_jinja2
 import requests
-from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
+from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from aiohttp import web
 from pyrogram.errors import (
     FloodWait,
@@ -557,9 +557,9 @@ class Web:
                 )
                 ops += [
                     functools.partial(
-                        bot.delete_message,
+                        bot.delete_messages,
                         chat_id=msg.chat.id,
-                        message_id=msg.message_id,
+                        message_ids=msg.id,
                     )
                 ]
             except Exception:

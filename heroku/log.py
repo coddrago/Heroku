@@ -28,10 +28,10 @@ from logging.handlers import RotatingFileHandler
 from collections.abc import Coroutine
 
 import pyrogram
-from aiogram.exceptions import TelegramNetworkError, TelegramRetryAfter
 from pyrogram.errors import PersistentTimestampOutdated
 from pyrogram.errors import (
     # ServerError,
+    FloodWait,
     RPCError
 )
 
@@ -47,7 +47,7 @@ from .tl_cache import CustomClient
 from .types import BotInlineCall, Module, CoreOverwriteError
 
 INTERNET_ERRORS = (
-    TelegramNetworkError, asyncio.exceptions.TimeoutError,
+    asyncio.exceptions.TimeoutError,
     PersistentTimestampOutdated
 )
 old = linecache.getlines
@@ -85,7 +85,7 @@ linecache.getlines = getlines
 def override_text(exception: Exception) -> typing.Optional[str]:
     """Returns error-specific description if available, else `None`"""
 
-    if isinstance(exception, (TelegramNetworkError, asyncio.exceptions.TimeoutError)):
+    if isinstance(exception, asyncio.exceptions.TimeoutError):
         return "✈️ <b>You have problems with internet connection on your server.</b>"
 
     if isinstance(exception, PersistentTimestampOutdated):
@@ -100,8 +100,8 @@ def override_text(exception: Exception) -> typing.Optional[str]:
     if isinstance(exception, ModuleNotFoundError):
         return f"📦 {traceback.format_exception_only(type(exception), exception)[0].split(':')[1].strip()}"
     
-    if isinstance(exception, TelegramRetryAfter):
-        return f"✋ <b>Bot is hitting limits on {type(exception.method).__name__!r} method and got {exception.retry_after} seconds floodwait</b>"
+    if isinstance(exception, FloodWait):
+        return f"✋ <b>Bot is hitting Telegram rate limits and got {exception.value} seconds floodwait</b>"
 
     return None
 
@@ -295,7 +295,7 @@ class TelegramLogsHandler(logging.Handler):
     async def _show_full_trace(
         self,
         call: BotInlineCall,
-        bot: "aiogram.Bot",  # type: ignore  # noqa: F821
+        bot: "pyrogram.Client",  # type: ignore  # noqa: F821
         item: HerokuException,
     ):
         chunks = item.message + "\n\n<b>🪐 Full traceback:</b>\n" + f"<pre><code class=\"language-python\">{item.full_stack}</code></pre>"
@@ -444,8 +444,8 @@ class TelegramLogsHandler(logging.Handler):
         for coro in coros:
             try:
                 await coro
-            except TelegramRetryAfter as e:
-                await asyncio.sleep(e.retry_after)
+            except FloodWait as e:
+                await asyncio.sleep(e.value)
             except RuntimeError:
                 pass
             except Exception:
@@ -582,13 +582,6 @@ rotating_handler.setFormatter(_main_formatter)
 
 
 def init():
-    class NoFetchUpdatesFilter(logging.Filter):
-        def filter(self, record: logging.LogRecord) -> bool:
-            msg = record.getMessage()
-            return "Failed to fetch updates" not in msg and "Sleep" not in msg
-
-    
-    logging.getLogger("aiogram.dispatcher").addFilter(NoFetchUpdatesFilter())
     handler = logging.StreamHandler()
     handler.setLevel(logging.INFO)
     handler.setFormatter(_main_formatter)
@@ -600,5 +593,4 @@ def init():
     logging.getLogger("pyrogram").setLevel(logging.WARNING)
     logging.getLogger("matplotlib").setLevel(logging.WARNING)
     logging.getLogger("aiohttp").setLevel(logging.WARNING)
-    logging.getLogger("aiogram").setLevel(logging.WARNING)
     logging.captureWarnings(True)

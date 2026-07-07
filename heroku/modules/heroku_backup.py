@@ -25,7 +25,6 @@ import orjson
 
 from pathlib import Path
 
-from aiogram.types import BufferedInputFile
 from pyrogram.types import Message
 
 from .. import loader, utils
@@ -123,14 +122,14 @@ class HerokuBackupMod(loader.Module):
     async def _set_backup_period(self, call: BotInlineCall, value: int):
         if not value:
             self.set("period", "disabled")
-            await self.inline.bot(call.answer(self.strings("never_bot").format(prefix=self.get_prefix()), show_alert=True))
+            await call.answer(self.strings("never_bot").format(prefix=self.get_prefix()), show_alert=True)
             await call.delete()
             return
 
         self.set("period", value * 60 * 60)
         self.set("last_backup", round(time.time()))
 
-        await self.inline.bot(call.answer(self.strings("saved_bot").format(prefix=self.get_prefix()), show_alert=True))
+        await call.answer(self.strings("saved_bot").format(prefix=self.get_prefix()), show_alert=True)
         await call.delete()
 
     @loader.command()
@@ -208,7 +207,7 @@ class HerokuBackupMod(loader.Module):
 
             await self.inline.bot.send_document(
                 int(f"{self._content_channel_id}"),
-                BufferedInputFile(archive.getvalue(), filename=archive.name),
+                archive,
                 reply_markup=self.inline.generate_markup(
                     [
                         [
@@ -248,7 +247,7 @@ class HerokuBackupMod(loader.Module):
         try:
             file = await (
                 await self._client.get_messages(
-                    self._content_channel_id, message_ids=[call.message.message_id]
+                    self._content_channel_id, message_ids=[call.message.id]
                 )
             )[0].download(in_memory=True)
 
@@ -285,11 +284,11 @@ class HerokuBackupMod(loader.Module):
                             with modzip.open(name, "r") as module:
                                 path.write_bytes(module.read())
 
-            await self.inline.bot(call.answer(self.strings("all_restored"), show_alert=True))
+            await call.answer(self.strings("all_restored"), show_alert=True)
             await self.invoke("restart", "-f", peer=call.message.chat.id)
         except Exception:
             logger.exception("Restore from backupall failed")
-            await self.inline.bot(call.answer(self.strings("reply_to_file"), show_alert=True))
+            await call.answer(self.strings("reply_to_file"), show_alert=True)
 
     def _convert(self, backup):
         fixed = re.sub(r'(hikka\.)(\S+\":)', lambda m: 'heroku.' + m.group(2), backup)
@@ -343,7 +342,7 @@ class HerokuBackupMod(loader.Module):
 
         backup_msg = await self.inline.bot.send_document(
             int(f"{self._content_channel_id}"),
-            BufferedInputFile(txt.getvalue(), filename=txt.name),
+            txt,
             caption=self.strings("backup_caption").format(
                 prefix=utils.escape_html(self.get_prefix())
             ),
@@ -353,7 +352,7 @@ class HerokuBackupMod(loader.Module):
         await utils.answer(
             message,
             self.strings("backup_sent").format(
-                f"https://t.me/c/{str(self._content_channel_id).replace('-100', '')}/{backup_topic_id}/{backup_msg.message_id}"
+                f"https://t.me/c/{str(self._content_channel_id).replace('-100', '')}/{backup_topic_id}/{backup_msg.id}"
             ),
         )
 
@@ -450,7 +449,7 @@ class HerokuBackupMod(loader.Module):
 
         backup_msg = await self.inline.bot.send_document(
             int(f"{self._content_channel_id}"),
-            BufferedInputFile(archive.getvalue(), filename=archive.name),
+            archive,
             caption=self.strings("modules_backup").format(
                 mods_quantity,
                 utils.escape_html(self.get_prefix()),
@@ -461,7 +460,7 @@ class HerokuBackupMod(loader.Module):
         await utils.answer(
             message,
             self.strings("backup_sent").format(
-                f"https://t.me/c/{str(self._content_channel_id).replace('-100', '')}/{backup_topic_id}/{backup_msg.message_id}"
+                f"https://t.me/c/{str(self._content_channel_id).replace('-100', '')}/{backup_topic_id}/{backup_msg.id}"
             ),
         )
 
@@ -553,7 +552,7 @@ class HerokuBackupMod(loader.Module):
 
         backup_msg = await self.inline.bot.send_document(
             int(f"{self._content_channel_id}"),
-            BufferedInputFile(archive.getvalue(), filename=archive.name),
+            archive,
             caption=self.strings["backupall_info"].format(
                 prefix=utils.escape_html(self.get_prefix()),
             ),
@@ -573,10 +572,10 @@ class HerokuBackupMod(loader.Module):
         await utils.answer(
             message,
             self.strings["backupall_sent"].format(
-                f"https://t.me/c/{str(self._content_channel_id).replace('-100', '')}/{backup_topic_id}/{backup_msg.message_id}"
+                f"https://t.me/c/{str(self._content_channel_id).replace('-100', '')}/{backup_topic_id}/{backup_msg.id}"
             ),
         )
-        
+
     @loader.command()
     async def restoreall(self, message: Message):
         if not (reply := message.reply_to_message) or not reply.media:
