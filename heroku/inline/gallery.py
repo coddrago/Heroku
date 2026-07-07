@@ -21,17 +21,17 @@ import traceback
 import typing
 from urllib.parse import urlparse
 
-from aiogram.types import (
+from pyrogram.types import (
     CallbackQuery,
     InlineKeyboardMarkup,
     InlineQuery,
-    InlineQueryResultGif,
+    InlineQueryResultAnimation,
     InlineQueryResultPhoto,
     InputMediaAnimation,
     InputMediaPhoto,
 )
-from aiogram.exceptions import TelegramBadRequest, TelegramRetryAfter
-from pyrogram.errors import ChatSendInlineForbidden
+from pyrogram.enums import ParseMode
+from pyrogram.errors import ChatSendInlineForbidden, FloodWait, RPCError
 CUSTOM_EMOJIS = True# from pyrogram.extensions.html import CUSTOM_EMOJIS
 from pyrogram.types import Message, ReplyParameters
 
@@ -425,15 +425,15 @@ class Gallery(InlineUnit):
     ):
         if not self._units[unit_id].get("slideshow", False):
             self._units[unit_id]["slideshow"] = True
-            await self.bot.edit_message_reply_markup(
-                inline_message_id=call.inline_message_id,
+            await self.bot.edit_inline_reply_markup(
+                call.inline_message_id,
                 reply_markup=self._gallery_markup(unit_id),
             )
             await call.answer("✅ Slideshow on")
         else:
             del self._units[unit_id]["slideshow"]
-            await self.bot.edit_message_reply_markup(
-                inline_message_id=call.inline_message_id,
+            await self.bot.edit_inline_reply_markup(
+                call.inline_message_id,
                 reply_markup=self._gallery_markup(unit_id),
             )
             await call.answer("🚫 Slideshow off")
@@ -465,14 +465,14 @@ class Gallery(InlineUnit):
             return
 
         try:
-            await self.bot.edit_message_media(
-                inline_message_id=call.inline_message_id,
+            await self.bot.edit_inline_media(
+                call.inline_message_id,
                 media=self._get_current_media(unit_id),
                 reply_markup=self._gallery_markup(unit_id),
             )
-        except TelegramRetryAfter as e:
+        except FloodWait as e:
             await call.answer(
-                f"Got FloodWait. Wait for {e.retry_after} seconds",
+                f"Got FloodWait. Wait for {e.value} seconds",
                 show_alert=True,
             )
         except Exception:
@@ -499,7 +499,7 @@ class Gallery(InlineUnit):
                     unit_id,
                     index=self._units[unit_id]["current_index"],
                 ),
-                parse_mode="HTML",
+                parse_mode=ParseMode.HTML,
             )
 
         return InputMediaPhoto(
@@ -508,7 +508,7 @@ class Gallery(InlineUnit):
                 unit_id,
                 index=self._units[unit_id]["current_index"],
             ),
-            parse_mode="HTML",
+            parse_mode=ParseMode.HTML,
         )
 
     async def _gallery_page(
@@ -555,22 +555,22 @@ class Gallery(InlineUnit):
                 asyncio.ensure_future(self._load_gallery_photos(unit_id))
 
         try:
-            await self.bot.edit_message_media(
-                inline_message_id=call.inline_message_id,
+            await self.bot.edit_inline_media(
+                call.inline_message_id,
                 media=self._get_current_media(unit_id),
                 reply_markup=self._gallery_markup(unit_id),
             )
-        except TelegramBadRequest:
+        except FloodWait as e:
+            await call.answer(
+                f"Got FloodWait. Wait for {e.value} seconds",
+                show_alert=True,
+            )
+            return
+        except RPCError:
             logger.debug("Error fetching photo content, attempting load next one")
             del self._units[unit_id]["photos"][self._units[unit_id]["current_index"]]
             self._units[unit_id]["current_index"] -= 1
             return await self._gallery_page(call, page, unit_id)
-        except TelegramRetryAfter as e:
-            await call.answer(
-                f"Got FloodWait. Wait for {e.retry_after} seconds",
-                show_alert=True,
-            )
-            return
         except Exception:
             logger.exception("Exception while trying to edit media")
             await call.answer("Error occurred", show_alert=True)
@@ -603,7 +603,7 @@ class Gallery(InlineUnit):
         )
 
     def _gallery_markup(self: "InlineManager", unit_id: str) -> InlineKeyboardMarkup:
-        """Generates aiogram markup for `gallery`"""
+        """Generates markup for `gallery`"""
         callback = functools.partial(self._gallery_page, unit_id=unit_id)
         unit = self._units[unit_id]
         return self.generate_markup(
@@ -682,7 +682,7 @@ class Gallery(InlineUnit):
                         ext = None
 
                     args = {
-                        "thumbnail_url": "https://img.icons8.com/fluency/344/loading.png",
+                        "thumb_url": "https://img.icons8.com/fluency/344/loading.png",
                         "caption": self._get_caption(unit["uid"], index=0),
                         "parse_mode": "HTML",
                         "reply_markup": self._gallery_markup(unit["uid"]),
@@ -692,7 +692,7 @@ class Gallery(InlineUnit):
 
                     if unit.get("gif", False) or ext in {".gif", ".mp4"}:
                         await inline_query.answer(
-                            [InlineQueryResultGif(gif_url=unit["photo_url"], **args)]
+                            [InlineQueryResultAnimation(animation_url=unit["photo_url"], **args)]
                         )
                         return
 

@@ -15,16 +15,35 @@
 import asyncio
 import contextlib
 import logging
+import os
 import time
 import typing
 
-from aiogram import Bot, Dispatcher
-from aiogram.client.default import DefaultBotProperties
-from aiogram.enums import ParseMode
-from aiogram.exceptions import TelegramConflictError, TelegramUnauthorizedError
-from aiogram.client.default import DefaultBotProperties
-from pyrogram.enums import ChatType
-from pyrogram.errors import InputUserDeactivated, YouBlockedUser
+from pyrogram import Client
+from pyrogram.enums import ChatAction, ChatType, ParseMode
+from pyrogram.errors import (
+    AccessTokenExpired,
+    AccessTokenInvalid,
+    AuthKeyUnregistered,
+    FloodWait,
+    InputUserDeactivated,
+    UserIsBlocked,
+    YouBlockedUser,
+)
+from pyrogram.handlers import (
+    CallbackQueryHandler,
+    ChatBoostHandler,
+    ChatJoinRequestHandler,
+    ChosenInlineResultHandler,
+    EditedMessageHandler,
+    InlineQueryHandler,
+    MessageHandler,
+    MessageReactionCountHandler,
+    MessageReactionHandler,
+    PollHandler,
+    PreCheckoutQueryHandler,
+    ShippingQueryHandler,
+)
 from pyrogram.types import Chat, Message, ReplyParameters
 from pyrogram.raw.functions.contacts.unblock import Unblock
 from pyrogram.raw.functions.messages import GetDialogFilters, UpdateDialogFilter
@@ -49,6 +68,26 @@ logger = logging.getLogger(__name__)
 if typing.TYPE_CHECKING:
     from ..loader import Modules
     from ..types import InlineResult
+
+# Bot-API-style update type name -> pyrogram Handler class.
+# "poll"/"poll_answer" share pyrogram's single `Poll` update/handler; they are
+# told apart at registration time by whether `poll.voter` is populated.
+_BOT_UPDATE_HANDLER_CLASSES: typing.Dict[str, type] = {
+    "message": MessageHandler,
+    "edited_message": EditedMessageHandler,
+    "callback_query": CallbackQueryHandler,
+    "inline_query": InlineQueryHandler,
+    "chosen_inline_result": ChosenInlineResultHandler,
+    "poll": PollHandler,
+    "poll_answer": PollHandler,
+    "shipping_query": ShippingQueryHandler,
+    "pre_checkout_query": PreCheckoutQueryHandler,
+    "chat_join_request": ChatJoinRequestHandler,
+    "message_reaction": MessageReactionHandler,
+    "message_reaction_count": MessageReactionCountHandler,
+    "chat_boost": ChatBoostHandler,
+}
+
 
 class InlineManager(
     Utils,
@@ -95,12 +134,17 @@ class InlineManager(
 
         self._me: int = None
         self._name: str = None
-        self._dp: Dispatcher = None
         self._task: asyncio.Future = None
         self._cleaner_task: asyncio.Future = None
-        self.bot: Bot = None
+        self.bot: Client = None
         self.bot_id: int = None
         self.bot_username: str = None
+
+        self._bot_update_handlers: typing.Dict[
+            str, typing.Tuple[str, typing.Callable]
+        ] = {}
+        self._bot_handler_refs: typing.Dict[str, typing.Tuple[typing.Any, int]] = {}
+        self._next_handler_group = 0
 
     async def _cleaner(self):
         """Cleans outdated inline units"""
@@ -110,6 +154,32 @@ class InlineManager(
                     del self._units[unit_id]
 
             await asyncio.sleep(5)
+
+    def _cleanup_stale_bot_sessions(self, bot_uid: str):
+        """Removes leftover bot session files from a previous/different bot token"""
+        from .. import main
+
+        prefix = f"heroku-{self._me}-bot-"
+        keep_stem = f"{prefix}{bot_uid}"
+
+        try:
+            entries = list(os.scandir(main.SESSIONS_DIR))
+        except FileNotFoundError:
+            return
+
+        for entry in entries:
+            if not entry.is_file() or not entry.name.startswith(prefix):
+                continue
+
+            if entry.name.split(".session", 1)[0] == keep_stem:
+                continue
+
+            try:
+                os.remove(entry.path)
+            except OSError:
+                logger.exception(
+                    "Failed to remove stale bot session file %s", entry.path
+                )
 
     async def register_manager(
         self,
@@ -125,6 +195,8 @@ class InlineManager(
         :return: None
         :rtype: None
         """
+        from .. import main
+
         self._me = self._client.tg_id
         self._name = get_display_name(self._client.heroku_me)
 
@@ -136,43 +208,39 @@ class InlineManager(
 
         self.init_complete = True
 
-        self.bot = Bot(token=self._token, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
-        self._bot = self.bot
-        self._dp = Dispatcher()
+        bot_uid = self._token.split(":", 1)[0]
+        self._cleanup_stale_bot_sessions(bot_uid)
+        self.bot = Client(
+            name=f"heroku-{self._me}-bot-{bot_uid}",
+            api_id=self._client.api_id,
+            api_hash=self._client.api_hash,
+            bot_token=self._token,
+            workdir=main.SESSIONS_DIR,
+            parse_mode=ParseMode.HTML,
+        )
 
         try:
-            bot_me = await self.bot.get_me()
-            self.bot_username = bot_me.username
-            self.bot_id = bot_me.id
-        except TelegramUnauthorizedError:
+            await self.bot.start()
+        except (AccessTokenExpired, AccessTokenInvalid, AuthKeyUnregistered):
             logger.critical("Token expired, revoking...")
             return await self.dp_revoke_token(False)
-
-        try:
-            m = await self._client.send_message(self.bot_username, "/start heroku init")
-        except (InputUserDeactivated, ValueError):
-            self._db.set("heroku.inline", "bot_token", None)
-            self._token = False
-
-            if not after_break:
-                return await self.register_manager(True)
-
+        except FloodWait as e:
+            logger.error(
+                "Inline bot authorization flood wait: %ss. "
+                "Inline manager initialization skipped for this run.",
+                e.value,
+            )
             self.init_complete = False
             return False
-        except YouBlockedUser:
-            await self._client.unblock_user(self.bot_username)
-            try:
-                m = await self._client.send_message(
-                    self.bot_username, "/start heroku init"
-                )
-            except Exception:
-                logger.critical("Can't unblock users bot", exc_info=True)
-                return False
-        except Exception:
-            self.init_complete = False
-            logger.critical("Initialization of inline manager failed!", exc_info=True)
-            return False
-        
+
+        bot_me = await self.bot.get_me()
+        self.bot_username = bot_me.username
+        self.bot_id = bot_me.id
+
+        result = await self._ping_bot(after_break)
+        if result is not True:
+            return result
+
         _folders = await self._client.get_folders()
         for folder in _folders:
             if getattr(folder, "title", None) == "Heroku":
@@ -200,53 +268,137 @@ class InlineManager(
                     icon=emoticon,
                     color=color,
                 )
- 
+
+        self._register_builtin_handlers()
+        self._cleaner_task = asyncio.ensure_future(self._cleaner())
+
+    async def _ping_bot(self, after_break: bool = False) -> bool:
+        """
+        Cheaply verify the bot can reach the owner via a typing action, only
+        falling back to sending (and deleting) an actual /start message if
+        that fails - avoids leaving a visible message in the chat on every
+        boot.
+        """
+        try:
+            await self.bot.send_chat_action(self._client.tg_id, ChatAction.TYPING)
+            return True
+        except (UserIsBlocked, YouBlockedUser):
+            await self._client.unblock_user(self.bot_username)
+            return True
+        except Exception:
+            pass
+
+        try:
+            m = await self._client.send_message(self.bot_username, "/start heroku init")
+        except (InputUserDeactivated, ValueError):
+            self._db.set("heroku.inline", "bot_token", None)
+            self._token = False
+
+            if not after_break:
+                return await self.register_manager(True)
+
+            self.init_complete = False
+            return False
+        except YouBlockedUser:
+            await self._client.unblock_user(self.bot_username)
+            try:
+                m = await self._client.send_message(
+                    self.bot_username, "/start heroku init"
+                )
+            except Exception:
+                logger.critical("Can't unblock users bot", exc_info=True)
+                return False
+        except Exception:
+            self.init_complete = False
+            logger.critical("Initialization of inline manager failed!", exc_info=True)
+            return False
 
         await self._client.delete_messages(self.bot_username, m.id)
+        return True
 
-        self._dp.inline_query.register(
-            self._inline_handler,
-            lambda _: True,
-        )
+    def _register_bot_handler(
+        self,
+        update_type: str,
+        handler: typing.Callable,
+        *,
+        handler_id: typing.Optional[str] = None,
+    ):
+        """Attach `handler` to the bot's pyrogram client for `update_type`"""
+        handler_cls = _BOT_UPDATE_HANDLER_CLASSES.get(update_type)
+        if not handler_cls or not self.bot:
+            return
 
-        self._dp.callback_query.register(
-            self._callback_query_handler,
-            lambda _: True,
-        )
+        callback = handler
+        if update_type in ("poll", "poll_answer"):
 
-        self._dp.chosen_inline_result.register(
-            self._chosen_inline_handler,
-            lambda _: True,
-        )
+            async def callback(client, poll, _handler=handler, _update_type=update_type):
+                is_vote = getattr(poll, "voter", None) is not None
+                if _update_type == "poll_answer" and not is_vote:
+                    return
+                if _update_type == "poll" and is_vote:
+                    return
+                await _handler(client, poll)
 
-        self._dp.message.register(
-            self._message_handler,
-            lambda *_: True,
-        )
+        group = self._next_handler_group
+        self._next_handler_group += 1
+        ref = self.bot.add_handler(handler_cls(callback), group)
+        if handler_id:
+            self._bot_handler_refs[handler_id] = ref
 
-        old = self.bot.get_updates
-        revoke = self.dp_revoke_token
+    def _register_builtin_handlers(self):
+        self._register_bot_handler("inline_query", self._inline_handler)
+        self._register_bot_handler("callback_query", self._callback_query_handler)
+        self._register_bot_handler("chosen_inline_result", self._chosen_inline_handler)
+        self._register_bot_handler("message", self._message_handler)
 
-        async def new(*args, **kwargs):
-            nonlocal revoke, old
-            try:
-                return await old(*args, **kwargs)
-            except TelegramConflictError:
-                await revoke()
-            except TelegramUnauthorizedError:
-                logger.critical("Got Unauthorized")
-                await self._stop()
+        for handler_id, (update_type, handler) in self._bot_update_handlers.items():
+            self._register_bot_handler(update_type, handler, handler_id=handler_id)
 
-        self.bot.get_updates = new
+    def register_bot_update_handler(
+        self,
+        handler_id: str,
+        update_type: str,
+        handler: typing.Callable,
+    ):
+        """
+        Register a per-module bot update handler (used by `@loader.need_update`)
+        :param handler_id: Stable id of the handler (module reload/unload uses it to detach)
+        :param update_type: Bot-API-style update type, e.g. "poll_answer"
+        :param handler: Callable of signature `(client, update)`
+        """
+        if update_type not in _BOT_UPDATE_HANDLER_CLASSES:
+            logger.warning(
+                "Unsupported bot update type: %s (handler_id=%s)",
+                update_type,
+                handler_id,
+            )
+            return
 
-        self._task = asyncio.ensure_future(self._dp.start_polling(self._bot, handle_signals=False))
-        self._cleaner_task = asyncio.ensure_future(self._cleaner())
+        self._bot_update_handlers[handler_id] = (update_type, handler)
+        if self.init_complete and self.bot:
+            self._register_bot_handler(update_type, handler, handler_id=handler_id)
+
+    def unregister_bot_update_handler(self, handler_id: str):
+        """Detach a previously registered per-module bot update handler"""
+        if handler_id not in self._bot_update_handlers:
+            return
+
+        del self._bot_update_handlers[handler_id]
+        ref = self._bot_handler_refs.pop(handler_id, None)
+
+        if not self.bot or ref is None:
+            return
+
+        with contextlib.suppress(Exception):
+            self.bot.remove_handler(*ref)
 
     async def _stop(self):
         """Stop the bot"""
-        self._task.cancel()
-        await self._dp.stop_polling()
-        self._cleaner_task.cancel()
+        if self._cleaner_task:
+            self._cleaner_task.cancel()
+
+        if self.bot:
+            await self.bot.stop()
 
     def pop_web_auth_token(self, token: str) -> bool:
         """

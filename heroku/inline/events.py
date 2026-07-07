@@ -16,17 +16,18 @@ import re
 import typing
 from asyncio import Event
 
-from aiogram.types import CallbackQuery, ChosenInlineResult
-from aiogram.types import InlineQuery as AiogramInlineQuery
-from aiogram.types import (
+from pyrogram.enums import ChatType, ParseMode
+from pyrogram.types import CallbackQuery, ChosenInlineResult
+from pyrogram.types import InlineQuery as PyrogramInlineQuery
+from pyrogram.types import (
+    InlineQueryResultAnimation,
     InlineQueryResultArticle,
     InlineQueryResultDocument,
-    InlineQueryResultGif,
     InlineQueryResultPhoto,
     InlineQueryResultVideo,
     InputTextMessageContent,
 )
-from aiogram.types import Message as AiogramMessage
+from pyrogram.types import Message as PyrogramMessage
 
 from .. import loader, utils, security
 from .types import BotInlineCall, InlineCall, InlineQuery, InlineUnit
@@ -38,26 +39,33 @@ logger = logging.getLogger(__name__)
 
 
 class Events(InlineUnit):
-    async def _message_handler(self: "InlineManager", message: AiogramMessage):
+    async def _message_handler(
+        self: "InlineManager", client, message: PyrogramMessage
+    ):
         """Processes incoming messages"""
         match True:
-            case _ if message.chat.type != "private" or message.text == "/start heroku init":
+            case _ if (
+                message.chat.type != ChatType.PRIVATE
+                or message.text == "/start heroku init"
+            ):
                 return
 
         for mod in self._allmodules.modules:
             if (
-                not hasattr(mod, "aiogram_watcher")
+                not hasattr(mod, "bot_watcher")
                 or message.text == "/start"
                 and mod.__class__.__name__ != "InlineStuff"
             ):
                 continue
 
             try:
-                await loader._call_with_external_context(mod.aiogram_watcher, message)
+                await loader._call_with_external_context(mod.bot_watcher, message)
             except Exception:
-                logger.exception("Error on running aiogram watcher!")
+                logger.exception("Error on running bot watcher!")
 
-    async def _inline_handler(self: "InlineManager", inline_query: AiogramInlineQuery):
+    async def _inline_handler(
+        self: "InlineManager", client, inline_query: PyrogramInlineQuery
+    ):
         """Inline query handler (forms' calls)"""
         if (
             not self._db.get(security.__name__, "allow_inline_query", False)
@@ -128,10 +136,10 @@ class Events(InlineUnit):
                                 description=self.sanitise_text(res.get("description")),
                                 input_message_content=InputTextMessageContent(
                                     message_text=self.sanitise_text(res["message"]),
-                                    parse_mode="HTML",
+                                    parse_mode=ParseMode.HTML,
                                     disable_web_page_preview=True,
                                 ),
-                                thumbnail_url=res.get("thumb"),
+                                thumb_url=res.get("thumb"),
                                 thumb_width=128,
                                 thumb_height=128,
                                 reply_markup=self.generate_markup(
@@ -147,8 +155,8 @@ class Events(InlineUnit):
                                         res.get("description")
                                     ),
                                     caption=self.sanitise_text(res.get("caption")),
-                                    parse_mode="HTML",
-                                    thumbnail_url=res.get("thumb", res["photo"]),
+                                    parse_mode=ParseMode.HTML,
+                                    thumb_url=res.get("thumb", res["photo"]),
                                     photo_url=res["photo"],
                                     reply_markup=self.generate_markup(
                                         res.get("reply_markup")
@@ -156,13 +164,13 @@ class Events(InlineUnit):
                                 )
                                 if "photo" in res
                                 else (
-                                    InlineQueryResultGif(
+                                    InlineQueryResultAnimation(
                                         id=utils.rand(20),
                                         title=self.sanitise_text(res.get("title")),
                                         caption=self.sanitise_text(res.get("caption")),
-                                        parse_mode="HTML",
-                                        thumbnail_url=res.get("thumb", res["gif"]),
-                                        gif_url=res["gif"],
+                                        parse_mode=ParseMode.HTML,
+                                        thumb_url=res.get("thumb", res["gif"]),
+                                        animation_url=res["gif"],
                                         reply_markup=self.generate_markup(
                                             res.get("reply_markup")
                                         ),
@@ -171,15 +179,16 @@ class Events(InlineUnit):
                                     else (
                                         InlineQueryResultVideo(
                                             id=utils.rand(20),
-                                            title=self.sanitise_text(res.get("title")),
+                                            title=self.sanitise_text(res.get("title"))
+                                            or "",
                                             description=self.sanitise_text(
                                                 res.get("description")
                                             ),
                                             caption=self.sanitise_text(
                                                 res.get("caption")
                                             ),
-                                            parse_mode="HTML",
-                                            thumbnail_url=res.get("thumb", res["video"]),
+                                            parse_mode=ParseMode.HTML,
+                                            thumb_url=res.get("thumb", res["video"]),
                                             video_url=res["video"],
                                             mime_type="video/mp4",
                                             reply_markup=self.generate_markup(
@@ -189,15 +198,16 @@ class Events(InlineUnit):
                                         if "video" in res
                                         else InlineQueryResultDocument(
                                             id=utils.rand(20),
-                                            title=self.sanitise_text(res.get("title")),
+                                            title=self.sanitise_text(res.get("title"))
+                                            or "",
                                             description=self.sanitise_text(
                                                 res.get("description")
                                             ),
                                             caption=self.sanitise_text(
                                                 res.get("caption")
                                             ),
-                                            parse_mode="HTML",
-                                            thumbnail_url=res.get("thumb", res["file"]),
+                                            parse_mode=ParseMode.HTML,
+                                            thumb_url=res.get("thumb", res["file"]),
                                             document_url=res["file"],
                                             mime_type=res["mime_type"],
                                             reply_markup=self.generate_markup(
@@ -225,6 +235,7 @@ class Events(InlineUnit):
 
     async def _callback_query_handler(
         self: "InlineManager",
+        client,
         call: CallbackQuery,
         reply_markup: typing.Optional[
             typing.List[typing.List[typing.Dict[str, typing.Any]]]
@@ -234,7 +245,7 @@ class Events(InlineUnit):
         if reply_markup is None:
             reply_markup = []
 
-        if re.search(r"authorize_web_(.{8})", call.data):
+        if call.data and re.search(r"authorize_web_(.{8})", call.data):
             self._web_auth_tokens += [re.search(r"authorize_web_(.{8})", call.data)[1]]
             return
 
@@ -363,6 +374,7 @@ class Events(InlineUnit):
 
     async def _chosen_inline_handler(
         self: "InlineManager",
+        client,
         chosen_inline_query: ChosenInlineResult,
     ):
         query = chosen_inline_query.query
@@ -440,10 +452,10 @@ class Events(InlineUnit):
                                     utils.escape_html(doc),
                                 )
                             ),
-                            parse_mode="HTML",
+                            parse_mode=ParseMode.HTML,
                             disable_web_page_preview=True,
                         ),
-                        thumbnail_url=thumb,
+                        thumb_url=thumb,
                         thumb_width=128,
                         thumb_height=128,
                         reply_markup=self.generate_markup(
@@ -469,10 +481,10 @@ class Events(InlineUnit):
                         description=self.translator.getkey("inline.no_inline_cmds"),
                         input_message_content=InputTextMessageContent(
                             message_text=self.translator.getkey("inline.no_inline_cmds_msg"),
-                            parse_mode="HTML",
+                            parse_mode=ParseMode.HTML,
                             disable_web_page_preview=True,
                         ),
-                        thumbnail_url=(
+                        thumb_url=(
                             "https://img.icons8.com/fluency/50/000000/info-squared.png"
                         ),
                         thumb_width=128,
@@ -497,10 +509,10 @@ class Events(InlineUnit):
                                 "\n".join(map(lambda x: x[1], _help))
                             )
                         ),
-                        parse_mode="HTML",
+                        parse_mode=ParseMode.HTML,
                         disable_web_page_preview=True,
                     ),
-                    thumbnail_url=(
+                    thumb_url=(
                         "https://img.icons8.com/fluency/50/000000/info-squared.png"
                     ),
                     thumb_width=128,

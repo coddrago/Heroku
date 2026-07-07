@@ -15,7 +15,8 @@ import logging
 import time
 import typing
 
-from aiogram.types import InlineQuery, InlineQueryResultArticle, InputTextMessageContent
+from pyrogram.enums import ParseMode
+from pyrogram.types import InlineQuery, InlineQueryResultArticle, InputTextMessageContent
 
 from .. import utils
 from .types import InlineUnit
@@ -147,10 +148,10 @@ class QueryGallery(InlineUnit):
                     description=i["description"],
                     input_message_content=InputTextMessageContent(
                         message_text=f"🪐 <b>Opening gallery...</b>\n<i>#id: {id_}</i>",
-                        parse_mode="HTML",
+                        parse_mode=ParseMode.HTML,
                         disable_web_page_preview=True,
                     ),
-                    thumbnail_url=photo_url,
+                    thumb_url=photo_url,
                     thumb_width=128,
                     thumb_height=128,
                 )

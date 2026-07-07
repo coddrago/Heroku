@@ -22,17 +22,18 @@ from asyncio import Event
 from urllib.parse import urlparse
 
 import grapheme
-from aiogram.types import (
+from pyrogram.types import (
     InlineQuery,
     InlineQueryResultArticle,
     InlineQueryResultAudio,
+    InlineQueryResultAnimation,
     InlineQueryResultDocument,
-    InlineQueryResultGif,
     InlineQueryResultLocation,
     InlineQueryResultPhoto,
     InlineQueryResultVideo,
     InputTextMessageContent,
 )
+from pyrogram.enums import ParseMode
 from pyrogram.errors import ChatSendInlineForbidden
 # from pyrogram.extensions.html import CUSTOM_EMOJIS
 from pyrogram.types import Message, ReplyParameters
@@ -436,7 +437,7 @@ class Form(InlineUnit):
                                         if inline_query.from_user.id == self._me
                                         else "🔄 <b>Transferring value to userbot...</b>"
                                     ),
-                                    parse_mode="HTML",
+                                    parse_mode=ParseMode.HTML,
                                     disable_web_page_preview=True,
                                 ),
                             )
@@ -462,9 +463,9 @@ class Form(InlineUnit):
                             title="Heroku",
                             description="Heroku",
                             caption=form.get("text"),
-                            parse_mode="HTML",
+                            parse_mode=ParseMode.HTML,
                             photo_url=form["photo"],
-                            thumbnail_url=(
+                            thumb_url=(
                                 "https://img.icons8.com/cotton/452/moon-satellite.png"
                             ),
                             reply_markup=self.generate_markup(
@@ -477,13 +478,13 @@ class Form(InlineUnit):
                 case _ if "gif" in form:
                     await inline_query.answer(
                     [
-                        InlineQueryResultGif(
+                        InlineQueryResultAnimation(
                             id=utils.rand(20),
                             title="Heroku",
                             caption=form.get("text"),
-                            parse_mode="HTML",
-                            gif_url=form["gif"],
-                            thumbnail_url=(
+                            parse_mode=ParseMode.HTML,
+                            animation_url=form["gif"],
+                            thumb_url=(
                                 "https://img.icons8.com/cotton/452/moon-satellite.png"
                             ),
                             reply_markup=self.generate_markup(
@@ -501,9 +502,9 @@ class Form(InlineUnit):
                             title="Heroku",
                             description="Heroku",
                             caption=form.get("text"),
-                            parse_mode="HTML",
+                            parse_mode=ParseMode.HTML,
                             video_url=form["video"],
-                            thumbnail_url=(
+                            thumb_url=(
                                 "https://img.icons8.com/cotton/452/moon-satellite.png"
                             ),
                             mime_type="video/mp4",
@@ -522,7 +523,7 @@ class Form(InlineUnit):
                             title="Heroku",
                             description="Heroku",
                             caption=form.get("text"),
-                            parse_mode="HTML",
+                            parse_mode=ParseMode.HTML,
                             document_url=form["file"],
                             mime_type=form["mime_type"],
                             reply_markup=self.generate_markup(
@@ -554,10 +555,10 @@ class Form(InlineUnit):
                             id=utils.rand(20),
                             audio_url=form["audio"]["url"],
                             caption=form.get("text"),
-                            parse_mode="HTML",
+                            parse_mode=ParseMode.HTML,
                             title=form["audio"].get("title", "Heroku"),
-                            performer=form["audio"].get("performer"),
-                            audio_duration=form["audio"].get("duration"),
+                            performer=form["audio"].get("performer", ""),
+                            audio_duration=form["audio"].get("duration", 0),
                             reply_markup=self.generate_markup(
                                 form["uid"],
                             ),
@@ -573,7 +574,7 @@ class Form(InlineUnit):
                             title="Heroku",
                             input_message_content=InputTextMessageContent(
                                 message_text=form["text"],
-                                parse_mode="HTML",
+                                parse_mode=ParseMode.HTML,
                                 disable_web_page_preview=True,
                             ),
                             reply_markup=self.generate_markup(inline_query.query),

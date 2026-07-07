@@ -214,6 +214,8 @@ class LoaderMod(loader.Module):
 
                         if result == MODULE_LOADING_FAILED:
                             not_installed.append(arg)
+                        elif result == MODULE_LOADING_FORBIDDEN:
+                            break
                     await utils.answer(
                         message,
                         "{} modules was installed.\n\nModules <code>{}</code> cannot be installed because they are not available in the repo".format(
@@ -252,6 +254,74 @@ class LoaderMod(loader.Module):
                     for repo, mods in (await self.get_repo_list()).items()
                 ],
             )
+
+    def _repo_to_label(self, repo: str) -> str:
+        parsed = urlparse(repo)
+        parts = [p for p in parsed.path.strip("/").split("/") if p]
+        if len(parts) >= 2:
+            return f"{parts[0]}/{parts[1]}"
+        return repo
+
+    @loader.command()
+    async def dlmall(self, message: Message):
+        repos = [self.config["MODULES_REPO"]] + self.config["ADDITIONAL_REPOS"]
+        repos = [r for r in repos if r.startswith("http")]
+        buttons = [
+            [
+                {
+                    "text": self._repo_to_label(repo),
+                    "callback": self._inline__install_all_from_repo,
+                    "args": (repo,),
+                }
+            ]
+            for repo in repos
+        ]
+        await self.inline.form(
+            self.strings("choose_repo"),
+            message,
+            reply_markup=buttons,
+        )
+
+    async def _inline__install_all_from_repo(
+        self,
+        call: InlineCall,
+        repo: str,
+    ):
+        await call.edit(self.strings("installing_all_from_repo"))
+
+        links = await self._get_repo(repo)
+
+        if not links:
+            await call.edit(self.strings("dlm_all_from_repo_error_nomods"))
+            return
+
+        not_installed = []
+
+        for link in links:
+            full_url = f"{repo.strip('/')}/{link}.py"
+            result = await self.download_and_install(full_url)
+            if result != MODULE_LOADING_SUCCESS:
+                not_installed.append(link.split("/")[-1])
+            elif result == MODULE_LOADING_FORBIDDEN:
+                break
+
+        installed_count = len(links) - len(not_installed)
+
+        if installed_count == 0:
+            await call.edit(self.strings("dlm_all_from_repo_error_nomods"))
+        elif not_installed:
+            failed_list = "\n".join(not_installed)
+            await call.edit(
+                self.strings("dlm_all_from_repo_error_somemods")
+                + "<blockquote expandable>"
+                + failed_list
+                + "</blockquote>"
+            )
+        else:
+            await call.edit(self.strings("installed_all_from_repo"))
+
+        if self.fully_loaded:
+            self.update_modules_in_db()
 
     async def _get_modules_to_load(self):
         todo = self.get("loaded_modules", {})
@@ -360,13 +430,15 @@ class LoaderMod(loader.Module):
 
                 return MODULE_LOADING_FAILED
 
-            await self.load_module(
+            if await self.load_module(
                 r,
                 message,
                 module_name,
                 url,
                 blob_link=blob_link,
-            )
+            ) == MODULE_LOADING_FORBIDDEN:
+                return MODULE_LOADING_FORBIDDEN
+
             return MODULE_LOADING_SUCCESS
         except Exception:
             logger.exception("Failed to load %s", module_name)
@@ -544,6 +616,18 @@ class LoaderMod(loader.Module):
         did_requires: bool = False,
         did_packages: bool = False,
     ):
+        if not self.lookup("LoaderRestrictor").get("passed", False):
+            logger.warning(
+                "Module %s was not loaded because the safety check was not passed",
+                name or origin,
+            )
+            if isinstance(message, Message):
+                await utils.answer(
+                    message,
+                    self.strings["verify_required"].format(self.inline.bot_username),
+                )
+            return MODULE_LOADING_FORBIDDEN
+
         if any(
             line.replace(" ", "") == "#scope:ffmpeg" for line in doc.splitlines()
         ) and os.system("ffmpeg -version 1>/dev/null 2>/dev/null"):
@@ -1176,6 +1260,42 @@ class LoaderMod(loader.Module):
         modules = [m.strip() for m in raw_list if m.strip()]
 
         if len(modules) == 1:
+            if not self.lookup(modules[0]):
+                suggestions = self._get_unload_suggestions(modules[0])
+                if suggestions:
+                    form = await self.inline.form(
+                        "<tg-emoji emoji-id=5134452506935427991>🪐</tg-emoji>",
+                        message,
+                        silent=True,
+                    )
+                    if form:
+                        await form.edit(
+                            self.strings("unload_suggestions").format(
+                                utils.escape_html(modules[0])
+                            ),
+                            reply_markup=[
+                                [
+                                    {
+                                        "text": label,
+                                        "callback": self._inline__unload_suggested,
+                                        "args": (classname, force),
+                                    }
+                                ]
+                                for classname, label in suggestions
+                            ]
+                            + [
+                                [
+                                    {
+                                        "text": self.strings("cancel").replace(
+                                            "🚫", "❌"
+                                        ),
+                                        "action": "close",
+                                    }
+                                ]
+                            ],
+                        )
+                    return
+
             msg = await self.unload_module(modules[0], force=force)
         else:
             success = []
@@ -1183,7 +1303,7 @@ class LoaderMod(loader.Module):
             msg = ""
             for module in modules:
                 status = await self.unload_module(module)
-                if "🚫" in status or "😖" in status:
+                if "❌" in status or "🚫" in status or "😖" in status:
                     if "💡" in status:
                         status = status.split("<code>")[0]
 
@@ -1204,6 +1324,56 @@ class LoaderMod(loader.Module):
                 ))
 
         await utils.answer(message, msg)
+
+    def _is_core_module(self, module) -> bool:
+        module_name = getattr(module.__class__, "__module__", "")
+        if not module_name.startswith("heroku.modules."):
+            return False
+
+        module_file = module_name.rsplit(".", 1)[-1]
+        return os.path.isfile(
+            os.path.join(utils.get_base_dir(), "modules", f"{module_file}.py")
+        )
+
+    def _get_unload_suggestions(
+        self,
+        query: str,
+        limit: int = 3,
+    ) -> list[tuple[str, str]]:
+        query = query.lower()
+        scored = []
+
+        for module in self.allmodules.modules:
+            if self._is_core_module(module):
+                continue
+
+            classname = module.__class__.__name__
+            public_name = str(getattr(module, "name", "") or module.strings["name"])
+            names = {
+                classname,
+                classname[:-3] if classname.endswith("Mod") else classname,
+                public_name,
+            }
+            score = max(
+                difflib.SequenceMatcher(None, query, name.lower()).ratio()
+                for name in names
+                if name
+            )
+            label = public_name
+            scored.append((score, classname.lower(), classname, label))
+
+        return [
+            (classname, label)
+            for _, _, classname, label in sorted(scored, reverse=True)[:limit]
+        ]
+
+    async def _inline__unload_suggested(
+        self,
+        call: InlineCall,
+        module: str,
+        force: bool = False,
+    ):
+        await call.edit(await self.unload_module(module, force=force))
 
     async def unload_module(self, module: str, force: bool = False) -> str:
         instance = self.lookup(module)

@@ -17,8 +17,7 @@ import logging
 import re
 
 # from pyrogram.extensions.html import CUSTOM_EMOJIS
-from pyrogram.types import Message
-from pyrogram.raw.types import InputMediaWebPage
+from pyrogram.types import Message, LinkPreviewOptions
 
 
 from .. import loader, utils
@@ -77,7 +76,17 @@ class Help(loader.Module):
                 lambda: "invert banner",
                 validator=loader.validators.Boolean(),
             ),
+            loader.ConfigValue(
+                "show_preview_in_help",
+                True,
+                lambda: self.strings("show_preview_in_help"),
+                validator=loader.validators.Boolean(),
+            ),
         )
+
+    def _get_banner_url(self, doc: str):
+        match = re.search(r"# ?meta banner: ?(.+)", doc)
+        return match.group(1).strip() if match else None
 
     @loader.command(ru_doc="[args] | Спрячет ваши модули", ua_doc="[args] | Сховає ваші модулі", de_doc="[args] | Versteckt Ihre Module")
     async def helphide(self, message: Message):
@@ -241,9 +250,24 @@ class Help(loader.Module):
         developer = re.search(r"# ?meta developer: ?(.+)", getattr(module, "__source__", None))
         dev_text = developer.group(1) if developer else None
         placeholders = "\n".join(utils.help_placeholders(module.__class__.__name__, self))
+
+        banner_kwargs = {}
+        if self.config["show_preview_in_help"]:
+            try:
+                source = getattr(module, "__source__", None)
+                if source:
+                    banner_url = self._get_banner_url(source)
+                    if banner_url:
+                        banner_kwargs = {
+                            "file": banner_url,
+                            "invert_media": True,
+                        }
+            except Exception:
+                pass
+
         await utils.answer(
             message,
-            f"{reply}<blockquote expandable>{cmds}{inline_cmd}</blockquote>\n<blockquote expandable>" 
+            f"{reply}<blockquote expandable>{cmds}{inline_cmd}</blockquote>\n<blockquote expandable>"
             + (f"{placeholders}</blockquote>" if placeholders else "")
             + (
                 f"\n\n{self.strings('developer')}".format(dev_text)
@@ -256,6 +280,7 @@ class Help(loader.Module):
                 if module.__origin__.startswith("<core")
                 else ""
             ),
+            **banner_kwargs,
         )
 
     @loader.command(ru_doc="[args] | Помощь с вашими модулями!", ua_doc="[args] | допоможіть з вашими модулями!", de_doc="[args] | Hilfe mit deinen Modulen!")
@@ -264,13 +289,15 @@ class Help(loader.Module):
 
         args = utils.get_args_raw(message)
 
-        banner = str(self.config["banner_url"])
+        kwargs = dict()
 
         if self.config["banner_url"] and self.config["media_quote"] is True:
-            banner = InputMediaWebPage(str(self.config["banner_url"]))
+            kwargs["link_preview_options"] = LinkPreviewOptions(
+                url=str(self.config["banner_url"]), is_disabled=False, show_above_text=not self.config["invert_media"]
+            )
 
-        if not self.config["banner_url"]:
-            banner = None
+        if self.config["banner_url"]:
+            kwargs["file"] = self.config["banner_url"]
 
         force = False
         if "-f" in args:
@@ -413,8 +440,7 @@ class Help(loader.Module):
                         else f"\n\n{self.strings('partial_load')}"
                     ),
                 ),
-                file=banner,
-                invert_media=self.config["invert_media"],
+                **kwargs,
             )
         elif only_loaded:
             await utils.answer(
@@ -428,8 +454,7 @@ class Help(loader.Module):
                         else f"\n\n{self.strings('partial_load')}"
                     ),
                 ),
-                file=banner,
-                invert_media=self.config["invert_media"],
+                **kwargs,
             )
         else:
             await utils.answer(
@@ -444,8 +469,7 @@ class Help(loader.Module):
                         else f"\n\n{self.strings('partial_load')}"
                     ),
                 ),
-                file=banner,
-                invert_media=self.config["invert_media"],
+                **kwargs,
             )
 
     @loader.command(ru_doc="| Ссылка на чат помощи", ua_doc="| посилання для чату служби підтримки", de_doc="| Link zum Support-Chat")

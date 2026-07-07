@@ -18,7 +18,6 @@ from urllib.parse import urlparse
 import emoji
 import pyrogram
 import requests
-from aiogram.types import Message as AiogramMessage
 from pyrogram import types
 from pyrogram.enums import ChatType
 from pyrogram.types import Message, Chat, ReplyParameters
@@ -549,7 +548,7 @@ def get_display_name(entity: 'Entity'):
 
     return name
 
-def get_chat_id(message: typing.Union[Message, AiogramMessage]) -> int:
+def get_chat_id(message: Message) -> int:
     """
     Get the chat ID, but without -100 if its a channel
     :param message: Message to get chat ID from

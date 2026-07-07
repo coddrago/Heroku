@@ -23,6 +23,7 @@ import json
 import logging
 import os
 import random
+import shutil
 import signal
 import socket
 import sqlite3
@@ -53,7 +54,7 @@ from .dispatcher import CommandDispatcher
 from .inline.token_obtainment import TokenObtainment
 from .inline.utils import Utils as inutils
 from .qr import QRCode
-from .types import SQLiteStringStorage
+from .types import SQLiteStringStorage, PatchedParser
 from .tl_cache import CustomClient
 from .translations import Translator
 from .version import __version__
@@ -74,6 +75,7 @@ BASE_DIR = (
 
 BASE_PATH = Path(BASE_DIR)
 CONFIG_PATH = BASE_PATH / "config.json"
+SESSIONS_DIR = os.path.join(BASE_DIR, "sessions")
 
 # fmt: off
 LATIN_MOCK = [
@@ -440,6 +442,13 @@ def parse_arguments():
         action="store_true",
         help="Disable git checks and updates",
     )
+    parser.add_argument(
+        "--wipe",
+        "-w",
+        dest="wipe",
+        action="store_true",
+        help="Remove saved sessions and config, then exit",
+    )
     arguments = parser.parse_args()
     logging.debug(arguments)
     return arguments
@@ -483,7 +492,7 @@ class Heroku:
     """Main userbot instance, which can handle multiple clients"""
 
     def __init__(self):
-        global BASE_DIR, BASE_PATH, CONFIG_PATH
+        global BASE_DIR, BASE_PATH, CONFIG_PATH, SESSIONS_DIR
         self.omit_log = False
         self.arguments = parse_arguments()
         if self.arguments.no_git:
@@ -492,6 +501,7 @@ class Heroku:
             BASE_DIR = self.arguments.data_root
             BASE_PATH = Path(BASE_DIR)
             CONFIG_PATH = BASE_PATH / "config.json"
+            SESSIONS_DIR = os.path.join(BASE_DIR, "sessions")
         try:
             self.loop = asyncio.get_running_loop()
 
@@ -501,9 +511,34 @@ class Heroku:
 
         self.clients: list[CustomClient] = SuperList()
         self.ready = asyncio.Event()
+        self._migrate_sessions()
         self._read_sessions()
         self._get_api_token()
         self._get_proxy()
+
+    def _migrate_sessions(self):
+        os.makedirs(SESSIONS_DIR, exist_ok=True)
+
+        with os.scandir(BASE_DIR) as entries:
+            legacy = [
+                entry
+                for entry in entries
+                if entry.is_file()
+                and entry.name.startswith("heroku-")
+                and entry.name.endswith(".session")
+            ]
+
+        for entry in legacy:
+            target = os.path.join(SESSIONS_DIR, entry.name)
+            if os.path.exists(target):
+                continue
+
+            try:
+                shutil.move(entry.path, target)
+            except OSError:
+                logging.exception(
+                    "Failed to migrate legacy session file %s", entry.path
+                )
 
     def _get_proxy(self):
         """
@@ -540,8 +575,10 @@ class Heroku:
         self.sessions += [
             session.rsplit(".session", maxsplit=1)[0]
             for session in filter(
-                lambda f: (f.startswith("heroku-") or f.startswith("hikka-")) and f.endswith(".session"),
-                os.listdir(BASE_DIR),
+                lambda f: (f.startswith("heroku-") or f.startswith("hikka-"))
+                and f.endswith(".session")
+                and "-bot-" not in f,
+                os.listdir(SESSIONS_DIR),
             )
         ]
         print(self.sessions, os.listdir(BASE_DIR))
@@ -618,6 +655,7 @@ class Heroku:
         client: CustomClient,
         *,
         delay_restart: bool = False,
+        restart_process: bool = True,
     ):
         if hasattr(client, "tg_id"):
             telegram_id = client.tg_id
@@ -634,15 +672,23 @@ class Heroku:
 
         session = f"heroku-{telegram_id}"
         init_kwargs = client._export_init_kwargs()
-        
-        init_kwargs["in_memory"] = False 
-        
+        init_kwargs["workdir"] = SESSIONS_DIR
         session_str = await client.export_session_string()
 
         cli = CustomClient(
             session,
             **init_kwargs
         )
+        cli.parser = PatchedParser(cli)
+        cli._tg_id = telegram_id
+        cli.tg_id = telegram_id
+        cli.hikka_me = client.hikka_me
+        cli.heroku_me = client.heroku_me
+
+        if client.is_initialized:
+            await client.stop()
+        elif client.is_connected:
+            await client.disconnect()
 
         storage = SQLiteStringStorage(cli)
         await storage.import_session_string(session_str)
@@ -650,10 +696,9 @@ class Heroku:
 
         await cli.start()
 
-        cli._tg_id = telegram_id
-        cli.tg_id = telegram_id
-        cli.hikka_me = me
-        cli.heroku_me = me
+        if not delay_restart and restart_process:
+            logging.info("restart")
+            restart()
 
         # Set db attribute to this client in order to save
         # custom bot nickname from web
@@ -693,6 +738,9 @@ class Heroku:
             restart()
         else:
             await asyncio.sleep(3600)  # Will be restarted from web anyway
+            return None
+
+        return cli
 
     async def _web_banner(self):
         """Shows web banner"""
@@ -726,34 +774,8 @@ class Heroku:
         client.hikka_me = me
         client.heroku_me = me
 
-        await client.stop()
-
-        # storage clearing bug workaround
-        is_bot = False
-        await client.storage.user_id(telegram_id)
-        await client.storage.is_bot(is_bot)
-
-        res = await client.connect()
-        if not res:
-            raise RuntimeError()
-
-        db = database.Database(client)
-        await db.init()
-
-        while (bot := input("You can enter a custom bot username or leave it empty and Heroku will generate a random one: ")):
-            try:
-                if await self._check_bot(client, bot):
-                    db.set("heroku.inline", "custom_bot", bot)
-                    print("Bot username saved!")
-                    break
-                else:
-                    print("Bot username is occupied. Try again or leave it empty")
-                    continue
-            except Exception:
-                print("Something went wrong")
-
-        await self.save_client_session(client)
-        self.clients += [client]
+        cli = await self.save_client_session(client, restart_process=False)
+        self.clients += [cli]
         return True
 
     async def _check_bot(
@@ -904,7 +926,7 @@ class Heroku:
 
             print_banner("success.txt")
             print("\033[0;92mLogged in successfully!\033[0m")
-            cli = await self.save_client_session(client)
+            cli = await self.save_client_session(client, restart_process=False)
             self.clients += [cli]
             return True
 
@@ -931,13 +953,15 @@ class Heroku:
                     self.api_token.ID,
                     self.api_token.HASH,
                     proxy=self.proxy,
-                    workdir=BASE_PATH,
+                    workdir=SESSIONS_DIR,
                     device_model=get_app_name(),
                     system_version=generate_random_system_version(),
                     app_version=".".join(map(str, __version__)) + " x64",
                     lang_code="en",
                     system_lang_code="en-US",
                 )
+
+                client.parser = PatchedParser(client)
 
                 rslt = await client.connect()
                 if not rslt:
@@ -1159,7 +1183,7 @@ class Heroku:
             not self.clients and not self.sessions or not await self._init_clients()
         ) and not (inital_web := await self._initial_setup()):
             return
-        if inital_web:
+        if inital_web and self.web:
             async def scheduled_web_stop():
                 await asyncio.sleep(delay=120)
                 await self.web.stop()

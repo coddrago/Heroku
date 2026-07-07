@@ -92,7 +92,7 @@ def print_banner(banner: str):
         print(f.read())
 
 
-def check_commit_ancestor(commit, repo_path):
+def check_commit_ancestor(repo, branch):
     """Check if commit is ancestor of origin/master or origin/kuri"""
     branches = [
         "master",
@@ -100,14 +100,22 @@ def check_commit_ancestor(commit, repo_path):
     ]
 
     try:
-        for branch in branches:
+        commit = repo.commit(branch).hexsha
+        repo_path = repo.working_tree_dir or os.path.abspath(
+            os.path.join(os.path.dirname(__file__), "..")
+        )
+
+        for ref in branches:
             proc = subprocess.run(
-                ["git", "merge-base", "--is-ancestor", commit, f"refs/remotes/origin/{branch}"],
+                ["git", "merge-base", "--is-ancestor", commit, f"refs/remotes/origin/{ref}"],
                 cwd=repo_path,
                 capture_output=True,
                 timeout=5,
             )
-            return proc.returncode == 0
+            if proc.returncode == 0:
+                return True
+
+        return False
     except (subprocess.TimeoutExpired, Exception):
         return False
 

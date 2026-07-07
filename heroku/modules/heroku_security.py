@@ -529,10 +529,13 @@ class HerokuSecurityMod(loader.Module):
             ttl=5 * 60,
         )
 
-    async def _resolve_user(self, message: Message):
-        if not (args := utils.get_args_raw(message).replace("@", "")) and not (
-            reply := message.reply_to_message
-        ):
+    async def _resolve_user(self, message: Message, args_raw: str = None):
+        args = (utils.get_args_raw(message) if args_raw is None else args_raw).replace(
+            "@", ""
+        )
+        reply = None
+
+        if not args and not (reply := message.reply_to_message):
             await utils.answer(message, self.strings("no_user"))
             return
 
@@ -546,10 +549,18 @@ class HerokuSecurityMod(loader.Module):
                 user = await self._client.get_entity(args, exp=0)
 
         if user is None:
-            try:
-                user = await self._client.get_entity(reply.from_user.id, exp=0)
-            except ValueError:
-                user = await reply.get_sender()
+            if reply is None:
+                reply = message.reply_to_message
+
+            if reply is not None:
+                try:
+                    user = await self._client.get_entity(reply.from_user.id, exp=0)
+                except ValueError:
+                    user = await reply.get_sender()
+
+        if user is None:
+            await utils.answer(message, self.strings("no_user"))
+            return
 
         if not isinstance(user, (User, PeerUser)):
             await utils.answer(message, self.strings("not_a_user"))
@@ -567,6 +578,8 @@ class HerokuSecurityMod(loader.Module):
         group: str,
         confirmed: bool = False,
         user: int = None,
+        enable_nonick: bool = False,
+        force: bool = False,
     ):
         if user is None and not (user := await self._resolve_user(message)):
             return
@@ -574,7 +587,7 @@ class HerokuSecurityMod(loader.Module):
         if isinstance(user, int):
             user = await self._client.get_entity(user, exp=0)
 
-        if not confirmed:
+        if not confirmed and not force:
             await self.inline.form(
                 self.strings("warning").format(
                     user.id,
@@ -591,7 +604,7 @@ class HerokuSecurityMod(loader.Module):
                     {
                         "text": self.strings("confirm"),
                         "callback": self._add_to_group,
-                        "args": (group, True, user.id),
+                        "args": (group, True, user.id, enable_nonick),
                     },
                 ],
             )
@@ -599,6 +612,26 @@ class HerokuSecurityMod(loader.Module):
 
         if user.id not in getattr(self._client._heroku_dispatcher.security, group):
             getattr(self._client._heroku_dispatcher.security, group).append(user.id)
+
+        if enable_nonick:
+            self._db.set(
+                main.__name__,
+                "nonickusers",
+                list(set(self._db.get(main.__name__, "nonickusers", []) + [user.id])),
+            )
+
+            await message.edit(
+                self.strings(f"{group}_added").format(
+                    user.id,
+                    utils.escape_html(get_display_name(user)),
+                )
+                + "\n\n"
+                + self.strings("user_nn").format(
+                    user.id,
+                    utils.escape_html(get_display_name(user)),
+                )
+            )
+            return
 
         await message.edit(
             (
@@ -640,7 +673,24 @@ class HerokuSecurityMod(loader.Module):
 
     @loader.command()
     async def owneradd(self, message: Message):
-        await self._add_to_group(message, "owner")
+        args = utils.get_args(message)
+        force = any(arg in {"-f", "--force"} for arg in args)
+        enable_nonick = any(arg in {"-n", "--nonick"} for arg in args)
+        user_args = " ".join(
+            arg for arg in args if arg not in {"-f", "--force", "-n", "--nonick"}
+        )
+        user = await self._resolve_user(message, user_args)
+
+        if not user:
+            return
+
+        await self._add_to_group(
+            message,
+            "owner",
+            user=user.id,
+            enable_nonick=enable_nonick,
+            force=force,
+        )
 
     @loader.command()
     async def ownerrm(self, message: Message):

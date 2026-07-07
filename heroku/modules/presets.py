@@ -109,7 +109,8 @@ class Presets(loader.Module):
     strings = {"name": "Presets"}
 
     async def client_ready(self):
-        self._markup = utils.chunks(
+        self._markup_gen = functools.partial(
+            utils.chunks,
             [
                 {
                     "text": self.strings(f"_{preset}_title"),
@@ -132,11 +133,11 @@ class Presets(loader.Module):
             self._client.tg_id,
             'https://raw.githubusercontent.com/coddrago/assets/refs/heads/main/heroku/presets_cmd.png',
             caption=self.strings('welcome'),
-            reply_markup=self.inline.generate_markup(self._markup),
+            reply_markup=self.inline.generate_markup(self._markup_gen()),
         )
 
     async def _back(self, call: InlineCall):
-        await call.edit(self.strings("welcome"), reply_markup=self._markup)
+        await call.edit(self.strings("welcome"), reply_markup=self._markup_gen())
 
     async def _choose_menu(self, call: InlineCall, page: int = 0, preset: str = "", to_remove: list | None = None):
         if not preset:
@@ -305,7 +306,7 @@ class Presets(loader.Module):
             ],
         )
 
-    async def aiogram_watcher(self, message: BotInlineMessage):
+    async def bot_watcher(self, message: BotInlineMessage):
         if message.text != "/presets" or message.from_user.id != self._client.tg_id:
             return
 
@@ -321,7 +322,7 @@ class Presets(loader.Module):
             message=message,
             photo='https://raw.githubusercontent.com/coddrago/assets/refs/heads/main/heroku/presets_cmd.png',
             text=self.strings('welcome').replace('/presets', self.get_prefix() + 'presets'),
-            reply_markup=self._markup,
+            reply_markup=self._markup_gen(),
         )
         
     @loader.command(alias="lp")
@@ -381,13 +382,13 @@ class Presets(loader.Module):
             return
         folder_name = args[0]
         module_name = args[1]
-        if folder_name not in FOLDERS:
-            FOLDERS[folder_name] = []
         if module_name.lower() in [m.lower() for m in FOLDERS[folder_name]]:
             await message.edit(self.strings("already_in_folder").format(folder_name))
             return
         for mod in self.allmodules.modules:
             if mod.__class__.__name__.lower() == module_name.lower():
+                if folder_name not in FOLDERS:
+                    FOLDERS[folder_name] = []
                 FOLDERS[folder_name].append(module_name)
                 self.db.set("presets", "folders", FOLDERS)
                 await message.edit(self.strings("added_to_folder").format(module_name, folder_name))
@@ -426,6 +427,29 @@ class Presets(loader.Module):
             file=file,
             reply_parameters=ReplyParameters(message_id=getattr(message, "reply_to_msg_id", None)),
         )
+    @loader.command(alias="rff")
+    async def removefromfolder(self, message: Message):
+        """Remove module from custom folder."""
+        args = utils.get_args(message)
+        if self.db.get("presets", "folders") is None:
+            self.db.set("presets", "folders", {})
+        FOLDERS = self.db.get("presets", "folders")
+        if len(args) < 2:
+            await message.edit(self.strings("remove_from_folder_usage").format(prefix=self.get_prefix()))
+            return
+        folder_name = args[0]
+        module_name = args[1]
+        if folder_name not in FOLDERS:
+            await message.edit(self.strings("folder_not_found").format(folder_name))
+            return
+        if module_name.lower() not in [m.lower() for m in FOLDERS[folder_name]]:
+            await message.edit(self.strings("module_not_in_folder").format(module_name, folder_name))
+            return
+        FOLDERS[folder_name].remove(module_name)
+        if FOLDERS[folder_name] == []:
+            del FOLDERS[folder_name]
+        self.db.set("presets", "folders", FOLDERS)
+        await message.edit(self.strings("removed_from_folder").format(module_name, folder_name))
     @loader.command(alias="la")
     async def loadaliases(self, message: Message):
         """Load aliases from file. Send a file with the command or reply to a file."""
@@ -443,8 +467,8 @@ class Presets(loader.Module):
             await message.edit(self.lookup("loader").strings['load_failed'])
             logger.error("Invalid aliases format")
             return
-        
-        fail = False
+
+        loaded = []
         for item in data:
             alias = item["alias"]
             cmd_str = item["command"]
@@ -452,25 +476,24 @@ class Presets(loader.Module):
             cmd = parts[0]
             rest = parts[1] if len(parts) > 1 else None
             if self.allmodules.add_alias(alias, cmd, rest):
-                self.set(
+                self.lookup("Presets").set(
                     "aliases",
                     {
-                        **self.get("aliases", {}),
+                        **self.lookup("Presets").get("aliases", {}),
                         alias: f"{cmd} {rest}" if rest else cmd,
                     },
                 )
+                loaded.append(alias)
+
             else:
-                await utils.answer(
-                    message,
-                    self.lookup("settings").strings("no_command").format(utils.escape_html(cmd)),
-                )
-                fail = True
-        if not fail:
-            await utils.answer(
-                message,
-                self.lookup("settings").strings("aliases_list").format("\n".join(f"{alias}" for alias, cmd in self.allmodules.aliases.items())),
-                reply_parameters=ReplyParameters(message_id=getattr(message, "reply_to_msg_id", None)),
-            )
+                logger.error("Falied to load alias %s", alias)
+
+        await utils.answer(
+            message,
+            self.lookup("settings").strings("aliases_list").format("\n".join(f"{alias}" for alias in loaded)),
+            reply_parameters=ReplyParameters(message_id=getattr(message, "reply_to_msg_id", None)),
+        )
+
     @loader.command(alias="al")
     async def aliasload(self, message: Message):
         """send aliases via file"""

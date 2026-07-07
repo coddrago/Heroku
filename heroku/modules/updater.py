@@ -72,12 +72,12 @@ class UpdaterMod(loader.Module):
         self.set("autoupdate", True)
         if not state:
             self.config["autoupdate"] = False
-            await self.inline.bot(call.answer(self.strings("autoupdate_off").format(prefix=self.get_prefix())))
+            await call.answer(self.strings("autoupdate_off").format(prefix=self.get_prefix()))
             return
 
         self.config["autoupdate"] = True
 
-        await self.inline.bot(call.answer(self.strings("autoupdate_on")))
+        await call.answer(self.strings("autoupdate_on"))
 
     def get_changelog(self) -> str:
         if NO_GIT:
@@ -85,7 +85,13 @@ class UpdaterMod(loader.Module):
         try:
             with git.Repo() as repo:
                 for remote in repo.remotes:
-                    remote.fetch()
+                    subprocess.run(
+                        ["git", "fetch", "--quiet", remote.name],
+                        cwd=repo.working_dir,
+                        timeout=60,
+                        capture_output=True,
+                        check=False,
+                    )
 
                 if not (
                     diff := [*repo.iter_commits(f"HEAD..origin/{version.branch}")]
@@ -241,7 +247,7 @@ class UpdaterMod(loader.Module):
 
         if call.data == "heroku/ignore_upd":
             self.set("ignore_permanent", self.get_latest())
-            await self.inline.bot(call.answer(self.strings("latest_disabled")))
+            await call.answer(self.strings("latest_disabled"))
             return
 
         await self._delete_all_upd_messages()
@@ -257,7 +263,7 @@ class UpdaterMod(loader.Module):
         with open('CHANGELOG.md', mode='r', encoding='utf-8') as f:
             changelog = f.read().split('##')[1].strip()
         if (await self._client.get_me()).is_premium:
-            changelog.replace('🌑 Heroku', '<tg-emoji emoji-id=5192765204898783881>🌘</tg-emoji><tg-emoji emoji-id=5195311729663286630>🌘</tg-emoji><tg-emoji emoji-id=5195045669324201904>🌘</tg-emoji>')
+            changelog.replace('🌑 Heroku', '<emoji id=5192765204898783881>🌘</emoji><emoji id=5195311729663286630>🌘</emoji><emoji id=5195045669324201904>🌘</emoji>')
 
         await utils.answer(message, self.strings('changelog').format(changelog))
 
@@ -346,13 +352,13 @@ class UpdaterMod(loader.Module):
             # Terminate main loop of all running clients
             # Won't work if not all clients are ready
             if client is not message._client:
-                await client.disconnect()
+                await client.stop()
 
         if "LAVHOST" in os.environ:
             await self.client.send_message("lavhostbot", "🔄 Restart")
             return
 
-        await message._client.disconnect()
+        await message._client.stop()
         restart()
 
     async def download_common(self):
@@ -666,7 +672,7 @@ class UpdaterMod(loader.Module):
         if ":" in str(ms):
             chat_id, message_id = ms.split(":")
             chat_id, message_id = int(chat_id), int(message_id)
-            await self._client.edit_message(chat_id, message_id, msg)
+            await self._client.edit_message_text(chat_id, message_id, msg)
             return
 
         await self.inline.bot.edit_message_text(
@@ -754,13 +760,42 @@ class UpdaterMod(loader.Module):
         await asyncio.create_subprocess_shell(f'git reset --hard HEAD~{number}', stdout=asyncio.subprocess.PIPE)
         await self.restart_common(call)
 
+    async def ubstop_func(self, call: typing.Union[Message, InlineCall]):
+        await utils.answer(
+            call,
+            self.strings["ub_stop"].format(emoji=utils.get_platform_emoji()),
+        )
+
+        if "LAVHOST" in os.environ:
+            await self.client.send_message("lavhostbot", "⏹ Stop")
+        else:
+            exit()
+
     @loader.command()
     async def ubstop(self, message: Message):
         """| stops your userbot"""
 
-        if "LAVHOST" in os.environ:
-            await utils.answer(message, self.strings["ub_stop"].format(emoji=utils.get_platform_emoji()))
-            await self.client.send_message("lavhostbot", "⏹ Stop")
-        else:
-            await utils.answer(message, self.strings["ub_stop"].format(emoji=utils.get_platform_emoji()))
-            exit()
+        args = utils.get_args(message)
+        if "-f" in args or "--force" in args:
+            await self.ubstop_func(message)
+            return
+
+        await self.inline.form(
+            message=message,
+            text=self.strings["stop_ub_confirm"].format(
+                utils.get_platform_emoji()
+                if self.client.heroku_me.is_premium
+                else "Heroku"
+            ),
+            reply_markup=[
+                [
+                    {
+                        "text": "✅",
+                        "callback": self.ubstop_func,
+                        "style": "primary",
+                    },
+                ],
+                [{"text": "❌", "action": "close", "style": "primary"}],
+            ],
+            silent=True,
+        )

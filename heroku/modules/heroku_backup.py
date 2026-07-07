@@ -16,14 +16,15 @@ import datetime
 import io
 import logging
 import os
-import re 
+import re
+import sys
+import tempfile
 import time
 import zipfile
 import orjson
 
 from pathlib import Path
 
-from aiogram.types import BufferedInputFile
 from pyrogram.types import Message
 
 from .. import loader, utils
@@ -69,17 +70,66 @@ class HerokuBackupMod(loader.Module):
 
         self._content_channel_id = await utils.wait_for_content_channel(self._db)
 
+    async def _install_reqs(self, reqs: bytes):
+        options = []
+        requirements = []
+
+        for line in reqs.decode(errors="ignore").splitlines():
+            line = line.strip()
+            if not line or line.startswith("#"):
+                continue
+
+            if line.startswith("--") or line.startswith("-i "):
+                options.append(line)
+                continue
+
+            requirements.append(line)
+
+        installed = 0
+        failed = []
+
+        for requirement in requirements:
+            fd, temp_file = tempfile.mkstemp(prefix="reqs_", suffix=".txt")
+            try:
+                with os.fdopen(fd, "w", encoding="utf-8") as f:
+                    f.write("\n".join([*options, requirement, ""]))
+
+                proc = await asyncio.create_subprocess_exec(
+                    sys.executable,
+                    "-m",
+                    "pip",
+                    "install",
+                    "-r",
+                    temp_file,
+                    stdout=asyncio.subprocess.PIPE,
+                    stderr=asyncio.subprocess.PIPE,
+                )
+                await proc.communicate()
+
+                if proc.returncode:
+                    failed.append(requirement)
+                else:
+                    installed += 1
+            except Exception:
+                logger.exception("Unable to install backup requirement %s", requirement)
+                failed.append(requirement)
+            finally:
+                if os.path.exists(temp_file):
+                    os.remove(temp_file)
+
+        return installed, failed
+
     async def _set_backup_period(self, call: BotInlineCall, value: int):
         if not value:
             self.set("period", "disabled")
-            await self.inline.bot(call.answer(self.strings("never_bot").format(prefix=self.get_prefix()), show_alert=True))
+            await call.answer(self.strings("never_bot").format(prefix=self.get_prefix()), show_alert=True)
             await call.delete()
             return
 
         self.set("period", value * 60 * 60)
         self.set("last_backup", round(time.time()))
 
-        await self.inline.bot(call.answer(self.strings("saved_bot").format(prefix=self.get_prefix()), show_alert=True))
+        await call.answer(self.strings("saved_bot").format(prefix=self.get_prefix()), show_alert=True)
         await call.delete()
 
     @loader.command()
@@ -157,7 +207,7 @@ class HerokuBackupMod(loader.Module):
 
             await self.inline.bot.send_document(
                 int(f"{self._content_channel_id}"),
-                BufferedInputFile(archive.getvalue(), filename=archive.name),
+                archive,
                 reply_markup=self.inline.generate_markup(
                     [
                         [
@@ -197,7 +247,7 @@ class HerokuBackupMod(loader.Module):
         try:
             file = await (
                 await self._client.get_messages(
-                    self._content_channel_id, message_ids=[call.message.message_id]
+                    self._content_channel_id, message_ids=[call.message.id]
                 )
             )[0].download(in_memory=True)
 
@@ -226,15 +276,19 @@ class HerokuBackupMod(loader.Module):
                         for name in modzip.namelist():
                             if name == "db_mods.json":
                                 continue
+                            if name.startswith("pip-backup-") and name.endswith(".txt"):
+                                await self._install_reqs(modzip.read(name))
+                                continue
+
                             path = loader.LOADED_MODULES_PATH / Path(name).name
                             with modzip.open(name, "r") as module:
                                 path.write_bytes(module.read())
 
-            await self.inline.bot(call.answer(self.strings("all_restored"), show_alert=True))
+            await call.answer(self.strings("all_restored"), show_alert=True)
             await self.invoke("restart", "-f", peer=call.message.chat.id)
         except Exception:
             logger.exception("Restore from backupall failed")
-            await self.inline.bot(call.answer(self.strings("reply_to_file"), show_alert=True))
+            await call.answer(self.strings("reply_to_file"), show_alert=True)
 
     def _convert(self, backup):
         fixed = re.sub(r'(hikka\.)(\S+\":)', lambda m: 'heroku.' + m.group(2), backup)
@@ -288,7 +342,7 @@ class HerokuBackupMod(loader.Module):
 
         backup_msg = await self.inline.bot.send_document(
             int(f"{self._content_channel_id}"),
-            BufferedInputFile(txt.getvalue(), filename=txt.name),
+            txt,
             caption=self.strings("backup_caption").format(
                 prefix=utils.escape_html(self.get_prefix())
             ),
@@ -298,7 +352,7 @@ class HerokuBackupMod(loader.Module):
         await utils.answer(
             message,
             self.strings("backup_sent").format(
-                f"https://t.me/c/{str(self._content_channel_id).replace('-100', '')}/{backup_topic_id}/{backup_msg.message_id}"
+                f"https://t.me/c/{str(self._content_channel_id).replace('-100', '')}/{backup_topic_id}/{backup_msg.id}"
             ),
         )
 
@@ -395,7 +449,7 @@ class HerokuBackupMod(loader.Module):
 
         backup_msg = await self.inline.bot.send_document(
             int(f"{self._content_channel_id}"),
-            BufferedInputFile(archive.getvalue(), filename=archive.name),
+            archive,
             caption=self.strings("modules_backup").format(
                 mods_quantity,
                 utils.escape_html(self.get_prefix()),
@@ -406,7 +460,7 @@ class HerokuBackupMod(loader.Module):
         await utils.answer(
             message,
             self.strings("backup_sent").format(
-                f"https://t.me/c/{str(self._content_channel_id).replace('-100', '')}/{backup_topic_id}/{backup_msg.message_id}"
+                f"https://t.me/c/{str(self._content_channel_id).replace('-100', '')}/{backup_topic_id}/{backup_msg.id}"
             ),
         )
 
@@ -498,7 +552,7 @@ class HerokuBackupMod(loader.Module):
 
         backup_msg = await self.inline.bot.send_document(
             int(f"{self._content_channel_id}"),
-            BufferedInputFile(archive.getvalue(), filename=archive.name),
+            archive,
             caption=self.strings["backupall_info"].format(
                 prefix=utils.escape_html(self.get_prefix()),
             ),
@@ -518,16 +572,17 @@ class HerokuBackupMod(loader.Module):
         await utils.answer(
             message,
             self.strings["backupall_sent"].format(
-                f"https://t.me/c/{str(self._content_channel_id).replace('-100', '')}/{backup_topic_id}/{backup_msg.message_id}"
+                f"https://t.me/c/{str(self._content_channel_id).replace('-100', '')}/{backup_topic_id}/{backup_msg.id}"
             ),
         )
-        
+
     @loader.command()
     async def restoreall(self, message: Message):
         if not (reply := message.reply_to_message) or not reply.media:
             await utils.answer(message, self.strings("reply_to_file"))
             return
 
+        status_message = await utils.answer(message, self.strings("restoring_backup"))
         file = await reply.download(in_memory=True)
         try:
             zipfile_bytes = io.BytesIO(file)
@@ -555,13 +610,17 @@ class HerokuBackupMod(loader.Module):
                         for name in modzip.namelist():
                             if name == "db_mods.json":
                                 continue
+                            if name.startswith("pip-backup-") and name.endswith(".txt"):
+                                await self._install_reqs(modzip.read(name))
+                                continue
+
                             path = loader.LOADED_MODULES_PATH / Path(name).name
                             with modzip.open(name, "r") as module:
                                 path.write_bytes(module.read())
-        except Exception as e:
+        except Exception:
             logger.exception("Restore all failed")
-            await utils.answer(message, self.strings["reply_to_file"])
+            await utils.answer(status_message, self.strings["reply_to_file"])
             return
 
-        await utils.answer(message, self.strings["all_restored"])
+        await utils.answer(status_message, self.strings["all_restored"])
         await self.invoke("restart", "-f", peer=message.peer_id)

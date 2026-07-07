@@ -14,6 +14,7 @@
 import ast
 import asyncio
 import base64
+import collections
 import contextlib
 import copy
 import importlib
@@ -36,6 +37,9 @@ import requests
 from pyrogram import raw
 from pyrogram.client import Client
 from pyrogram.enums import ChatType
+from pyrogram.errors import PeerIdInvalid
+from pyrogram.parser import Parser
+from pyrogram.parser.html import HTML, Parser as HTMLParser, utils
 from pyrogram.types import Object
 from pyrogram.storage.sqlite_storage import (
     SQLiteStorage,
@@ -1153,10 +1157,21 @@ class StopLoop(Exception):
 class ModuleConfig(dict):
     """Stores config for modules and apparently libraries"""
 
-    def __init__(self, *entries: typing.Union[str, "ConfigValue"]):
-        if all(isinstance(entry, ConfigValue) for entry in entries):
+    def __init__(self, *entries: typing.Union[str, "ConfigValue", "ConfigCategory"]):
+        self._option_categories: dict[str, str] = dict()
+        self._categories: dict[str, "ConfigCategory"] = dict()
+
+        if all(isinstance(entry, (ConfigValue, ConfigCategory)) for entry in entries):
             # New config format processing
-            self._config = {config.option: config for config in entries}
+            self._config = {}
+            for entry in entries:
+                if isinstance(entry, ConfigCategory):
+                    self._categories[entry.name] = entry
+                    for cv in entry:
+                        self._config[cv.option] = cv
+                        self._option_categories[cv.option] = entry.name
+                else:
+                    self._config[entry.option] = entry
         else:
             # Legacy config processing
             keys = []
@@ -1198,6 +1213,19 @@ class ModuleConfig(dict):
     def getdef(self, key: str) -> str:
         """Get the default value by key"""
         return self._config[key].default
+
+    def get_category(self, key: str) -> typing.Optional["ConfigCategory"]:
+        cat_name = self._option_categories.get(key)
+        return self._categories.get(cat_name) if cat_name else None
+
+    def grouped_options(
+        self,
+    ) -> "collections.OrderedDict[str | None, list[str]]":
+        result = collections.OrderedDict()
+        for option in self._config:
+            cat = self._option_categories.get(option)
+            result.setdefault(cat, []).append(option)
+        return result
 
     def __setitem__(self, key: str, value: typing.Any):
         self._config[key].value = value
@@ -1341,6 +1369,30 @@ class ConfigValue:
                 syncwrap(self.on_change)
 
 
+class ConfigCategory(list):
+    def __init__(
+        self,
+        name: str,
+        *config_values: ConfigValue,
+        doc: typing.Union[typing.Callable[[], str], str, "ConfigValue"] = "No description",
+    ):
+        super().__init__(config_values)
+        self.name = str(name)
+        self.doc = doc
+
+    def getdoc(self) -> str:
+        if callable(self.doc):
+            try:
+                return self.doc()
+            except Exception:
+                return "No description"
+        return self.doc
+
+    @property
+    def _config_values(self) -> tuple:
+        return tuple(self)
+
+
 def _get_members(
     mod: Module,
     ending: str,
@@ -1424,6 +1476,54 @@ class SQLiteStringStorage(SQLiteStorage):
         await self.user_id(user_id)
         await self.is_bot(is_bot)
         await self.date(0)
+
+class HTML(HTML):
+    async def parse(self, text: str) -> dict:
+        # Strip whitespaces from the beginning and the end, but preserve closing tags
+        text = re.sub(r"^\s*(<[\w<>=\s\"]*>)\s*", r"\1", text)
+        text = re.sub(r"\s*(</[\w</>]*>)\s*$", r"\1", text)
+        text = re.sub(
+            r"<tg-emoji emoji-id=(\d+)>([^<]+)</tg-emoji>",
+            r"<emoji id=\1>\2</emoji>",
+            text,
+        )
+
+        parser = HTMLParser(self.client)
+        parser.feed(utils.add_surrogates(text))
+        parser.close()
+
+        if parser.tag_entities:
+            unclosed_tags = []
+
+            for tag, entities in parser.tag_entities.items():
+                unclosed_tags.append(f"<{tag}> (x{len(entities)})")
+
+            logger.info("Unclosed tags: %s", ", ".join(unclosed_tags))
+
+        entities = []
+
+        for entity in parser.entities:
+            if isinstance(entity, raw.types.InputMessageEntityMentionName):
+                try:
+                    if self.client is not None:
+                        entity.user_id = await self.client.resolve_peer(entity.user_id)
+                except PeerIdInvalid:
+                    continue
+
+            entities.append(entity)
+
+        # Remove zero-length entities
+        entities = list(filter(lambda x: x.length > 0, entities))
+
+        return {
+            "message": utils.remove_surrogates(parser.text),
+            "entities": sorted(entities, key=lambda e: e.offset) or None
+        }
+
+class PatchedParser(Parser):
+    def __init__(self, client):
+        super().__init__(client)
+        self.html = HTML(client)
 
 class InlineResult(Object):
     """Single inline result"""
