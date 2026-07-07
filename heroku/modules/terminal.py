@@ -458,7 +458,7 @@ class TerminalMod(loader.Module):
         }
 
     @staticmethod
-    def _short_cmd(cmd: str) -> str:
+    def _truncate_label(cmd: str) -> str:
         return cmd[:15] + "..." if len(cmd) > 15 else cmd
 
     @loader.inline_handler()
@@ -477,7 +477,7 @@ class TerminalMod(loader.Module):
         if self._is_dangerous(raw):
             return {
                 "title": self.strings("inline_hint"),
-                "description": self._short_cmd(raw),
+                "description": self._truncate_label(raw),
                 "message": self.strings("dangerous_command").format(
                     utils.escape_html(raw)
                 ),
@@ -489,7 +489,7 @@ class TerminalMod(loader.Module):
 
         return {
             "title": self.strings("inline_hint"),
-            "description": self._short_cmd(raw),
+            "description": self._truncate_label(raw),
             "message": self.strings("exec_confirm").format(utils.escape_html(raw)),
             "thumb": BANNER_OK,
             "reply_markup": self._build_inline_exec_markup(uid),
