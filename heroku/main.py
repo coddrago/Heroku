@@ -576,7 +576,9 @@ class Heroku:
         self.sessions += [
             session.rsplit(".session", maxsplit=1)[0]
             for session in filter(
-                lambda f: (f.startswith("heroku-") or f.startswith("hikka-")) and f.endswith(".session"),
+                lambda f: (f.startswith("heroku-") or f.startswith("hikka-"))
+                and f.endswith(".session")
+                and "-bot-" not in f,
                 os.listdir(SESSIONS_DIR),
             )
         ]
