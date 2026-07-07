@@ -440,7 +440,7 @@ class Help(loader.Module):
                         else f"\n\n{self.strings('partial_load')}"
                     ),
                 ),
-                link_preview_options = banner,
+                **kwargs,
             )
         elif only_loaded:
             await utils.answer(
@@ -454,7 +454,7 @@ class Help(loader.Module):
                         else f"\n\n{self.strings('partial_load')}"
                     ),
                 ),
-                link_preview_options = banner,
+                **kwargs,
             )
         else:
             await utils.answer(
@@ -469,7 +469,7 @@ class Help(loader.Module):
                         else f"\n\n{self.strings('partial_load')}"
                     ),
                 ),
-                link_preview_options = banner,
+                **kwargs,
             )
 
     @loader.command(ru_doc="| Ссылка на чат помощи", ua_doc="| посилання для чату служби підтримки", de_doc="| Link zum Support-Chat")
