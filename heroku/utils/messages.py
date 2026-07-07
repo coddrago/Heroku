@@ -14,7 +14,7 @@ import typing
 
 import grapheme
 import pyrogram
-from pyrogram.enums import ChatType, MessageMediaType
+from pyrogram.enums import ChatType, MessageMediaType, ParseMode
 from pyrogram.parser.html import HTML
 from pyrogram.types import InputMedia, Message, MessageEntity, LinkPreviewOptions, ReplyParameters
 from pyrogram.raw.types import (
@@ -407,9 +407,14 @@ async def answer(
                 )
             else:
                 kwargs.pop("file", None)
-                result = await (message.edit_text if edit else message.answer)(
-                    text,
-                    entities=entities,
+                # kurigram's edit_message_text/edit_inline_text silently discard a
+                # passed `entities=` list (it gets shadowed by a local `entities = None`
+                # before use), so pre-computed entities never actually apply on edit.
+                # Pass the raw HTML through parse_mode instead and let the single
+                # internal parse pass (which does honor parse_mode) do the work.
+                result = await message.edit_text(
+                    response,
+                    parse_mode=ParseMode.HTML,
                     **kwargs,
                 )
         else:
