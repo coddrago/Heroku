@@ -9,9 +9,10 @@
 import asyncio
 import logging
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
-from aiogram.types import InputPollOption, Message as AiogramMessage, PollAnswer
+from pyrogram import enums
+from pyrogram.types import InputPollOption, Message as PyrogramMessage, Poll
 
 from .. import loader
 from ..inline.types import BotInlineCall
@@ -45,6 +46,10 @@ class PollStatus:
     message_ids: list[int]
     answers: list[bool]
     step: int
+    # Persistent ids of the poll's options, in the order they were sent -
+    # a vote update only tells us which persistent_id was picked, not its
+    # index, so this is how we map it back to `QUESTIONS[step].answer_index`.
+    option_ids: list[str] = field(default_factory=list)
 
 
 QUESTIONS = [
@@ -61,7 +66,6 @@ class LoaderRestrictor(loader.Module):
 
     async def client_ready(self):
         self.poll: PollStatus | None = None
-        self.inline._dp.poll_answer.register(self.poll_handler)
 
         if not self.get("passed", False):
             await self.inline.bot.send_message(
@@ -83,7 +87,7 @@ class LoaderRestrictor(loader.Module):
         await call.delete()
         await self._start_quiz()
 
-    async def _send_poll(self, poll_step: PollStep) -> AiogramMessage:
+    async def _send_poll(self, poll_step: PollStep) -> PyrogramMessage:
         return await self.inline.bot.send_poll(
             self.client.tg_id,
             question=self.strings[poll_step.key],
@@ -91,26 +95,33 @@ class LoaderRestrictor(loader.Module):
                 InputPollOption(text=self.strings[ans])
                 for ans in poll_step.answer_keys
             ],
-            type="quiz",
+            type=enums.PollType.QUIZ,
             is_anonymous=False,
-            correct_option_id=poll_step.answer_index,
+            correct_option_ids=[poll_step.answer_index],
             explanation=self.strings[poll_step.hint],
         )
 
-    async def poll_handler(self, poll_answer: PollAnswer):
+    @loader.need_update("poll_answer")
+    async def poll_handler(self, client, poll: Poll):
         if self.get("passed", False):
             return
 
-        if not self.poll or poll_answer.poll_id != self.poll.poll_id:
+        if not self.poll or poll.id != self.poll.poll_id:
             return
 
-        if poll_answer.user is None or poll_answer.user.id != self.client.tg_id:
+        if poll.voter is None or poll.voter.id != self.client.tg_id:
             return
 
-        if not poll_answer.option_ids:
+        if not poll.options:
             return
 
-        correct = QUESTIONS[self.poll.step].is_correct(poll_answer.option_ids[0])
+        try:
+            answer_index = self.poll.option_ids.index(poll.options[0].persistent_id)
+        except ValueError:
+            logger.warning("Got a poll vote with an unknown persistent_id")
+            return
+
+        correct = QUESTIONS[self.poll.step].is_correct(answer_index)
         self.poll.answers.append(correct)
 
         if not correct:
@@ -141,9 +152,10 @@ class LoaderRestrictor(loader.Module):
 
         self.poll = PollStatus(
             poll_id=poll_m.poll.id,
-            message_ids=[poll_m.message_id],
+            message_ids=[poll_m.id],
             answers=[],
             step=0,
+            option_ids=[opt.persistent_id for opt in poll_m.poll.options],
         )
         asyncio.create_task(self._watch_timeout(self.poll.poll_id))
 
@@ -155,8 +167,9 @@ class LoaderRestrictor(loader.Module):
         question = QUESTIONS[self.poll.step]
 
         poll_m = await self._send_poll(question)
-        self.poll.message_ids.append(poll_m.message_id)
+        self.poll.message_ids.append(poll_m.id)
         self.poll.poll_id = poll_m.poll.id
+        self.poll.option_ids = [opt.persistent_id for opt in poll_m.poll.options]
         asyncio.create_task(self._watch_timeout(self.poll.poll_id))
 
     async def _end_quiz(self):
@@ -177,7 +190,7 @@ class LoaderRestrictor(loader.Module):
             self.strings[message_key],
         )
 
-    async def aiogram_watcher(self, message: AiogramMessage):
+    async def bot_watcher(self, message: PyrogramMessage):
         if (
             message.text != "/start lm_verify"
             or message.from_user is None
