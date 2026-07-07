@@ -26,6 +26,7 @@ from pyrogram.types import (
     InlineQueryResultArticle,
     InputTextMessageContent,
 )
+from pyrogram.enums import ParseMode
 from pyrogram.errors import ChatSendInlineForbidden, FloodWait
 # from pyrogram.extensions.html import CUSTOM_EMOJIS
 from pyrogram.types import Message, ReplyParameters
@@ -317,7 +318,7 @@ class List(InlineUnit):
                                 title="Heroku",
                                 input_message_content=InputTextMessageContent(
                                     message_text=self.sanitise_text(unit["strings"][0]),
-                                    parse_mode="HTML",
+                                    parse_mode=ParseMode.HTML,
                                     disable_web_page_preview=True,
                                 ),
                                 reply_markup=self._list_markup(inline_query.query),

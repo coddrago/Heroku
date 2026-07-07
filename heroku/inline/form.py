@@ -33,6 +33,7 @@ from pyrogram.types import (
     InlineQueryResultVideo,
     InputTextMessageContent,
 )
+from pyrogram.enums import ParseMode
 from pyrogram.errors import ChatSendInlineForbidden
 # from pyrogram.extensions.html import CUSTOM_EMOJIS
 from pyrogram.types import Message, ReplyParameters
@@ -436,7 +437,7 @@ class Form(InlineUnit):
                                         if inline_query.from_user.id == self._me
                                         else "🔄 <b>Transferring value to userbot...</b>"
                                     ),
-                                    parse_mode="HTML",
+                                    parse_mode=ParseMode.HTML,
                                     disable_web_page_preview=True,
                                 ),
                             )
@@ -462,7 +463,7 @@ class Form(InlineUnit):
                             title="Heroku",
                             description="Heroku",
                             caption=form.get("text"),
-                            parse_mode="HTML",
+                            parse_mode=ParseMode.HTML,
                             photo_url=form["photo"],
                             thumb_url=(
                                 "https://img.icons8.com/cotton/452/moon-satellite.png"
@@ -481,7 +482,7 @@ class Form(InlineUnit):
                             id=utils.rand(20),
                             title="Heroku",
                             caption=form.get("text"),
-                            parse_mode="HTML",
+                            parse_mode=ParseMode.HTML,
                             animation_url=form["gif"],
                             thumb_url=(
                                 "https://img.icons8.com/cotton/452/moon-satellite.png"
@@ -501,7 +502,7 @@ class Form(InlineUnit):
                             title="Heroku",
                             description="Heroku",
                             caption=form.get("text"),
-                            parse_mode="HTML",
+                            parse_mode=ParseMode.HTML,
                             video_url=form["video"],
                             thumb_url=(
                                 "https://img.icons8.com/cotton/452/moon-satellite.png"
@@ -522,7 +523,7 @@ class Form(InlineUnit):
                             title="Heroku",
                             description="Heroku",
                             caption=form.get("text"),
-                            parse_mode="HTML",
+                            parse_mode=ParseMode.HTML,
                             document_url=form["file"],
                             mime_type=form["mime_type"],
                             reply_markup=self.generate_markup(
@@ -554,7 +555,7 @@ class Form(InlineUnit):
                             id=utils.rand(20),
                             audio_url=form["audio"]["url"],
                             caption=form.get("text"),
-                            parse_mode="HTML",
+                            parse_mode=ParseMode.HTML,
                             title=form["audio"].get("title", "Heroku"),
                             performer=form["audio"].get("performer", ""),
                             audio_duration=form["audio"].get("duration", 0),
@@ -573,7 +574,7 @@ class Form(InlineUnit):
                             title="Heroku",
                             input_message_content=InputTextMessageContent(
                                 message_text=form["text"],
-                                parse_mode="HTML",
+                                parse_mode=ParseMode.HTML,
                                 disable_web_page_preview=True,
                             ),
                             reply_markup=self.generate_markup(inline_query.query),

@@ -19,7 +19,7 @@ import time
 import typing
 
 from pyrogram import Client
-from pyrogram.enums import ChatType
+from pyrogram.enums import ChatType, ParseMode
 from pyrogram.errors import (
     AccessTokenExpired,
     AccessTokenInvalid,
@@ -172,6 +172,7 @@ class InlineManager(
             api_hash=self._client.api_hash,
             bot_token=self._token,
             workdir=main.SESSIONS_DIR,
+            parse_mode=ParseMode.HTML,
         )
 
         try:

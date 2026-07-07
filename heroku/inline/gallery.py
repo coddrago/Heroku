@@ -30,6 +30,7 @@ from pyrogram.types import (
     InputMediaAnimation,
     InputMediaPhoto,
 )
+from pyrogram.enums import ParseMode
 from pyrogram.errors import ChatSendInlineForbidden, FloodWait, RPCError
 CUSTOM_EMOJIS = True# from pyrogram.extensions.html import CUSTOM_EMOJIS
 from pyrogram.types import Message, ReplyParameters
@@ -498,7 +499,7 @@ class Gallery(InlineUnit):
                     unit_id,
                     index=self._units[unit_id]["current_index"],
                 ),
-                parse_mode="HTML",
+                parse_mode=ParseMode.HTML,
             )
 
         return InputMediaPhoto(
@@ -507,7 +508,7 @@ class Gallery(InlineUnit):
                 unit_id,
                 index=self._units[unit_id]["current_index"],
             ),
-            parse_mode="HTML",
+            parse_mode=ParseMode.HTML,
         )
 
     async def _gallery_page(

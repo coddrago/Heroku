@@ -34,7 +34,7 @@ from pyrogram.types import (
     InputMediaVideo,
 )
 
-from pyrogram.enums import ButtonStyle
+from pyrogram.enums import ButtonStyle, ParseMode
 
 from pyrogram.errors import RPCError, FloodWait
 from pyrogram.enums import ClientPlatform
@@ -436,9 +436,9 @@ class Utils(InlineUnit):
 
         match kind:
             case "file":
-                media = InputMediaDocument(media=media, caption=text, parse_mode="HTML")
+                media = InputMediaDocument(media=media, caption=text, parse_mode=ParseMode.HTML)
             case "photo":
-                media = InputMediaPhoto(media=media, caption=text, parse_mode="HTML")
+                media = InputMediaPhoto(media=media, caption=text, parse_mode=ParseMode.HTML)
             case "audio":
                 if isinstance(audio, dict):
                     media = InputMediaAudio(
@@ -447,18 +447,18 @@ class Utils(InlineUnit):
                         performer=audio.get("performer"),
                         duration=audio.get("duration"),
                         caption=text,
-                        parse_mode="HTML",
+                        parse_mode=ParseMode.HTML,
                     )
                 else:
                     media = InputMediaAudio(
                         media=audio,
                         caption=text,
-                        parse_mode="HTML",
+                        parse_mode=ParseMode.HTML,
                     )
             case "video":
-                media = InputMediaVideo(media=media, caption=text, parse_mode="HTML")
+                media = InputMediaVideo(media=media, caption=text, parse_mode=ParseMode.HTML)
             case "gif":
-                media = InputMediaAnimation(media=media, caption=text, parse_mode="HTML")
+                media = InputMediaAnimation(media=media, caption=text, parse_mode=ParseMode.HTML)
 
         if media is None and text is None and reply_markup:
             try:

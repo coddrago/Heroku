@@ -13,7 +13,9 @@
 import logging
 import typing
 
+from pyrogram.enums import ParseMode
 from pyrogram.types import InlineQueryResultArticle, InputTextMessageContent
+from pyrogram.types import Message as _PyrogramMessage
 
 HerokuReplyMarkup = typing.Union[typing.List[typing.List[dict]], typing.List[dict], dict]
 
@@ -186,6 +188,10 @@ class InlineUnit:
         """Made just for type specification"""
 
 
+class BotMessage(_PyrogramMessage):
+    """Message sent/received through the inline bot's pyrogram client"""
+
+
 class InlineQuery(_RawProxyMixin):
     """Wraps a pyrogram `InlineQuery`, adding Heroku's canned error responders"""
 
@@ -207,7 +213,7 @@ class InlineQuery(_RawProxyMixin):
                 description=description,
                 input_message_content=InputTextMessageContent(
                     message_text="😶‍🌫️ <i>There is nothing here...</i>",
-                    parse_mode="HTML",
+                    parse_mode=ParseMode.HTML,
                 ),
                 thumb_url=thumbnail_url,
                 thumb_width=128,

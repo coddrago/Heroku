@@ -16,7 +16,7 @@ import re
 import typing
 from asyncio import Event
 
-from pyrogram.enums import ChatType
+from pyrogram.enums import ChatType, ParseMode
 from pyrogram.types import CallbackQuery, ChosenInlineResult
 from pyrogram.types import InlineQuery as PyrogramInlineQuery
 from pyrogram.types import (
@@ -136,7 +136,7 @@ class Events(InlineUnit):
                                 description=self.sanitise_text(res.get("description")),
                                 input_message_content=InputTextMessageContent(
                                     message_text=self.sanitise_text(res["message"]),
-                                    parse_mode="HTML",
+                                    parse_mode=ParseMode.HTML,
                                     disable_web_page_preview=True,
                                 ),
                                 thumb_url=res.get("thumb"),
@@ -155,7 +155,7 @@ class Events(InlineUnit):
                                         res.get("description")
                                     ),
                                     caption=self.sanitise_text(res.get("caption")),
-                                    parse_mode="HTML",
+                                    parse_mode=ParseMode.HTML,
                                     thumb_url=res.get("thumb", res["photo"]),
                                     photo_url=res["photo"],
                                     reply_markup=self.generate_markup(
@@ -168,7 +168,7 @@ class Events(InlineUnit):
                                         id=utils.rand(20),
                                         title=self.sanitise_text(res.get("title")),
                                         caption=self.sanitise_text(res.get("caption")),
-                                        parse_mode="HTML",
+                                        parse_mode=ParseMode.HTML,
                                         thumb_url=res.get("thumb", res["gif"]),
                                         animation_url=res["gif"],
                                         reply_markup=self.generate_markup(
@@ -187,7 +187,7 @@ class Events(InlineUnit):
                                             caption=self.sanitise_text(
                                                 res.get("caption")
                                             ),
-                                            parse_mode="HTML",
+                                            parse_mode=ParseMode.HTML,
                                             thumb_url=res.get("thumb", res["video"]),
                                             video_url=res["video"],
                                             mime_type="video/mp4",
@@ -206,7 +206,7 @@ class Events(InlineUnit):
                                             caption=self.sanitise_text(
                                                 res.get("caption")
                                             ),
-                                            parse_mode="HTML",
+                                            parse_mode=ParseMode.HTML,
                                             thumb_url=res.get("thumb", res["file"]),
                                             document_url=res["file"],
                                             mime_type=res["mime_type"],
@@ -452,7 +452,7 @@ class Events(InlineUnit):
                                     utils.escape_html(doc),
                                 )
                             ),
-                            parse_mode="HTML",
+                            parse_mode=ParseMode.HTML,
                             disable_web_page_preview=True,
                         ),
                         thumb_url=thumb,
@@ -481,7 +481,7 @@ class Events(InlineUnit):
                         description=self.translator.getkey("inline.no_inline_cmds"),
                         input_message_content=InputTextMessageContent(
                             message_text=self.translator.getkey("inline.no_inline_cmds_msg"),
-                            parse_mode="HTML",
+                            parse_mode=ParseMode.HTML,
                             disable_web_page_preview=True,
                         ),
                         thumb_url=(
@@ -509,7 +509,7 @@ class Events(InlineUnit):
                                 "\n".join(map(lambda x: x[1], _help))
                             )
                         ),
-                        parse_mode="HTML",
+                        parse_mode=ParseMode.HTML,
                         disable_web_page_preview=True,
                     ),
                     thumb_url=(
