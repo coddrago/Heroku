@@ -29,10 +29,17 @@ from pyrogram.errors import (
 )
 from pyrogram.handlers import (
     CallbackQueryHandler,
+    ChatBoostHandler,
+    ChatJoinRequestHandler,
     ChosenInlineResultHandler,
+    EditedMessageHandler,
     InlineQueryHandler,
     MessageHandler,
+    MessageReactionCountHandler,
+    MessageReactionHandler,
     PollHandler,
+    PreCheckoutQueryHandler,
+    ShippingQueryHandler,
 )
 from pyrogram.types import Chat, Message, ReplyParameters
 from pyrogram.raw.functions.contacts.unblock import Unblock
@@ -64,11 +71,18 @@ if typing.TYPE_CHECKING:
 # told apart at registration time by whether `poll.voter` is populated.
 _BOT_UPDATE_HANDLER_CLASSES: typing.Dict[str, type] = {
     "message": MessageHandler,
+    "edited_message": EditedMessageHandler,
     "callback_query": CallbackQueryHandler,
     "inline_query": InlineQueryHandler,
     "chosen_inline_result": ChosenInlineResultHandler,
     "poll": PollHandler,
     "poll_answer": PollHandler,
+    "shipping_query": ShippingQueryHandler,
+    "pre_checkout_query": PreCheckoutQueryHandler,
+    "chat_join_request": ChatJoinRequestHandler,
+    "message_reaction": MessageReactionHandler,
+    "message_reaction_count": MessageReactionCountHandler,
+    "chat_boost": ChatBoostHandler,
 }
 
 
