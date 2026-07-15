@@ -343,11 +343,9 @@ class CommandDispatcher:
         if not message.message or len(message.message.strip()) == len(prefix):
             return False  # Message is just the prefix
 
-        command = message.message[len(prefix) :].strip().split(maxsplit=1)[0]
+        _cmd = message.message[len(prefix) :]
+        command = _cmd.strip().split(maxsplit=1)[0]
         tag = command.split("@", maxsplit=1)
-        # logger.info(f"Received command: {command}")
-        tag = command.split("@", maxsplit=1)
-        # logger.info(f"Command tag: {tag}")
 
         if len(tag) == 2:
             if tag[1] == "me":
@@ -404,7 +402,9 @@ class CommandDispatcher:
 
             return False
 
-        message.message = prefix + txt + message.message[len(prefix + command) :]
+        _cmd_offset = len(prefix) + len(_cmd) - len(_cmd.strip())
+        if not watcher:
+            message.message = prefix + txt + message.message[_cmd_offset + len(command) :]
 
         if (
             f"{str(chat_id)}.{func.__self__.__module__}" in blacklist_chats
