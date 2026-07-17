@@ -277,6 +277,11 @@ class InlineManager(
             self._bot = self.bot
             self._register_builtin_handlers()
             bot_me = await self._bot_client.get_me()
+            telegram_id = bot_me.id
+            self._bot_client._tg_id = telegram_id
+            self._bot_client.tg_id = telegram_id
+            self._bot_client.hikka_me = bot_me
+            self._bot_client.heroku_me = bot_me
             self.bot_username = bot_me.username
             self.bot_id = bot_me.id
         except (
