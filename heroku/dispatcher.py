@@ -327,7 +327,7 @@ class CommandDispatcher:
             or event.dice
             or event.audio
             or event.via_bot_id
-            or getattr(event, "reactions", False)
+            or (getattr(event, "reactions", False) and getattr(event, "edit_hide", False))
         ):
             return False
 
@@ -404,7 +404,15 @@ class CommandDispatcher:
 
         _cmd_offset = len(prefix) + len(_cmd) - len(_cmd.strip())
         if not watcher:
-            message.message = prefix + txt + message.message[_cmd_offset + len(command) :]
+            new_text = prefix + txt + message.message[_cmd_offset + len(command) :]
+            if new_text != message.message:
+                _offset = len(new_text) - len(message.message)
+
+                if _offset:
+                    utils.relocate_entities(message.entities, _offset, new_text)
+
+                message._text = None
+                message.message = new_text
 
         if (
             f"{str(chat_id)}.{func.__self__.__module__}" in blacklist_chats
