@@ -12,7 +12,7 @@
 # You can redistribute it and/or modify it under the terms of the GNU AGPLv3
 # 🔑 https://www.gnu.org/licenses/agpl-3.0.html
 
-__version__ = (2, 0, 0)
+__version__ = (2, 1, 0)
 
 import os
 
@@ -21,22 +21,17 @@ if not NO_GIT:
     import git
 else:
     git = None
-from ._internal import (
-    check_commit_ancestor,
-    get_branch_name,
-    reset_to_master,
-    restart,
-    restore_worktree,
-)
+from ._internal import (check_commit_ancestor, get_branch_name,
+                        reset_to_master, restart, restore_worktree)
 
 if NO_GIT:
     branch = "master"
 else:
     try:
-        branch = git.Repo(
+        assert git is not None
+        with git.Repo(
             path=os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-        ).active_branch.name
+        ) as repo:
+            branch = repo.active_branch.name
     except Exception:
         branch = "master"
-
-

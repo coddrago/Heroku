@@ -18,14 +18,14 @@ import random
 import signal
 import sys
 import subprocess
-import re
+from collections.abc import Callable
 
 
 async def fw_protect():
     await asyncio.sleep(random.randint(1000, 2000) / 1000)
 
 
-def get_startup_callback() -> callable:
+def get_startup_callback() -> Callable:
     return lambda *_: os.execl(
         sys.executable,
         sys.executable,
@@ -60,21 +60,16 @@ def restart():
 
     print("🔄 Restarting...")
 
-    match True:
-        case _ if "LAVHOST" in os.environ:
-            os.system("lavhost restart")
-            return
-        case _:
-            if "HEROKU_DO_NOT_RESTART" not in os.environ:
-                os.environ["HEROKU_DO_NOT_RESTART"] = "1"
-            else:
-                os.environ["HEROKU_DO_NOT_RESTART2"] = "1"
+    if "HEROKU_DO_NOT_RESTART" not in os.environ:
+        os.environ["HEROKU_DO_NOT_RESTART"] = "1"
+    else:
+        os.environ["HEROKU_DO_NOT_RESTART2"] = "1"
 
-            if "DOCKER" in os.environ or sys.platform == "win32":
-                atexit.register(get_startup_callback())
-            else:
-                signal.signal(signal.SIGTERM, get_startup_callback())
-            die()
+    if "DOCKER" in os.environ or sys.platform == "win32":
+        atexit.register(get_startup_callback())
+    else:
+        signal.signal(signal.SIGTERM, get_startup_callback())
+    die()
 
 
 def print_banner(banner: str):
@@ -88,14 +83,18 @@ def print_banner(banner: str):
                 banner,
             )
         ),
-        "r",
     ) as f:
         print(f.read())
 
 
-def check_commit_ancestor(commit, repo_path):
+def check_commit_ancestor(repo, branch):
     """Check if commit is ancestor of origin/master"""
     try:
+        commit = repo.commit(branch).hexsha
+        repo_path = repo.working_tree_dir or os.path.abspath(
+            os.path.join(os.path.dirname(__file__), "..")
+        )
+
         proc = subprocess.run(
             [
                 "git",
@@ -120,15 +119,15 @@ def get_branch_name(repo_path):
     try:
         import git
 
-        repo = git.Repo(path=repo_path)
-        branch_name = repo.active_branch.name
+        with git.Repo(path=repo_path) as repo:
+            branch_name = repo.active_branch.name
     except Exception:
         pass
 
     if not branch_name:
         try:
             head_path = os.path.join(repo_path, ".git", "HEAD")
-            with open(head_path, "r", encoding="utf-8") as f:
+            with open(head_path, encoding="utf-8") as f:
                 content = f.read().strip()
             if content.startswith("ref:"):
                 branch_name = content.split("/")[-1]
@@ -162,9 +161,9 @@ def reset_to_master(repo_path):
     try:
         import git
 
-        repo = git.Repo(path=repo_path)
-        repo.head.reset(index=True, working_tree=True)
-        repo.heads.master.checkout(force=True)
+        with git.Repo(path=repo_path) as repo:
+            repo.head.reset(index=True, working_tree=True)
+            repo.heads.master.checkout(force=True)
     except Exception:
         try:
             subprocess.run(

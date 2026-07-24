@@ -12,7 +12,7 @@ custom_placeholders = {}
 def register_placeholder(
     placeholder: str,
     callback: typing.Callable,
-    description: typing.Optional[str] = None,
+    description: str | None = None,
 ):
     """
     Register placeholder
@@ -36,7 +36,7 @@ async def get_placeholder(placeholder: str, data: dict | None = None):
     callback = custom_placeholders[placeholder]["callback"]
     try:
         callback_data = str(await callback(data))
-    except:
+    except Exception:
         callback_data = str(await callback())
     return callback_data
 
@@ -81,6 +81,17 @@ def config_placeholders():
         return None
     else:
         return "\n".join(result)
+
+
+def module_placeholders(module_name: str) -> list[str]:
+    """
+    Return placeholder names registered by module
+    """
+    result = []
+    for placeholder_name, placeholder_data in custom_placeholders.items():
+        if placeholder_data.get("module_name") == module_name:
+            result.append(placeholder_name)
+    return result
 
 
 def help_placeholders(module_name, self):

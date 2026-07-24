@@ -11,8 +11,9 @@ import functools
 import logging
 import random
 import signal
+import sys
 import typing
-import inspect
+import warnings
 
 import herokutl
 from herokutl import hints
@@ -29,6 +30,25 @@ from ..types import ListLike
 
 parser = herokutl.utils.sanitize_parse_mode("html")
 logger = logging.getLogger(__name__)
+
+
+def ensure_child_watcher():
+    """Ensure the active asyncio policy can spawn subprocesses."""
+    if sys.platform == "win32" or sys.version_info >= (3, 14):
+        return
+
+    with warnings.catch_warnings():
+        # get_child_watcher() is deprecated on 3.12/3.13; we use it knowingly.
+        warnings.simplefilter("ignore", DeprecationWarning)
+        try:
+            asyncio.get_event_loop_policy().get_child_watcher()
+            return
+        except NotImplementedError:
+            pass
+
+        asyncio.set_event_loop_policy(asyncio.DefaultEventLoopPolicy())
+        with contextlib.suppress(RuntimeError):
+            asyncio.set_event_loop(asyncio.get_running_loop())
 
 custom_placeholders = {}
 
@@ -60,8 +80,8 @@ async def invite_inline_bot(
         await client(InviteToChannelRequest(peer, [client.loader.inline.bot_username]))
     except Exception as e:
         raise RuntimeError(
-            "Can't invite inline bot to old asset chat, which is required by module"
-        ) from e
+            f"Can't invite inline bot to old asset chat, which is required by module: {e}"
+        )
 
     with contextlib.suppress(Exception):
         await client(
@@ -129,7 +149,7 @@ def merge(
     return b
 
 
-def chunks(_list: ListLike, n: int, /) -> typing.List[typing.List[typing.Any]]:
+def chunks(_list: ListLike, n: int, /) -> list[list[typing.Any]]:
     """
     Split provided `_list` into chunks of `n`
     :param _list: List to split
@@ -141,7 +161,7 @@ def chunks(_list: ListLike, n: int, /) -> typing.List[typing.List[typing.Any]]:
 
 def atexit(
     func: typing.Callable,
-    use_signal: typing.Optional[int] = None,
+    use_signal: int | None = None,
     *args,
     **kwargs,
 ) -> None:

@@ -4,11 +4,10 @@
 # You can redistribute it and/or modify it under the terms of the GNU AGPLv3
 # 🔑 https://www.gnu.org/licenses/agpl-3.0.html
 
-import asyncio
 import logging
 import os
 import subprocess
-import typing
+from typing import Literal
 
 import git
 import herokutl
@@ -24,21 +23,21 @@ def _is_no_git() -> bool:
 
 
 # GeekTG Compatibility
-def get_git_info() -> typing.Tuple[str, str]:
+def get_git_info() -> tuple[str, str]:
     """
     Get git info
     :return: Git info
     """
     if _is_no_git():
         return ("", "")
-    hash_ = get_git_hash()
+    hash_ = get_git_hash() or ""
     return (
         hash_,
         f"https://github.com/coddrago/Heroku/commit/{hash_}" if hash_ else "",
     )
 
 
-def get_git_hash() -> typing.Union[str, bool]:
+def get_git_hash() -> str | Literal[False]:
     """
     Get current Heroku git hash
     :return: Git commit hash
@@ -46,7 +45,8 @@ def get_git_hash() -> typing.Union[str, bool]:
     if _is_no_git():
         return False
     try:
-        return git.Repo().head.commit.hexsha
+        with git.Repo() as repo:
+            return repo.head.commit.hexsha
     except Exception:
         return False
 
@@ -60,6 +60,8 @@ def get_commit_url() -> str:
         return "Unknown"
     try:
         hash_ = get_git_hash()
+        if not hash_:
+            return "Unknown"
         return f'<a href="https://github.com/coddrago/Heroku/commit/{hash_}">#{hash_[:7]}</a>'
     except Exception:
         return "Unknown"
@@ -105,8 +107,11 @@ def get_last_commit_message() -> str:
     if _is_no_git():
         return "Unknown"
     try:
-        repo = git.Repo()
-        return repo.head.commit.message.strip()
+        with git.Repo() as repo:
+            message = repo.head.commit.message
+            if isinstance(message, bytes):
+                return message.decode(errors="replace").strip()
+            return message.strip()
     except Exception:
         return "Unknown"
 
@@ -119,13 +124,13 @@ def get_commit_count() -> int:
     if _is_no_git():
         return 0
     try:
-        repo = git.Repo()
-        return len(list(repo.iter_commits()))
+        with git.Repo() as repo:
+            return len(list(repo.iter_commits()))
     except Exception:
         return 0
 
 
 def is_up_to_date():
-    repo = git.Repo(search_parent_directories=True)
-    diff = any(repo.iter_commits(f"HEAD..origin/{version.branch}", max_count=1))
-    return not diff
+    with git.Repo(search_parent_directories=True) as repo:
+        diff = any(repo.iter_commits(f"HEAD..origin/{version.branch}", max_count=1))
+        return not diff

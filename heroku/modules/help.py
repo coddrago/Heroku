@@ -16,7 +16,6 @@ import inspect
 import logging
 import re
 
-from herokutl.extensions.html import CUSTOM_EMOJIS
 from herokutl.tl.types import Message
 from herokutl.types import InputMediaWebPage
 
@@ -77,7 +76,17 @@ class Help(loader.Module):
                 lambda: "invert banner",
                 validator=loader.validators.Boolean(),
             ),
+            loader.ConfigValue(
+                "show_preview_in_help",
+                True,
+                lambda: self.strings["show_preview_in_help"],
+                validator=loader.validators.Boolean(),
+            ),
         )
+
+    def _get_banner_url(self, doc: str):
+        match = re.search(r"# ?meta banner: ?(.+)", doc)
+        return match.group(1).strip() if match else None
 
     @loader.command(
         ru_doc="[args] | Спрячет ваши модули",
@@ -87,7 +96,7 @@ class Help(loader.Module):
     async def helphide(self, message: Message):
         """[args] | hide your modules"""
         if not (modules := utils.get_args(message)):
-            await utils.answer(message, self.strings("no_mod"))
+            await utils.answer(message, self.strings["no_mod"])
             return
 
         currently_hidden = self.get("hide", [])
@@ -106,7 +115,7 @@ class Help(loader.Module):
 
         await utils.answer(
             message,
-            self.strings("hidden_shown").format(
+            self.strings["hidden_shown"].format(
                 len(hidden),
                 len(shown),
                 "\n".join([f"👁‍🗨 <i>{m}</i>" for m in hidden]),
@@ -170,7 +179,8 @@ class Help(loader.Module):
         )
 
         reply = "{} <b>{}</b>:".format(
-            "<tg-emoji emoji-id=5134452506935427991>🪐</tg-emoji>", _name, ""
+            "<tg-emoji emoji-id=5134452506935427991>🪐</tg-emoji>",
+            _name,
         )
         inline_cmd = ""
         cmds = ""
@@ -199,7 +209,7 @@ class Help(loader.Module):
                         (
                             utils.escape_html(inspect.getdoc(fun))
                             if fun.__doc__
-                            else self.strings("undoc")
+                            else self.strings["undoc"]
                         ),
                     )
                 )
@@ -227,7 +237,7 @@ class Help(loader.Module):
                     (
                         utils.escape_html(inspect.getdoc(fun))
                         if fun.__doc__
-                        else self.strings("undoc")
+                        else self.strings["undoc"]
                     ),
                 )
             )
@@ -239,17 +249,37 @@ class Help(loader.Module):
         placeholders = "\n".join(
             utils.help_placeholders(module.__class__.__name__, self)
         )
+
+        banner_kwargs = {}
+        if self.config["show_preview_in_help"]:
+            try:
+                source = getattr(module, "__source__", None)
+                if source:
+                    banner_url = self._get_banner_url(source)
+                    if banner_url:
+                        banner_kwargs = {
+                            "file": InputMediaWebPage(banner_url, optional=True),
+                            "invert_media": True,
+                        }
+            except Exception:
+                pass
+
         await utils.answer(
             message,
-            f"{reply}<blockquote expandable>{cmds}{inline_cmd}</blockquote>\n<blockquote expandable>"
-            + (f"{placeholders}</blockquote>" if placeholders else "")
-            + (f"\n\n{self.strings('developer')}".format(dev_text) if dev_text else "")
-            + (f"\n\n{self.strings('not_exact')}" if not exact else "")
+            f"{reply}<blockquote expandable>{cmds}{inline_cmd}</blockquote>"
             + (
-                f"\n{self.strings('core_notice')}"
+                f"<blockquote expandable>\n{placeholders}</blockquote>"
+                if placeholders
+                else ""
+            )
+            + (f"\n\n{self.strings['developer']}".format(dev_text) if dev_text else "")
+            + (f"\n\n{self.strings['not_exact']}" if not exact else "")
+            + (
+                f"\n{self.strings['core_notice']}"
                 if module.__origin__.startswith("<core")
                 else ""
             ),
+            **banner_kwargs,
         )
 
     @loader.command(
@@ -298,7 +328,7 @@ class Help(loader.Module):
 
         hidden = self.get("hide", [])
 
-        reply = self.strings("all_header").format(
+        reply = self.strings["all_header"].format(
             len(self.allmodules.modules),
             (
                 0
@@ -330,10 +360,13 @@ class Help(loader.Module):
             except KeyError:
                 name = getattr(mod, "name", "ERROR")
 
+            placeholders = utils.module_placeholders(mod.__class__.__name__)
+
             if (
                 not getattr(mod, "commands", None)
                 and not getattr(mod, "inline_handlers", None)
                 and not getattr(mod, "callback_handlers", None)
+                and not placeholders
             ):
                 no_commands_ += [
                     "\n{} <code>{}</code>".format(self.config["empty_emoji"], name)
@@ -392,7 +425,14 @@ class Help(loader.Module):
                 else:
                     tmp += f" | 🤖 {cmd}"
 
-            if commands or icommands:
+            for placeholder in placeholders:
+                if first:
+                    tmp += f": ( {{{placeholder}}}"
+                    first = False
+                else:
+                    tmp += f" | {{{placeholder}}}"
+
+            if commands or icommands or placeholders:
                 tmp += " )"
                 if core:
                     core_ += [tmp]
@@ -421,8 +461,8 @@ class Help(loader.Module):
                         "".join(core_),
                         (
                             ""
-                            if self.lookup("Loader").fully_loaded
-                            else f"\n\n{self.strings('partial_load')}"
+                            if self.lookup("LoaderMod").fully_loaded
+                            else f"\n\n{self.strings['partial_load']}"
                         ),
                     ),
                     file=banner,
@@ -439,8 +479,8 @@ class Help(loader.Module):
                         "".join(plain_ + (no_commands_ if force else [])),
                         (
                             ""
-                            if self.lookup("Loader").fully_loaded
-                            else f"\n\n{self.strings('partial_load')}"
+                            if self.lookup("LoaderMod").fully_loaded
+                            else f"\n\n{self.strings['partial_load']}"
                         ),
                     ),
                     file=banner,
@@ -458,8 +498,8 @@ class Help(loader.Module):
                         "".join(plain_ + (no_commands_ if force else [])),
                         (
                             ""
-                            if self.lookup("Loader").fully_loaded
-                            else f"\n\n{self.strings('partial_load')}"
+                            if self.lookup("LoaderMod").fully_loaded
+                            else f"\n\n{self.strings['partial_load']}"
                         ),
                     ),
                     file=banner,
@@ -476,5 +516,5 @@ class Help(loader.Module):
 
         await utils.answer(
             message,
-            self.strings("offchats"),
+            self.strings["offchats"],
         )

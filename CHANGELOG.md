@@ -1,5 +1,137 @@
 # Heroku Changelog
+## 🪐 Heroku 2.1.0
+
+ - fix security check in help
+ - fix blockquote in config and info
+ - add pip packages backup to backupall
+ - fix placeholders in help
+ - fix placeholders caption in UwU language
+ - fix loader.tag's
+ - add dlmall command
+ - add banner to .dlm
+ - add banner to help
+ - fix double prefixes
+ - fix RCE in web (add password and user to initializating client)
+ - fix bot creation
+ - fix chat creation
+ - add category in config
+ - fix addacc self reply logic
+ - add -w and --wipe argument for python3 -m heroku for wipe session, databases, loaded modules
+ - add duplicate alias warning with target command name
+ - add -f and --force argument to owneradd
+ - add -n and --nonick argument to owneradd
+ - add ubstop inline confirmation
+ - add -f and --force argument to ubstop
+ - migrate inline bot from aiogram to HerokuTL
+ - add support for receiving Bot API update types in the inline bot
+ - add inline terminal input continuation
+ - add terminate support for inline terminal sessions
+ - add configurable terminal protection boolean
+ - fix query_gallery calls when the bot is not mounted
+ - remove the web stack, web resources and related Docker/runtime pieces
+ - add Rust and Go eval commands
+ - add multi addalias and multi alias delete support
+ - add -c / --clear for delalias
+ - add -f flag for logs
+ - add --type-proxy startup option
+ - add packurl translation fallback cache
+ - add missing language packs
+ - add fuzzy suggestions for unload typos
+ - improve unknown string handling
+ - add loader.download_and_install logging
+ - replace direct database access with _get_raw
+ - catch AuthKeyUnregisteredError on startup
+ - remove custom_emojis handling from inline/config paths
+ - simplify config option formatting and category parameter display
+ - remove HerokuPluginSecurity
+ - fix requirements installation on startup
+ - add fuzzy search in config
+ - add pagination in config
+ - add language aliases for Ukrainian and Japanese
+ - refactor inline initialization
+ - remove GeekTG compatibility layer
+ - remove dead code
+ - fix chosen inline message edit
+ - fix child watcher
+ - fix terminal reply getting logic
+ - fix print() censor in .e command
+ - fix buttons language
+ - fix callable type annotation
+ - fix argument of type 'bool' is not iterable exception in inline events
+ - fix update banner display logic
+ - fix BotFather bot name in UwU strings
+ - improve bot update type handling (IDE hints)
+ - add basic auth for first-time web initialization
+ - add global rate limiting and tunnel closure
+ - add restriction for password and username length in web auth
+ - decentralize forum and topics creation
+ - add debug data to bot creation logs
+ - fix check_commit_ancestor
+ - fix headers reusing
+ - update SSH tunnel regex and add Serveo warning message
+ - enhance error logging for bot creation and inline settings changes
+ - fix wrong asynchronous function calls
+ - add broadcast to asset channel
+ - add code escape to error output
+ - add print output to error
+ - fix clearmodule command logic
+ - add output skip flag (-so) to e command
+ - fix clearmodules
+ - add # meta banner preview for modules
+ - add .dlmall command to download all modules from repositories
+ - fix invert media answer function
+ - fix getting args
+ - add # meta developer banner preview to help [module]
+ - fix IndexError in config pages
+ - avoid unexpected error while deleting inline message
+ - remove botfather web implementation
+ - add account transfer
+ - add new ConfigCategory type
+ - remove Jamhost
+ - remove command for disabling core protection
+ - improve token obtainment logic
+ - add category configuration options
+ - add support for receiving all Bot API update types via loader.need_update
+ - add inline terminal command execution
+ - add management for downloaded languages
+ - fix help command strings
+ - update Dockerfile
+ - fix database rights and actualize requirements
+ - add wipe command and safety flags
+ - fix full backup restore dependencies
+ - fix: wrap bot update handlers to bypass aiogram signature inspection
+ - fix TelegramClient missing _set_module_info attribute
+ - add successful module load debug log
+ - feat(config): add expandable blockquote for section parameters display
+ - fix(loader): include module name in debug log message
+ - fix(heroku_config): simplify formatting of option lines
+ - update config formatting
+ - refactor: streamline category parameter display
+ - add scope for restrict ml (no_ml)
+ - fix blocked db write to protected owner from loader
+ - improve autoupdate bot message logic
+ - remove web
+ - fix(Docker): fix image build and GitPython zombie processes, clean unused packages and envs
+ - migrate inline bot to Telethon
+ - add support for receiving all bot API updates 
+ - reload bot update handlers on module unload 
+ - replace &lt;emoji&gt; tag with &lt;tg-emoji&gt;
+ - support direct TL request execution via <b>call</b>
+ - add asyncio timeout to update retrieval function
+ - fix bugs
+ - modernize typing, format with Black and small cleanups
+ - refactor inline init and add ping bot function
+ - remove lavhost
+ - fix premium check
+ - update validators for emoji 1.x/2.x compat
+ - fix git zombie processes in updater
+ - migrate session management to dedicated sessions directory
+ - restrict ability to ml LoaderRestrictor module
+ - store bot's ID and user information in client instance
+ - enhance reaction handling and improve message text update logic
+
 ## 🪐 Heroku 2.0.0
+
 - rework utils
 - add prefix to start message
 - fix create bot
@@ -90,8 +222,8 @@
 - fix permission denied in info 
 - add hiding the phone in htl
 - add more protection for official telegram account (777000)
-- add button styles support for aiogram 3.25.0+ (danger, primary, success)
-- add premium emoji support in buttons via icon_custom_emoji_id (aiogram 3.25.0+)
+- add button styles support for the inline bot stack (danger, primary, success)
+- add premium emoji support in buttons via icon_custom_emoji_id
 - add aliases export/import
 - add folders
 - restrict inline queries for not allowed users
@@ -116,6 +248,7 @@
 - improve logging logic
 
 ## 🪐 Heroku 1.7.2
+
 - added autoupdate
 - updated heroku-tl to 1.7.2
 - fix folder bug
@@ -152,6 +285,7 @@
 - fix banner in .presets command
 
 ## 🪐 Heroku 1.7.1
+
 - fixed bug with web 
 - fixed bug with executor
 - fixed bug with presets command
@@ -165,7 +299,7 @@
 - update dockerfile
 - update heroku-tl to 1.1.3
 - fixed error with "method not mounted"
-- added log "aiogram sleep" to ignore filter
+- added bot polling sleep log to ignore filter
 
 ## 🪐 Heroku 1.7.0
 
@@ -188,7 +322,7 @@
 - fix close btn
 - fix native imports
 - added converting Hikka backups to Heroku
-- updated to aiogram 3.20.0
+- updated inline bot stack
 - fix some bugs with buttons in inline
 
 ## 🪐 Heroku 1.6.8
@@ -233,7 +367,7 @@
 ## 🌑 Heroku 1.6.6 beta
 
 - formatting ruff
-- add webapp support in InlineKeyboardButton
+- add webapp support in inline buttons
 - add random version name
 - fix UnicodeDecodeError in windows
 - add a new language Ukrainian
@@ -560,7 +694,7 @@
 - Add `@loader.command`, `@loader.watcher`, `@loader.inline_handler`, `@loader.callback_handler`
 - Add support for multiple watchers
 - Add support for command translate directly in decorator (`@loader.command(ru_doc="Привет")`)
-- Add support for :obj:`aiogram.types.Message` in `utils.get_chat_id`
+- Add support for bot messages in `utils.get_chat_id`
 - Add human-readable error message when trying to unload core module
 - Replace `print` with `logging.info` in main script to make url visible in logs
 - Automatically react to module post in developer's channel if possible
@@ -596,7 +730,7 @@
 - New `.e` error format
 - Ignore folder creation error
 - Fix unload error in module without commands
-- Rework aiogram media processing on edit
+- Rework inline media processing on edit
 
 ## 🌑 Heroku 1.2.10
 
@@ -873,7 +1007,7 @@
 - Add additional foolchecks
 - Migrate to walrus operator where necessary
 - Remove redundant code block
-- Add default aiogram parse mode
+- Add default inline bot parse mode
 - Rename some core stuff which was not supposed to be used by external developers
 
 ## 🌑 Heroku 1.1.15
