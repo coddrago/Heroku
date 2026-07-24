@@ -980,7 +980,7 @@ class Heroku:
             client.hikka_me = me
             client.heroku_me = me
 
-            await version.check_branch(me.id, a_i, self)
+            #await version.check_branch(me.id, a_i, self)
 
             while await self.amain(first, client):
                 first = False
