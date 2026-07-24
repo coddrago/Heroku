@@ -206,7 +206,3 @@ class LoaderRestrictor(loader.Module):
 
         await self._start_quiz()
 
-    @loader.command()
-    async def testquiz(self, message: Message):
-        await message.delete()
-        await self._start_quiz()
