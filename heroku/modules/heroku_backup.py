@@ -111,7 +111,7 @@ class HerokuBackupMod(loader.Module):
             )
             return
 
-        period = int(args)
+        period = int(args) * 60 * 60
         self.set("period", period)
         self.set("last_backup", round(time.time()))
         await utils.answer(
