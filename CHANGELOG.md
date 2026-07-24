@@ -1,7 +1,7 @@
 # Heroku Changelog
 ## 🪐 Heroku 2.1.0
 
-- fix security check in help
+ - fix security check in help
  - fix blockquote in config and info
  - add pip packages backup to backupall
  - fix placeholders in help
@@ -55,13 +55,11 @@
  - fix child watcher
  - fix terminal reply getting logic
  - fix print() censor in .e command
- - fix missing <a href="module.name">module.name</a> attribute
  - fix buttons language
  - fix callable type annotation
  - fix argument of type 'bool' is not iterable exception in inline events
  - fix update banner display logic
  - fix BotFather bot name in UwU strings
- - fix m.delete fallback
  - improve bot update type handling (IDE hints)
  - add basic auth for first-time web initialization
  - add global rate limiting and tunnel closure
@@ -78,13 +76,11 @@
  - add print output to error
  - fix clearmodule command logic
  - add output skip flag (-so) to e command
- - fix UA strings
  - fix clearmodules
  - add # meta banner preview for modules
- - add .dlm all argument to download all modules from repositories
+ - add .dlmall command to download all modules from repositories
  - fix invert media answer function
  - fix getting args
- - remove 'all' argument from .dlm, add standalone .dlmall command
  - add # meta developer banner preview to help [module]
  - fix IndexError in config pages
  - avoid unexpected error while deleting inline message
@@ -114,34 +110,23 @@
  - add scope for restrict ml (no_ml)
  - fix blocked db write to protected owner from loader
  - improve autoupdate bot message logic
- - remove web (first-time web auth/init)
+ - remove web
  - fix(Docker): fix image build and GitPython zombie processes, clean unused packages and envs
  - migrate inline bot to Telethon
- - add protection against sys._getframe usage
- - remove test strings
- - add support for receiving all bot API updates (partial)
- - reload bot update handlers on module unload (anti-zombie)
- - fix downloaded languages button
- - add check for help flag in root user condition
- - remove "Heroku" mention in uwu language
+ - add support for receiving all bot API updates 
+ - reload bot update handlers on module unload 
  - replace &lt;emoji&gt; tag with &lt;tg-emoji&gt;
  - support direct TL request execution via <b>call</b>
- - fix: revive categories after removing dead code
  - add asyncio timeout to update retrieval function
- - set ASKPASS to 0 to skip interactive prompt
  - fix bugs
- - downgrade code to support Python 3.10+
  - modernize typing, format with Black and small cleanups
  - refactor inline init and add ping bot function
- - replace some emojis
  - remove lavhost
  - fix premium check
  - update validators for emoji 1.x/2.x compat
  - fix git zombie processes in updater
  - migrate session management to dedicated sessions directory
  - restrict ability to ml LoaderRestrictor module
- - exclude bot sessions from session file retrieval
- - fix command offset
  - store bot's ID and user information in client instance
  - enhance reaction handling and improve message text update logic
 
