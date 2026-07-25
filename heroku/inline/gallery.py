@@ -523,7 +523,13 @@ class Gallery(InlineUnit):
                 await self._gallery_slideshow(call, unit_id)
                 return
             case _ if page == "close":
-                await self._delete_unit_message(call, unit_id=unit_id)
+                deleted = await self._delete_unit_message(call, unit_id=unit_id)
+                try:
+                    await call.answer(
+                        "" if deleted else "Error occurred", show_alert=not deleted
+                    )
+                except Exception:
+                    pass
                 return
             case _ if page < 0:
                 await call.answer("No way back")

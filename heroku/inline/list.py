@@ -271,7 +271,13 @@ class List(InlineUnit):
     ):
         match True:
             case _ if page == "close":
-                await self._delete_unit_message(call, unit_id=unit_id)
+                deleted = await self._delete_unit_message(call, unit_id=unit_id)
+                try:
+                    await call.answer(
+                        "" if deleted else "Error occurred", show_alert=not deleted
+                    )
+                except Exception:
+                    pass
                 return
             case _ if self._units[unit_id]["current_index"] < 0 or page >= len(
                 self._units[unit_id]["strings"]
