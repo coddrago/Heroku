@@ -302,9 +302,7 @@ class CommandDispatcher:
                         message.message[len(prefix) :],
                         parse_mode=lambda s: (
                             s,
-                            utils.relocate_entities(
-                                message.entities, -1, message.message
-                            )
+                            utils.relocate_entities(message.entities, -1)
                             or (),
                         ),
                     )
@@ -409,7 +407,7 @@ class CommandDispatcher:
                 _offset = len(new_text) - len(message.message)
 
                 if _offset:
-                    utils.relocate_entities(message.entities, _offset, new_text)
+                    utils.relocate_entities(message.entities, _offset)
 
                 message._text = None
                 message.message = new_text
