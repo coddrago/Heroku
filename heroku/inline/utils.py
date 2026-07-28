@@ -565,13 +565,13 @@ class Utils(InlineUnit):
             if chat_id and message_id:
                 try:
                     await self.bot.delete_message(chat_id, message_id)
-                    return True
                 except Exception:
                     logger.debug(
-                        "Bot couldn't delete %s, falling back to user client",
-                        unit_id,
-                        exc_info=True,
+                        "Failed to delete bot message %s", unit_id, exc_info=True
                     )
+                    return False
+
+                return True
 
         if not unit_id and getattr(call, "unit_id", None):
             unit_id = call.unit_id
