@@ -64,7 +64,13 @@ CONSTRUCTORS = {
 }
 
 
-_MODULE_FRAME_RE = re.compile(r"heroku\.modules\.([\w.]+)")
+_MODULE_FRAME_RE = re.compile(r"heroku\.modules\.([^>]+)")
+_MODULE_UID_RE = re.compile(r"%(.)")
+
+
+def _module_name(uid: str) -> ыек:
+    name = _MODULE_UID_RE.sub(lambda m: "." if m[1] == "d" else m[1], uid)
+    return name.rsplit("/", 1)[-1].removesuffix(".py") if "/" in name else name
 
 
 def _current_task_label() -> str:
@@ -92,7 +98,7 @@ def find_call_chain(*, limit: int = 4, skip: int = 1) -> str:
         while frame and len(chain) < limit:
             code = frame.f_code
             if match := _MODULE_FRAME_RE.search(code.co_filename):
-                chain += [f"{match[1]}:{frame.f_lineno}:{code.co_name}"]
+                chain += [f"{_module_name(match[1])}:{frame.f_lineno}:{code.co_name}"]
 
             frame = frame.f_back
 
