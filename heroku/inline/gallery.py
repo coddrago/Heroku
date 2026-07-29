@@ -102,7 +102,7 @@ class Gallery(InlineUnit):
             isinstance(caption, str)
             or isinstance(caption, list)
             and all(isinstance(item, str) for item in caption)
-        ) and not Callable(caption):
+        ) and not callable(caption):
             logger.error(
                 (
                     "Invalid type for `caption`. Expected `str` or `list` or"
@@ -225,7 +225,7 @@ class Gallery(InlineUnit):
             **({"ttl": round(time.time()) + ttl} if ttl else {}),
             **({"force_me": force_me} if force_me else {}),
             **({"disable_security": disable_security} if disable_security else {}),
-            **({"on_unload": on_unload} if Callable(on_unload) else {}),
+            **({"on_unload": on_unload} if callable(on_unload) else {}),
             **({"preload": preload} if preload else {}),
             **({"gif": gif} if gif else {}),
             **({"always_allow": always_allow} if always_allow else {}),
@@ -344,7 +344,7 @@ class Gallery(InlineUnit):
                 photo_url = callback[0]
             case _ if asyncio.iscoroutinefunction(callback):
                 photo_url = await callback()
-            case _ if Callable(callback):
+            case _ if callable(callback):
                 photo_url = callback()
             case _:
                 logger.error(
@@ -608,7 +608,7 @@ class Gallery(InlineUnit):
         return (
             caption
             if isinstance(caption, str)
-            else caption() if Callable(caption) else ""
+            else caption() if callable(caption) else ""
         )
 
     def _gallery_markup(self: "InlineManager", unit_id: str):
