@@ -68,7 +68,7 @@ _MODULE_FRAME_RE = re.compile(r"heroku\.modules\.([^>]+)")
 _MODULE_UID_RE = re.compile(r"%(.)")
 
 
-def _module_name(uid: str) -> ыек:
+def _module_name(uid: str) -> str:
     name = _MODULE_UID_RE.sub(lambda m: "." if m[1] == "d" else m[1], uid)
     return name.rsplit("/", 1)[-1].removesuffix(".py") if "/" in name else name
 
