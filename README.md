@@ -47,7 +47,7 @@
 ## ⚠️ Security Notice
 
 > **Important Security Advisory**  
-> While Heroku implements extended security measures, installing modules from untrusted developers may still cause damage to your server/account.
+> While Heroku offers extended security measures, installing modules from untrusted developers may still cause damage to your server/account.
 > 
 > **Recommendations:**
 > - ✅ Download modules exclusively from official repositories or trusted developers
