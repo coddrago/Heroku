@@ -1780,6 +1780,6 @@ class HerokuConfigMod(loader.Module):
 
         await self.inline__choose_category(message)
 
-    @loader.command(alias="fcfg")
+    @loader.command(alias="cfg")
     async def configcmd(self, message: Message):
         await self._configcmd_impl(message)
