@@ -223,6 +223,7 @@ class InfiniteLoop:
             self.status = False
             self._task.add_done_callback(self._stop)
             self._task.cancel()
+            self._task = None
             return asyncio.ensure_future(self._wait_for_stop.wait())
 
         logger.debug("Loop is not running")
