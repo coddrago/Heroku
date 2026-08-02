@@ -173,6 +173,26 @@ def get_ram_usage() -> float:
         return 0
 
 
+def get_swap_usage() -> dict:
+    """
+    Get swap usage information
+    :return: Dictionary with used, total in MB and percent, or error string
+    """
+    try:
+        import psutil
+
+        swap = psutil.swap_memory()
+        if swap.total == 0:
+            return {"error": "Swap is not configured on this system"}
+        return {
+            "percent": round(swap.percent, 1),
+            "used": round(swap.used / 1024 / 1024),
+            "total": round(swap.total / 1024 / 1024),
+        }
+    except Exception:
+        return {"error": "Failed to get swap usage"}
+
+
 def get_cpu_usage():
     """
     Get CPU usage percentage using system-wide metrics
