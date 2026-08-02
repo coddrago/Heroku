@@ -207,6 +207,7 @@ class InfiniteLoop:
         self._wait_before = wait_before
         self._stop_clause = stop_clause
         self.autostart = autostart
+        self._wait_for_stop = asyncio.Event()
 
     def _stop(self, *args, **kwargs):
         self._wait_for_stop.set()
@@ -275,6 +276,7 @@ class InfiniteLoop:
         self._wait_for_stop.set()
 
         self.status = False
+        self._task = None
 
     def __del__(self):
         self.stop()
