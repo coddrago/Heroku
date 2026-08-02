@@ -173,6 +173,24 @@ def get_ram_usage() -> float:
         return 0
 
 
+def get_ram_usage_system() -> dict:
+    """
+    Get system-wide RAM usage information
+    :return: Dictionary with used, total in MB and percent
+    """
+    try:
+        import psutil
+
+        vm = psutil.virtual_memory()
+        return {
+            "percent": round(vm.percent, 1),
+            "used": round(vm.used / 1024 / 1024),
+            "total": round(vm.total / 1024 / 1024),
+        }
+    except Exception:
+        return {"error": "Failed to get RAM usage"}
+
+
 def get_swap_usage() -> dict:
     """
     Get swap usage information
