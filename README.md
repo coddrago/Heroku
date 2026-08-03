@@ -142,7 +142,7 @@ python3 -m heroku
   4. <b>After successful installation, a terminal will open in front of you, write there:</b>
     
   ```bash
-  sudo apt update && sudo apt upgrade -y && sudo apt install python3 git python3-pip -y && git clone https://github.com/coddrago/Heroku && cd Heroku && python3 -m venv .venv && source .venv/bin/activate && sudo pip install -r requirements.txt && python3 -m heroku
+  sudo apt update ; sudo apt upgrade -y ; sudo apt install -y python3 python3-venv git ; git clone https://github.com/coddrago/Heroku ; cd Heroku ; python3 -m venv venv ; source venv/bin/activate ; python3 -m heroku
   ```
 
 5. <b>At the end of the installation, a link will appear, follow it and enter your account details to log in.</b>
