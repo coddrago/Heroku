@@ -140,7 +140,7 @@ clear && git clone https://github.com/coddrago/Heroku && cd Heroku && python3 -m
 3. <b>Дождитесь установки дистрибутива, можете заварить чай</b>
 4. <b>После успешной установки перед вами откроется терминал, введите туда:</b>
 ```bash
-sudo apt update && sudo apt upgrade -y && sudo apt install python3 git python3-pip -y && git clone https://github.com/coddrago/Heroku && cd Heroku && python3 -m venv .venv && source .venv/bin/activate && sudo pip install -r requirements.txt && python3 -m heroku
+sudo apt update ; sudo apt upgrade -y ; sudo apt install -y python3 python3-venv git ; git clone https://github.com/coddrago/Heroku ; cd Heroku ; python3 -m venv venv ; source venv/bin/activate ; python3 -m heroku
 ```
 5. <b>В конце установки появится ссылка, перейдите по ней и введите данные своей учетной записи для входа.</b>
 > Вуаля! Вы установили Heroku на UserLAnd.
