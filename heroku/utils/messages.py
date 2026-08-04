@@ -13,14 +13,16 @@ import typing
 
 import grapheme
 import herokutl
+from herokutl.tl.custom import Message
 from herokutl.tl.types import (
     Channel,
     Chat,
     InputDocument,
-    Message,
+    InputReplyToMessage,
     MessageMediaPhoto,
     MessageMediaDocument,
     MessageMediaWebPage,
+    MessageReplyHeader,
 )
 
 from .other import _copy_tl
@@ -49,19 +51,20 @@ def get_topic(message: Message) -> int | None:
     :param message: Message to get topic of
     :return: int or None if not present
     """
-    return (
-        (message.reply_to.reply_to_top_id or message.reply_to.reply_to_msg_id)
-        if (
-            isinstance(message, Message)
-            and message.reply_to
-            and message.reply_to.forum_topic
-        )
-        else (
-            message.form["top_msg_id"]
-            if isinstance(message, (InlineCall, InlineMessage))
-            else None
-        )
-    )
+    if isinstance(message, (InlineCall, InlineMessage)):
+        return message.form["top_msg_id"]
+
+    if not isinstance(message, Message):
+        return None
+
+    reply_to = message.reply_to
+    if isinstance(reply_to, MessageReplyHeader):
+        if reply_to.forum_topic:
+            return reply_to.reply_to_top_id or reply_to.reply_to_msg_id
+        return None
+    if isinstance(reply_to, InputReplyToMessage):
+        return reply_to.top_msg_id
+    return None
 
 
 def mime_type(message: Message) -> str:
