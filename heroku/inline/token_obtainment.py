@@ -42,7 +42,36 @@ class TokenObtainment(InlineUnit):
             logger.debug(">> %s", m.raw_text)
             logger.debug("<< %s", r.raw_text)
 
-            if "20" in r.raw_text:
+            if "cannot create new bots" in r.raw_text.lower() or "20" in r.raw_text:
+                prefix = self._client.loader.get_prefix()
+
+                text = (
+                    "<b>🚫 @BotFather won't create an inline bot for this"
+                    " account because of spamban or has exceeded the 20-bot limit</b>.\n\n"
+                    "You can still enable inline features with an existing"
+                    " bot:\n\n"
+                    "• <b>You already own a bot</b> - attach it:"
+                    f" <code>{prefix}ch_heroku_bot &lt;username&gt;</code>"
+                    f" (or paste its token: <code>{prefix}ch_bot_token"
+                    " &lt;token&gt;</code>).\n\n"
+                    "• <b>You don't</b> - create a bot on another account"
+                    " via @BotFather, then transfer it to this account"
+                    " (@BotFather > <code>/mybots</code> > the bot >"
+                    " <b>Transfer Ownership</b>) and run"
+                    f" <code>{prefix}ch_heroku_bot &lt;username&gt;</code>"
+                    " here."
+                )
+
+                try:
+                    await self._client.send_message(
+                        "me",
+                        text,
+                    )
+                except Exception:
+                    logger.exception("Unable to send a warn to user's Saved Messages")
+
+                logger.error(utils.remove_html(text))
+
                 return False
 
             await fw_protect()
@@ -67,8 +96,6 @@ class TokenObtainment(InlineUnit):
                 uid = utils.rand(6)
                 genran = "".join(random.choice(main.LATIN_MOCK))
                 username = f"@{genran}_{uid}_bot"
-
-            self._token = None
 
             for msg in [
                 "🪐 Heroku userbot"[:64],
