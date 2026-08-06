@@ -68,9 +68,17 @@ class TokenObtainment(InlineUnit):
                 genran = "".join(random.choice(main.LATIN_MOCK))
                 username = f"@{genran}_{uid}_bot"
 
+            self._token = None
+
             for msg in [
                 "🪐 Heroku userbot"[:64],
                 username,
+                "/setinline",
+                username,
+                "user@heroku:~$",
+                "/setinlinefeedback",
+                username,
+                "Enabled",
                 "/setuserpic",
                 username,
             ]:
@@ -80,6 +88,12 @@ class TokenObtainment(InlineUnit):
 
                 logger.debug(">> %s", m.raw_text)
                 logger.debug("<< %s", r.raw_text)
+
+                if not self._token and (
+                    match := re.search(r"\d{6,}:[A-Za-z0-9_-]{35}", r.raw_text)
+                ):
+                    self._token = match.group(0)
+                    self._db.set("heroku.inline", "bot_token", self._token)
 
                 await fw_protect()
                 await m.delete()
@@ -113,6 +127,9 @@ class TokenObtainment(InlineUnit):
 
             await m.delete()
             await r.delete()
+
+        if self._token:
+            return True
 
         return await self._assert_token(create_new_if_needed=False)
 
