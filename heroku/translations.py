@@ -48,6 +48,13 @@ LANGUAGE_COMPAT_ALIASES = {
 }
 MEME_LANGUAGES = {}
 
+MEME_LANGUAGE_FALLBACKS = {
+    "neofit": ("ru", "en"),
+    "tiktok": ("ru", "en"),
+    "leet": ("en",),
+    "uwu": ("en",),
+}
+
 
 def normalize_language(language: str) -> str:
     return LANGUAGE_ALIASES.get(language, language)
@@ -65,6 +72,7 @@ def iter_language_codes(language: str) -> typing.Iterator[str]:
     language = normalize_language(language)
     yield language
     yield from LANGUAGE_COMPAT_ALIASES.get(language, ())
+    yield from MEME_LANGUAGE_FALLBACKS.get(language, ())
 
 
 def get_language_pack_path(language: str) -> Path | None:
