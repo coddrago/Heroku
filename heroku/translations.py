@@ -33,6 +33,10 @@ SUPPORTED_LANGUAGES = {
     "uk": "🇺🇦 Український",
     "de": "🇩🇪 Deutsch",
     "ja": "🇯🇵 日本語",
+    "leet": "🇬🇧 1337",
+    "uwu": "🇬🇧 UwU",
+    "tiktok": "🇷🇺 TikTokKid",
+    "neofit": "🇬🇧 Neofit",
 }
 LANGUAGE_ALIASES = {
     "ua": "uk",
@@ -42,12 +46,7 @@ LANGUAGE_COMPAT_ALIASES = {
     "uk": ("ua",),
     "ja": ("jp",),
 }
-MEME_LANGUAGES = {
-    "leet": "🏴‍☠️ 1337",
-    "uwu": "🏴‍☠️ UwU",
-    "tiktok": "🏴‍☠️ TikTokKid",
-    "neofit": "🏴‍☠️ Neofit",
-}
+MEME_LANGUAGES = {}
 
 
 def normalize_language(language: str) -> str:
@@ -291,14 +290,7 @@ class Strings:
                                 if self._translator is not None
                                 else ["en"]
                             )
-                            for lang in (
-                                list(iter_language_codes(original_lang))
-                                + (
-                                    ["en"]
-                                    if original_lang in ["leet", "uwu", "neofit"]
-                                    else ["ru"] if original_lang == "tiktok" else []
-                                )
-                            )
+                            for lang in list(iter_language_codes(original_lang))
                             if hasattr(self._mod, f"strings_{lang}")
                             and isinstance(getattr(self._mod, f"strings_{lang}"), dict)
                             and key in getattr(self._mod, f"strings_{lang}")

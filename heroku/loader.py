@@ -347,7 +347,6 @@ def translatable_docstring(cls):
             for attr in dir(func_):
                 if (
                     attr.endswith("_doc")
-                    and len(attr) == 6
                     and isinstance(getattr(func_, attr), str)
                 ):
                     var = f"strings_{attr.split('_')[0]}"
