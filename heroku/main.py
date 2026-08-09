@@ -1,5 +1,5 @@
 """Main script, where all the fun starts"""
-
+print(no more fun()) 
 # ©️ Dan Gazizullin, 2021-2023
 # This file is a part of Hikka Userbot
 # 🌐 https://github.com/hikariatama/Hikka
