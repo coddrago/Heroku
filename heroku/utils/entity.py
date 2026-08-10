@@ -403,6 +403,8 @@ async def asset_forum_topic(
         )
         await fw_protect()
         for found_topic in result.topics:
+            if isinstance(found_topic, ForumTopicDeleted):
+                continue
             if found_topic.title == topic_title:
                 forums_cache.setdefault(entity.title, {})[topic_title] = found_topic.id
                 return found_topic.id
