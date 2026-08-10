@@ -223,7 +223,7 @@ class Translator(BaseTranslator):
                     self.raw_data[language] = data
                     any_ = True
 
-        for language in SUPPORTED_LANGUAGES:
+        for language in {**SUPPORTED_LANGUAGES, **MEME_LANGUAGES}:
             if language not in self.raw_data and (
                 possible_path := get_language_pack_path(language)
             ):
@@ -235,7 +235,7 @@ class Translator(BaseTranslator):
 class ExternalTranslator(BaseTranslator):
     def __init__(self):
         self.data = {}
-        for lang in SUPPORTED_LANGUAGES:
+        for lang in {**SUPPORTED_LANGUAGES, **MEME_LANGUAGES}:
             pack_path = get_language_pack_path(lang)
             self.data[lang] = (
                 self._get_pack_content(pack_path, prefix="") if pack_path else {}
