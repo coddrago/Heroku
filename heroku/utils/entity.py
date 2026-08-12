@@ -157,6 +157,16 @@ def get_entity_url(
     )
 
 
+def get_link(user: User | Channel, /) -> str:
+    """
+    Get telegram permalink to entity
+    :param user: User or channel
+    :return: Link to entity
+    """
+    return get_entity_url(user)
+
+
+
 def remove_emoji(text: str) -> str:
     """
     Removes all emoji from text
