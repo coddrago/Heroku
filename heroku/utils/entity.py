@@ -201,23 +201,6 @@ def check_url(url: str) -> bool:
         return False
 
 
-def get_link(user: User | Channel, /) -> str:
-    """
-    Get telegram permalink to entity
-    :param user: User or channel
-    :return: Link to entity
-    """
-    return (
-        f"tg://user?id={user.id}"
-        if isinstance(user, User)
-        else (
-            f"tg://resolve?domain={user.username}"
-            if getattr(user, "username", None)
-            else ""
-        )
-    )
-
-
 async def asset_channel(
     client: CustomTelegramClient,
     title: str,
