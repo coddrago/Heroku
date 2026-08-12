@@ -730,7 +730,7 @@ class HerokuSecurityMod(loader.Module):
                 "\n".join(
                     [
                         self.strings["li"].format(
-                            i.id, utils.escape_html(get_display_name(i))
+                            utils.get_entity_url(i), utils.escape_html(get_display_name(i))
                         )
                         + (f" ({p})" if p else "")
                         for i, p in zip(_resolved_users, _and_prefixes)

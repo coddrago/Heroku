@@ -23,7 +23,7 @@ heroku_security:
   owner_removed: '<tg-emoji emoji-id=5386399931378440814>😎</tg-emoji> <b><a href="tg://user?id={}">{}</a> をグループ</b> <code>owner</code> <b>から削除しました</b>'
   no_user: "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>許可するユーザーを指定してください</b>"
   not_a_user: "<tg-emoji emoji-id=5447644880824181073>⚠️</tg-emoji> <b>指定されたエンティティはユーザーではありません</b>"
-  li: '<tg-emoji emoji-id=4974307891025543730>▫️</tg-emoji> <b><a href="tg://user?id={}">{}</a></b>'
+  li: '<tg-emoji emoji-id=4974307891025543730>▫️</tg-emoji> <b><a href="{}">{}</a></b>'
   warning: "⚠️ <b>本当に <a href=\"tg://user?id={}\">{}</a> をグループ</b> <code>{}</code> <b>に追加しますか？\nこの操作により、個人情報が開示されたり、このユーザーにユーザーボットへの完全または部分的なアクセス権が付与される可能性があります</b>"
   cancel: "🚫 キャンセル"
   confirm: "👑 確認"

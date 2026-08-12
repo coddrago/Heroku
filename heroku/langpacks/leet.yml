@@ -23,7 +23,7 @@ heroku_security:
   owner_removed: '<tg-emoji emoji-id=5386399931378440814>😎</tg-emoji> <b><a href="tg://user?id={}">{}</a> r3m0v3d fr0m gr0up</b> <code>owner</code>'
   no_user: "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>Sp3c1fy u53r 2 p3rm17</b>"
   not_a_user: "<tg-emoji emoji-id=5447644880824181073>⚠️</tg-emoji> <b>Sp3c1f13d 3n717y 15 n07 4 u53r</b>"
-  li: '<tg-emoji emoji-id=4974307891025543730>▫️</tg-emoji> <b><a href="tg://user?id={}">{}</a></b>'
+  li: '<tg-emoji emoji-id=4974307891025543730>▫️</tg-emoji> <b><a href="{}">{}</a></b>'
   warning: "⚠️ <b>Plz, c0nf1rm, 7h47 u w4n7 2 4dd <a href=\"tg://user?id={}\">{}</a> 2 gr0up</b> <code>{}</code><b>!\n7h15 4c710n m4y r3v34l p3r50n4l 1nf0 & gr4n7 full/p4r714l 4cc355 2 u53rb07 4 7h15 u53r</b>"
   cancel: "🚫 C4nc3l"
   confirm: "👑 C0nf1rm"

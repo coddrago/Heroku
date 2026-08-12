@@ -23,7 +23,7 @@ heroku_security:
   owner_removed: '<tg-emoji emoji-id=5386399931378440814>😎</tg-emoji> <b><a href="tg://user?id={}">{}</a> wemoved fwom gwoup</b> <code>owner</code> T_T'
   no_user: "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>Spwecify usew to pewmit pwz</b>"
   not_a_user: "<tg-emoji emoji-id=5447644880824181073>⚠️</tg-emoji> <b>Specified entity is nyot a usew o_O</b>"
-  li: '<tg-emoji emoji-id=4974307891025543730>▫️</tg-emoji> <b><a href="tg://user?id={}">{}</a></b>'
+  li: '<tg-emoji emoji-id=4974307891025543730>▫️</tg-emoji> <b><a href="{}">{}</a></b>'
   warning: "⚠️ <b>P-Pwease, confiwm, dat you want to add <a href=\"tg://user?id={}\">{}</a> to gwoup</b> <code>{}</code><b>!\nDis action may weveaw pewsonaw info and gwant fuww ow pawtiaw access to usewbot to dis usew &gt;///&lt;</b>"
   cancel: "🚫 Cancew"
   confirm: "👑 Confiwm"

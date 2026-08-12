@@ -94,7 +94,7 @@ heroku_security:
   name: HerokuSecurity
   cancel_btn: 🚫 Abbrechen
   confirm_btn: 👑 Bestätigen
-  li: <tg-emoji emoji-id=4974307891025543730>▫️</tg-emoji> <b><a href="tg://user?id={}">{}</a></b>
+  li: <tg-emoji emoji-id=4974307891025543730>▫️</tg-emoji> <b><a href="{}">{}</a></b>
 heroku_settings:
   watchers: "<tg-emoji emoji-id=5424885441100782420>👀</tg-emoji> <b>Wächter:</b>\n\n<blockquote expandable><b>{}</b></blockquote>"
   mod404: "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>Wächter {} nicht gefunden</b>"

@@ -23,7 +23,7 @@ heroku_security:
   owner_removed: '<tg-emoji emoji-id=5386399931378440814>😎</tg-emoji> <b>deluser <a href="tg://user?id={}">{}</a> sudo</b>'
   no_user: "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>NullPointer: Target is None</b>"
   not_a_user: "<tg-emoji emoji-id=5447644880824181073>⚠️</tg-emoji> <b>TypeError: Expected User instance</b>"
-  li: '<tg-emoji emoji-id=4974307891025543730>▫️</tg-emoji> <b><a href="tg://user?id={}">{}</a></b>'
+  li: '<tg-emoji emoji-id=4974307891025543730>▫️</tg-emoji> <b><a href="{}">{}</a></b>'
   warning: "⚠️ <b>Warning: echo \"<a href=\"tg://user?id={}\">{}</a>\" >> /etc/group (</b><code>{}</code><b>)!\nGranting rwx permissions.</b>"
   cancel: "🚫 SIGINT (^C)"
   confirm: "👑 sudo !!"
