@@ -75,6 +75,15 @@ class HerokuInfoMod(loader.Module):
             ),
         )
 
+    def _get_cpu_info(self) -> str | None:
+        try:
+            return f"{psutil.cpu_count(logical=False)} ({psutil.cpu_count()}) core(-s); {psutil.cpu_percent()}% total"
+        except PermissionError:
+            return None
+        except Exception:
+            logger.exception("Unsupported placeholder")
+            return None
+
     def _get_os_name(self):
         try:
             with open("/etc/os-release") as f:
@@ -149,20 +158,22 @@ class HerokuInfoMod(loader.Module):
             "user": getpass.getuser(),
             "os": self._get_os_name() or self.strings["non_detectable"],
             "kernel": lib_platform.release(),
-            "cpu": f"{psutil.cpu_count(logical=False)} ({psutil.cpu_count()}) core(-s); {psutil.cpu_percent()}% total",
             "ping": round((time.perf_counter_ns() - start) / 10**6, 3),
             "htl_ver": herokutl.__version__,
             "git_status": utils.get_git_status(),
         }
+
+        cpu_info = self._get_cpu_info()
+        if cpu_info:
+            data["cpu"] = cpu_info
+
         data = await utils.get_placeholders(data, self.config["custom_message"])
         if self.config["custom_message"]:
             try:
                 placeholders_msg = self.config["custom_message"].format(**data)
             except KeyError:
                 logger.exception("Missing placeholder in custom_message")
-                placeholders_msg = (
-                    "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji>"
-                )
+                placeholders_msg = self.config["custom_message"]
         return (
             placeholders_msg
             if self.config["custom_message"]
