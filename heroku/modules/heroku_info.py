@@ -22,6 +22,7 @@ from herokutl.utils import get_display_name
 from .. import loader, utils, version
 import platform as lib_platform
 import getpass
+import re
 
 logger = logging.getLogger(__name__)
 
@@ -170,7 +171,11 @@ class HerokuInfoMod(loader.Module):
         data = await utils.get_placeholders(data, self.config["custom_message"])
         if self.config["custom_message"]:
             try:
-                placeholders_msg = self.config["custom_message"].format(**data)
+                placeholders_msg = re.sub(
+                    r"{(\w+)}",
+                    lambda match: str(data.get(match.group(1), match.group(0))),
+                    self.config["custom_message"],
+                )
             except KeyError:
                 logger.exception("Missing placeholder in custom_message")
                 placeholders_msg = self.config["custom_message"]
