@@ -28,6 +28,7 @@ from herokutl.errors.rpcerrorlist import ChatSendInlineForbiddenError
 from herokutl.tl.types import InputGeoPoint, Message
 
 from .. import main, utils
+from .._internal import tag_client_id
 from ..types import HerokuReplyMarkup
 from .types import InlineMessage, InlineUnit
 
@@ -57,6 +58,7 @@ class Placeholder:
 
 
 class Form(InlineUnit):
+    @tag_client_id("_client.tg_id")
     async def form(
         self: "InlineManager",
         text: str,
@@ -107,9 +109,6 @@ class Form(InlineUnit):
         :param silent: Whether the form must be sent silently (w/o "Opening form..." message)
         :return: If form is sent, returns :obj:`InlineMessage`, otherwise returns `False`
         """
-        with contextlib.suppress(AttributeError):
-            _heroku_client_id_logging_tag = copy.copy(self._client.tg_id)  # noqa: F841
-
         if reply_markup is None:
             reply_markup = []
 

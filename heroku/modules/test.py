@@ -56,8 +56,8 @@ class TestMod(loader.Module):
                     " is a module TestModule installed on Client1 and TestModule2 on"
                     " Client2. By default, Client2 will get logs from TestModule2, and"
                     " Client1 will get logs from TestModule. If this option is enabled,"
-                    " Heroku will send all logs to Client1 and Client2, even if it is"
-                    " not the one that caused the log."
+                    " this client will also receive logs, caused by other clients. It"
+                    " affects this client only."
                 ),
                 validator=loader.validators.Boolean(),
                 on_change=self._pass_config_to_logger,
@@ -136,24 +136,32 @@ class TestMod(loader.Module):
         )
 
     def _pass_config_to_logger(self):
-        logging.getLogger().handlers[0].force_send_all = self.config["force_send_all"]
-        logging.getLogger().handlers[0].tg_level = {
-            "ALL": 0,
-            "DEBUG": 10,
-            "INFO": 20,
-            "WARNING": 30,
-            "ERROR": 40,
-            "CRITICAL": 50,
-            "DISABLE": 50000,
-        }[self.config["tglog_level"]]
-        logging.getLogger().handlers[0].ignore_common = self.config["ignore_common"]
+        client_id = getattr(self, "tg_id", None)
+
+        if client_id is None:
+            return
+
+        logging.getLogger().handlers[0].set_client_options(
+            client_id,
+            force_send_all=self.config["force_send_all"],
+            tg_level={
+                "ALL": 0,
+                "DEBUG": 10,
+                "INFO": 20,
+                "WARNING": 30,
+                "ERROR": 40,
+                "CRITICAL": 50,
+                "DISABLE": 50000,
+            }[self.config["tglog_level"]],
+            ignore_common=self.config["ignore_common"],
+        )
 
     @loader.command()
     async def clearlogs(self, message: Message):
         for handler in logging.getLogger().handlers:
             handler.buffer = []
             handler.handledbuffer = []
-            handler.tg_buff = ""
+            handler.tg_buff = []
 
         await utils.answer(message, self.strings["logs_cleared"])
 

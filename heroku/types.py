@@ -42,6 +42,7 @@ from herokutl.tl.types import (
 )
 
 from . import version
+from ._internal import tag_client_id
 from ._reference_finder import replace_all_refs
 from .inline.types import (
     BotInlineCall,
@@ -258,6 +259,7 @@ class Module:
     def heroku_watchers(self, _):
         pass
 
+    @tag_client_id("client.tg_id")
     async def animate(
         self,
         message: Message | InlineMessage,
@@ -278,9 +280,6 @@ class Module:
         button due to the limitations of Telegram API
         """
         from . import utils
-
-        with contextlib.suppress(AttributeError):
-            _heroku_client_id_logging_tag = copy.copy(self.client.tg_id)  # noqa: F841
 
         if interval < 0.1:
             logger.warning(
