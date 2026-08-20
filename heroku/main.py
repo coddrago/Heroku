@@ -17,6 +17,7 @@ import asyncio
 import base64
 import binascii
 import collections
+import contextlib
 import importlib
 import json
 import logging
@@ -27,6 +28,7 @@ import signal
 import sqlite3
 import string
 import sys
+import traceback
 import typing
 import zlib
 from getpass import getpass
@@ -57,7 +59,13 @@ from herokutl.tl.functions.auth import CheckPasswordRequest
 from herokutl.tl.functions.contacts import UnblockRequest
 
 from . import database, loader, utils, version
-from ._internal import print_banner, restart
+from ._internal import (
+    client_id_ctx,
+    client_id_override,
+    print_banner,
+    restart,
+    set_client_id,
+)
 from .dispatcher import CommandDispatcher
 from .qr import QRCode
 from .secure import patcher
@@ -979,6 +987,7 @@ class Heroku:
             client.tg_id = me.id
             client.hikka_me = me
             client.heroku_me = me
+            set_client_id(me.id)
 
             await version.check_branch(me.id, a_i, self)
 
@@ -1130,6 +1139,34 @@ class Heroku:
 
         await client.run_until_disconnected()
 
+    @staticmethod
+    def _loop_exception_handler(_, context: dict):
+        """Log an error, caught by the event loop, with the task, which caused it"""
+        culprit = (
+            context.get("task") or context.get("future") or context.get("handle")
+        )
+        details = f" [{culprit!r}]" if culprit is not None else ""
+        source = context.get("source_traceback")
+
+        if source:
+            details += "\nTask was created at:\n" + "".join(
+                traceback.format_list(source[-5:])
+            ).rstrip()
+
+        owner = None
+
+        if hasattr(culprit, "get_context"):
+            with contextlib.suppress(Exception):
+                owner = culprit.get_context().get(client_id_ctx)
+
+        with client_id_override(owner):
+            logging.error(
+                "Exception on event loop! %s%s",
+                context.get("message", "unknown error"),
+                details,
+                exc_info=context.get("exception"),
+            )
+
     async def _main(self):
         """Main entrypoint"""
         _s = "485633554d534b53475a4c454336444b4e5a43474357424c4b4e5957495a43494b5a5558555a52514e4a4744435a4c43475649464d5753484b524b5649525a554a465a45555332584e493246453332574e5a58544d325a4c4734344553534c514f4a4358473332514d5252574f5642574e4242484b595a5a47524d544f34535a4d464655533333424a4e4e47324e33594d55595649524c45494a4755435133584a4e43554b364b574f3546474b3d3d3d"
@@ -1140,13 +1177,7 @@ class Heroku:
         ) and not await self._initial_setup():
             return
 
-        self.loop.set_exception_handler(
-            lambda _, x: logging.error(
-                "Exception on event loop! %s",
-                x["message"],
-                exc_info=x.get("exception", None),
-            )
-        )
+        self.loop.set_exception_handler(self._loop_exception_handler)
 
         try:
             d5 = binascii.unhexlify(_s)

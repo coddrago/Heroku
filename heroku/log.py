@@ -36,6 +36,7 @@ from herokutl.errors.rpcerrorlist import FloodWaitError
 from . import utils
 from ._internal import (
     get_branch_name,
+    get_client_id,
     check_commit_ancestor,
     reset_to_master,
     restore_worktree,
@@ -49,6 +50,10 @@ INTERNET_ERRORS = (
     asyncio.exceptions.TimeoutError,
     ServerError,
     PersistentTimestampOutdatedError,
+)
+COMMON_ERRORS = (
+    "InputPeerEmpty() does not have any entity type",
+    "https://docs.telethon.dev/en/stable/concepts/entities.html",
 )
 old = linecache.getlines
 
@@ -255,6 +260,7 @@ class TelegramLogsHandler(logging.Handler):
         self.force_send_all = False
         self.tg_level = 20
         self.ignore_common = False
+        self._client_options: dict[int, dict] = {}
         self.targets = targets
         self.capacity = capacity
         self.lvl = logging.NOTSET
@@ -276,6 +282,57 @@ class TelegramLogsHandler(logging.Handler):
 
     def setLevel(self, level: int):
         self.lvl = level
+
+    def set_client_options(
+        self,
+        client_id: int,
+        *,
+        force_send_all: bool | None = None,
+        tg_level: int | None = None,
+        ignore_common: bool | None = None,
+    ):
+        """Override logging options for a single client"""
+        options = self._client_options.setdefault(client_id, {})
+
+        for name, value in {
+            "force_send_all": force_send_all,
+            "tg_level": tg_level,
+            "ignore_common": ignore_common,
+        }.items():
+            if value is not None:
+                options[name] = value
+
+    def _option(self, client_id: int, name: str):
+        return self._client_options.get(client_id, {}).get(name, getattr(self, name))
+
+    def _min_tg_level(self) -> int:
+        return min(
+            (self._option(client_id, "tg_level") for client_id in self._mods),
+            default=self.tg_level,
+        )
+
+    def _common_ignored(self) -> bool:
+        if not self._mods:
+            return self.ignore_common
+
+        return all(
+            self._option(client_id, "ignore_common") for client_id in self._mods
+        )
+
+    def _receives(self, client_id: int, item: tuple) -> bool:
+        _, caller, levelno, common = item
+
+        if levelno < self._option(client_id, "tg_level"):
+            return False
+
+        if common and self._option(client_id, "ignore_common"):
+            return False
+
+        return (
+            caller is None
+            or caller == client_id
+            or self._option(client_id, "force_send_all")
+        )
 
     def dump(self):
         """Return a list of logging entries"""
@@ -349,11 +406,7 @@ class TelegramLogsHandler(logging.Handler):
                                 item[0]
                                 for item in self.tg_buff
                                 if isinstance(item[0], str)
-                                and (
-                                    not item[1]
-                                    or item[1] == client_id
-                                    or self.force_send_all
-                                )
+                                and self._receives(client_id, item)
                             ]
                         )
                     ),
@@ -370,7 +423,7 @@ class TelegramLogsHandler(logging.Handler):
                 for item in self.tg_buff:
                     if not isinstance(item[0], HerokuException):
                         continue
-                    if not (not item[1] or item[1] == client_id or self.force_send_all):
+                    if not self._receives(client_id, item):
                         continue
                     if isinstance(item[0].sysinfo[1], INTERNET_ERRORS) and getattr(
                         self._mods[client_id].lookup("tester"), "config", {}
@@ -473,30 +526,31 @@ class TelegramLogsHandler(logging.Handler):
                     exc_info=True,
                 )
 
+    @staticmethod
+    def _legacy_caller() -> int | None:
+        frame = sys._getframe(1)
+
+        while frame:
+            tag = frame.f_locals.get("_heroku_client_id_logging_tag")
+            if isinstance(tag, int):
+                return tag
+
+            frame = frame.f_back
+
+        return None
+
     def emit(self, record: logging.LogRecord):
         try:
-            caller = next(
-                (
-                    frame_info.frame.f_locals["_heroku_client_id_logging_tag"]
-                    for frame_info in inspect.stack()
-                    if isinstance(
-                        getattr(getattr(frame_info, "frame", None), "f_locals", {}).get(
-                            "_heroku_client_id_logging_tag"
-                        ),
-                        int,
-                    )
-                ),
-                False,
-            )
+            caller = get_client_id()
 
-            if not isinstance(caller, int):
-                caller = None
+            if caller is None:
+                caller = self._legacy_caller()
         except Exception:
             caller = None
 
         record.heroku_caller = caller
 
-        if record.levelno >= self.tg_level:
+        if record.levelno >= self._min_tg_level():
             if record.exc_info:
                 try:
                     if record.args:
@@ -512,19 +566,17 @@ class TelegramLogsHandler(logging.Handler):
                     comment=comment,
                 )
 
-                if not self.ignore_common or all(
-                    field not in exc.message
-                    for field in [
-                        "InputPeerEmpty() does not have any entity type",
-                        "https://docs.telethon.dev/en/stable/concepts/entities.html",
-                    ]
-                ):
-                    self.tg_buff += [(exc, caller)]
+                common = any(field in exc.message for field in COMMON_ERRORS)
+
+                if not common or not self._common_ignored():
+                    self.tg_buff += [(exc, caller, record.levelno, common)]
             else:
                 self.tg_buff += [
                     (
                         _tg_formatter.format(record),
                         caller,
+                        record.levelno,
+                        False,
                     )
                 ]
 

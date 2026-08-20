@@ -12,7 +12,6 @@
 
 import asyncio
 import contextlib
-import copy
 import functools
 import logging
 import os
@@ -27,6 +26,7 @@ from herokutl.errors.rpcerrorlist import ChatSendInlineForbiddenError
 from herokutl.tl.types import Message
 
 from .. import main, utils
+from .._internal import tag_client_id
 from ..types import HerokuReplyMarkup
 from .types import InlineMessage, InlineUnit
 
@@ -50,6 +50,7 @@ class ListGalleryHelper:
 
 
 class Gallery(InlineUnit):
+    @tag_client_id("_client.tg_id")
     async def gallery(
         self: "InlineManager",
         message: Message | int,
@@ -93,9 +94,6 @@ class Gallery(InlineUnit):
         :param silent: Whether the gallery must be sent silently (w/o "Opening gallery..." message)
         :return: If gallery is sent, returns :obj:`InlineMessage`, otherwise returns `False`
         """
-        with contextlib.suppress(AttributeError):
-            _heroku_client_id_logging_tag = copy.copy(self._client.tg_id)  # noqa: F841
-
         custom_buttons = self._validate_markup(custom_buttons)
 
         if not (

@@ -12,7 +12,6 @@
 
 import asyncio
 import contextlib
-import copy
 import functools
 import logging
 import time
@@ -24,6 +23,7 @@ from herokutl.errors.rpcerrorlist import ChatSendInlineForbiddenError
 from herokutl.tl.types import Message
 
 from .. import main, utils
+from .._internal import tag_client_id
 from ..types import HerokuReplyMarkup
 from .types import InlineMessage, InlineUnit
 
@@ -34,6 +34,7 @@ logger = logging.getLogger(__name__)
 
 
 class List(InlineUnit):
+    @tag_client_id("_client.tg_id")
     async def list(
         self: "InlineManager",
         message: Message | int,
@@ -67,9 +68,6 @@ class List(InlineUnit):
         :param custom_buttons: Custom buttons to add above native ones
         :return: If list is sent, returns :obj:`InlineMessage`, otherwise returns `False`
         """
-        with contextlib.suppress(AttributeError):
-            _heroku_client_id_logging_tag = copy.copy(self._client.tg_id)  # noqa: F841
-
         custom_buttons = self._validate_markup(custom_buttons)
 
         if not isinstance(manual_security, bool):

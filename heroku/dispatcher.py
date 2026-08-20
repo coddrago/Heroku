@@ -15,7 +15,6 @@
 import asyncio
 import collections
 import contextlib
-import copy
 import inspect
 import logging
 from collections.abc import Callable
@@ -28,6 +27,7 @@ from herokutl.errors import FloodWaitError, RPCError
 from herokutl.tl.types import Message
 
 from . import main, security, utils
+from ._internal import tag_client_id
 from .database import Database
 from .loader import Modules
 from .tl_cache import CustomTelegramClient
@@ -686,6 +686,7 @@ class CommandDispatcher:
                 )
             )
 
+    @tag_client_id("client.tg_id")
     async def future_dispatcher(
         self,
         func: Callable,
@@ -693,9 +694,6 @@ class CommandDispatcher:
         exception_handler: Callable,
         *args,
     ):
-        # Will be used to determine, which client caused logging messages
-        # parsed via inspect.stack()
-        _heroku_client_id_logging_tag = copy.copy(self.client.tg_id)  # noqa: F841
         try:
             await func(message)
         except Exception as e:

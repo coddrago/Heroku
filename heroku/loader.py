@@ -16,7 +16,6 @@ import asyncio
 import builtins
 import contextlib
 import contextvars
-import copy
 import importlib
 import importlib.machinery
 import importlib.util
@@ -34,6 +33,7 @@ from uuid import uuid4
 from herokutl.tl.tlobject import TLObject
 
 from . import main, security, utils, validators
+from ._internal import resolve_client_id, set_client_id, tag_client_id
 from .database import Database
 from .inline.core import BotUpdateType, InlineManager
 from .translations import Strings, Translator
@@ -212,12 +212,8 @@ class InfiniteLoop:
     def _stop(self, *args, **kwargs):
         self._wait_for_stop.set()
 
+    @tag_client_id("module_instance.allmodules.client.tg_id")
     def stop(self, *args, **kwargs):
-        with contextlib.suppress(AttributeError):
-            _heroku_client_id_logging_tag = copy.copy(  # noqa: F841
-                self.module_instance.allmodules.client.tg_id
-            )
-
         if self._task:
             logger.debug("Stopped loop for method %s", self.func)
             self._wait_for_stop = asyncio.Event()
@@ -230,12 +226,8 @@ class InfiniteLoop:
         logger.debug("Loop is not running")
         return asyncio.ensure_future(stop_placeholder())
 
+    @tag_client_id("module_instance.allmodules.client.tg_id")
     def start(self, *args, **kwargs):
-        with contextlib.suppress(AttributeError):
-            _heroku_client_id_logging_tag = copy.copy(  # noqa: F841
-                self.module_instance.allmodules.client.tg_id
-            )
-
         if not self._task:
             logger.debug("Started loop for method %s", self.func)
             self._task = asyncio.ensure_future(self.actual_loop(*args, **kwargs))
@@ -246,6 +238,10 @@ class InfiniteLoop:
         # Wait for loader to set attribute
         while not self.module_instance:
             await asyncio.sleep(0.01)
+
+        set_client_id(
+            resolve_client_id(self, "module_instance.allmodules.client.tg_id")
+        )
 
         if isinstance(self._stop_clause, str) and self._stop_clause:
             self.module_instance.set(self._stop_clause, True)
@@ -660,14 +656,12 @@ class Modules:
 
         return loaded
 
+    @tag_client_id("client.tg_id")
     async def _register_modules(
         self,
         modules: list,
         origin: str = "<core>",
     ) -> list[Module]:
-        with contextlib.suppress(AttributeError):
-            _heroku_client_id_logging_tag = copy.copy(self.client.tg_id)  # noqa: F841
-
         loaded = []
 
         for mod in modules:
@@ -696,6 +690,7 @@ class Modules:
 
         return loaded
 
+    @tag_client_id("client.tg_id")
     async def register_module(
         self,
         spec: importlib.machinery.ModuleSpec,
@@ -704,9 +699,6 @@ class Modules:
         save_fs: bool = False,
     ) -> Module:
         """Register single module from importlib spec"""
-        with contextlib.suppress(AttributeError):
-            _heroku_client_id_logging_tag = copy.copy(self.client.tg_id)  # noqa: F841
-
         module = importlib.util.module_from_spec(spec)
         sys.modules[module_name] = module
 
@@ -867,11 +859,9 @@ class Modules:
 
         return self._db.get(main.__name__, "remove_core_protection", False)
 
+    @tag_client_id("client.tg_id")
     def register_commands(self, instance: Module):
         """Register commands from instance"""
-        with contextlib.suppress(AttributeError):
-            _heroku_client_id_logging_tag = copy.copy(self.client.tg_id)  # noqa: F841
-
         if instance.__origin__.startswith("<core"):
             self._core_commands += list(
                 map(lambda x: x.lower(), list(instance.heroku_commands))
@@ -969,11 +959,9 @@ class Modules:
                     purpose,
                 )
 
+    @tag_client_id("client.tg_id")
     def register_watchers(self, instance: Module):
         """Register watcher from instance"""
-        with contextlib.suppress(AttributeError):
-            _heroku_client_id_logging_tag = copy.copy(self.client.tg_id)  # noqa: F841
-
         for _watcher in self.watchers:
             if _watcher.__self__.__class__.__name__ == instance.__class__.__name__:
                 logger.debug("Removing watcher %s for update", _watcher)
@@ -1030,11 +1018,9 @@ class Modules:
 
         return set(prefixes)
 
+    @tag_client_id("client.tg_id")
     async def complete_registration(self, instance: Module):
         """Complete registration of instance"""
-        with contextlib.suppress(AttributeError):
-            _heroku_client_id_logging_tag = copy.copy(self.client.tg_id)  # noqa: F841
-
         instance.allmodules = self
         instance.internal_init()
 
@@ -1146,11 +1132,9 @@ class Modules:
         for mod in self.modules:
             self.send_config_one(mod, skip_hook)
 
+    @tag_client_id("client.tg_id")
     def send_config_one(self, mod: Module, skip_hook: bool = False):
         """Send config to single instance"""
-        with contextlib.suppress(AttributeError):
-            _heroku_client_id_logging_tag = copy.copy(self.client.tg_id)  # noqa: F841
-
         if hasattr(mod, "config"):
             modcfg = self._db.get(
                 mod.__class__.__name__,
@@ -1207,15 +1191,13 @@ class Modules:
             *[self.send_ready_one_wrapper(mod) for mod in self.modules]
         )
 
+    @tag_client_id("client.tg_id")
     async def send_ready_one(
         self,
         mod: Module,
         no_self_unload: bool = False,
         from_dlmod: bool = False,
     ):
-        with contextlib.suppress(AttributeError):
-            _heroku_client_id_logging_tag = copy.copy(self.client.tg_id)  # noqa: F841
-
         if from_dlmod:
             try:
                 if len(inspect.signature(mod.on_dlmod).parameters) == 2:
@@ -1303,12 +1285,10 @@ class Modules:
             name,
         )
 
+    @tag_client_id("client.tg_id")
     async def unload_module(self, classname: str) -> list[str]:
         """Remove module and all stuff from it"""
         worked = []
-
-        with contextlib.suppress(AttributeError):
-            _heroku_client_id_logging_tag = copy.copy(self.client.tg_id)  # noqa: F841
 
         for module in self.modules:
             if classname.lower() in (

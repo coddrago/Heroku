@@ -39,6 +39,7 @@ from herokutl.tl.types import (
 )
 from herokutl.utils import is_list_like
 
+from ._internal import tag_client_id
 from .types import (
     CacheRecordEntity,
     CacheRecordFullChannel,
@@ -239,6 +240,7 @@ class CustomTelegramClient(TelegramClient):
 
         return await self.get_entity(*args, force=True, **kwargs)
 
+    @tag_client_id("tg_id")
     async def get_entity(
         self,
         entity: EntityLike,
@@ -253,10 +255,6 @@ class CustomTelegramClient(TelegramClient):
         :param force: Whether to force refresh the cache (make API request)
         :return: :obj:`Entity`
         """
-
-        # Will be used to determine, which client caused logging messages
-        # parsed via inspect.stack()
-        _heroku_client_id_logging_tag = copy.copy(self.tg_id)  # noqa: F841
 
         if not hashable(entity):
             try:
@@ -314,6 +312,7 @@ class CustomTelegramClient(TelegramClient):
 
         return copy.deepcopy(resolved_entity)
 
+    @tag_client_id("tg_id")
     async def get_perms_cached(
         self,
         entity: EntityLike,
@@ -330,10 +329,6 @@ class CustomTelegramClient(TelegramClient):
         :param force: Whether to force refresh the cache (make API request)
         :return: :obj:`ChatPermissions`
         """
-
-        # Will be used to determine, which client caused logging messages
-        # parsed via inspect.stack()
-        _heroku_client_id_logging_tag = copy.copy(self.tg_id)  # noqa: F841
 
         entity = await self.get_entity(entity)
         user = await self.get_entity(user) if user else None

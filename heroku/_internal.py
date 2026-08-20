@@ -12,6 +12,10 @@
 
 import asyncio
 import atexit
+import contextlib
+import contextvars
+import functools
+import inspect
 import logging
 import os
 import random
@@ -19,6 +23,78 @@ import signal
 import sys
 import subprocess
 from collections.abc import Callable
+
+
+client_id_ctx: contextvars.ContextVar[int | None] = contextvars.ContextVar(
+    "heroku_client_id",
+    default=None,
+)
+
+
+def get_client_id() -> int | None:
+    """Get id of the client, which owns the current execution context"""
+    return client_id_ctx.get()
+
+
+def set_client_id(client_id: int | None):
+    """Bind the current execution context and its future tasks to the client"""
+    if isinstance(client_id, int):
+        client_id_ctx.set(client_id)
+
+
+def resolve_client_id(instance, path: str) -> int | None:
+    """Read client id from the attribute chain of `instance`"""
+    value = instance
+    for attr in path.split("."):
+        value = getattr(value, attr, None)
+        if value is None:
+            return None
+
+    return value if isinstance(value, int) else None
+
+
+@contextlib.contextmanager
+def client_id_override(client_id: int | None):
+    """Bind the block to the client, detaching it from the outer one if `None`"""
+    token = client_id_ctx.set(client_id)
+    try:
+        yield
+    finally:
+        client_id_ctx.reset(token)
+
+
+@contextlib.contextmanager
+def client_id_scope(client_id: int | None):
+    """Bind the block to the client, keeping the outer one if there is no id"""
+    if not isinstance(client_id, int):
+        yield
+        return
+
+    with client_id_override(client_id):
+        yield
+
+
+def tag_client_id(path: str) -> Callable:
+    """Bind the decorated method to the client, read from `self.<path>`"""
+
+    def decorator(func: Callable) -> Callable:
+        if inspect.iscoroutinefunction(func):
+
+            @functools.wraps(func)
+            async def async_wrapper(self, *args, **kwargs):
+                with client_id_scope(resolve_client_id(self, path)):
+                    return await func(self, *args, **kwargs)
+
+            return async_wrapper
+
+        @functools.wraps(func)
+        def wrapper(self, *args, **kwargs):
+            with client_id_scope(resolve_client_id(self, path)):
+                return func(self, *args, **kwargs)
+
+        return wrapper
+
+    return decorator
 
 
 async def fw_protect():
