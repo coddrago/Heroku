@@ -1,7 +1,5 @@
 herokutl==2.2.0.dev1
 pyaes
-aiofile==3.8.1
-aiofiles==24.1.0
 gitpython==3.1.50
 deep-translator
 meval==2.5
@@ -14,7 +12,6 @@ psutil==6.0.0
 TgCrypto-pyrofork
 rsa==4.9
 ruamel.yaml==0.17.21
-bs4==0.0.2
 orjson
 Pillow
 
