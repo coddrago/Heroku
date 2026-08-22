@@ -1,4 +1,4 @@
-herokutl==2.1.0
+herokutl==2.2.0.dev1
 pyaes
 aiofile==3.8.1
 aiofiles==24.1.0
