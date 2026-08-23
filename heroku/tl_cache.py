@@ -32,7 +32,10 @@ from herokutl.tl.tlobject import TLRequest
 from herokutl.tl.types import (
     ChannelFull,
     InputReplyToMessage,
+    InputRichMessage,
     InputRichMessageHTML,
+    InputRichMessageMarkdown,
+    InputSendMessageRichMessageDraftAction,
     Message,
     Updates,
     UpdatesCombined,
@@ -116,18 +119,40 @@ class CustomTelegramClient(TelegramClient):
         self.loader: "Modules"
         self.heroku_inline: "InlineManager"
 
+    @staticmethod
+    def _rich_input(
+        html: str | None = None,
+        markdown: str | None = None,
+        rich_message=None,
+        *,
+        rtl: bool | None = None,
+        noautolink: bool | None = None,
+    ):
+        if rich_message is not None:
+            return rich_message
+        if html is not None:
+            return InputRichMessageHTML(html=html, rtl=rtl, noautolink=noautolink)
+        if markdown is not None:
+            return InputRichMessageMarkdown(
+                markdown=markdown,
+                rtl=rtl,
+                noautolink=noautolink,
+            )
+        raise ValueError("One of html, markdown or rich_message is required")
+
     async def send_rich_message(
         self,
         entity: EntityLike,
-        html: str,
+        html: str | None = None,
         *,
+        markdown: str | None = None,
+        rich_message=None,
         reply_to: int | None = None,
         buttons=None,
         silent: bool | None = None,
+        rtl: bool | None = None,
+        noautolink: bool | None = None,
     ):
-        if not isinstance(html, str):
-            raise TypeError("rich_message must be a str")
-
         input_entity = await self.get_input_entity(entity)
         request = functions.messages.SendMessageRequest(
             peer=input_entity,
@@ -138,7 +163,13 @@ class CustomTelegramClient(TelegramClient):
                 InputReplyToMessage(reply_to) if reply_to is not None else None
             ),
             reply_markup=self.build_reply_markup(buttons),
-            rich_message=InputRichMessageHTML(html=html),
+            rich_message=self._rich_input(
+                html,
+                markdown,
+                rich_message,
+                rtl=rtl,
+                noautolink=noautolink,
+            ),
         )
         return self._get_response_message(request, await self(request), input_entity)
 
@@ -146,22 +177,189 @@ class CustomTelegramClient(TelegramClient):
         self,
         entity: EntityLike,
         message,
-        html: str,
+        html: str | None = None,
         *,
+        markdown: str | None = None,
+        rich_message=None,
         buttons=None,
+        rtl: bool | None = None,
+        noautolink: bool | None = None,
     ):
-        if not isinstance(html, str):
-            raise TypeError("rich_message must be a str")
-
         input_entity = await self.get_input_entity(entity)
         request = functions.messages.EditMessageRequest(
             peer=input_entity,
             id=tl_utils.get_message_id(message),
             no_webpage=True,
             reply_markup=self.build_reply_markup(buttons),
-            rich_message=InputRichMessageHTML(html=html),
+            rich_message=self._rich_input(
+                html,
+                markdown,
+                rich_message,
+                rtl=rtl,
+                noautolink=noautolink,
+            ),
         )
         return self._get_response_message(request, await self(request), input_entity)
+
+    async def get_rich_message(self, entity: EntityLike, message, *, raw=True):
+        input_entity = await self.get_input_entity(entity)
+        result = await self(
+            functions.messages.GetRichMessageRequest(
+                peer=input_entity,
+                id=tl_utils.get_message_id(message),
+            )
+        )
+        rich_message = result.messages[0].rich_message if result.messages else None
+        if raw or rich_message is None:
+            return rich_message
+        from .utils.rich import rich_message_to_html
+
+        return rich_message_to_html(rich_message)
+
+    async def translate_rich_message(
+        self,
+        to_lang: str,
+        *,
+        entity: EntityLike | None = None,
+        messages=None,
+        rich_messages=None,
+        tone: str | None = None,
+        raw=True,
+    ):
+        input_entity = (
+            await self.get_input_entity(entity) if entity is not None else None
+        )
+        result = await self(
+            functions.messages.TranslateRichMessageRequest(
+                to_lang=to_lang,
+                peer=input_entity,
+                id=(
+                    [tl_utils.get_message_id(message) for message in messages]
+                    if messages is not None
+                    else None
+                ),
+                text=rich_messages,
+                tone=tone,
+            )
+        )
+        translated = result.result
+        if raw:
+            return translated
+        from .utils.rich import rich_message_to_html
+
+        return [rich_message_to_html(item) for item in translated]
+
+    async def compose_rich_message(
+        self,
+        html: str | None = None,
+        *,
+        markdown: str | None = None,
+        rich_message=None,
+        proofread: bool | None = None,
+        emojify: bool | None = None,
+        translate_to_lang: str | None = None,
+        tone=None,
+        raw=True,
+    ):
+        result = await self(
+            functions.messages.ComposeRichMessageWithAIRequest(
+                proofread=proofread,
+                emojify=emojify,
+                text=self._rich_input(html, markdown, rich_message),
+                translate_to_lang=translate_to_lang,
+                tone=tone,
+            )
+        )
+        composed = result.result
+        if raw:
+            return composed
+        from .utils.rich import rich_message_to_html
+
+        return rich_message_to_html(composed)
+
+    async def save_rich_draft(
+        self,
+        entity: EntityLike,
+        html: str | None = None,
+        *,
+        markdown: str | None = None,
+        rich_message=None,
+        reply_to: int | None = None,
+        rtl: bool | None = None,
+        noautolink: bool | None = None,
+    ):
+        input_entity = await self.get_input_entity(entity)
+        return await self(
+            functions.messages.SaveDraftRequest(
+                peer=input_entity,
+                message="",
+                reply_to=(
+                    InputReplyToMessage(reply_to) if reply_to is not None else None
+                ),
+                rich_message=self._rich_input(
+                    html,
+                    markdown,
+                    rich_message,
+                    rtl=rtl,
+                    noautolink=noautolink,
+                ),
+            )
+        )
+
+    async def send_rich_typing(
+        self,
+        entity: EntityLike,
+        html: str | None = None,
+        *,
+        markdown: str | None = None,
+        rich_message=None,
+        top_msg_id: int | None = None,
+        can_stop: bool | None = None,
+        keep_on_stop: bool | None = None,
+    ):
+        input_entity = await self.get_input_entity(entity)
+        return await self(
+            functions.messages.SetTypingRequest(
+                peer=input_entity,
+                top_msg_id=top_msg_id,
+                action=InputSendMessageRichMessageDraftAction(
+                    rich_message=self._rich_input(html, markdown, rich_message),
+                    can_stop=can_stop,
+                    keep_on_stop=keep_on_stop,
+                ),
+            )
+        )
+
+    async def send_rich_ephemeral(
+        self,
+        entity: EntityLike,
+        receiver_id: EntityLike,
+        html: str | None = None,
+        *,
+        markdown: str | None = None,
+        rich_message=None,
+        reply_to: int | None = None,
+    ):
+        input_entity = await self.get_input_entity(entity)
+        return await self(
+            functions.ephemeral.SendMessageRequest(
+                peer=input_entity,
+                receiver_id=receiver_id,
+                message="",
+                reply_to=(
+                    InputReplyToMessage(reply_to) if reply_to is not None else None
+                ),
+                rich_message=self._rich_input(html, markdown, rich_message),
+            )
+        )
+
+    rich_send_ephemeral = send_rich_ephemeral
+
+    rich_get_message = get_rich_message
+    rich_translate = translate_rich_message
+    rich_answer_ai = compose_rich_message
+    rich_save_draft = save_rich_draft
+    rich_send_typing = send_rich_typing
 
     async def connect(self, unix_socket_path: str | None = None):
         if self.session is None:

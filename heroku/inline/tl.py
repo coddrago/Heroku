@@ -14,6 +14,7 @@ from herokutl.tl.types import (
     DocumentAttributeAudio,
     InputReplyToMessage,
     InputRichMessageHTML,
+    InputRichMessageMarkdown,
 )
 from herokutl.tl import TLObject
 
@@ -191,17 +192,29 @@ class TelethonBot:
             )
         )
 
+    @staticmethod
+    def _rich_input(html=None, markdown=None, rich_message=None):
+        if rich_message is not None:
+            return rich_message
+        if html is not None:
+            return InputRichMessageHTML(html=html)
+        if markdown is not None:
+            return InputRichMessageMarkdown(markdown=markdown)
+        raise ValueError("One of html, markdown or rich_message is required")
+
     async def send_rich_message(
         self,
         chat_id,
-        html: str,
+        html: str | None = None,
         *,
+        markdown: str | None = None,
+        rich_message=None,
         reply_markup=None,
         message_thread_id: int | None = None,
         disable_notification: bool | None = None,
     ):
-        if not isinstance(html, str):
-            raise TypeError("rich_message must be a str")
+        if html is not None and not isinstance(html, str):
+            raise TypeError("html must be a str")
 
         entity = await self.client.get_input_entity(chat_id)
         request = SendMessageRequest(
@@ -215,29 +228,31 @@ class TelethonBot:
                 else None
             ),
             reply_markup=self.client.build_reply_markup(reply_markup),
-            rich_message=InputRichMessageHTML(html=html),
+            rich_message=self._rich_input(html, markdown, rich_message),
         )
         result = await self.client(request)
         return self.client._get_response_message(request, result, entity)
 
     async def edit_rich_message(
         self,
-        html: str,
+        html: str | None = None,
         *,
+        markdown: str | None = None,
+        rich_message=None,
         inline_message_id=None,
         chat_id=None,
         message_id=None,
         reply_markup=None,
     ):
-        if not isinstance(html, str):
-            raise TypeError("rich_message must be a str")
+        if html is not None and not isinstance(html, str):
+            raise TypeError("html must be a str")
 
         markup = self._build_reply_markup(reply_markup)
         if inline_message_id is not None:
             request = EditInlineBotMessageRequest(
                 id=self._coerce_inline_message_id(inline_message_id),
                 no_webpage=True,
-                rich_message=InputRichMessageHTML(html=html),
+                rich_message=self._rich_input(html, markdown, rich_message),
                 reply_markup=markup,
             )
             return await self.client(request)
@@ -247,7 +262,7 @@ class TelethonBot:
             peer=entity,
             id=message_id,
             no_webpage=True,
-            rich_message=InputRichMessageHTML(html=html),
+            rich_message=self._rich_input(html, markdown, rich_message),
             reply_markup=markup,
         )
         return await self.client(request)

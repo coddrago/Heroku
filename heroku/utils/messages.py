@@ -271,7 +271,7 @@ def array_sum(array: list[list[typing.Any]], /) -> list[typing.Any]:
 
 async def _send_rich_message(
     message: Message,
-    html: str,
+    html: typing.Any,
     *,
     reply_to: int | None = None,
     reply_markup=None,
@@ -288,7 +288,7 @@ async def _send_rich_message(
 
 async def _edit_rich_message(
     message: Message,
-    html: str,
+    html: typing.Any,
     *,
     reply_markup=None,
 ):
@@ -337,9 +337,6 @@ async def answer(
         message = message[0]
 
     if rich_message is not None:
-        if not isinstance(rich_message, str):
-            raise TypeError("rich_message must be a str")
-
         if isinstance(message, (InlineMessage, InlineCall)):
             await message.inline_manager.bot.edit_rich_message(
                 rich_message,

@@ -77,8 +77,10 @@ class Translator(loader.Module):
                 except IndexError:
                     text = None
 
+        reply = None
         if not text:
-            if not (reply := await message.get_reply_message()):
+            reply = await message.get_reply_message()
+            if not reply:
                 await utils.answer(message, self.strings["no_args"])
                 return
 
@@ -91,9 +93,19 @@ class Translator(loader.Module):
 
         try:
             if provider == "telegram":
-                tr_text = await self._client.translate(
-                    message.peer_id, message, lang, raw_text=text, entities=entities
-                )
+                if reply is not None and getattr(reply, "rich_message", None):
+                    tr_text = (
+                        await self._client.translate_rich_message(
+                            lang,
+                            entity=message.peer_id,
+                            messages=[reply],
+                            raw=False,
+                        )
+                    )[0]
+                else:
+                    tr_text = await self._client.translate(
+                        message.peer_id, message, lang, raw_text=text, entities=entities
+                    )
             else:
                 tr_text = await self._translate_external(text, lang)
 
