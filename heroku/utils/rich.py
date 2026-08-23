@@ -1,0 +1,230 @@
+import html
+
+
+def _escape(value) -> str:
+    return html.escape(str(value), quote=False)
+
+
+def _attribute(value) -> str:
+    return html.escape(str(value), quote=True)
+
+
+def _text(value) -> str:
+    if value is None:
+        return ""
+    if isinstance(value, str):
+        return _escape(value)
+
+    name = type(value).__name__
+    if name == "TextEmpty":
+        return ""
+    if name == "TextPlain":
+        return _escape(getattr(value, "text", ""))
+    if name == "TextConcat":
+        return "".join(_text(item) for item in getattr(value, "texts", []))
+    if name == "TextWithEntities":
+        return _escape(getattr(value, "text", ""))
+
+    tags = {
+        "TextBold": ("<b>", "</b>"),
+        "TextItalic": ("<i>", "</i>"),
+        "TextUnderline": ("<u>", "</u>"),
+        "TextStrike": ("<s>", "</s>"),
+        "TextFixed": ("<code>", "</code>"),
+        "TextSubscript": ("<sub>", "</sub>"),
+        "TextSuperscript": ("<sup>", "</sup>"),
+        "TextMarked": ("<mark>", "</mark>"),
+        "TextSpoiler": ("<tg-spoiler>", "</tg-spoiler>"),
+    }
+    if name in tags:
+        start, end = tags[name]
+        return start + _text(getattr(value, "text", None)) + end
+
+    if name in {"TextUrl", "TextAutoUrl"}:
+        url = getattr(value, "url", None) or getattr(value, "text", "")
+        return f'<a href="{_attribute(url)}">{_text(getattr(value, "text", None))}</a>'
+    if name in {"TextEmail", "TextAutoEmail"}:
+        email = getattr(value, "email", None) or getattr(value, "text", "")
+        return f'<a href="mailto:{_attribute(email)}">{_text(getattr(value, "text", None))}</a>'
+    if name in {"TextPhone", "TextAutoPhone"}:
+        phone = getattr(value, "phone", None) or getattr(value, "text", "")
+        return f'<a href="tel:{_attribute(phone)}">{_text(getattr(value, "text", None))}</a>'
+    if name == "TextMentionName":
+        return f'<a href="tg://user?id={_attribute(getattr(value, "user_id", ""))}">{_text(value.text)}</a>'
+    if name == "TextMention":
+        return _text(getattr(value, "text", None))
+    if name in {"TextHashtag", "TextCashtag", "TextBotCommand", "TextBankCard"}:
+        return _text(getattr(value, "text", None))
+    if name == "TextCustomEmoji":
+        return f'<tg-emoji emoji-id={_attribute(getattr(value, "document_id", ""))}>{_escape(getattr(value, "alt", ""))}</tg-emoji>'
+    if name == "TextImage":
+        return f'<i>[image:{_attribute(getattr(value, "document_id", ""))}]</i>'
+    if name == "TextMath":
+        return f"<tg-math-block>{_escape(getattr(value, 'source', ''))}</tg-math-block>"
+    if name == "TextDate":
+        attributes = [f'date="{_attribute(getattr(value, "date", ""))}"']
+        for field, tag in (
+            ("relative", "relative"),
+            ("short_time", "short-time"),
+            ("long_time", "long-time"),
+            ("short_date", "short-date"),
+            ("long_date", "long-date"),
+            ("day_of_week", "day-of-week"),
+        ):
+            if getattr(value, field, False):
+                attributes.append(tag)
+        return f'<date {" ".join(attributes)}>{_text(getattr(value, "text", None))}</date>'
+    if name == "TextAnchor":
+        return f'<a name="{_attribute(getattr(value, "name", ""))}">{_text(getattr(value, "text", None))}</a>'
+    if name == "TextDiff":
+        return _text(getattr(value, "text", None))
+    if name == "TextButton":
+        return _text(getattr(value, "text", None))
+
+    nested = getattr(value, "text", None)
+    if nested is not None:
+        return _text(nested)
+    return _escape(getattr(value, "source", ""))
+
+
+def _caption(value) -> str:
+    if value is None:
+        return ""
+    text = _text(getattr(value, "text", None))
+    credit = _text(getattr(value, "credit", None))
+    if credit:
+        return f"{text}<cite>{credit}</cite>" if text else f"<cite>{credit}</cite>"
+    return text
+
+
+def _media(name: str, value) -> str:
+    media_id = getattr(value, f"{name}_id", "")
+    caption = _caption(getattr(value, "caption", None))
+    marker = f"<i>[{name}:{_attribute(media_id)}]</i>"
+    return marker + caption
+
+
+def _list_item(value) -> str:
+    name = type(value).__name__
+    if name in {"PageListItemBlocks", "PageListOrderedItemBlocks"}:
+        text = "".join(_block(item) for item in getattr(value, "blocks", []))
+    else:
+        text = _text(getattr(value, "text", None))
+    if getattr(value, "checkbox", False):
+        text = ("[x] " if getattr(value, "checked", False) else "[ ] ") + text
+    attributes = []
+    if name == "PageListOrderedItemBlocks" or name == "PageListOrderedItemText":
+        if getattr(value, "num", None) is not None:
+            attributes.append(f' value="{_attribute(value.num)}"')
+    return f"<li{''.join(attributes)}>{text}</li>"
+
+
+def _table_cell(value) -> str:
+    tag = "th" if getattr(value, "header", False) else "td"
+    attributes = []
+    for field, attribute in (("colspan", "colspan"), ("rowspan", "rowspan")):
+        value_ = getattr(value, field, None)
+        if value_:
+            attributes.append(f' {attribute}="{_attribute(value_)}"')
+    if getattr(value, "align_center", False):
+        attributes.append(' align="center"')
+    elif getattr(value, "align_right", False):
+        attributes.append(' align="right"')
+    return f"<{tag}{''.join(attributes)}>{_text(getattr(value, 'text', None))}</{tag}>"
+
+
+def _block(value) -> str:
+    if value is None:
+        return ""
+
+    name = type(value).__name__
+    text = _text(getattr(value, "text", None))
+    simple = {
+        "PageBlockTitle": "h1",
+        "PageBlockSubtitle": "h2",
+        "PageBlockHeading1": "h1",
+        "PageBlockHeading2": "h2",
+        "PageBlockHeading3": "h3",
+        "PageBlockHeading4": "h4",
+        "PageBlockHeading5": "h5",
+        "PageBlockHeading6": "h6",
+        "PageBlockHeader": "h3",
+        "PageBlockSubheader": "h4",
+        "PageBlockKicker": None,
+        "PageBlockParagraph": None,
+        "PageBlockFooter": "footer",
+    }
+    if name in simple:
+        tag = simple[name]
+        return text if tag is None else f"<{tag}>{text}</{tag}>"
+    if name == "PageBlockPreformatted":
+        language = _attribute(getattr(value, "language", ""))
+        return f'<pre><code class="language-{language}">{text}</code></pre>'
+    if name == "PageBlockDivider":
+        return "<hr>"
+    if name == "PageBlockAnchor":
+        return f'<a name="{_attribute(getattr(value, "name", ""))}"></a>'
+    if name in {"PageBlockBlockquote", "PageBlockPullquote"}:
+        caption = _caption(getattr(value, "caption", None))
+        return f"<blockquote>{text}{f'<cite>{caption}</cite>' if caption else ''}</blockquote>"
+    if name == "PageBlockBlockquoteBlocks":
+        blocks = "".join(_block(item) for item in getattr(value, "blocks", []))
+        return f"<blockquote>{blocks}{_caption(getattr(value, 'caption', None))}</blockquote>"
+    if name in {"PageBlockPhoto", "PageBlockVideo", "PageBlockAudio", "PageBlockDocument"}:
+        return _media(name.removeprefix("PageBlock").lower(), value)
+    if name == "PageBlockMap":
+        return _caption(getattr(value, "caption", None))
+    if name in {"PageBlockCollage", "PageBlockSlideshow"}:
+        return "".join(_block(item) for item in getattr(value, "items", [])) + _caption(getattr(value, "caption", None))
+    if name == "PageBlockTable":
+        title = _text(getattr(value, "title", None)) if getattr(value, "title", None) else ""
+        rows = "".join(
+            "<tr>" + "".join(_table_cell(cell) for cell in getattr(row, "cells", [])) + "</tr>"
+            for row in getattr(value, "rows", [])
+        )
+        return title + ("\n" if title else "") + f"<table>{rows}</table>"
+    if name in {"PageBlockList", "PageBlockOrderedList"}:
+        tag = "ol" if name.endswith("OrderedList") else "ul"
+        attributes = ""
+        if tag == "ol":
+            if getattr(value, "reversed", False):
+                attributes += " reversed"
+            if getattr(value, "start", None) is not None:
+                attributes += f' start="{_attribute(value.start)}"'
+            if getattr(value, "type", None):
+                attributes += f' type="{_attribute(value.type)}"'
+        items = "".join(_list_item(item) for item in getattr(value, "items", []))
+        return f"<{tag}{attributes}>{items}</{tag}>"
+    if name == "PageBlockDetails":
+        title = _text(getattr(value, "title", None))
+        blocks = "".join(_block(item) for item in getattr(value, "blocks", []))
+        return f"<details><summary>{title}</summary>{blocks}</details>"
+    if name == "PageBlockMath":
+        return f"<tg-math-block>{_escape(getattr(value, 'source', ''))}</tg-math-block>"
+    if name == "PageBlockThinking":
+        return f"<tg-thinking>{text}</tg-thinking>"
+    if name == "PageBlockEmbed":
+        url = getattr(value, "url", None)
+        return f'<a href="{_attribute(url)}">{_escape(getattr(value, "html", "") or url or "[embed]")}</a>' if url else _escape(getattr(value, "html", "[embed]"))
+    if name == "PageBlockEmbedPost":
+        return "".join(_block(item) for item in getattr(value, "blocks", [])) + _caption(getattr(value, "caption", None))
+    if name == "PageBlockRelatedArticles":
+        return _text(getattr(value, "title", None))
+    if name == "PageBlockAuthorDate":
+        return _text(getattr(value, "author", None))
+    if name in {"PageBlockChannel", "PageBlockCover", "PageBlockUnsupported"}:
+        return f"<i>[{_escape(name)}]</i>"
+    nested = getattr(value, "blocks", None)
+    if nested is not None:
+        return "".join(_block(item) for item in nested)
+    return text if text else f"<i>[{_escape(name)}]</i>"
+
+
+def rich_message_to_html(rich_message) -> str:
+    if rich_message is None:
+        return ""
+    return "\n".join(
+        rendered
+        for rendered in (_block(item) for item in getattr(rich_message, "blocks", []))
+        if rendered
+    )

@@ -28,7 +28,7 @@ from herokutl.tl.types import (
 from .other import _copy_tl
 from .entity import get_chat_id, FormattingEntity
 
-from ..inline.types import BotInlineCall, InlineCall, InlineMessage
+from ..inline.types import BotInlineCall, BotInlineMessage, InlineCall, InlineMessage
 from ..types import HerokuReplyMarkup, ListLike
 
 emoji_pattern = re.compile(
@@ -269,11 +269,43 @@ def array_sum(array: list[list[typing.Any]], /) -> list[typing.Any]:
     return result
 
 
+async def _send_rich_message(
+    message: Message,
+    html: typing.Any,
+    *,
+    reply_to: int | None = None,
+    reply_markup=None,
+    silent: bool | None = None,
+):
+    return await message.client.send_rich_message(
+        message.peer_id,
+        html,
+        reply_to=reply_to,
+        buttons=reply_markup,
+        silent=silent,
+    )
+
+
+async def _edit_rich_message(
+    message: Message,
+    html: typing.Any,
+    *,
+    reply_markup=None,
+):
+    return await message.client.edit_rich_message(
+        message.peer_id,
+        message,
+        html,
+        buttons=reply_markup,
+    )
+
+
 async def answer(
     message: Message | InlineCall | InlineMessage,
-    response: str,
+    response: str = "",
     *,
     reply_markup: HerokuReplyMarkup | None = None,
+    rich_message: str | None = None,
     **kwargs,
 ) -> InlineCall | InlineMessage | Message:
     """
@@ -303,6 +335,42 @@ async def answer(
 
     if isinstance(message, list) and message:
         message = message[0]
+
+    if rich_message is not None:
+        if isinstance(message, (InlineMessage, InlineCall)):
+            await message.inline_manager.bot.edit_rich_message(
+                rich_message,
+                inline_message_id=message.inline_message_id,
+                reply_markup=reply_markup,
+            )
+            return message
+
+        if isinstance(message, (BotInlineMessage, BotInlineCall)):
+            await message.inline_manager.bot.edit_rich_message(
+                rich_message,
+                chat_id=message.chat_id,
+                message_id=message.message_id,
+                reply_markup=reply_markup,
+            )
+            return message
+
+        edit = message.out and not message.via_bot_id and not message.fwd_from
+        if edit:
+            return await _edit_rich_message(
+                message,
+                rich_message,
+                reply_markup=reply_markup,
+            )
+
+        return await _send_rich_message(
+            message,
+            rich_message,
+            reply_to=kwargs.pop("reply_to", None)
+            or getattr(message, "reply_to_msg_id", None)
+            or get_topic(message),
+            reply_markup=reply_markup,
+            silent=kwargs.pop("silent", None),
+        )
 
     if reply_markup is not None:
         if not isinstance(reply_markup, (list, dict)):

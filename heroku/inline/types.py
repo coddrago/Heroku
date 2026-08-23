@@ -1,4 +1,5 @@
 import logging
+import secrets
 import typing
 
 from herokutl.tl import types
@@ -29,6 +30,15 @@ class InlineMessage:
         )
 
     async def edit(self, *args, **kwargs) -> "InlineMessage":
+        rich_message = kwargs.pop("rich_message", None)
+        if rich_message is not None:
+            await self.inline_manager.bot.edit_rich_message(
+                rich_message,
+                inline_message_id=self.inline_message_id,
+                reply_markup=kwargs.get("reply_markup"),
+            )
+            return self
+
         kwargs.pop("unit_id", None)
         kwargs.pop("inline_message_id", None)
 
@@ -99,6 +109,7 @@ class _MessageProxy:
             text,
             reply_markup=kwargs.get("reply_markup"),
             message_thread_id=kwargs.get("message_thread_id"),
+            rich_message=kwargs.get("rich_message"),
         )
 
     async def answer_photo(
@@ -162,6 +173,7 @@ class BotInlineMessage:
             text,
             reply_markup=kwargs.get("reply_markup"),
             message_thread_id=kwargs.get("message_thread_id"),
+            rich_message=kwargs.get("rich_message"),
         )
 
     async def answer_photo(
@@ -176,6 +188,16 @@ class BotInlineMessage:
         )
 
     async def edit(self, *args, **kwargs) -> "BotMessage":
+        rich_message = kwargs.pop("rich_message", None)
+        if rich_message is not None:
+            await self.inline_manager.bot.edit_rich_message(
+                rich_message,
+                chat_id=self.chat_id,
+                message_id=self.message_id,
+                reply_markup=kwargs.get("reply_markup"),
+            )
+            return self
+
         kwargs.pop("unit_id", None)
         kwargs.pop("message_id", None)
         kwargs.pop("chat_id", None)
@@ -320,6 +342,41 @@ class InlineQuery:
 
     def __getattr__(self, item: str):
         return getattr(self.inline_query, item)
+
+    async def rich_article(
+        self,
+        title: str,
+        html: str | None = None,
+        *,
+        markdown: str | None = None,
+        rich_message=None,
+        description: str | None = None,
+        id: str | None = None,
+        buttons=None,
+    ):
+        if rich_message is None:
+            if html is not None:
+                rich_message = types.InputRichMessageHTML(html=html)
+            elif markdown is not None:
+                rich_message = types.InputRichMessageMarkdown(markdown=markdown)
+            else:
+                raise ValueError("One of html, markdown or rich_message is required")
+
+        markup = (
+            self.inline_query.builder._client.build_reply_markup(buttons)
+            if buttons is not None
+            else None
+        )
+        return types.InputBotInlineResult(
+            id=id or secrets.token_urlsafe(15),
+            type="article",
+            title=title,
+            description=description,
+            send_message=types.InputBotInlineMessageRichMessage(
+                rich_message=rich_message,
+                reply_markup=markup,
+            ),
+        )
 
     async def answer(self, results=None, cache_time: int = 0, **kwargs):
         return await self.inline_query.answer(
