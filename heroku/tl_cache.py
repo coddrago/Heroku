@@ -19,6 +19,7 @@ from collections.abc import Callable
 
 from herokutl import TelegramClient
 from herokutl import helpers
+from herokutl import utils as tl_utils
 from herokutl._updates import ChannelState, Entity, EntityType, SessionState
 from herokutl.errors.rpcerrorlist import TopicDeletedError
 from herokutl.hints import EntityLike
@@ -30,6 +31,8 @@ from herokutl.tl.functions.users import GetFullUserRequest
 from herokutl.tl.tlobject import TLRequest
 from herokutl.tl.types import (
     ChannelFull,
+    InputReplyToMessage,
+    InputRichMessageMarkdown,
     Message,
     Updates,
     UpdatesCombined,
@@ -112,6 +115,53 @@ class CustomTelegramClient(TelegramClient):
         self.heroku_db: "Database"
         self.loader: "Modules"
         self.heroku_inline: "InlineManager"
+
+    async def send_rich_message(
+        self,
+        entity: EntityLike,
+        markdown: str,
+        *,
+        reply_to: int | None = None,
+        buttons=None,
+        silent: bool | None = None,
+    ):
+        if not isinstance(markdown, str):
+            raise TypeError("rich_message must be a str")
+
+        input_entity = await self.get_input_entity(entity)
+        request = functions.messages.SendMessageRequest(
+            peer=input_entity,
+            message="",
+            no_webpage=True,
+            silent=silent,
+            reply_to=(
+                InputReplyToMessage(reply_to) if reply_to is not None else None
+            ),
+            reply_markup=self.build_reply_markup(buttons),
+            rich_message=InputRichMessageMarkdown(markdown=markdown),
+        )
+        return self._get_response_message(request, await self(request), input_entity)
+
+    async def edit_rich_message(
+        self,
+        entity: EntityLike,
+        message,
+        markdown: str,
+        *,
+        buttons=None,
+    ):
+        if not isinstance(markdown, str):
+            raise TypeError("rich_message must be a str")
+
+        input_entity = await self.get_input_entity(entity)
+        request = functions.messages.EditMessageRequest(
+            peer=input_entity,
+            id=tl_utils.get_message_id(message),
+            no_webpage=True,
+            reply_markup=self.build_reply_markup(buttons),
+            rich_message=InputRichMessageMarkdown(markdown=markdown),
+        )
+        return self._get_response_message(request, await self(request), input_entity)
 
     async def connect(self, unix_socket_path: str | None = None):
         if self.session is None:

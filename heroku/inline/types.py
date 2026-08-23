@@ -29,6 +29,15 @@ class InlineMessage:
         )
 
     async def edit(self, *args, **kwargs) -> "InlineMessage":
+        rich_message = kwargs.pop("rich_message", None)
+        if rich_message is not None:
+            await self.inline_manager.bot.edit_rich_message(
+                rich_message,
+                inline_message_id=self.inline_message_id,
+                reply_markup=kwargs.get("reply_markup"),
+            )
+            return self
+
         kwargs.pop("unit_id", None)
         kwargs.pop("inline_message_id", None)
 
@@ -99,6 +108,7 @@ class _MessageProxy:
             text,
             reply_markup=kwargs.get("reply_markup"),
             message_thread_id=kwargs.get("message_thread_id"),
+            rich_message=kwargs.get("rich_message"),
         )
 
     async def answer_photo(
@@ -162,6 +172,7 @@ class BotInlineMessage:
             text,
             reply_markup=kwargs.get("reply_markup"),
             message_thread_id=kwargs.get("message_thread_id"),
+            rich_message=kwargs.get("rich_message"),
         )
 
     async def answer_photo(
@@ -176,6 +187,16 @@ class BotInlineMessage:
         )
 
     async def edit(self, *args, **kwargs) -> "BotMessage":
+        rich_message = kwargs.pop("rich_message", None)
+        if rich_message is not None:
+            await self.inline_manager.bot.edit_rich_message(
+                rich_message,
+                chat_id=self.chat_id,
+                message_id=self.message_id,
+                reply_markup=kwargs.get("reply_markup"),
+            )
+            return self
+
         kwargs.pop("unit_id", None)
         kwargs.pop("message_id", None)
         kwargs.pop("chat_id", None)

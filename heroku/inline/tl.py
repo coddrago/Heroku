@@ -6,9 +6,15 @@ from herokutl import utils as tl_utils
 from herokutl.tl import types
 from herokutl.tl.functions.messages import (
     EditInlineBotMessageRequest,
+    EditMessageRequest,
+    SendMessageRequest,
     SetInlineBotResultsRequest,
 )
-from herokutl.tl.types import DocumentAttributeAudio
+from herokutl.tl.types import (
+    DocumentAttributeAudio,
+    InputReplyToMessage,
+    InputRichMessageMarkdown,
+)
 from herokutl.tl import TLObject
 
 
@@ -157,8 +163,18 @@ class TelethonBot:
         reply_markup=None,
         message_thread_id: int | None = None,
         disable_notification: bool | None = None,
+        rich_message: str | None = None,
         **kwargs,
     ):
+        if rich_message is not None:
+            return await self.send_rich_message(
+                chat_id,
+                rich_message,
+                reply_markup=reply_markup,
+                message_thread_id=message_thread_id,
+                disable_notification=disable_notification,
+            )
+
         return self._with_message_id_alias(
             await self.client.send_message(
                 chat_id,
@@ -174,6 +190,67 @@ class TelethonBot:
                 **self._thread_kwargs(message_thread_id),
             )
         )
+
+    async def send_rich_message(
+        self,
+        chat_id,
+        markdown: str,
+        *,
+        reply_markup=None,
+        message_thread_id: int | None = None,
+        disable_notification: bool | None = None,
+    ):
+        if not isinstance(markdown, str):
+            raise TypeError("rich_message must be a str")
+
+        entity = await self.client.get_input_entity(chat_id)
+        request = SendMessageRequest(
+            peer=entity,
+            message="",
+            no_webpage=True,
+            silent=disable_notification,
+            reply_to=(
+                InputReplyToMessage(message_thread_id)
+                if message_thread_id is not None
+                else None
+            ),
+            reply_markup=self.client.build_reply_markup(reply_markup),
+            rich_message=InputRichMessageMarkdown(markdown=markdown),
+        )
+        result = await self.client(request)
+        return self.client._get_response_message(request, result, entity)
+
+    async def edit_rich_message(
+        self,
+        markdown: str,
+        *,
+        inline_message_id=None,
+        chat_id=None,
+        message_id=None,
+        reply_markup=None,
+    ):
+        if not isinstance(markdown, str):
+            raise TypeError("rich_message must be a str")
+
+        markup = self._build_reply_markup(reply_markup)
+        if inline_message_id is not None:
+            request = EditInlineBotMessageRequest(
+                id=self._coerce_inline_message_id(inline_message_id),
+                no_webpage=True,
+                rich_message=InputRichMessageMarkdown(markdown=markdown),
+                reply_markup=markup,
+            )
+            return await self.client(request)
+
+        entity = await self.client.get_input_entity(chat_id)
+        request = EditMessageRequest(
+            peer=entity,
+            id=message_id,
+            no_webpage=True,
+            rich_message=InputRichMessageMarkdown(markdown=markdown),
+            reply_markup=markup,
+        )
+        return await self.client(request)
 
     async def send_document(
         self,
