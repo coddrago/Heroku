@@ -323,7 +323,7 @@ class Form(InlineUnit):
             **({"gif": gif} if gif else {}),
             **({"location": location} if location else {}),
             **({"audio": audio} if audio else {}),
-            **({"location": location} if location else {}),
+            **({"file": file, "mime_type": mime_type} if file else {}),
             **({"perms_map": perms_map} if perms_map else {}),
             **({"message": message} if isinstance(message, Message) else {}),
             **({"force_me": force_me} if force_me else {}),
@@ -346,6 +346,8 @@ class Form(InlineUnit):
             m = await self._invoke_unit(unit_id, message)
         except ChatSendInlineForbiddenError:
             await answer(self.translator.getkey("inline.inline403"))
+            del self._units[unit_id]
+            return False
         except Exception as e:
             logger.exception("Can't send form")
 

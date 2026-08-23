@@ -281,6 +281,8 @@ class Gallery(InlineUnit):
             m = await self._invoke_unit(unit_id, message)
         except ChatSendInlineForbiddenError:
             await answer(self.translator.getkey("inline.inline403"))
+            del self._units[unit_id]
+            return False
         except Exception:
             logger.exception("Error sending inline gallery")
 
@@ -289,7 +291,6 @@ class Gallery(InlineUnit):
             if _reattempt:
                 logger.exception("Can't send gallery")
 
-                del self._units[unit_id]
                 await answer(
                     self.translator.getkey("inline.invoke_failed_logs").format(
                         utils.escape_html(
@@ -391,9 +392,12 @@ class Gallery(InlineUnit):
         while True:
             await asyncio.sleep(7)
 
+            if unit_id not in self._units:
+                return
+
             unit = self._units[unit_id]
 
-            if unit_id not in self._units or not unit.get("slideshow", False):
+            if not unit.get("slideshow", False):
                 return
 
             if unit["current_index"] + 1 >= len(unit["photos"]) and isinstance(

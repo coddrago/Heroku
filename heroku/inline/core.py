@@ -182,7 +182,7 @@ class InlineManager(
         while True:
             for unit_id, unit in self._units.copy().items():
                 if (unit.get("ttl") or (time.time() + self._markup_ttl)) < time.time():
-                    del self._units[unit_id]
+                    await self._unload_unit(unit_id)
 
             await asyncio.sleep(5)
 
