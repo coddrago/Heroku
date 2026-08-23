@@ -339,6 +339,7 @@ settings:
   no_alias: "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>4l145</b> <code>{}</code> <b>d035 n07 3x157</b>"
   db_cleared: "<tg-emoji emoji-id=5197474765387864959>👍</tg-emoji> <b>DB cl34r3d</b>"
   heroku: "{} <b>{}.{}.{}</b> <i>{}</i>\n\n<b><tg-emoji emoji-id=5289608677244811430>📁</tg-emoji> <b>heroku-tl:</b> <i>{}</i>\n\n<tg-emoji emoji-id=5228879218363872764>⌨</tg-emoji> <b>D3v5: <a href=\"t.me/codrago\">@codrago</a>, <a href=\"t.me/zetgo\">@zetgo</a></b>"
+  rich_heroku_message: '<figure><img src="{banner_url}"/></figure><details><summary>{platform} Heroku 1nf0</summary><table><tr><th>V3r5i0n</th><th>Bu1ld</th></tr><tr><td>【<tg-emoji emoji-id=5289608677244811430>📁</tg-emoji>】 <b>V3r5i0n</b></td><td>{version}</td></tr><tr><td>【<tg-emoji emoji-id=5289608677244811430>📁</tg-emoji>】 <b>Bu1ld</b></td><td>{build}</td></tr><tr><td>【<tg-emoji emoji-id=5289608677244811430>📁</tg-emoji>】 <b>Heroku TL</b></td><td>{htl_version}</td></tr><tr><td>【<tg-emoji emoji-id=5289608677244811430>📁</tg-emoji>】 <b>Br4nch</b></td><td>{branch}</td></tr><tr><td>【<tg-emoji emoji-id=5289608677244811430>📁</tg-emoji>】 <b>D3v3l0p3r5</b></td><td><a href="t.me/codrago">@codrago</a>, <a href="t.me/zetgo">@zetgo</a></td></tr></table></details>'
   confirm_cleardb: "⚠️ <b>R u 5ur3, 7h47 u w4n7 2 cl34r DB?</b>"
   cleardb_confirm: "🗑 Cl34r DB"
   cancel: "🚫 C4nc3l"
@@ -367,6 +368,7 @@ settings:
   _cmd_doc_unblacklist: "<chat_id> - Unbl4ckl157 7h3 b07 fr0m 0p3r471ng s0m3wh3r3"
   _cmd_doc_unblacklistuser: "[user_id] - 4ll0w 7h15 u53r 2 run p3rm1773d cmd5"
   _cfg_nonstandart_prefixes: "4ll0w n0n-574nd4r7 pr3f1x35 l1k3 fl4g5 0r m0r3 7h4n 1 symb0l"
+  _cfg_rich_mode: "Show heroku as a Rich message."
   _cls_doc: "C7rl c0r3 u53rb07 s3771ng5"
 
   cmd404: <tg-emoji emoji-id=5469791106591890404>🪄</tg-emoji> <b>Cmd n07 f0und</b>

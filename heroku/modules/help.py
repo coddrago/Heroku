@@ -272,9 +272,14 @@ class Help(loader.Module):
                 pass
 
         if self.config["rich_mode"]:
+            rich_reply = reply.replace("\r\n", "<br>").replace("\n", "<br>")
+            rich_commands = "".join(f"<p>{line.strip()}</p>" for line in lines)
+            rich_inline_commands = inline_cmd.replace("\r\n", "<br>").replace(
+                "\n", "<br>"
+            )
             rich_message = (
-                f"{reply}<details><summary>{self.strings['rich_commands']}</summary>"
-                f"{cmds}{inline_cmd}</details>"
+                f"{rich_reply}<details><summary>{self.strings['rich_commands']}</summary>"
+                f"{rich_commands}{rich_inline_commands}</details>"
                 + (
                     f"<details><summary>{self.strings['rich_placeholders']}</summary>"
                     f"{placeholders}</details>"

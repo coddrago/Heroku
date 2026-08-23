@@ -339,6 +339,7 @@ settings:
   no_alias: "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>Awias</b> <code>{}</code> <b>does nyot exist</b>"
   db_cleared: "<tg-emoji emoji-id=5197474765387864959>👍</tg-emoji> <b>Database cweawed</b>"
   heroku: "{} <b>{}.{}.{}</b> <i>{}</i>\n\n<b><tg-emoji emoji-id=5289608677244811430>📁</tg-emoji> <b>heroku-tl:</b> <i>{}</i>\n\n<tg-emoji emoji-id=5228879218363872764>⌨</tg-emoji> <b>Devewopews: <a href=\"t.me/codrago\">@codrago</a>, <a href=\"t.me/zetgo\">@zetgo</a></b> :3"
+  rich_heroku_message: '<figure><img src="{banner_url}"/></figure><details><summary>{platform} Heroku infowmation</summary><table><tr><th>Vewsion</th><th>Buiwd</th></tr><tr><td>【<tg-emoji emoji-id=5289608677244811430>📁</tg-emoji>】 <b>Vewsion</b></td><td>{version}</td></tr><tr><td>【<tg-emoji emoji-id=5289608677244811430>📁</tg-emoji>】 <b>Buiwd</b></td><td>{build}</td></tr><tr><td>【<tg-emoji emoji-id=5289608677244811430>📁</tg-emoji>】 <b>Heroku TL</b></td><td>{htl_version}</td></tr><tr><td>【<tg-emoji emoji-id=5289608677244811430>📁</tg-emoji>】 <b>Bwanch</b></td><td>{branch}</td></tr><tr><td>【<tg-emoji emoji-id=5289608677244811430>📁</tg-emoji>】 <b>Devewopews</b></td><td><a href="t.me/codrago">@codrago</a>, <a href="t.me/zetgo">@zetgo</a></td></tr></table></details>'
   confirm_cleardb: "⚠️ <b>Awe you suwe, dat you want to cweaw database?</b>"
   cleardb_confirm: "🗑 Cweaw database"
   cancel: "🚫 Cancew"
@@ -367,6 +368,7 @@ settings:
   _cmd_doc_unblacklist: "<chat_id> - Unbwackwist da bot fwom opewating somewhewe"
   _cmd_doc_unblacklistuser: "[user_id] - Awwow dis usew to wun pewmitted commands"
   _cfg_nonstandart_prefixes: "Awwow nyon-standawt pwefixes wike fwags ow mowe dan onye symbow"
+  _cfg_rich_mode: "Show heroku as a Rich message."
   _cls_doc: "Contwow cowe usewbot settings"
 
   cmd404: <tg-emoji emoji-id=5469791106591890404>🪄</tg-emoji> <b>Command nyot found</b>
