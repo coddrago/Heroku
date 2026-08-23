@@ -424,6 +424,7 @@ test:
   configpingph: "🤖Кастомні плейсхолдери: {}"
   hint: "Встановіть підказку"
   ping_emoji: "Емоджі, який з'являється, коли пінг не збільшується суттєво"
+  _cfg_rich_mode: "Показывать ping как Rich-сообщение."
   back: "↩️ Назад"
   banner_url: "Картинка для вашого пінгу, наприклад: https://raw.githubusercontent.com/coddrago/assets/refs/heads/main/heroku/ping_cmd.png"
   logs_caption: "<tg-emoji emoji-id=5350594756126721186>🪐</tg-emoji> <b>Логи Heroku рівня</b> <code>{}</code>\n\n<tg-emoji emoji-id=5228879218363872764>⚪️</tg-emoji> <b>Версія: {}.{}.{}</b>{}"
@@ -529,10 +530,16 @@ help:
   _cmd_doc_helphide: "<модуль або модулі> - Сховати модуль(-і) з help\n*Розділяй модулі пробілами"
   _cmd_doc_support: "Показати посилання на чат допомоги Heroku"
   show_preview_in_help: "Показати # meta banner в прев'ю команди help [module] ?"
+  _cfg_rich_mode: "Показувати help як Rich-повідомлення."
+  rich_core: "Вбудовані модулі"
+  rich_modules: "Модулі"
+  rich_placeholders: "Плейсхолдери"
+  rich_commands: "Команди"
 
   name: Help
 heroku_info:
   info_message: "{}\n<blockquote>┌\n├  【<tg-emoji emoji-id=5883964170268840032>👤</tg-emoji>】 <b>𝙾𝚠𝚗𝚎𝚛</b>: {me}\n├  【<tg-emoji emoji-id=5931415565955503486>🤖</tg-emoji>】 <b>𝚅𝚎𝚛𝚜𝚒𝚘𝚗</b>: {version}\n└</blockquote>\n<blockquote>┌\n├  【<tg-emoji emoji-id=5778335621491723621>📷</tg-emoji>】 <b>𝙿𝚛𝚎𝚏𝚒𝚡</b>: {prefix}⠀ ⠀ \n├  【<tg-emoji emoji-id=5843799474362652262>🔄</tg-emoji>】 <b>𝚄𝚙𝚝𝚒𝚖𝚎</b>: {uptime}\n├  【<tg-emoji emoji-id=5879770735999717115>👤</tg-emoji>】 <b>𝙱𝚛𝚊𝚗𝚌𝚑</b>: {branch}\n└</blockquote>\n<blockquote>┌\n├  【<tg-emoji emoji-id=5775887550262546277>❗️</tg-emoji>】 <b>𝙲𝙿𝚄</b>: {cpu_usage}\n├  【<tg-emoji emoji-id=5931409969613116639>🛡</tg-emoji>】 <b>𝚁𝙰𝙼</b>: {ram_usage}\n├  【<tg-emoji emoji-id=5931472654660800739>📊</tg-emoji>】 <b>𝙿𝚒𝚗𝚐</b>: {ping}\n└</blockquote>\n<blockquote>┌\n├  【<tg-emoji emoji-id=5926783847453692661>🛡</tg-emoji>】 <b>𝚄𝚙𝚍𝚊𝚝𝚎</b>: {upd}\n├  【<tg-emoji emoji-id=5931415565955503486>🤖</tg-emoji>】 <b>𝙷𝚘𝚜𝚝</b>: {platform}\n├  【<tg-emoji emoji-id=5819078828017849357>🤖</tg-emoji>】 <b>𝙾𝚂</b>: {os}\n├  【<tg-emoji emoji-id=5819078828017849357>🤖</tg-emoji>】 <b>𝙿𝚢𝚝𝚑𝚘𝚗 𝚅𝚎𝚛𝚜𝚒𝚘𝚗</b>: {python_ver}\n└</blockquote>"
+  rich_info_message: '<figure><img src="{banner_url}"/></figure><details><summary>Основне</summary><table><tr><th>Основне</th><th>Власник</th></tr><tr><td>【<tg-emoji emoji-id=5883964170268840032>👤</tg-emoji>】 <b>Власник</b></td><td>{me}</td></tr><tr><td>【<tg-emoji emoji-id=5931415565955503486>🤖</tg-emoji>】 <b>Версія</b></td><td>{version}</td></tr><tr><td>【<tg-emoji emoji-id=5778335621491723621>📷</tg-emoji>】 <b>Префікс</b></td><td>{prefix}</td></tr><tr><td>【<tg-emoji emoji-id=5843799474362652262>🔄</tg-emoji>】 <b>Час роботи</b></td><td>{uptime}</td></tr><tr><td>【<tg-emoji emoji-id=5879770735999717115>👤</tg-emoji>】 <b>Гілка</b></td><td>{branch}</td></tr></table></details><details><summary>Стан</summary><table><tr><th>Стан</th><th>Оновлення</th></tr><tr><td>【<tg-emoji emoji-id=5926783847453692661>🛡</tg-emoji>】 <b>Оновлення</b></td><td>{upd}</td></tr><tr><td>【<tg-emoji emoji-id=5775887550262546277>❗️</tg-emoji>】 <b>CPU</b></td><td>{cpu_usage}</td></tr><tr><td>【<tg-emoji emoji-id=5931409969613116639>🛡</tg-emoji>】 <b>RAM</b></td><td>{ram_usage}</td></tr><tr><td>【<tg-emoji emoji-id=5931472654660800739>📊</tg-emoji>】 <b>Пінг</b></td><td>{ping}</td></tr></table></details><details><summary>Оточення</summary><table><tr><th>Оточення</th><th>ОС</th></tr><tr><td>【<tg-emoji emoji-id=5931415565955503486>🤖</tg-emoji>】 <b>Хост</b></td><td>{platform}</td></tr><tr><td>【<tg-emoji emoji-id=5819078828017849357>🤖</tg-emoji>】 <b>ОС</b></td><td>{os}</td></tr><tr><td>【<tg-emoji emoji-id=5819078828017849357>🤖</tg-emoji>】 <b>Python</b></td><td>{python_ver}</td></tr></table></details>'
   non_detectable: "<tg-emoji emoji-id=5210952531676504517>❌</tg-emoji> <b>Цей компонент не може бути виявлений на вашому сервері!</b>"
   ping_emoji: "Пінг для вашого інфо"
   send_info: "Надіслати інформацію про юзербота"
@@ -544,6 +551,7 @@ heroku_info:
   _cfg_cst_ph: "🤖Кастомні плейсхолдери: {}"
   _cfg_cst_btn: "Кастомна кнопка в повідомленні в info. Залиш порожнім, щоб прибрати кнопку"
   _cfg_banner: "Посилання на банер-картинку"
+  _cfg_rich_mode: "Показувати info як Rich-повідомлення."
   switchinfo_on: "<tg-emoji emoji-id=5118861066981344121>✅</tg-emoji> Інформація про зображення успішно увімкнена"
   switchinfo_off: "<tg-emoji emoji-id=5118861066981344121>✅</tg-emoji> Інформація про зображення успішно вимкнена"
   desc: "<tg-emoji emoji-id=5188377234380954537>🪐</tg-emoji> <b>Що таке Userbot?</b>\n\n<tg-emoji emoji-id=5472238129849048175>😎</tg-emoji> Userbot - це <b>стороння програма</b>, яка взаємодіє з Telegram API для виконання <b>автоматизованих завдань від імені користувача</b>. Юзерботи можуть використовуватися для автоматизації різних завдань, таких як <b>надсилання повідомлень, приєднання до каналів, завантаження медіафайлів і багато іншого</b>.\n\n<tg-emoji emoji-id=5474667187258006816>😎</tg-emoji> Юзерботи відрізняються від звичайних ботів у Telegram тим, що <b>вони працюють на акаунті користувача</b>, а не на бот-акаунті. Це означає, що вони можуть мати доступ до більшої кількості функцій і мають більшу гнучкість у плані виконання дій.\n\n<tg-emoji emoji-id=5472267631979405211>🚫</tg-emoji> Однак важливо зазначити, що <b>юзерботи офіційно не підтримуються Telegram</b> і їх використання може порушувати умови використання платформи. Тому <b>користувачі мають бути обережними під час їх використання</b> і переконатися, що на їхньому акаунті не виконується шкідливий код.\n\n"
