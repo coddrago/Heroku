@@ -32,7 +32,7 @@ from herokutl.tl.tlobject import TLRequest
 from herokutl.tl.types import (
     ChannelFull,
     InputReplyToMessage,
-    InputRichMessageMarkdown,
+    InputRichMessageHTML,
     Message,
     Updates,
     UpdatesCombined,
@@ -119,13 +119,13 @@ class CustomTelegramClient(TelegramClient):
     async def send_rich_message(
         self,
         entity: EntityLike,
-        markdown: str,
+        html: str,
         *,
         reply_to: int | None = None,
         buttons=None,
         silent: bool | None = None,
     ):
-        if not isinstance(markdown, str):
+        if not isinstance(html, str):
             raise TypeError("rich_message must be a str")
 
         input_entity = await self.get_input_entity(entity)
@@ -138,7 +138,7 @@ class CustomTelegramClient(TelegramClient):
                 InputReplyToMessage(reply_to) if reply_to is not None else None
             ),
             reply_markup=self.build_reply_markup(buttons),
-            rich_message=InputRichMessageMarkdown(markdown=markdown),
+            rich_message=InputRichMessageHTML(html=html),
         )
         return self._get_response_message(request, await self(request), input_entity)
 
@@ -146,11 +146,11 @@ class CustomTelegramClient(TelegramClient):
         self,
         entity: EntityLike,
         message,
-        markdown: str,
+        html: str,
         *,
         buttons=None,
     ):
-        if not isinstance(markdown, str):
+        if not isinstance(html, str):
             raise TypeError("rich_message must be a str")
 
         input_entity = await self.get_input_entity(entity)
@@ -159,7 +159,7 @@ class CustomTelegramClient(TelegramClient):
             id=tl_utils.get_message_id(message),
             no_webpage=True,
             reply_markup=self.build_reply_markup(buttons),
-            rich_message=InputRichMessageMarkdown(markdown=markdown),
+            rich_message=InputRichMessageHTML(html=html),
         )
         return self._get_response_message(request, await self(request), input_entity)
 

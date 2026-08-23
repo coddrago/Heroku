@@ -271,7 +271,7 @@ def array_sum(array: list[list[typing.Any]], /) -> list[typing.Any]:
 
 async def _send_rich_message(
     message: Message,
-    markdown: str,
+    html: str,
     *,
     reply_to: int | None = None,
     reply_markup=None,
@@ -279,7 +279,7 @@ async def _send_rich_message(
 ):
     return await message.client.send_rich_message(
         message.peer_id,
-        markdown,
+        html,
         reply_to=reply_to,
         buttons=reply_markup,
         silent=silent,
@@ -288,14 +288,14 @@ async def _send_rich_message(
 
 async def _edit_rich_message(
     message: Message,
-    markdown: str,
+    html: str,
     *,
     reply_markup=None,
 ):
     return await message.client.edit_rich_message(
         message.peer_id,
         message,
-        markdown,
+        html,
         buttons=reply_markup,
     )
 
