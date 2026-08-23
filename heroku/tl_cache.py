@@ -180,6 +180,7 @@ class CustomTelegramClient(TelegramClient):
         markdown: str | None = None,
         rich_message=None,
         reply_to: int | None = None,
+        top_msg_id: int | None = None,
         buttons=None,
         silent: bool | None = None,
         rtl: bool | None = None,
@@ -192,7 +193,12 @@ class CustomTelegramClient(TelegramClient):
             no_webpage=True,
             silent=silent,
             reply_to=(
-                InputReplyToMessage(reply_to) if reply_to is not None else None
+                InputReplyToMessage(
+                    reply_to_msg_id=reply_to,
+                    top_msg_id=top_msg_id,
+                )
+                if reply_to is not None
+                else None
             ),
             reply_markup=self.build_reply_markup(buttons),
             rich_message=self._rich_input(
