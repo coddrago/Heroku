@@ -150,13 +150,13 @@ def _block(value) -> str:
         "PageBlockHeading6": "h6",
         "PageBlockHeader": "h3",
         "PageBlockSubheader": "h4",
-        "PageBlockKicker": "p",
-        "PageBlockParagraph": "p",
+        "PageBlockKicker": None,
+        "PageBlockParagraph": None,
         "PageBlockFooter": "footer",
     }
     if name in simple:
         tag = simple[name]
-        return f"<{tag}>{text}</{tag}>"
+        return text if tag is None else f"<{tag}>{text}</{tag}>"
     if name == "PageBlockPreformatted":
         language = _attribute(getattr(value, "language", ""))
         return f'<pre><code class="language-{language}">{text}</code></pre>'
@@ -177,12 +177,12 @@ def _block(value) -> str:
     if name in {"PageBlockCollage", "PageBlockSlideshow"}:
         return "".join(_block(item) for item in getattr(value, "items", [])) + _caption(getattr(value, "caption", None))
     if name == "PageBlockTable":
-        title = f"<p>{_text(getattr(value, 'title', None))}</p>" if getattr(value, "title", None) else ""
+        title = _text(getattr(value, "title", None)) if getattr(value, "title", None) else ""
         rows = "".join(
             "<tr>" + "".join(_table_cell(cell) for cell in getattr(row, "cells", [])) + "</tr>"
             for row in getattr(value, "rows", [])
         )
-        return title + f"<table>{rows}</table>"
+        return title + ("\n" if title else "") + f"<table>{rows}</table>"
     if name in {"PageBlockList", "PageBlockOrderedList"}:
         tag = "ol" if name.endswith("OrderedList") else "ul"
         attributes = ""
@@ -209,15 +209,15 @@ def _block(value) -> str:
     if name == "PageBlockEmbedPost":
         return "".join(_block(item) for item in getattr(value, "blocks", [])) + _caption(getattr(value, "caption", None))
     if name == "PageBlockRelatedArticles":
-        return f"<p>{_text(getattr(value, 'title', None))}</p>"
+        return _text(getattr(value, "title", None))
     if name == "PageBlockAuthorDate":
-        return f"<p>{_text(getattr(value, 'author', None))}</p>"
+        return _text(getattr(value, "author", None))
     if name in {"PageBlockChannel", "PageBlockCover", "PageBlockUnsupported"}:
         return f"<i>[{_escape(name)}]</i>"
     nested = getattr(value, "blocks", None)
     if nested is not None:
         return "".join(_block(item) for item in nested)
-    return f"<p>{text}</p>" if text else f"<i>[{_escape(name)}]</i>"
+    return text if text else f"<i>[{_escape(name)}]</i>"
 
 
 def rich_message_to_html(rich_message) -> str:

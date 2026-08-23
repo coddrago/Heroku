@@ -120,6 +120,38 @@ class CustomTelegramClient(TelegramClient):
         self.heroku_inline: "InlineManager"
 
     @staticmethod
+    def _rich_output_to_input(rich_message):
+        if type(rich_message).__name__ != "RichMessage":
+            return rich_message
+
+        from herokutl.tl.types import InputDocument, InputPhoto
+
+        photos = [
+            InputPhoto(
+                id=photo.id,
+                access_hash=photo.access_hash,
+                file_reference=photo.file_reference,
+            )
+            for photo in getattr(rich_message, "photos", [])
+            if hasattr(photo, "access_hash") and hasattr(photo, "file_reference")
+        ]
+        documents = [
+            InputDocument(
+                id=document.id,
+                access_hash=document.access_hash,
+                file_reference=document.file_reference,
+            )
+            for document in getattr(rich_message, "documents", [])
+            if hasattr(document, "access_hash") and hasattr(document, "file_reference")
+        ]
+        return InputRichMessage(
+            blocks=getattr(rich_message, "blocks", []),
+            rtl=getattr(rich_message, "rtl", None),
+            photos=photos,
+            documents=documents,
+        )
+
+    @staticmethod
     def _rich_input(
         html: str | None = None,
         markdown: str | None = None,
@@ -129,7 +161,7 @@ class CustomTelegramClient(TelegramClient):
         noautolink: bool | None = None,
     ):
         if rich_message is not None:
-            return rich_message
+            return CustomTelegramClient._rich_output_to_input(rich_message)
         if html is not None:
             return InputRichMessageHTML(html=html, rtl=rtl, noautolink=noautolink)
         if markdown is not None:
