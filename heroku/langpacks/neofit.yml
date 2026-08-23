@@ -438,6 +438,7 @@ test:
   configpingph: "🤖 Vars: {}"
   hint: "Set hint"
   ping_emoji: "Low-latency Emoji"
+  _cfg_rich_mode: "Show ping as a Rich message."
   back: "↩️ cd .."
   banner_url: "Ping banner URL"
   logs_caption: "<tg-emoji emoji-id=5350594756126721186>🪐</tg-emoji> <b>Logs (Verbosity:</b> <code>{}</code><b>)</b>\n\n<tg-emoji emoji-id=5228879218363872764>⚪️</tg-emoji> <b>v{}.{}.{}</b>{}"
@@ -546,8 +547,14 @@ help:
   _cmd_doc_helphide: <module ...> - Hide/show modules in help output
   _cmd_doc_support: Print support chat link
   show_preview_in_help: 'Show # meta banner in help preview [module]'
+  _cfg_rich_mode: "Show help as a Rich message."
+  rich_core: "Core modules"
+  rich_modules: "Modules"
+  rich_placeholders: "Placeholders"
+  rich_commands: "Commands"
 heroku_info:
   info_message: "{}\n<blockquote>┌\n├  【<tg-emoji emoji-id=5883964170268840032>👤</tg-emoji>】 <b>𝚁𝚘𝚘𝚝</b>: {me}\n├  【<tg-emoji emoji-id=5931415565955503486>🤖</tg-emoji>】 <b>𝚅𝚎𝚛</b>: {version}\n└</blockquote>\n<blockquote>┌\n├  【<tg-emoji emoji-id=5778335621491723621>📷</tg-emoji>】 <b>𝙿𝚛𝚎𝚏𝚒𝚡</b>: {prefix}⠀ ⠀ \n├  【<tg-emoji emoji-id=5843799474362652262>🔄</tg-emoji>】 <b>𝚄𝚙𝚝𝚒𝚖𝚎</b>: {uptime}\n├  【<tg-emoji emoji-id=5879770735999717115>👤</tg-emoji>】 <b>𝙱𝚛𝚊𝚗𝚌𝚑</b>: {branch}\n└</blockquote>\n<blockquote>┌\n├  【<tg-emoji emoji-id=5775887550262546277>❗️</tg-emoji>】 <b>𝙲𝙿𝚄</b>: {cpu_usage}\n├  【<tg-emoji emoji-id=5931409969613116639>🛡</tg-emoji>】 <b>𝚁𝙰𝙼</b>: {ram_usage}\n├  【<tg-emoji emoji-id=5931472654660800739>📊</tg-emoji>】 <b>𝙿𝚒𝚗𝚐</b>: {ping}\n└</blockquote>\n<blockquote>┌\n├  【<tg-emoji emoji-id=5926783847453692661>🛡</tg-emoji>】 <b>𝚄𝚙𝚍𝚊𝚝𝚎</b>: {upd}\n├  【<tg-emoji emoji-id=5931415565955503486>🤖</tg-emoji>】 <b>𝙷𝚘𝚜𝚝</b>: {platform}\n├  【<tg-emoji emoji-id=5819078828017849357>🤖</tg-emoji>】 <b>𝙾𝚂</b>: {os}\n├  【<tg-emoji emoji-id=5819078828017849357>🤖</tg-emoji>】 <b>𝙿𝚢𝚝𝚑𝚘𝚗</b>: {python_ver}\n└</blockquote>"
+  rich_info_message: '<figure><img src="{banner_url}"/></figure><details><summary>Overview</summary><table><tr><th>Overview</th><th>Owner</th></tr><tr><td>【<tg-emoji emoji-id=5883964170268840032>👤</tg-emoji>】 <b>Owner</b></td><td>{me}</td></tr><tr><td>【<tg-emoji emoji-id=5931415565955503486>🤖</tg-emoji>】 <b>Version</b></td><td>{version}</td></tr><tr><td>【<tg-emoji emoji-id=5778335621491723621>📷</tg-emoji>】 <b>Prefix</b></td><td>{prefix}</td></tr><tr><td>【<tg-emoji emoji-id=5843799474362652262>🔄</tg-emoji>】 <b>Uptime</b></td><td>{uptime}</td></tr><tr><td>【<tg-emoji emoji-id=5879770735999717115>👤</tg-emoji>】 <b>Branch</b></td><td>{branch}</td></tr></table></details><details><summary>Status</summary><table><tr><th>Status</th><th>Updates</th></tr><tr><td>【<tg-emoji emoji-id=5926783847453692661>🛡</tg-emoji>】 <b>Updates</b></td><td>{upd}</td></tr><tr><td>【<tg-emoji emoji-id=5775887550262546277>❗️</tg-emoji>】 <b>CPU</b></td><td>{cpu_usage}</td></tr><tr><td>【<tg-emoji emoji-id=5931409969613116639>🛡</tg-emoji>】 <b>RAM</b></td><td>{ram_usage}</td></tr><tr><td>【<tg-emoji emoji-id=5931472654660800739>📊</tg-emoji>】 <b>Ping</b></td><td>{ping}</td></tr></table></details><details><summary>Environment</summary><table><tr><th>Environment</th><th>OS</th></tr><tr><td>【<tg-emoji emoji-id=5931415565955503486>🤖</tg-emoji>】 <b>Host</b></td><td>{platform}</td></tr><tr><td>【<tg-emoji emoji-id=5819078828017849357>🤖</tg-emoji>】 <b>OS</b></td><td>{os}</td></tr><tr><td>【<tg-emoji emoji-id=5819078828017849357>🤖</tg-emoji>】 <b>Python</b></td><td>{python_ver}</td></tr></table></details>'
   non_detectable: "<tg-emoji emoji-id=5210952531676504517>❌</tg-emoji> <b>Hardware detection failed!</b>"
   ping_emoji: "Ping emoji"
   send_info: "Cat info"
@@ -560,6 +567,7 @@ heroku_info:
   _cfg_cst_ph: "🤖Vars: {}"
   _cfg_cst_btn: "Custom Button"
   _cfg_banner: "Banner URL"
+  _cfg_rich_mode: "Show info as a Rich message."
   desc: "<tg-emoji emoji-id=5188377234380954537>🪐</tg-emoji> <b>What is Userbot?</b>\n\n<tg-emoji emoji-id=5472238129849048175>😎</tg-emoji> A userbot is an automation script running on a user account (Client API).\n\n<tg-emoji emoji-id=5474667187258006816>😎</tg-emoji> Unlike Bots (Bot API), userbots have full access to User methods.\n\n<tg-emoji emoji-id=5472267631979405211>🚫</tg-emoji> <b>Warning: Violates ToS? Use at own risk.</b>\n\n"
   no_font: "<tg-emoji emoji-id=5465665476971471368>❌</tg-emoji> Font not found in reply/link."
   no_banner: "<tg-emoji emoji-id=6010394680179562842>😶</tg-emoji> <b>404: Link </b><code>{link></code> <b>unreachable.</b>"

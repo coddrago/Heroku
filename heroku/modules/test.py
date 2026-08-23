@@ -128,6 +128,12 @@ class TestMod(loader.Module):
                 validator=loader.validators.Boolean(),
             ),
             loader.ConfigValue(
+                "rich_mode",
+                False,
+                lambda: self.strings["_cfg_rich_mode"],
+                validator=loader.validators.Boolean(),
+            ),
+            loader.ConfigValue(
                 "invert_media",
                 False,
                 "Switch preview invert media in ping",
@@ -367,6 +373,14 @@ class TestMod(loader.Module):
         except KeyError:
             logger.exception("Missing placeholder in custom_message")
             placeholders_msg = "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji>"
+        if self.config["rich_mode"]:
+            rich_message = placeholders_msg.replace("\r\n", "<br>").replace("\n", "<br>")
+            await utils.answer(
+                message,
+                rich_message=rich_message,
+            )
+            return
+
         await utils.answer(
             message,
             placeholders_msg,

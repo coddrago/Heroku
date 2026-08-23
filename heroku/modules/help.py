@@ -82,6 +82,12 @@ class Help(loader.Module):
                 lambda: self.strings["show_preview_in_help"],
                 validator=loader.validators.Boolean(),
             ),
+            loader.ConfigValue(
+                "rich_mode",
+                False,
+                lambda: self.strings["_cfg_rich_mode"],
+                validator=loader.validators.Boolean(),
+            ),
         )
 
     def _get_banner_url(self, doc: str):
@@ -251,6 +257,7 @@ class Help(loader.Module):
         )
 
         banner_kwargs = {}
+        banner_url = None
         if self.config["show_preview_in_help"]:
             try:
                 source = getattr(module, "__source__", None)
@@ -263,6 +270,29 @@ class Help(loader.Module):
                         }
             except Exception:
                 pass
+
+        if self.config["rich_mode"]:
+            rich_message = (
+                f"{reply}<details><summary>{self.strings['rich_commands']}</summary>"
+                f"{cmds}{inline_cmd}</details>"
+                + (
+                    f"<details><summary>{self.strings['rich_placeholders']}</summary>"
+                    f"{placeholders}</details>"
+                    if placeholders
+                    else ""
+                )
+                + (f"<p>{self.strings['developer'].format(dev_text)}</p>" if dev_text else "")
+                + (f"<p>{self.strings['not_exact']}</p>" if not exact else "")
+                + (
+                    f"<p>{self.strings['core_notice']}</p>"
+                    if module.__origin__.startswith("<core")
+                    else ""
+                )
+            )
+            if banner_url:
+                rich_message = f'<figure><img src="{banner_url}"/></figure>' + rich_message
+            await utils.answer(message, rich_message=rich_message)
+            return
 
         await utils.answer(
             message,
@@ -448,6 +478,39 @@ class Help(loader.Module):
         plain_.sort(key=str.lower)
         core_.sort(key=str.lower)
         no_commands_.sort(key=str.lower)
+
+        if self.config["rich_mode"]:
+            rich_message = (
+                f"{self.config['desc_icon']} {reply}"
+                + (
+                    f"<figure><img src=\"{self.config['banner_url']}\"/></figure>"
+                    if self.config["banner_url"]
+                    else ""
+                )
+            )
+            rich_core = "".join(f"<p>{item.strip()}</p>" for item in core_)
+            rich_modules = "".join(
+                f"<p>{item.strip()}</p>"
+                for item in plain_ + (no_commands_ if force else [])
+            )
+            if only_core:
+                sections = [(self.strings["rich_core"], rich_core)]
+            elif only_loaded:
+                sections = [(self.strings["rich_modules"], rich_modules)]
+            else:
+                sections = [
+                    (self.strings["rich_core"], rich_core),
+                    (self.strings["rich_modules"], rich_modules),
+                ]
+            rich_message += "".join(
+                f"<details><summary>{title}</summary>{content}</details>"
+                for title, content in sections
+                if content
+            )
+            if not self.lookup("LoaderMod").fully_loaded:
+                rich_message += f"<p>{self.strings['partial_load']}</p>"
+            await utils.answer(message, rich_message=rich_message)
+            return
 
         match True:
             case _ if only_core:

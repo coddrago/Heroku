@@ -472,6 +472,7 @@ test:
   configpingph: "🤖Custom placeholders: {}"
   hint: "Set a hint"
   ping_emoji: "Emoji that appears when ping does not increase significantly"
+  _cfg_rich_mode: "Show ping as a Rich message."
   back: "↩️ Back"
   banner_url: "Image for your ping, for example: https://raw.githubusercontent.com/coddrago/assets/refs/heads/main/heroku/ping_cmd.png"
   logs_caption: "<tg-emoji emoji-id=5350594756126721186>🪐</tg-emoji> <b>Heroku logs with verbosity</b> <code>{}</code>\n\n<tg-emoji emoji-id=5228879218363872764>⚪️</tg-emoji> <b>Version: {}.{}.{}</b>{}"
@@ -580,8 +581,14 @@ help:
   _cmd_doc_helphide: <module ...> - Hide or show modules in help
   _cmd_doc_support: Show support chat link
   show_preview_in_help: 'Show # meta banner in help preview [module]'
+  _cfg_rich_mode: "Show help as a Rich message."
+  rich_core: "Core modules"
+  rich_modules: "Modules"
+  rich_placeholders: "Placeholders"
+  rich_commands: "Commands"
 heroku_info:
   info_message: "{}\n<blockquote>┌\n├  【<tg-emoji emoji-id=5883964170268840032>👤</tg-emoji>】 <b>𝙾𝚠𝚗𝚎𝚛</b>: {me}\n├  【<tg-emoji emoji-id=5931415565955503486>🤖</tg-emoji>】 <b>𝚅𝚎𝚛𝚜𝚒𝚘𝚗</b>: {version}\n└</blockquote>\n<blockquote>┌\n├  【<tg-emoji emoji-id=5778335621491723621>📷</tg-emoji>】 <b>𝙿𝚛𝚎𝚏𝚒𝚡</b>: {prefix}⠀ ⠀ \n├  【<tg-emoji emoji-id=5843799474362652262>🔄</tg-emoji>】 <b>𝚄𝚙𝚝𝚒𝚖𝚎</b>: {uptime}\n├  【<tg-emoji emoji-id=5879770735999717115>👤</tg-emoji>】 <b>𝙱𝚛𝚊𝚗𝚌𝚑</b>: {branch}\n└</blockquote>\n<blockquote>┌\n├  【<tg-emoji emoji-id=5775887550262546277>❗️</tg-emoji>】 <b>𝙲𝙿𝚄</b>: {cpu_usage}\n├  【<tg-emoji emoji-id=5931409969613116639>🛡</tg-emoji>】 <b>𝚁𝙰𝙼</b>: {ram_usage}\n├  【<tg-emoji emoji-id=5931472654660800739>📊</tg-emoji>】 <b>𝙿𝚒𝚗𝚐</b>: {ping}\n└</blockquote>\n<blockquote>┌\n├  【<tg-emoji emoji-id=5926783847453692661>🛡</tg-emoji>】 <b>𝚄𝚙𝚍𝚊𝚝𝚎</b>: {upd}\n├  【<tg-emoji emoji-id=5931415565955503486>🤖</tg-emoji>】 <b>𝙷𝚘𝚜𝚝</b>: {platform}\n├  【<tg-emoji emoji-id=5819078828017849357>🤖</tg-emoji>】 <b>𝙾𝚂</b>: {os}\n├  【<tg-emoji emoji-id=5819078828017849357>🤖</tg-emoji>】 <b>𝙿𝚢𝚝𝚑𝚘𝚗 𝚅𝚎𝚛𝚜𝚒𝚘𝚗</b>: {python_ver}\n└</blockquote>"
+  rich_info_message: '<figure><img src="{banner_url}"/></figure><details><summary>Overview</summary><table><tr><th>Overview</th><th>Owner</th></tr><tr><td>【<tg-emoji emoji-id=5883964170268840032>👤</tg-emoji>】 <b>Owner</b></td><td>{me}</td></tr><tr><td>【<tg-emoji emoji-id=5931415565955503486>🤖</tg-emoji>】 <b>Version</b></td><td>{version}</td></tr><tr><td>【<tg-emoji emoji-id=5778335621491723621>📷</tg-emoji>】 <b>Prefix</b></td><td>{prefix}</td></tr><tr><td>【<tg-emoji emoji-id=5843799474362652262>🔄</tg-emoji>】 <b>Uptime</b></td><td>{uptime}</td></tr><tr><td>【<tg-emoji emoji-id=5879770735999717115>👤</tg-emoji>】 <b>Branch</b></td><td>{branch}</td></tr></table></details><details><summary>Status</summary><table><tr><th>Status</th><th>Updates</th></tr><tr><td>【<tg-emoji emoji-id=5926783847453692661>🛡</tg-emoji>】 <b>Updates</b></td><td>{upd}</td></tr><tr><td>【<tg-emoji emoji-id=5775887550262546277>❗️</tg-emoji>】 <b>CPU</b></td><td>{cpu_usage}</td></tr><tr><td>【<tg-emoji emoji-id=5931409969613116639>🛡</tg-emoji>】 <b>RAM</b></td><td>{ram_usage}</td></tr><tr><td>【<tg-emoji emoji-id=5931472654660800739>📊</tg-emoji>】 <b>Ping</b></td><td>{ping}</td></tr></table></details><details><summary>Environment</summary><table><tr><th>Environment</th><th>OS</th></tr><tr><td>【<tg-emoji emoji-id=5931415565955503486>🤖</tg-emoji>】 <b>Host</b></td><td>{platform}</td></tr><tr><td>【<tg-emoji emoji-id=5819078828017849357>🤖</tg-emoji>】 <b>OS</b></td><td>{os}</td></tr><tr><td>【<tg-emoji emoji-id=5819078828017849357>🤖</tg-emoji>】 <b>Python</b></td><td>{python_ver}</td></tr></table></details>'
   non_detectable: "<tg-emoji emoji-id=5210952531676504517>❌</tg-emoji> <b>This component cannot be detected on your server!</b>"
   ping_emoji: "emoji for ping in your info"
   send_info: "Send userbot info"
@@ -594,6 +601,7 @@ heroku_info:
   _cfg_cst_ph: "🤖Custom placeholders: {}"
   _cfg_cst_btn: "Custom button for info. Leave empty to remove button"
   _cfg_banner: "URL to image banner"
+  _cfg_rich_mode: "Show info as a Rich message."
   desc: "<tg-emoji emoji-id=5188377234380954537>🪐</tg-emoji> <b>Userbot — what is it?</b>\n\n<tg-emoji emoji-id=5472238129849048175>😎</tg-emoji> A userbot refers to a <b>third-party program</b> that interacts with the Telegram API to perform <b>automated tasks on behalf of a user</b>. These userbots can be used to automate various tasks such as <b>sending messages, joining channels, downloading media, and much more</b>.\n\n<tg-emoji emoji-id=5474667187258006816>😎</tg-emoji> Userbots are different from regular Telegram bots as <b>they run on the user's account</b> rather than a bot account. This means that userbots can access more features and have greater flexibility in terms of the actions they can perform.\n\n<tg-emoji emoji-id=5472267631979405211>🚫</tg-emoji> However, it is important to note that <b>userbots are not officially supported by Telegram</b> and their use may violate the platform's terms of service. As such, <b>users should exercise caution when using userbots</b> and ensure that they are not being used for malicious purposes.\n\n"
   no_font: "<tg-emoji emoji-id=5465665476971471368>❌</tg-emoji> Where is the link or reply to the font?"
   no_banner: "<tg-emoji emoji-id=6010394680179562842>😶</tg-emoji> <b>Nothing was found at the specified link </b><code>{link></code><b>.\n\nCheck the integrity of your file at the link, and also make sure that the link points directly to the file.</b>"

@@ -74,6 +74,12 @@ class HerokuInfoMod(loader.Module):
                 "Switch preview invert media",
                 validator=loader.validators.Boolean(),
             ),
+            loader.ConfigValue(
+                "rich_mode",
+                False,
+                lambda: self.strings["_cfg_rich_mode"],
+                validator=loader.validators.Boolean(),
+            ),
         )
 
     def _get_cpu_info(self) -> str | None:
@@ -94,7 +100,11 @@ class HerokuInfoMod(loader.Module):
         except FileNotFoundError:
             return self.strings["non_detectable"]
 
-    async def _render_info(self, start: float) -> str:
+    async def _render_info(
+        self,
+        start: float,
+        template_key: str = "info_message",
+    ) -> str:
         try:
             up_to_date = utils.is_up_to_date()
             if up_to_date:
@@ -143,6 +153,7 @@ class HerokuInfoMod(loader.Module):
         ]:
             platform_emoji = platform_emoji.replace(emoji, icon)
         data = {
+            "banner_url": self.config["banner_url"],
             "me": me,
             "version": _version,
             "build": build,
@@ -182,12 +193,13 @@ class HerokuInfoMod(loader.Module):
         return (
             placeholders_msg
             if self.config["custom_message"]
-            else self.strings["info_message"].format(
+            else self.strings[template_key].format(
                 (
                     utils.get_platform_emoji()
                     if self._client.heroku_me.premium and self.config["show_heroku"]
                     else ""
                 ),
+                banner_url=self.config["banner_url"],
                 me=me,
                 version=_version,
                 prefix=prefix,
@@ -206,6 +218,18 @@ class HerokuInfoMod(loader.Module):
     @loader.command()
     async def infocmd(self, message: Message):
         start = time.perf_counter_ns()
+
+        if self.config["rich_mode"]:
+            await utils.answer(
+                message,
+                rich_message=await self._render_info(
+                    start,
+                    template_key="rich_info_message",
+                ),
+                reply_to=getattr(message, "reply_to_msg_id", None),
+            )
+            return
+
         media = str(self.config["banner_url"])
 
         if self.config["banner_url"] and self.config["quote_media"] is True:

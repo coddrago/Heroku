@@ -438,6 +438,7 @@ test:
   configpingph: "🤖カスタムプレースホルダー: {}"
   hint: "ヒントを設定"
   ping_emoji: "Ping が大幅に増加しない場合に表示される絵文字"
+  _cfg_rich_mode: "Show ping as a Rich message."
   back: "↩️ 戻る"
   banner_url: "Ping 用の画像。例: https://raw.githubusercontent.com/coddrago/assets/refs/heads/main/heroku/ping_cmd.png"
   logs_caption: "<tg-emoji emoji-id=5350594756126721186>🪐</tg-emoji> <b>詳細レベル</b> <code>{}</code> <b>の Heroku ログ</b>\n\n<tg-emoji emoji-id=5228879218363872764>⚪️</tg-emoji> <b>バージョン: {}.{}.{}</b>{}"
@@ -545,8 +546,14 @@ help:
   _cmd_doc_helphide: <module ...> - help でモジュールを非表示/表示
   _cmd_doc_support: サポートチャットのリンクを表示
   show_preview_in_help: 'helpプレビューに # meta banner を表示 [module]'
+  _cfg_rich_mode: "helpをRichメッセージで表示"
+  rich_core: "コアモジュール"
+  rich_modules: "モジュール"
+  rich_placeholders: "プレースホルダー"
+  rich_commands: "コマンド"
 heroku_info:
   info_message: "{}\n<blockquote>┌\n├  【<tg-emoji emoji-id=5883964170268840032>👤</tg-emoji>】 <b>所有者</b>: {me}\n├  【<tg-emoji emoji-id=5931415565955503486>🤖</tg-emoji>】 <b>バージョン</b>: {version}\n└</blockquote>\n<blockquote>┌\n├  【<tg-emoji emoji-id=5778335621491723621>📷</tg-emoji>】 <b>プレフィックス</b>: {prefix}⠀ ⠀ \n├  【<tg-emoji emoji-id=5843799474362652262>🔄</tg-emoji>】 <b>稼働時間</b>: {uptime}\n├  【<tg-emoji emoji-id=5879770735999717115>👤</tg-emoji>】 <b>ブランチ</b>: {branch}\n└</blockquote>\n<blockquote>┌\n├  【<tg-emoji emoji-id=5775887550262546277>❗️</tg-emoji>】 <b>ＣＰＵ</b>: {cpu_usage}\n├  【<tg-emoji emoji-id=5931409969613116639>🛡</tg-emoji>】 <b>ＲＡＭ</b>: {ram_usage}\n├  【<tg-emoji emoji-id=5931472654660800739>📊</tg-emoji>】 <b>Ｐｉｎｇ</b>: {ping}\n└</blockquote>\n<blockquote>┌\n├  【<tg-emoji emoji-id=5926783847453692661>🛡</tg-emoji>】 <b>更新</b>: {upd}\n├  【<tg-emoji emoji-id=5931415565955503486>🤖</tg-emoji>】 <b>ホスト</b>: {platform}\n├  【<tg-emoji emoji-id=5819078828017849357>🤖</tg-emoji>】 <b>ＯＳ</b>: {os}\n├  【<tg-emoji emoji-id=5819078828017849357>🤖</tg-emoji>】 <b>Python Ver</b>: {python_ver}\n└</blockquote>"
+  rich_info_message: '<figure><img src="{banner_url}"/></figure><details><summary>概要</summary><table><tr><th>概要</th><th>所有者</th></tr><tr><td>【<tg-emoji emoji-id=5883964170268840032>👤</tg-emoji>】 <b>所有者</b></td><td>{me}</td></tr><tr><td>【<tg-emoji emoji-id=5931415565955503486>🤖</tg-emoji>】 <b>バージョン</b></td><td>{version}</td></tr><tr><td>【<tg-emoji emoji-id=5778335621491723621>📷</tg-emoji>】 <b>プレフィックス</b></td><td>{prefix}</td></tr><tr><td>【<tg-emoji emoji-id=5843799474362652262>🔄</tg-emoji>】 <b>稼働時間</b></td><td>{uptime}</td></tr><tr><td>【<tg-emoji emoji-id=5879770735999717115>👤</tg-emoji>】 <b>ブランチ</b></td><td>{branch}</td></tr></table></details><details><summary>状態</summary><table><tr><th>状態</th><th>更新</th></tr><tr><td>【<tg-emoji emoji-id=5926783847453692661>🛡</tg-emoji>】 <b>更新</b></td><td>{upd}</td></tr><tr><td>【<tg-emoji emoji-id=5775887550262546277>❗️</tg-emoji>】 <b>CPU</b></td><td>{cpu_usage}</td></tr><tr><td>【<tg-emoji emoji-id=5931409969613116639>🛡</tg-emoji>】 <b>RAM</b></td><td>{ram_usage}</td></tr><tr><td>【<tg-emoji emoji-id=5931472654660800739>📊</tg-emoji>】 <b>Ping</b></td><td>{ping}</td></tr></table></details><details><summary>環境</summary><table><tr><th>環境</th><th>OS</th></tr><tr><td>【<tg-emoji emoji-id=5931415565955503486>🤖</tg-emoji>】 <b>ホスト</b></td><td>{platform}</td></tr><tr><td>【<tg-emoji emoji-id=5819078828017849357>🤖</tg-emoji>】 <b>OS</b></td><td>{os}</td></tr><tr><td>【<tg-emoji emoji-id=5819078828017849357>🤖</tg-emoji>】 <b>Python</b></td><td>{python_ver}</td></tr></table></details>'
   non_detectable: "<tg-emoji emoji-id=5210952531676504517>❌</tg-emoji> <b>このコンポーネントはお使いのサーバーでは検出できません！</b>"
   ping_emoji: "情報内の Ping 用絵文字"
   send_info: "ユーザーボット情報を送信"
@@ -559,6 +566,7 @@ heroku_info:
   _cfg_cst_ph: "🤖カスタムプレースホルダー: {}"
   _cfg_cst_btn: "情報のカスタムボタン。ボタンを削除するには空のままにしてください"
   _cfg_banner: "画像バナーのURL"
+  _cfg_rich_mode: "infoをRichメッセージで表示"
   desc: "<tg-emoji emoji-id=5188377234380954537>🪐</tg-emoji> <b>ユーザーボットとは？</b>\n\n<tg-emoji emoji-id=5472238129849048175>😎</tg-emoji> ユーザーボットとは、Telegram API と対話して<b>ユーザーに代わって自動化されたタスクを実行するサードパーティのプログラム</b>のことです。これらのユーザーボットは、<b>メッセージの送信、チャンネルへの参加、メディアのダウンロードなど</b>、さまざまなタスクを自動化するために使用できます。\n\n<tg-emoji emoji-id=5474667187258006816>😎</tg-emoji> ユーザーボットは、ボットアカウントではなく<b>ユーザーのアカウントで実行される</b>ため、通常の Telegram ボットとは異なります。つまり、ユーザーボットはより多くの機能にアクセスでき、実行できるアクションの柔軟性が高くなります。\n\n<tg-emoji emoji-id=5472267631979405211>🚫</tg-emoji> ただし、<b>ユーザーボットは Telegram によって公式にサポートされていない</b>ことに注意してください。使用するとプラットフォームの利用規約に違反する可能性があります。そのため、<b>ユーザーはユーザーボットを使用する際に注意が必要であり</b>、悪意のある目的で使用されていないことを確認する必要があります。\n\n"
   no_font: "<tg-emoji emoji-id=5465665476971471368>❌</tg-emoji> フォントへのリンクまたは返信はどこですか？"
   no_banner: "<tg-emoji emoji-id=6010394680179562842>😶</tg-emoji> <b>指定されたリンク </b><code>{link></code><b> には何も見つかりませんでした。\n\nリンク先のファイルの整合性を確認し、リンクがファイルを直接指していることも確認してください。</b>"
