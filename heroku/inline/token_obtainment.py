@@ -164,9 +164,14 @@ class TokenObtainment(InlineUnit):
         self: "InlineManager",
         create_new_if_needed: bool = True,
         revoke_token: bool = False,
+        skip_search: bool = False,
     ) -> bool:
         if self._token:
             return True
+
+        if skip_search:
+            logger.info("Skipping search for an existing bot, creating a new one")
+            return await self._create_bot() if create_new_if_needed else False
 
         logger.info("Bot token not found in db, attempting search in BotFather")
 

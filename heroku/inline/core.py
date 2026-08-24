@@ -239,13 +239,17 @@ class InlineManager(
         self,
         after_break: bool = False,
         ignore_token_checks: bool = False,
+        force_new_bot: bool = False,
     ):
         """
         Register manager
         :param after_break: Loop marker
         :param ignore_token_checks: If `True`, will not check for token
+        :param force_new_bot: If `True`, will not search for an existing bot
+            in BotFather and will create a brand new one instead
         :type after_break: bool
         :type ignore_token_checks: bool
+        :type force_new_bot: bool
         :return: None
         :rtype: None
         """
@@ -253,7 +257,7 @@ class InlineManager(
         self._name = get_display_name(self._client.heroku_me)
 
         if not ignore_token_checks:
-            is_token_asserted = await self._assert_token()
+            is_token_asserted = await self._assert_token(skip_search=force_new_bot)
             if not is_token_asserted:
                 self.init_complete = False
                 return
@@ -360,7 +364,7 @@ class InlineManager(
             self._token = False
 
             if not after_break:
-                return await self.register_manager(True)
+                return await self.register_manager(True, force_new_bot=True)
 
             self.init_complete = False
             return False
