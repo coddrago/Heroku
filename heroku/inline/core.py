@@ -317,6 +317,15 @@ class InlineManager(
             )
             self.init_complete = False
             return False
+
+        if self._db.get("heroku.inline", "needs_inline_setup", False):
+            try:
+                await self._configure_inline_bot(self.bot_username)
+            except Exception:
+                pass
+
+            self._db.set("heroku.inline", "needs_inline_setup", False)
+
         result = await self._ping_bot(after_break)
         if result is not True:
             return result

@@ -109,6 +109,7 @@ class InlineStuff(loader.Module):
             await utils.answer(message, self.strings["token_invalid"])
             return
         self._db.set("heroku.inline", "bot_token", args)
+        self._db.set("heroku.inline", "needs_inline_setup", True)
         await utils.answer(message, self.strings["bot_updated"])
 
     async def bot_watcher(self, message: BotInlineMessage):
