@@ -37,6 +37,12 @@ class CoreMod(loader.Module):
                 "<tg-emoji emoji-id=4974259868996207180>▪️</tg-emoji>",
                 "just emoji in .aliases",
             ),
+            loader.ConfigValue(
+                "rich_mode",
+                False,
+                lambda: self.strings["_cfg_rich_mode"],
+                validator=loader.validators.Boolean(),
+            ),
         )
 
     async def client_ready(self):
@@ -101,6 +107,28 @@ class CoreMod(loader.Module):
             branch_text = self.strings["happy_beta"].format(version.branch)
         else:
             branch_text = self.strings["unstable"].format(version.branch)
+
+        platform = (
+            utils.get_platform_emoji()
+            if self._client.heroku_me.premium
+            else "🪐 <b>Heroku userbot</b>"
+        )
+
+        if self.config["rich_mode"]:
+            rich_message = self.strings["rich_heroku_message"].format(
+                platform=platform,
+                version=".".join(map(str, version.__version__)),
+                build=utils.get_commit_url(),
+                htl_version=f"{herokutl.__version__} #{herokutl.tl.alltlobjects.LAYER}",
+                branch=branch_text.replace("\r\n", "<br>").replace("\n", "<br>"),
+                banner_url="https://raw.githubusercontent.com/coddrago/assets/refs/heads/main/heroku/heroku_cmd.png",
+            )
+            await utils.answer(
+                message,
+                rich_message=rich_message,
+                reply_to=getattr(message, "reply_to_msg_id", None),
+            )
+            return
 
         await utils.answer(
             message,

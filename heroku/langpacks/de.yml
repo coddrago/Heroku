@@ -326,6 +326,8 @@ settings:
   no_alias: "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>Alias</b> <code>{}</code> <b>existiert nicht</b>"
   db_cleared: "<tg-emoji emoji-id=5197474765387864959>👍</tg-emoji> <b>Datenbank wurde gelöscht</b>"
   heroku: "{} <b>{}.{}.{}</b> <i>{}</i>\n\n<b><tg-emoji emoji-id=5289608677244811430>📁</tg-emoji> <b>heroku-tl:</b> <i>{}</i>\n\n<tg-emoji emoji-id=5228879218363872764>⌨</tg-emoji> <b>Developers: <a href=\"t.me/codrago\">@codrago</a>, <a href=\"t.me/zetgo\">@zetgo</a></b>"
+  rich_heroku_message: '<figure><img src="{banner_url}"/></figure><details><summary>{platform} Heroku-Informationen</summary><table><tr><th>Version</th><th>Build</th></tr><tr><td>【<tg-emoji emoji-id=5289608677244811430>📁</tg-emoji>】 <b>Version</b></td><td>{version}</td></tr><tr><td>【<tg-emoji emoji-id=5289608677244811430>📁</tg-emoji>】 <b>Build</b></td><td>{build}</td></tr><tr><td>【<tg-emoji emoji-id=5289608677244811430>📁</tg-emoji>】 <b>Heroku TL</b></td><td>{htl_version}</td></tr><tr><td>【<tg-emoji emoji-id=5289608677244811430>📁</tg-emoji>】 <b>Branch</b></td><td>{branch}</td></tr><tr><td>【<tg-emoji emoji-id=5289608677244811430>📁</tg-emoji>】 <b>Entwickler</b></td><td><a href="t.me/codrago">@codrago</a>, <a href="t.me/zetgo">@zetgo</a></td></tr></table></details>'
+  _cfg_rich_mode: "Heroku als Rich-Nachricht anzeigen."
   _cls_doc: "Verwaltung der grundlegenden Einstellungen des Userbots"
   confirm_cleardb: "⚠️ <b>Bist du sicher, dass du die Datenbank zurücksetzen möchtest?</b>"
   cleardb_confirm: "🗑 Datenbank löschen"
@@ -424,7 +426,7 @@ test:
   configpingph: "🤖Benutzerdefinierte Platzhalter: {}"
   hint: "Geben Sie einen Hinweis an"
   ping_emoji: "Emoji, das bei einer leichten Ping-Erhöhung angezeigt wird."
-  _cfg_rich_mode: "Show ping as a Rich message."
+  _cfg_rich_mode: "Ping als Rich-Nachricht anzeigen."
   back: "↩️ Zurück"
   banner_url: "Bild für Ihren Ping, zum Beispiel: https://raw.githubusercontent.com/coddrago/assets/refs/heads/main/heroku/ping_cmd.png"
   logs_caption: "<tg-emoji emoji-id=5350594756126721186>🪐</tg-emoji> <b>Heroku-Logs des Levels</b> <code>{}</code>\n\n<tg-emoji emoji-id=5228879218363872764>⚪️</tg-emoji> <b>Version: {}.{}.{}</b>{}"

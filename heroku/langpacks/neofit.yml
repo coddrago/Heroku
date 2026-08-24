@@ -339,6 +339,7 @@ settings:
   no_alias: "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>Alias</b> <code>{}</code> <b>not found</b>"
   db_cleared: "<tg-emoji emoji-id=5197474765387864959>👍</tg-emoji> <b>DB flushed</b>"
   heroku: "{} <b>v{}.{}.{}</b> <i>{}</i>\n\n<b><tg-emoji emoji-id=5289608677244811430>📁</tg-emoji> <b>lib-ver:</b> <i>{}</i>\n\n<tg-emoji emoji-id=5228879218363872764>⌨</tg-emoji> <b>Devs: <a href=\"t.me/codrago\">@codrago</a>, <a href=\"t.me/zetgo\">@zetgo</a></b>"
+  rich_heroku_message: '<figure><img src="{banner_url}"/></figure><details><summary>{platform} Heroku information</summary><table><tr><th>Version</th><th>Build</th></tr><tr><td>【<tg-emoji emoji-id=5289608677244811430>📁</tg-emoji>】 <b>Version</b></td><td>{version}</td></tr><tr><td>【<tg-emoji emoji-id=5289608677244811430>📁</tg-emoji>】 <b>Build</b></td><td>{build}</td></tr><tr><td>【<tg-emoji emoji-id=5289608677244811430>📁</tg-emoji>】 <b>Heroku TL</b></td><td>{htl_version}</td></tr><tr><td>【<tg-emoji emoji-id=5289608677244811430>📁</tg-emoji>】 <b>Branch</b></td><td>{branch}</td></tr><tr><td>【<tg-emoji emoji-id=5289608677244811430>📁</tg-emoji>】 <b>Developers</b></td><td><a href="t.me/codrago">@codrago</a>, <a href="t.me/zetgo">@zetgo</a></td></tr></table></details>'
   confirm_cleardb: "⚠️ <b>Warning: Drop Database? Data loss imminent.</b>"
   cleardb_confirm: "🗑 DROP DATABASE"
   cancel: "🚫 ^C"
@@ -367,6 +368,7 @@ settings:
   _cmd_doc_unblacklist: "<chat_id> - Allow module"
   _cmd_doc_unblacklistuser: "[user_id] - Allow exec"
   _cfg_nonstandart_prefixes: "Allow multi-char/emoji prefixes"
+  _cfg_rich_mode: "Render Heroku info as a Rich message."
   _cls_doc: "Core Config"
 
   cmd404: <tg-emoji emoji-id=5469791106591890404>🪄</tg-emoji> <b>Command not found in PATH</b>
@@ -438,7 +440,7 @@ test:
   configpingph: "🤖 Vars: {}"
   hint: "Set hint"
   ping_emoji: "Low-latency Emoji"
-  _cfg_rich_mode: "Show ping as a Rich message."
+  _cfg_rich_mode: "Render ping as a Rich message."
   back: "↩️ cd .."
   banner_url: "Ping banner URL"
   logs_caption: "<tg-emoji emoji-id=5350594756126721186>🪐</tg-emoji> <b>Logs (Verbosity:</b> <code>{}</code><b>)</b>\n\n<tg-emoji emoji-id=5228879218363872764>⚪️</tg-emoji> <b>v{}.{}.{}</b>{}"
@@ -547,7 +549,7 @@ help:
   _cmd_doc_helphide: <module ...> - Hide/show modules in help output
   _cmd_doc_support: Print support chat link
   show_preview_in_help: 'Show # meta banner in help preview [module]'
-  _cfg_rich_mode: "Show help as a Rich message."
+  _cfg_rich_mode: "Render help as a Rich message."
   rich_core: "Core modules"
   rich_modules: "Modules"
   rich_placeholders: "Placeholders"
@@ -567,7 +569,7 @@ heroku_info:
   _cfg_cst_ph: "🤖Vars: {}"
   _cfg_cst_btn: "Custom Button"
   _cfg_banner: "Banner URL"
-  _cfg_rich_mode: "Show info as a Rich message."
+  _cfg_rich_mode: "Render info as a Rich message."
   desc: "<tg-emoji emoji-id=5188377234380954537>🪐</tg-emoji> <b>What is Userbot?</b>\n\n<tg-emoji emoji-id=5472238129849048175>😎</tg-emoji> A userbot is an automation script running on a user account (Client API).\n\n<tg-emoji emoji-id=5474667187258006816>😎</tg-emoji> Unlike Bots (Bot API), userbots have full access to User methods.\n\n<tg-emoji emoji-id=5472267631979405211>🚫</tg-emoji> <b>Warning: Violates ToS? Use at own risk.</b>\n\n"
   no_font: "<tg-emoji emoji-id=5465665476971471368>❌</tg-emoji> Font not found in reply/link."
   no_banner: "<tg-emoji emoji-id=6010394680179562842>😶</tg-emoji> <b>404: Link </b><code>{link></code> <b>unreachable.</b>"

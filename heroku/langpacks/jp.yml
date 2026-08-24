@@ -339,6 +339,7 @@ settings:
   no_alias: "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>エイリアス</b> <code>{}</code> <b>は存在しません</b>"
   db_cleared: "<tg-emoji emoji-id=5197474765387864959>👍</tg-emoji> <b>データベースをクリアしました</b>"
   heroku: "{} <b>{}.{}.{}</b> <i>{}</i>\n\n<b><tg-emoji emoji-id=5289608677244811430>📁</tg-emoji> <b>heroku-tl:</b> <i>{}</i>\n\n<tg-emoji emoji-id=5228879218363872764>⌨</tg-emoji> <b>開発者: <a href=\"t.me/codrago\">@codrago</a>, <a href=\"t.me/zetgo\">@zetgo</a></b>"
+  rich_heroku_message: '<figure><img src="{banner_url}"/></figure><details><summary>{platform} Heroku情報</summary><table><tr><th>バージョン</th><th>ビルド</th></tr><tr><td>【<tg-emoji emoji-id=5289608677244811430>📁</tg-emoji>】 <b>バージョン</b></td><td>{version}</td></tr><tr><td>【<tg-emoji emoji-id=5289608677244811430>📁</tg-emoji>】 <b>ビルド</b></td><td>{build}</td></tr><tr><td>【<tg-emoji emoji-id=5289608677244811430>📁</tg-emoji>】 <b>Heroku TL</b></td><td>{htl_version}</td></tr><tr><td>【<tg-emoji emoji-id=5289608677244811430>📁</tg-emoji>】 <b>ブランチ</b></td><td>{branch}</td></tr><tr><td>【<tg-emoji emoji-id=5289608677244811430>📁</tg-emoji>】 <b>開発者</b></td><td><a href="t.me/codrago">@codrago</a>, <a href="t.me/zetgo">@zetgo</a></td></tr></table></details>'
   confirm_cleardb: "⚠️ <b>本当にデータベースをクリアしますか？</b>"
   cleardb_confirm: "🗑 データベースをクリア"
   cancel: "🚫 キャンセル"
@@ -367,6 +368,7 @@ settings:
   _cmd_doc_unblacklist: "<chat_id> - ボットの動作を特定の場所でブラックリストから削除します"
   _cmd_doc_unblacklistuser: "[user_id] - このユーザーに許可されたコマンドの実行を許可します"
   _cfg_nonstandart_prefixes: "フラグや複数の記号などの非標準プレフィックスを許可します"
+  _cfg_rich_mode: "HerokuをRichメッセージで表示"
   _cls_doc: "コアユーザーボット設定を制御します"
 
   cmd404: <tg-emoji emoji-id=5469791106591890404>🪄</tg-emoji> <b>コマンドが見つかりません</b>
@@ -438,7 +440,7 @@ test:
   configpingph: "🤖カスタムプレースホルダー: {}"
   hint: "ヒントを設定"
   ping_emoji: "Ping が大幅に増加しない場合に表示される絵文字"
-  _cfg_rich_mode: "Show ping as a Rich message."
+  _cfg_rich_mode: "pingをRichメッセージで表示"
   back: "↩️ 戻る"
   banner_url: "Ping 用の画像。例: https://raw.githubusercontent.com/coddrago/assets/refs/heads/main/heroku/ping_cmd.png"
   logs_caption: "<tg-emoji emoji-id=5350594756126721186>🪐</tg-emoji> <b>詳細レベル</b> <code>{}</code> <b>の Heroku ログ</b>\n\n<tg-emoji emoji-id=5228879218363872764>⚪️</tg-emoji> <b>バージョン: {}.{}.{}</b>{}"
