@@ -481,12 +481,12 @@ class Help(loader.Module):
 
         if self.config["rich_mode"]:
             rich_message = (
-                f"{self.config['desc_icon']} {reply}"
-                + (
+                (
                     f"<figure><img src=\"{self.config['banner_url']}\"/></figure>"
                     if self.config["banner_url"]
                     else ""
                 )
+                + f"{self.config['desc_icon']} {reply}" 
             )
             rich_core = "".join(f"<p>{item.strip()}</p>" for item in core_)
             rich_modules = "".join(
