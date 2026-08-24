@@ -2,6 +2,7 @@ import io
 import typing
 
 from herokutl import Button
+from herokutl.extensions import html as html_parser
 from herokutl import utils as tl_utils
 from herokutl.tl import types
 from herokutl.tl.functions.messages import (
@@ -202,6 +203,30 @@ class TelethonBot:
             return InputRichMessageMarkdown(markdown=markdown)
         raise ValueError("One of html, markdown or rich_message is required")
 
+    @staticmethod
+    def _rich_fallback_text(html=None, markdown=None, rich_message=None):
+        if html:
+            text, _ = html_parser.parse(html)
+            return text or " "
+        if markdown:
+            return str(markdown) or " "
+        if rich_message is not None:
+            rich_html = getattr(rich_message, "html", None)
+            if rich_html:
+                text, _ = html_parser.parse(rich_html)
+                return text or " "
+            rich_markdown = getattr(rich_message, "markdown", None)
+            if rich_markdown:
+                return str(rich_markdown)
+            try:
+                from ..utils.rich import rich_message_to_html
+
+                text, _ = html_parser.parse(rich_message_to_html(rich_message))
+                return text or " "
+            except Exception:
+                return " "
+        return " "
+
     async def send_rich_message(
         self,
         chat_id,
@@ -217,9 +242,10 @@ class TelethonBot:
             raise TypeError("html must be a str")
 
         entity = await self.client.get_input_entity(chat_id)
+        rich_input = self._rich_input(html, markdown, rich_message)
         request = SendMessageRequest(
             peer=entity,
-            message="",
+            message=self._rich_fallback_text(html, markdown, rich_message),
             no_webpage=True,
             silent=disable_notification,
             reply_to=(
@@ -228,7 +254,7 @@ class TelethonBot:
                 else None
             ),
             reply_markup=self.client.build_reply_markup(reply_markup),
-            rich_message=self._rich_input(html, markdown, rich_message),
+            rich_message=rich_input,
         )
         result = await self.client(request)
         return self.client._get_response_message(request, result, entity)
@@ -248,11 +274,14 @@ class TelethonBot:
             raise TypeError("html must be a str")
 
         markup = self._build_reply_markup(reply_markup)
+        rich_input = self._rich_input(html, markdown, rich_message)
+        fallback_text = self._rich_fallback_text(html, markdown, rich_message)
         if inline_message_id is not None:
             request = EditInlineBotMessageRequest(
                 id=self._coerce_inline_message_id(inline_message_id),
+                message=fallback_text,
                 no_webpage=True,
-                rich_message=self._rich_input(html, markdown, rich_message),
+                rich_message=rich_input,
                 reply_markup=markup,
             )
             return await self.client(request)
@@ -261,8 +290,9 @@ class TelethonBot:
         request = EditMessageRequest(
             peer=entity,
             id=message_id,
+            message=fallback_text,
             no_webpage=True,
-            rich_message=self._rich_input(html, markdown, rich_message),
+            rich_message=rich_input,
             reply_markup=markup,
         )
         return await self.client(request)

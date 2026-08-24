@@ -20,6 +20,7 @@ from collections.abc import Callable
 from herokutl import TelegramClient
 from herokutl import helpers
 from herokutl import utils as tl_utils
+from herokutl.extensions import html as html_parser
 from herokutl._updates import ChannelState, Entity, EntityType, SessionState
 from herokutl.errors.rpcerrorlist import TopicDeletedError
 from herokutl.hints import EntityLike
@@ -200,6 +201,30 @@ class CustomTelegramClient(TelegramClient):
             )
         raise ValueError("One of html, markdown or rich_message is required")
 
+    @staticmethod
+    def _rich_fallback_text(html=None, markdown=None, rich_message=None):
+        if html:
+            text, _ = html_parser.parse(html)
+            return text or " "
+        if markdown:
+            return str(markdown) or " "
+        if rich_message is not None:
+            rich_html = getattr(rich_message, "html", None)
+            if rich_html:
+                text, _ = html_parser.parse(rich_html)
+                return text or " "
+            rich_markdown = getattr(rich_message, "markdown", None)
+            if rich_markdown:
+                return str(rich_markdown)
+            try:
+                from .utils.rich import rich_message_to_html
+
+                text, _ = html_parser.parse(rich_message_to_html(rich_message))
+                return text or " "
+            except Exception:
+                return " "
+        return " "
+
     async def send_rich_message(
         self,
         entity: EntityLike,
@@ -215,9 +240,16 @@ class CustomTelegramClient(TelegramClient):
         noautolink: bool | None = None,
     ):
         input_entity = await self.get_input_entity(entity)
+        rich_input = self._rich_input(
+            html,
+            markdown,
+            rich_message,
+            rtl=rtl,
+            noautolink=noautolink,
+        )
         request = functions.messages.SendMessageRequest(
             peer=input_entity,
-            message="",
+            message=self._rich_fallback_text(html, markdown, rich_message),
             no_webpage=True,
             silent=silent,
             reply_to=(
@@ -229,13 +261,7 @@ class CustomTelegramClient(TelegramClient):
                 else None
             ),
             reply_markup=self.build_reply_markup(buttons),
-            rich_message=self._rich_input(
-                html,
-                markdown,
-                rich_message,
-                rtl=rtl,
-                noautolink=noautolink,
-            ),
+            rich_message=rich_input,
         )
         return self._get_response_message(request, await self(request), input_entity)
 
@@ -252,18 +278,20 @@ class CustomTelegramClient(TelegramClient):
         noautolink: bool | None = None,
     ):
         input_entity = await self.get_input_entity(entity)
+        rich_input = self._rich_input(
+            html,
+            markdown,
+            rich_message,
+            rtl=rtl,
+            noautolink=noautolink,
+        )
         request = functions.messages.EditMessageRequest(
             peer=input_entity,
             id=tl_utils.get_message_id(message),
+            message=self._rich_fallback_text(html, markdown, rich_message),
             no_webpage=True,
             reply_markup=self.build_reply_markup(buttons),
-            rich_message=self._rich_input(
-                html,
-                markdown,
-                rich_message,
-                rtl=rtl,
-                noautolink=noautolink,
-            ),
+            rich_message=rich_input,
         )
         return self._get_response_message(request, await self(request), input_entity)
 
