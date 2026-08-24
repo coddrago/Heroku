@@ -120,32 +120,60 @@ class CustomTelegramClient(TelegramClient):
         self.heroku_inline: "InlineManager"
 
     @staticmethod
+    def _rich_output_block_to_input(block):
+        from herokutl.tl.types import (
+            InputGeoPoint,
+            InputGeoPointEmpty,
+            InputPageBlockMap,
+        )
+
+        block = copy.deepcopy(block)
+        if type(block).__name__ == "PageBlockMap":
+            geo = block.geo
+            if type(geo).__name__ == "GeoPoint":
+                geo = InputGeoPoint(
+                    lat=geo.lat,
+                    long=geo.long,
+                    accuracy_radius=geo.accuracy_radius,
+                )
+            else:
+                geo = InputGeoPointEmpty()
+            return InputPageBlockMap(
+                geo=geo,
+                zoom=block.zoom,
+                w=block.w,
+                h=block.h,
+                caption=block.caption,
+            )
+
+        for field in ("blocks", "items"):
+            value = getattr(block, field, None)
+            if isinstance(value, list):
+                setattr(
+                    block,
+                    field,
+                    [CustomTelegramClient._rich_output_block_to_input(item) for item in value],
+                )
+        return block
+
+    @staticmethod
     def _rich_output_to_input(rich_message):
         if type(rich_message).__name__ != "RichMessage":
             return rich_message
 
-        from herokutl.tl.types import InputDocument, InputPhoto
-
         photos = [
-            InputPhoto(
-                id=photo.id,
-                access_hash=photo.access_hash,
-                file_reference=photo.file_reference,
-            )
+            tl_utils.get_input_photo(photo)
             for photo in getattr(rich_message, "photos", [])
-            if hasattr(photo, "access_hash") and hasattr(photo, "file_reference")
         ]
         documents = [
-            InputDocument(
-                id=document.id,
-                access_hash=document.access_hash,
-                file_reference=document.file_reference,
-            )
+            tl_utils.get_input_document(document)
             for document in getattr(rich_message, "documents", [])
-            if hasattr(document, "access_hash") and hasattr(document, "file_reference")
         ]
         return InputRichMessage(
-            blocks=getattr(rich_message, "blocks", []),
+            blocks=[
+                CustomTelegramClient._rich_output_block_to_input(block)
+                for block in getattr(rich_message, "blocks", [])
+            ],
             rtl=getattr(rich_message, "rtl", None),
             photos=photos,
             documents=documents,
