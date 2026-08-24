@@ -16,6 +16,7 @@ import asyncio
 import contextlib
 import logging
 import os
+import sqlite3
 import time
 import typing
 
@@ -303,7 +304,13 @@ class InlineManager(
             )
             self.init_complete = False
             return False
-
+        except sqlite3.OperationalError:
+            logger.critical(
+                "Bot session database is locked, could not start bot client",
+                exc_info=True,
+            )
+            self.init_complete = False
+            return False
         result = await self._ping_bot(after_break)
         if result is not True:
             return result
