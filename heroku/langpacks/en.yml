@@ -402,7 +402,7 @@ settings:
   _cmd_doc_unblacklist: "<chat_id> - Unblacklist the bot from operating somewhere"
   _cmd_doc_unblacklistuser: "[user_id] - Allow this user to run permitted commands"
   _cfg_nonstandart_prefixes: "Allow non-standart prefixes like flags or more than one symbol"
-  _cfg_rich_mode: "Show heroku as a Rich message."
+  _cfg_rich_mode: "Show Heroku as a Rich message."
   _cls_doc: "Control core userbot settings"
 
   cmd404: <tg-emoji emoji-id=5469791106591890404>🪄</tg-emoji> <b>Command not found</b>

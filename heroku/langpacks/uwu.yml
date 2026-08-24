@@ -368,7 +368,7 @@ settings:
   _cmd_doc_unblacklist: "<chat_id> - Unbwackwist da bot fwom opewating somewhewe"
   _cmd_doc_unblacklistuser: "[user_id] - Awwow dis usew to wun pewmitted commands"
   _cfg_nonstandart_prefixes: "Awwow nyon-standawt pwefixes wike fwags ow mowe dan onye symbow"
-  _cfg_rich_mode: "Show heroku as a Rich message."
+  _cfg_rich_mode: "Show Hewoku as a Wich message."
   _cls_doc: "Contwow cowe usewbot settings"
 
   cmd404: <tg-emoji emoji-id=5469791106591890404>🪄</tg-emoji> <b>Command nyot found</b>
@@ -440,7 +440,7 @@ test:
   configpingph: "🤖 Custom pwaceholders: {}"
   hint: "Set a hint"
   ping_emoji: "Emoji dat appeaws when ping does nyot incwease signyificantwy"
-  _cfg_rich_mode: "Show ping as a Rich message."
+  _cfg_rich_mode: "Show ping as a Wich message."
   back: "↩️ Back"
   banner_url: "Image fow youw ping, fow exampwe: https://raw.githubusercontent.com/coddrago/assets/refs/heads/main/heroku/ping_cmd.png"
   logs_caption: "<tg-emoji emoji-id=5350594756126721186>🪐</tg-emoji> <b>Heroku wogs with vewbosity</b> <code>{}</code>\n\n<tg-emoji emoji-id=5228879218363872764>⚪️</tg-emoji> <b>Vewsion: {}.{}.{}</b>{}"
