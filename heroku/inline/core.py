@@ -265,6 +265,12 @@ class InlineManager(
 
         self.init_complete = True
 
+        if self._bot_client:
+            try:
+                await self._bot_client.disconnect()
+            except Exception:
+                pass
+
         bot_uid = self._token.split(":", 1)[0]
         self._cleanup_stale_bot_sessions(bot_uid)
         self._bot_client = TelegramClient(
