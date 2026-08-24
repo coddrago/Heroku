@@ -328,6 +328,7 @@ class TestMod(loader.Module):
                 caption=caption,
                 reply_to=message.form["top_msg_id"],
             )
+            await message.delete()
 
     @loader.command()
     async def suspend(self, message: Message):
