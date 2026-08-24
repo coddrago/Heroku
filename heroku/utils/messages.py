@@ -300,6 +300,48 @@ async def _edit_rich_message(
     )
 
 
+async def _edit_inline_rich_message(
+    message,
+    rich_message: str,
+    reply_markup=None,
+):
+    unit = getattr(message, "form", None) or {}
+    caller = unit.get("caller")
+    if caller is None:
+        caller = unit.get("chat")
+    if caller is None:
+        caller = getattr(message, "chat_id", None)
+    if caller is not None and hasattr(message, "inline_manager"):
+        with contextlib.suppress(Exception):
+            await message.delete()
+        return await message.inline_manager.form(
+            "",
+            caller,
+            reply_markup=reply_markup or [],
+            rich_message=rich_message,
+            silent=True,
+        )
+    rich_markup = (
+        message.inline_manager.generate_markup(reply_markup)
+        if reply_markup is not None
+        else None
+    )
+    if isinstance(message, (InlineMessage, InlineCall)):
+        await message.inline_manager.bot.edit_rich_message(
+            rich_message,
+            inline_message_id=message.inline_message_id,
+            reply_markup=rich_markup,
+        )
+    else:
+        await message.inline_manager.bot.edit_rich_message(
+            rich_message,
+            chat_id=message.chat_id,
+            message_id=message.message_id,
+            reply_markup=rich_markup,
+        )
+    return message
+
+
 async def answer(
     message: Message | InlineCall | InlineMessage,
     response: str = "",
@@ -337,22 +379,15 @@ async def answer(
         message = message[0]
 
     if rich_message is not None:
-        if isinstance(message, (InlineMessage, InlineCall)):
-            await message.inline_manager.bot.edit_rich_message(
+        if isinstance(
+            message,
+            (InlineMessage, InlineCall, BotInlineMessage, BotInlineCall),
+        ):
+            return await _edit_inline_rich_message(
+                message,
                 rich_message,
-                inline_message_id=message.inline_message_id,
                 reply_markup=reply_markup,
             )
-            return message
-
-        if isinstance(message, (BotInlineMessage, BotInlineCall)):
-            await message.inline_manager.bot.edit_rich_message(
-                rich_message,
-                chat_id=message.chat_id,
-                message_id=message.message_id,
-                reply_markup=reply_markup,
-            )
-            return message
 
         edit = message.out and not message.via_bot_id and not message.fwd_from
         if edit:

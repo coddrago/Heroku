@@ -1,3 +1,4 @@
+import base64
 import html
 
 
@@ -133,6 +134,40 @@ def _table_cell(value) -> str:
     return f"<{tag}{''.join(attributes)}>{_text(getattr(value, 'text', None))}</{tag}>"
 
 
+def _button(value) -> str:
+    text = _text(getattr(value, "text", None))
+    button_type = getattr(value, "type", None)
+    type_name = type(button_type).__name__
+    attributes = []
+    if type_name == "InlineButtonTypeUrl":
+        attributes = ["type=\"url\"", f"url=\"{_attribute(getattr(button_type, 'url', ''))}\""]
+    elif type_name == "InlineButtonTypeCallback":
+        data = getattr(button_type, "data", b"")
+        if isinstance(data, (bytes, bytearray, memoryview)):
+            data = base64.urlsafe_b64encode(bytes(data)).decode()
+        attributes = ["type=\"callback_data\"", f"data=\"{_attribute(data)}\""]
+    elif type_name == "InlineButtonTypeSwitchInline":
+        query = _attribute(getattr(button_type, "query", ""))
+        tag = "switch_inline_query_current_chat" if getattr(button_type, "same_peer", False) else "switch_inline_query"
+        attributes = [f"type=\"{tag}\"", f"query=\"{query}\""]
+    elif type_name == "InlineButtonTypeWebView":
+        attributes = ["type=\"web_app\"", f"url=\"{_attribute(getattr(button_type, 'url', ''))}\""]
+    elif type_name == "InlineButtonTypeCopy":
+        attributes = ["type=\"copy_text\"", f"text=\"{_attribute(getattr(button_type, 'copy_text', ''))}\""]
+    elif type_name == "InlineButtonTypeUrlAuth":
+        attributes = ["type=\"login_url\"", f"url=\"{_attribute(getattr(button_type, 'url', ''))}\""]
+    elif type_name == "InlineButtonTypeUserProfile":
+        attributes = ["type=\"url\"", f"url=\"tg://user?id={_attribute(getattr(button_type, 'user_id', ''))}\""]
+    else:
+        attributes = ["type=\"disabled\""]
+    style = getattr(getattr(value, "style", None), "__dict__", {})
+    for key in ("bg_primary", "bg_danger", "bg_success", "link"):
+        if style.get(key):
+            attributes.append(f"style=\"{key.removeprefix('bg_')}\"")
+            break
+    return f"<tg-button {' '.join(attributes)}>{text}</tg-button>"
+
+
 def _block(value) -> str:
     if value is None:
         return ""
@@ -174,6 +209,9 @@ def _block(value) -> str:
         return _media(name.removeprefix("PageBlock").lower(), value)
     if name == "PageBlockMap":
         return _caption(getattr(value, "caption", None))
+    if name == "PageBlockButtonRow":
+        buttons = "".join(_button(item) for item in getattr(value, "buttons", []))
+        return f"<tg-button-row>{buttons}</tg-button-row>"
     if name in {"PageBlockCollage", "PageBlockSlideshow"}:
         return "".join(_block(item) for item in getattr(value, "items", [])) + _caption(getattr(value, "caption", None))
     if name == "PageBlockTable":
@@ -228,3 +266,58 @@ def rich_message_to_html(rich_message) -> str:
         for rendered in (_block(item) for item in getattr(rich_message, "blocks", []))
         if rendered
     )
+
+
+def install_rich_message_support():
+    from herokutl.tl.custom.message import Message
+
+    if getattr(Message, "_heroku_rich_message_support", False):
+        return
+
+    original_text = Message.text
+    original_raw_text = Message.raw_text
+
+    def get_message(self):
+        native = getattr(self, "_heroku_rich_message_native", None)
+        if native is not None:
+            return rich_message_to_html(native)
+        return getattr(self, "_heroku_message_text", None)
+
+    def set_message(self, value):
+        self._heroku_message_text = value
+
+    def get_rich_message(self):
+        native = getattr(self, "_heroku_rich_message_native", None)
+        return rich_message_to_html(native) if native is not None else None
+
+    def set_rich_message(self, value):
+        self._heroku_rich_message_native = value
+
+    def get_text(self):
+        if getattr(self, "_heroku_rich_message_native", None) is not None:
+            return get_rich_message(self)
+        return original_text.fget(self)
+
+    def set_text(self, value):
+        original_text.fset(self, value)
+
+    def get_raw_text(self):
+        if getattr(self, "_heroku_rich_message_native", None) is not None:
+            return get_rich_message(self)
+        return original_raw_text.fget(self)
+
+    def set_raw_text(self, value):
+        original_raw_text.fset(self, value)
+
+    def get_rich_message_entity(self):
+        return getattr(self, "_heroku_rich_message_native", None)
+
+    Message.message = property(get_message, set_message)
+    Message.rich_message = property(get_rich_message, set_rich_message)
+    Message.text = property(get_text, set_text)
+    Message.raw_text = property(get_raw_text, set_raw_text)
+    Message.rich_message_entity = property(get_rich_message_entity)
+    Message._heroku_rich_message_support = True
+
+
+install_rich_message_support()

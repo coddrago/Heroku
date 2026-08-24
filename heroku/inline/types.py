@@ -32,10 +32,15 @@ class InlineMessage:
     async def edit(self, *args, **kwargs) -> "InlineMessage":
         rich_message = kwargs.pop("rich_message", None)
         if rich_message is not None:
+            rich_markup = (
+                self.inline_manager.generate_markup(kwargs.get("reply_markup"))
+                if kwargs.get("reply_markup") is not None
+                else None
+            )
             await self.inline_manager.bot.edit_rich_message(
                 rich_message,
                 inline_message_id=self.inline_message_id,
-                reply_markup=kwargs.get("reply_markup"),
+                reply_markup=rich_markup,
             )
             return self
 
@@ -190,11 +195,16 @@ class BotInlineMessage:
     async def edit(self, *args, **kwargs) -> "BotMessage":
         rich_message = kwargs.pop("rich_message", None)
         if rich_message is not None:
+            rich_markup = (
+                self.inline_manager.generate_markup(kwargs.get("reply_markup"))
+                if kwargs.get("reply_markup") is not None
+                else None
+            )
             await self.inline_manager.bot.edit_rich_message(
                 rich_message,
                 chat_id=self.chat_id,
                 message_id=self.message_id,
-                reply_markup=kwargs.get("reply_markup"),
+                reply_markup=rich_markup,
             )
             return self
 
