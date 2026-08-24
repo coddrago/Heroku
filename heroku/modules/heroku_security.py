@@ -619,7 +619,8 @@ class HerokuSecurityMod(loader.Module):
                 list(set(self._db.get(main.__name__, "nonickusers", []) + [user.id])),
             )
 
-            await message.edit(
+            await utils.answer(
+                message,
                 self.strings[f"{group}_added"].format(
                     user.id,
                     utils.escape_html(get_display_name(user)),
@@ -628,11 +629,12 @@ class HerokuSecurityMod(loader.Module):
                 + self.strings["user_nn"].format(
                     user.id,
                     utils.escape_html(get_display_name(user)),
-                )
+                ),
             )
             return
 
-        await message.edit(
+        await utils.answer(
+            message,
             (
                 self.strings[f"{group}_added"].format(
                     user.id,
