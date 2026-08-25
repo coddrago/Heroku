@@ -21,8 +21,12 @@ import typing
 from collections.abc import Callable
 from urllib.parse import urlparse
 
-from herokutl.errors.rpcerrorlist import FloodWaitError, MediaPrevInvalidError
-from herokutl.errors.rpcerrorlist import ChatSendInlineForbiddenError
+from herokutl.errors.rpcerrorlist import (
+    ChatSendInlineForbiddenError,
+    FloodWaitError,
+    MediaPrevInvalidError,
+    MessageIdInvalidError,
+)
 from herokutl.tl.types import Message
 
 from .. import main, utils
@@ -369,15 +373,17 @@ class Gallery(InlineUnit):
 
     async def _load_gallery_photos(self: "InlineManager", unit_id: str):
         """Preloads photo. Should be called via ensure_future"""
-        unit = self._units[unit_id]
+        unit = self._units.get(unit_id)
+        if not unit:
+            return
 
         photo_url = await self._call_photo(unit["next_handler"])
 
-        self._units[unit_id]["photos"] += (
-            [photo_url] if isinstance(photo_url, str) else photo_url
-        )
+        unit = self._units.get(unit_id)
+        if not unit:
+            return
 
-        unit = self._units[unit_id]
+        unit["photos"] += [photo_url] if isinstance(photo_url, str) else photo_url
 
         if unit.get("preload", False) and len(unit["photos"]) - unit[
             "current_index"
@@ -404,14 +410,19 @@ class Gallery(InlineUnit):
                 unit["next_handler"],
                 ListGalleryHelper,
             ):
-                del self._units[unit_id]["slideshow"]
-                self._units[unit_id]["current_index"] -= 1
+                unit.pop("slideshow", None)
+                unit["current_index"] -= 1
 
-            await self._gallery_page(
-                call,
-                self._units[unit_id]["current_index"] + 1,
-                unit_id=unit_id,
-            )
+            try:
+                await self._gallery_page(
+                    call,
+                    unit["current_index"] + 1,
+                    unit_id=unit_id,
+                )
+            except KeyError:
+                if unit_id not in self._units:
+                    return
+                raise
 
     async def _gallery_slideshow(
         self: "InlineManager",
@@ -526,6 +537,9 @@ class Gallery(InlineUnit):
                 return
             case _ if page == "close":
                 deleted = await self._delete_unit_message(call, unit_id=unit_id)
+                if deleted:
+                    self._units.get(unit_id, {}).pop("slideshow", None)
+                    await self._unload_unit(unit_id)
                 try:
                     await call.answer(
                         "" if deleted else "Error occurred", show_alert=not deleted
@@ -583,6 +597,10 @@ class Gallery(InlineUnit):
                 f"Got FloodWait. Wait for {e.seconds} seconds",
                 show_alert=True,
             )
+            return
+        except MessageIdInvalidError:
+            self._units.get(unit_id, {}).pop("slideshow", None)
+            await self._unload_unit(unit_id)
             return
         except Exception:
             logger.exception("Exception while trying to edit media")
