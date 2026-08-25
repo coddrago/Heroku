@@ -339,7 +339,7 @@ settings:
   no_alias: "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>Awias</b> <code>{}</code> <b>does nyot exist</b>"
   db_cleared: "<tg-emoji emoji-id=5197474765387864959>👍</tg-emoji> <b>Database cweawed</b>"
   heroku: "{} <b>{}.{}.{}</b> <i>{}</i>\n\n<b><tg-emoji emoji-id=5289608677244811430>📁</tg-emoji> <b>heroku-tl:</b> <i>{}</i>\n\n<tg-emoji emoji-id=5228879218363872764>⌨</tg-emoji> <b>Devewopews: <a href=\"t.me/codrago\">@codrago</a>, <a href=\"t.me/zetgo\">@zetgo</a></b> :3"
-  rich_heroku_message: '<figure><img src="{banner_url}"/></figure><details><summary>{platform} Heroku infowmation</summary><table><tr><th>Vewsion</th><th>Buiwd</th></tr><tr><td>【<tg-emoji emoji-id=5289608677244811430>📁</tg-emoji>】 <b>Vewsion</b></td><td>{version}</td></tr><tr><td>【<tg-emoji emoji-id=5289608677244811430>📁</tg-emoji>】 <b>Buiwd</b></td><td>{build}</td></tr><tr><td>【<tg-emoji emoji-id=5289608677244811430>📁</tg-emoji>】 <b>Heroku TL</b></td><td>{htl_version}</td></tr><tr><td>【<tg-emoji emoji-id=5289608677244811430>📁</tg-emoji>】 <b>Bwanch</b></td><td>{branch}</td></tr><tr><td>【<tg-emoji emoji-id=5289608677244811430>📁</tg-emoji>】 <b>Devewopews</b></td><td><a href="t.me/codrago">@codrago</a>, <a href="t.me/zetgo">@zetgo</a></td></tr></table></details>'
+  rich_heroku_message: '<figure><img src="{banner_url}"/></figure><h1>{platform} Userbot</h1><table bordered><tr><th>Component</th><th>Cuwwent wewease</th></tr><tr><td><b>Vewsion</b></td><td><code>{version}</code></td></tr><tr><td><b>Buiwd</b></td><td>{build}</td></tr><tr><td><b>Hewoku TL</b></td><td><code>{htl_version}</code></td></tr><tr><td><b>API wayew</b></td><td><code>{layer}</code></td></tr><tr><td><b>Cuwwent usew</b></td><td><code>{current_user}</code></td></tr><tr><td><b>Devewopews</b></td><td><a href="https://t.me/codrago">@codrago</a>, <a href="https://t.me/zetgo">@zetgo</a></td></tr></table>'
   confirm_cleardb: "⚠️ <b>Awe you suwe, dat you want to cweaw database?</b>"
   cleardb_confirm: "🗑 Cweaw database"
   cancel: "🚫 Cancew"
@@ -584,6 +584,14 @@ heroku_info:
 
   name: HerokuInfo
 loader:
+  module_update_prompt: "<tg-emoji emoji-id=5765071340847501478>🔗</tg-emoji> <b>Moduwe {} has been updated. Instaww it?</b>"
+  module_update_yes: "Yes"
+  module_update_no: "No"
+  module_update_always: "Awways update"
+  module_update_installed: "<b>Moduwe update instawwed.</b>"
+  module_update_declined: "<b>Moduwe update decwined.</b>"
+  module_update_expired: "<b>The moduwe update offew has expiwed.</b>"
+  module_update_failed: "<b>Faiwed to instaww the moduwe update.</b>"
   name: "Woadew"
   link: "<tg-emoji emoji-id=5256113064821926998>📁</tg-emoji> <b>Fiwe of</b> {class_name}\n\n<tg-emoji emoji-id=5134452506935427991>🪐</tg-emoji> <b>{prefix}lm in wepwy to dis message to instaww</b>\n\n<tg-emoji emoji-id=4916086774649848789>🔗</tg-emoji> <code>{prefix}dlm {url}</code>\n\n{not_exact}"
   file: "<tg-emoji emoji-id=5256113064821926998>📁</tg-emoji> <b>Fiwe of</b> {class_name}\n\n<tg-emoji emoji-id=5134452506935427991>🪐</tg-emoji> <b>{prefix}lm in wepwy to dis message to instaww</b>\n\n{not_exact}"

@@ -339,7 +339,7 @@ settings:
   no_alias: "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>4l145</b> <code>{}</code> <b>d035 n07 3x157</b>"
   db_cleared: "<tg-emoji emoji-id=5197474765387864959>👍</tg-emoji> <b>DB cl34r3d</b>"
   heroku: "{} <b>{}.{}.{}</b> <i>{}</i>\n\n<b><tg-emoji emoji-id=5289608677244811430>📁</tg-emoji> <b>heroku-tl:</b> <i>{}</i>\n\n<tg-emoji emoji-id=5228879218363872764>⌨</tg-emoji> <b>D3v5: <a href=\"t.me/codrago\">@codrago</a>, <a href=\"t.me/zetgo\">@zetgo</a></b>"
-  rich_heroku_message: '<figure><img src="{banner_url}"/></figure><details><summary>{platform} Heroku 1nf0</summary><table><tr><th>V3r5i0n</th><th>Bu1ld</th></tr><tr><td>【<tg-emoji emoji-id=5289608677244811430>📁</tg-emoji>】 <b>V3r5i0n</b></td><td>{version}</td></tr><tr><td>【<tg-emoji emoji-id=5289608677244811430>📁</tg-emoji>】 <b>Bu1ld</b></td><td>{build}</td></tr><tr><td>【<tg-emoji emoji-id=5289608677244811430>📁</tg-emoji>】 <b>Heroku TL</b></td><td>{htl_version}</td></tr><tr><td>【<tg-emoji emoji-id=5289608677244811430>📁</tg-emoji>】 <b>Br4nch</b></td><td>{branch}</td></tr><tr><td>【<tg-emoji emoji-id=5289608677244811430>📁</tg-emoji>】 <b>D3v3l0p3r5</b></td><td><a href="t.me/codrago">@codrago</a>, <a href="t.me/zetgo">@zetgo</a></td></tr></table></details>'
+  rich_heroku_message: '<figure><img src="{banner_url}"/></figure><h1>{platform} Userbot</h1><table bordered><tr><th>C0mp0n3nt</th><th>Curr3nt r3l3453</th></tr><tr><td><b>V3r510n</b></td><td><code>{version}</code></td></tr><tr><td><b>Bu1ld</b></td><td>{build}</td></tr><tr><td><b>Heroku TL</b></td><td><code>{htl_version}</code></td></tr><tr><td><b>API l4y3r</b></td><td><code>{layer}</code></td></tr><tr><td><b>Curr3nt u53r</b></td><td><code>{current_user}</code></td></tr><tr><td><b>D3v3l0p3r5</b></td><td><a href="https://t.me/codrago">@codrago</a>, <a href="https://t.me/zetgo">@zetgo</a></td></tr></table>'
   confirm_cleardb: "⚠️ <b>R u 5ur3, 7h47 u w4n7 2 cl34r DB?</b>"
   cleardb_confirm: "🗑 Cl34r DB"
   cancel: "🚫 C4nc3l"
@@ -583,6 +583,14 @@ heroku_info:
 
   name: HerokuInfo
 loader:
+  module_update_prompt: "<tg-emoji emoji-id=5765071340847501478>🔗</tg-emoji> <b>M0dul3 {} h45 b33n upd473d. 1n574ll 17?</b>"
+  module_update_yes: "Y35"
+  module_update_no: "N0"
+  module_update_always: "4lw4y5 upd473"
+  module_update_installed: "<b>M0dul3 upd473 1n574ll3d.</b>"
+  module_update_declined: "<b>M0dul3 upd473 d3cl1n3d.</b>"
+  module_update_expired: "<b>7h3 m0dul3 upd473 0ff3r h45 3xp1r3d.</b>"
+  module_update_failed: "<b>F41l3d 70 1n574ll 7h3 m0dul3 upd473.</b>"
   name: "L04d3r"
   link: "<tg-emoji emoji-id=5256113064821926998>📁</tg-emoji> <b>F1l3 0f</b> {class_name}\n\n<tg-emoji emoji-id=5134452506935427991>🪐</tg-emoji> <b>{prefix}lm 1n r3ply 2 7h15 m5g 2 1n574ll</b>\n\n<tg-emoji emoji-id=4916086774649848789>🔗</tg-emoji> <code>{prefix}dlm {url}</code>\n\n{not_exact}"
   file: "<tg-emoji emoji-id=5256113064821926998>📁</tg-emoji> <b>F1l3 0f</b> {class_name}\n\n<tg-emoji emoji-id=5134452506935427991>🪐</tg-emoji> <b>{prefix}lm 1n r3ply 2 7h15 m5g 2 1n574ll</b>\n\n{not_exact}"

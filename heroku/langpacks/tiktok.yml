@@ -326,7 +326,7 @@ settings:
   no_alias: "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>Нет такого алиаса</b> <code>{}</code>"
   db_cleared: "<tg-emoji emoji-id=5197474765387864959>👍</tg-emoji> <b>Базу вайпнул (очистил)</b>"
   heroku: "{} <b>{}.{}.{}</b> <i>{}</i>\n\n<b><tg-emoji emoji-id=5289608677244811430>📁</tg-emoji> <b>heroku-tl:</b> <i>{}</i>\n\n<tg-emoji emoji-id=5228879218363872764>⌨</tg-emoji> <b>Кодеры: <a href=\"t.me/codrago\">@codrago</a>, <a href=\"t.me/zetgo\">@zetgo</a><b>"
-  rich_heroku_message: '<figure><img src="{banner_url}"/></figure><details><summary>{platform} Инфа по Heroku</summary><table><tr><th>Версия</th><th>Сборка</th></tr><tr><td>【<tg-emoji emoji-id=5289608677244811430>📁</tg-emoji>】 <b>Версия</b></td><td>{version}</td></tr><tr><td>【<tg-emoji emoji-id=5289608677244811430>📁</tg-emoji>】 <b>Сборка</b></td><td>{build}</td></tr><tr><td>【<tg-emoji emoji-id=5289608677244811430>📁</tg-emoji>】 <b>Heroku TL</b></td><td>{htl_version}</td></tr><tr><td>【<tg-emoji emoji-id=5289608677244811430>📁</tg-emoji>】 <b>Ветка</b></td><td>{branch}</td></tr><tr><td>【<tg-emoji emoji-id=5289608677244811430>📁</tg-emoji>】 <b>Разработчики</b></td><td><a href="t.me/codrago">@codrago</a>, <a href="t.me/zetgo">@zetgo</a></td></tr></table></details>'
+  rich_heroku_message: '<figure><img src="{banner_url}"/></figure><h1>{platform} Userbot</h1><table bordered><tr><th>Компонент</th><th>Текущий релиз</th></tr><tr><td><b>Версия</b></td><td><code>{version}</code></td></tr><tr><td><b>Сборка</b></td><td>{build}</td></tr><tr><td><b>Heroku TL</b></td><td><code>{htl_version}</code></td></tr><tr><td><b>Слой API</b></td><td><code>{layer}</code></td></tr><tr><td><b>Текущий юзер</b></td><td><code>{current_user}</code></td></tr><tr><td><b>Разработчики</b></td><td><a href="https://t.me/codrago">@codrago</a>, <a href="https://t.me/zetgo">@zetgo</a></td></tr></table>'
   _cfg_rich_mode: "Показывать heroku как Rich-сообщение."
   _cls_doc: "Базовые настройки"
   confirm_cleardb: "⚠️ <b>Ты реально хочешь вайпнуть базу данных? Все слетит!</b>"
@@ -568,6 +568,14 @@ heroku_info:
   name: HerokuInfo
   _cls_doc: Показать инфу о юзерботе
 loader:
+  module_update_prompt: "<tg-emoji emoji-id=5765071340847501478>🔗</tg-emoji> <b>Модуль {} получил обнову. Установить?</b>"
+  module_update_yes: "Да"
+  module_update_no: "Нет"
+  module_update_always: "Обновлять всегда"
+  module_update_installed: "<b>Обнова модуля установлена.</b>"
+  module_update_declined: "<b>Обнова модуля отклонена.</b>"
+  module_update_expired: "<b>Предложение обновы уже устарело.</b>"
+  module_update_failed: "<b>Не удалось поставить обнову модуля.</b>"
   link: "<tg-emoji emoji-id=5256113064821926998>📁</tg-emoji> <b>Файл</b> {class_name}\n\n<tg-emoji emoji-id=5134452506935427991>🪐</tg-emoji> <b>{prefix}lm реплаем сюда, чтоб поставить</b>\n\n<tg-emoji emoji-id=4916086774649848789>🔗</tg-emoji> <code>{prefix}dlm {url}</code>\n\n{not_exact}"
   file: "<tg-emoji emoji-id=5256113064821926998>📁</tg-emoji> <b>Файл</b> {class_name}\n\n<tg-emoji emoji-id=5134452506935427991>🪐</tg-emoji> <b>{prefix}lm реплаем сюда, чтоб поставить</b>\n\n{not_exact}"
   finding_module_in_repos: "<tg-emoji emoji-id=5873204392429096339>🔄</tg-emoji> Ищу в репо..."

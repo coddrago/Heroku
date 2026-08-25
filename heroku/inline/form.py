@@ -315,7 +315,7 @@ class Form(InlineUnit):
             "caller": message,
             "chat": None,
             "message_id": None,
-            "top_msg_id": utils.get_topic(message),
+            "top_msg_id": utils.get_topic(message) if isinstance(message, Message) else None,
             "uid": unit_id,
             "on_unload": on_unload,
             "future": Event(),

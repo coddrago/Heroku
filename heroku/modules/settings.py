@@ -11,6 +11,7 @@
 # 🔑 https://www.gnu.org/licenses/agpl-3.0.html
 
 import contextlib
+import getpass
 import herokutl
 from herokutl.tl.types import Message, User
 
@@ -108,19 +109,14 @@ class CoreMod(loader.Module):
         else:
             branch_text = self.strings["unstable"].format(version.branch)
 
-        platform = (
-            utils.get_platform_emoji()
-            if self._client.heroku_me.premium
-            else "🪐 <b>Heroku userbot</b>"
-        )
-
         if self.config["rich_mode"]:
             rich_message = self.strings["rich_heroku_message"].format(
-                platform=platform,
+                platform=utils.get_platform_emoji(),
                 version=".".join(map(str, version.__version__)),
                 build=utils.get_commit_url(),
-                htl_version=f"{herokutl.__version__} #{herokutl.tl.alltlobjects.LAYER}",
-                branch=branch_text.replace("\r\n", "<br>").replace("\n", "<br>"),
+                htl_version=herokutl.__version__,
+                layer=herokutl.tl.alltlobjects.LAYER,
+                current_user=getpass.getuser(),
                 banner_url="https://raw.githubusercontent.com/coddrago/assets/refs/heads/main/heroku/heroku_cmd.png",
             )
             await utils.answer(

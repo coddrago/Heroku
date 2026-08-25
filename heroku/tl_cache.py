@@ -288,7 +288,6 @@ class CustomTelegramClient(TelegramClient):
         request = functions.messages.EditMessageRequest(
             peer=input_entity,
             id=tl_utils.get_message_id(message),
-            message=self._rich_fallback_text(html, markdown, rich_message),
             no_webpage=True,
             reply_markup=self.build_reply_markup(buttons),
             rich_message=rich_input,
