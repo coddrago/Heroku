@@ -1655,6 +1655,42 @@ class LoaderMod(loader.Module):
         key = hashlib.sha256(url.encode()).hexdigest()
         return os.path.join(self._modules_cache_dir, f"{key}.py")
 
+    @staticmethod
+    def _module_class_names(doc: str) -> set[str]:
+        try:
+            tree = ast.parse(doc)
+        except (SyntaxError, ValueError):
+            return set()
+
+        return {
+            node.name.casefold()
+            for node in tree.body
+            if isinstance(node, ast.ClassDef)
+            and any(
+                isinstance(base, ast.Name) and base.id == "Module"
+                or isinstance(base, ast.Attribute) and base.attr == "Module"
+                for base in node.bases
+            )
+        }
+
+    def _is_core_module_update(self, url: str, doc: str) -> bool:
+        path = [
+            part.casefold()
+            for part in urlparse(url).path.strip("/").split("/")
+        ]
+        if any(
+            path[index : index + 2] == ["heroku", "modules"]
+            for index in range(len(path) - 1)
+        ):
+            return True
+
+        classes = self._module_class_names(doc)
+        return any(
+            module.__class__.__name__.casefold() in classes
+            and getattr(module, "__origin__", "").startswith("<core")
+            for module in self.allmodules.modules
+        )
+
     def _write_module_cache(self, url: str, doc: str) -> None:
         os.makedirs(self._modules_cache_dir, exist_ok=True)
         path = self._module_cache_path(url)
@@ -1708,7 +1744,6 @@ class LoaderMod(loader.Module):
         token = uuid.uuid4().hex
         self._pending_module_updates[token] = (url, doc)
 
-        # Checks may start before the inline bot is fully initialized.
         for _ in range(120):
             if self.inline.init_complete and self.inline._bot_client:
                 break
@@ -1718,9 +1753,6 @@ class LoaderMod(loader.Module):
             logger.error("Inline bot is not ready; module update prompt was not sent")
             return
 
-        # This is a regular private Bot API message, not an inline result sent by
-        # the user account.  Keep a unit so the standard callback dispatcher and
-        # BotInlineCall.edit() can process its buttons.
         unit_id = utils.rand(16)
         buttons = [
             [
@@ -1811,6 +1843,10 @@ class LoaderMod(loader.Module):
         if cached_hash == remote_hash:
             return False
 
+        if self._is_core_module_update(url, remote_doc):
+            self._write_module_cache(url, remote_doc)
+            return True
+
         if url in self.get("always_update_modules", []):
             installed = await self.load_module(
                 remote_doc,
@@ -1836,13 +1872,28 @@ class LoaderMod(loader.Module):
     async def _load_cached_module(self, url: str) -> None:
         path = self._module_cache_path(url)
         if not os.path.isfile(path):
-            # First run after migration: install once and establish the baseline.
+            try:
+                doc = await self._storage.fetch(
+                    url, auth=self.config["basic_auth"]
+                )
+            except Exception:
+                await self.download_and_install(url)
+                return
+
+            if self._is_core_module_update(url, doc):
+                self._write_module_cache(url, doc)
+                return
+
             await self.download_and_install(url)
             return
 
         try:
             with open(path, encoding="utf-8") as file:
                 cached_doc = file.read()
+            if self._is_core_module_update(url, cached_doc):
+                await self._check_module_update(url, cached_doc)
+                return
+
             installed = await self.load_module(
                 cached_doc,
                 None,
