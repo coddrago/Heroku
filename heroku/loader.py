@@ -1040,15 +1040,11 @@ class Modules:
                 logger.debug("Removing module %s for update", module)
                 await module.on_unload()
 
+                self.unregister_raw_handlers(module, "update")
+                self.unregister_bot_update_handlers(module, "update")
+                self.unregister_loops(module, "update")
+
                 self.modules.remove(module)
-                for _, method in utils.iter_attrs(module):
-                    if isinstance(method, InfiniteLoop):
-                        method.stop()
-                        logger.debug(
-                            "Stopped loop in module %s, method %s",
-                            module,
-                            method,
-                        )
 
         self.modules += [instance]
 
