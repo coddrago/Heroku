@@ -69,20 +69,7 @@ class ModuleInstallError(RuntimeError):
 class LoaderMod(loader.Module):
     """Loads modules"""
 
-    strings = {
-        "name": "Loader",
-        "module_update_prompt": (
-            '<tg-emoji emoji-id=5765071340847501478>🔗</tg-emoji> '
-            "<b>Module {} has been updated. Install it?</b>"
-        ),
-        "module_update_yes": "Yes",
-        "module_update_no": "No",
-        "module_update_always": "Always update",
-        "module_update_installed": "<b>Module update installed.</b>",
-        "module_update_declined": "<b>Module update declined.</b>",
-        "module_update_expired": "<b>The module update offer has expired.</b>",
-        "module_update_failed": "<b>Failed to install the module update.</b>",
-    }
+    strings = {"name": "Loader"}
 
     def __init__(self):
         self.fully_loaded = False
@@ -430,12 +417,14 @@ class LoaderMod(loader.Module):
         module_name: str,
         message: Message | None = None,
         force_pm: bool = False,
+        name: str | None = None,
     ) -> int:
         try:
             blob_link = False
             module_name = module_name.strip()
             if urlparse(module_name).netloc:
                 url = module_name
+                resolved_name = name
                 if re.match(
                     r"^(https:\/\/github\.com\/.*?\/.*?\/blob\/.*\.py)|"
                     r"(https:\/\/gitlab\.com\/.*?\/.*?\/-\/blob\/.*\.py)$",
@@ -445,6 +434,7 @@ class LoaderMod(loader.Module):
                     blob_link = True
             else:
                 url = await self._find_link(module_name)
+                resolved_name = name or module_name
 
                 if not url:
                     logger.warning(
@@ -478,7 +468,7 @@ class LoaderMod(loader.Module):
             installed = await self.load_module(
                 r,
                 message,
-                module_name,
+                resolved_name,
                 url,
                 blob_link=blob_link,
                 _raise_install_errors=True,
@@ -1667,17 +1657,39 @@ class LoaderMod(loader.Module):
             for node in tree.body
             if isinstance(node, ast.ClassDef)
             and any(
-                isinstance(base, ast.Name) and base.id == "Module"
-                or isinstance(base, ast.Attribute) and base.attr == "Module"
+                isinstance(base, ast.Name)
+                and base.id == "Module"
+                or isinstance(base, ast.Attribute)
+                and base.attr == "Module"
                 for base in node.bases
             )
         }
 
+    @staticmethod
+    def _extract_module_name(doc: str) -> str | None:
+        try:
+            tree = ast.parse(doc)
+        except (SyntaxError, ValueError):
+            return None
+
+        return next(
+            (
+                node.name
+                for node in tree.body
+                if isinstance(node, ast.ClassDef)
+                and any(
+                    isinstance(base, ast.Name)
+                    and base.id == "Module"
+                    or isinstance(base, ast.Attribute)
+                    and base.attr == "Module"
+                    for base in node.bases
+                )
+            ),
+            None,
+        )
+
     def _is_core_module_update(self, url: str, doc: str) -> bool:
-        path = [
-            part.casefold()
-            for part in urlparse(url).path.strip("/").split("/")
-        ]
+        path = [part.casefold() for part in urlparse(url).path.strip("/").split("/")]
         if any(
             path[index : index + 2] == ["heroku", "modules"]
             for index in range(len(path) - 1)
@@ -1723,7 +1735,7 @@ class LoaderMod(loader.Module):
         installed = await self.load_module(
             doc,
             call,
-            url.rsplit("/", 1)[-1].removesuffix(".py"),
+            self._extract_module_name(doc),
             url,
             _raise_install_errors=True,
         )
@@ -1740,7 +1752,10 @@ class LoaderMod(loader.Module):
         await call.edit(self.strings["module_update_declined"])
 
     async def _offer_module_update(self, url: str, doc: str) -> None:
-        name = utils.escape_html(url.rsplit("/", 1)[-1].removesuffix(".py"))
+        name = self._extract_module_name(doc) or url.rsplit("/", 1)[-1].removesuffix(
+            ".py"
+        )
+        name = f'<a href="{utils.escape_html(url)}">{utils.escape_html(name)}</a>'
         token = uuid.uuid4().hex
         self._pending_module_updates[token] = (url, doc)
 
@@ -1810,12 +1825,12 @@ class LoaderMod(loader.Module):
             )
             return
 
-
     async def _check_module_update(
         self,
         url: str,
         cached_doc: str | None = None,
         *,
+        name: str | None = None,
         offer_update: bool = True,
     ) -> bool:
         if cached_doc is None:
@@ -1831,9 +1846,7 @@ class LoaderMod(loader.Module):
                 return False
 
         try:
-            remote_doc = await self._storage.fetch(
-                url, auth=self.config["basic_auth"]
-            )
+            remote_doc = await self._storage.fetch(url, auth=self.config["basic_auth"])
         except Exception:
             logger.warning("Failed to check module update for %s", url, exc_info=True)
             return False
@@ -1851,7 +1864,7 @@ class LoaderMod(loader.Module):
             installed = await self.load_module(
                 remote_doc,
                 None,
-                url.rsplit("/", 1)[-1].removesuffix(".py"),
+                name,
                 url,
                 _raise_install_errors=True,
             )
@@ -1869,35 +1882,33 @@ class LoaderMod(loader.Module):
 
         return False
 
-    async def _load_cached_module(self, url: str) -> None:
+    async def _load_cached_module(self, url: str, name: str | None = None) -> None:
         path = self._module_cache_path(url)
         if not os.path.isfile(path):
             try:
-                doc = await self._storage.fetch(
-                    url, auth=self.config["basic_auth"]
-                )
+                doc = await self._storage.fetch(url, auth=self.config["basic_auth"])
             except Exception:
-                await self.download_and_install(url)
+                await self.download_and_install(url, name=name)
                 return
 
             if self._is_core_module_update(url, doc):
                 self._write_module_cache(url, doc)
                 return
 
-            await self.download_and_install(url)
+            await self.download_and_install(url, name=name)
             return
 
         try:
             with open(path, encoding="utf-8") as file:
                 cached_doc = file.read()
             if self._is_core_module_update(url, cached_doc):
-                await self._check_module_update(url, cached_doc)
+                await self._check_module_update(url, cached_doc, name=name)
                 return
 
             installed = await self.load_module(
                 cached_doc,
                 None,
-                url.rsplit("/", 1)[-1].removesuffix(".py"),
+                name,
                 url,
                 _raise_install_errors=True,
             )
@@ -1907,17 +1918,18 @@ class LoaderMod(loader.Module):
             logger.exception("Failed to load cached module %s", url)
             return
 
-        await self._check_module_update(url, cached_doc)
+        await self._check_module_update(url, cached_doc, name=name)
 
     @loader.loop(interval=60, wait_before=True, autostart=True)
     async def _auto_update_modules(self):
         if not self.fully_loaded or self._storage is None:
             return
 
-        loaded_urls = set(self.get("loaded_modules", {}).values())
+        loaded_modules = self.get("loaded_modules", {})
         always_update_urls = set(self.get("always_update_modules", []))
-        for url in loaded_urls & always_update_urls:
-            await self._check_module_update(url, offer_update=False)
+        for name, url in loaded_modules.items():
+            if url in always_update_urls:
+                await self._check_module_update(url, offer_update=False, name=name)
 
     async def _update_modules(self):
         todo = await self._get_modules_to_load()
@@ -1928,8 +1940,8 @@ class LoaderMod(loader.Module):
             self._db.set(loader.__name__, "secure_boot", False)
             self._secure_boot = True
         else:
-            for mod in todo.values():
-                await self._load_cached_module(mod)
+            for name, url in todo.items():
+                await self._load_cached_module(url, name)
 
             self.update_modules_in_db()
 
