@@ -13,6 +13,7 @@
 import contextlib
 import itertools
 import os
+import re
 import subprocess
 import sys
 import tempfile
@@ -64,12 +65,13 @@ class Evaluator(loader.Module):
         args = utils.get_args_raw(message)
         reply = await message.get_reply_message()
 
+        skip_output = False
+        if match := re.match(r"^(?:-so|--skip-output)(?:\s+|$)", args):
+            skip_output = True
+            args = args[match.end() :]
+
         if not args and reply and reply.text:
             args = reply.message
-
-        skip_output = args.startswith(("-so ", "--skip-output "))
-        if skip_output:
-            args = args.split(" ", 1)[1]
 
         args = args.replace("\xa0", "\x20")
 
