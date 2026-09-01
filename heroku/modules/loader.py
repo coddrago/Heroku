@@ -1708,7 +1708,7 @@ class LoaderMod(loader.Module):
         path = self._module_cache_path(url)
         tmp_path = f"{path}.{uuid.uuid4().hex}.tmp"
         try:
-            with open(tmp_path, "w", encoding="utf-8") as file:
+            with open(tmp_path, "w", encoding="utf-8", newline="") as file:
                 file.write(doc)
             os.replace(tmp_path, path)
         finally:
@@ -1839,7 +1839,7 @@ class LoaderMod(loader.Module):
                 return False
 
             try:
-                with open(path, encoding="utf-8") as file:
+                with open(path, encoding="utf-8", newline="") as file:
                     cached_doc = file.read()
             except Exception:
                 logger.exception("Failed to read cached module %s", url)
@@ -1899,7 +1899,7 @@ class LoaderMod(loader.Module):
             return
 
         try:
-            with open(path, encoding="utf-8") as file:
+            with open(path, encoding="utf-8", newline="") as file:
                 cached_doc = file.read()
             if self._is_core_module_update(url, cached_doc):
                 await self._check_module_update(url, cached_doc, name=name)

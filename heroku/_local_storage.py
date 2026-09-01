@@ -88,7 +88,7 @@ class LocalStorage:
         path = self._get_path(repo, module_name)
         previous_size = os.path.getsize(path) if os.path.isfile(path) else 0
 
-        with open(path, "w", encoding="utf-8") as f:
+        with open(path, "w", encoding="utf-8", newline="") as f:
             f.write(module_code)
 
         self._tracked_total_size = self._total_size + size - previous_size
@@ -103,7 +103,7 @@ class LocalStorage:
         """
         path = self._get_path(repo, module_name)
         if os.path.isfile(path):
-            with open(path, encoding="utf-8") as f:
+            with open(path, encoding="utf-8", newline="") as f:
                 return f.read()
 
         return None
