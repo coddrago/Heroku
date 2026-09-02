@@ -99,6 +99,37 @@ def tag_client_id(path: str) -> Callable:
 
     return decorator
 
+_background_tasks: set[asyncio.Task] = set()
+
+
+def _track_task(task: asyncio.Task) -> asyncio.Task:
+    _background_tasks.add(task)
+    task.add_done_callback(_background_tasks.discard)
+    return task
+
+
+def install_task_tracking():
+    if getattr(asyncio.ensure_future, "_heroku_tracked", False):
+        return
+
+    original_ensure_future = asyncio.ensure_future
+    original_create_task = asyncio.create_task
+
+    def ensure_future(coro_or_future, **kwargs):
+        result = original_ensure_future(coro_or_future, **kwargs)
+        if isinstance(result, asyncio.Task):
+            _track_task(result)
+        return result
+
+    def create_task(coro, **kwargs):
+        return _track_task(original_create_task(coro, **kwargs))
+
+    ensure_future._heroku_tracked = True
+    create_task._heroku_tracked = True
+
+    asyncio.ensure_future = ensure_future
+    asyncio.create_task = create_task
+
 
 async def fw_protect():
     await asyncio.sleep(random.randint(1000, 2000) / 1000)

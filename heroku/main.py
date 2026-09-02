@@ -62,6 +62,7 @@ from . import database, loader, utils, version
 from ._internal import (
     client_id_ctx,
     client_id_override,
+    install_task_tracking,
     print_banner,
     restart,
     set_client_id,
@@ -514,6 +515,8 @@ class Heroku:
         except RuntimeError:
             self.loop = asyncio.new_event_loop()
             asyncio.set_event_loop(self.loop)
+
+        install_task_tracking()
 
         self.clients = SuperList()
         self.ready = asyncio.Event()
