@@ -60,7 +60,10 @@ def client_id_override(client_id: int | None):
     try:
         yield
     finally:
-        client_id_ctx.reset(token)
+        try:
+            client_id_ctx.reset(token)
+        except ValueError:
+            pass
 
 
 @contextlib.contextmanager
