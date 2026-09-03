@@ -208,8 +208,12 @@ class LoaderMod(loader.Module):
         return repo
 
     async def _check_pass(self, message: Message | InlineCall) -> bool:
-        if self.lookup("LoaderRestrictor").get("passed", False):
+        if self.db.get("LoaderRestrictor", "passed", False):
             return False
+
+        if not self.inline.init_complete:
+            return False # in case the inline bot did not start successfully,
+                         # allow the user to install the modules
 
         await utils.answer(
             message,
