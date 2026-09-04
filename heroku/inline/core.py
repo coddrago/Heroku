@@ -13,7 +13,6 @@
 # 🔑 https://www.gnu.org/licenses/agpl-3.0.html
 
 import asyncio
-import contextlib
 import logging
 import os
 import sqlite3
@@ -505,12 +504,18 @@ class InlineManager(
 
         async def result_getter():
             nonlocal unit_id, q
-            with contextlib.suppress(Exception):
+            try:
                 q = await self._client.inline_query(self.bot_username, unit_id)
+            except Exception:
+                logger.exception("Inline query for unit %s failed", unit_id)
 
         async def event_poller():
             nonlocal exception
-            await asyncio.wait_for(event.wait(), timeout=10)
+            try:
+                await asyncio.wait_for(event.wait(), timeout=10)
+            except asyncio.TimeoutError:
+                logger.debug("Inline query for unit %s timed out after 10s", unit_id)
+                return
             if self._error_events.get(unit_id):
                 exception = self._error_events[unit_id]
 
