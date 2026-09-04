@@ -80,6 +80,7 @@ class Form(InlineUnit):
         audio: dict | str | None = None,
         rich_message: typing.Any = None,
         silent: bool = False,
+        reply_to: Message | int | None = None,
     ) -> InlineMessage | bool:
         """
         Send inline form to chat
@@ -108,6 +109,8 @@ class Form(InlineUnit):
                          ⚠️ If you pass this parameter, you'll need to pass empty string to `text` ⚠️
         :param audio: Attach a audio to the form. Dict or URL must be supplied
         :param silent: Whether the form must be sent silently (w/o "Opening form..." message)
+        :param reply_to: Message or message ID to reply to. If passed, the form will be sent
+                         as a reply to this message
         :return: If form is sent, returns :obj:`InlineMessage`, otherwise returns `False`
         """
         if reply_markup is None:
@@ -151,6 +154,13 @@ class Form(InlineUnit):
             logger.error(
                 "Invalid type for `message`. Expected `Message` or `int`, got `%s`",
                 type(message),
+            )
+            return False
+
+        if reply_to is not None and not isinstance(reply_to, (Message, int)):
+            logger.error(
+                "Invalid type for `reply_to`. Expected `Message` or `int`, got `%s`",
+                type(reply_to),
             )
             return False
 
@@ -345,7 +355,7 @@ class Form(InlineUnit):
                 await self._client.send_message(message, msg)
 
         try:
-            m = await self._invoke_unit(unit_id, message)
+            m = await self._invoke_unit(unit_id, message, reply_to=reply_to)
         except ChatSendInlineForbiddenError:
             await answer(self.translator.getkey("inline.inline403"))
             del self._units[unit_id]

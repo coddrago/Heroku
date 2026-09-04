@@ -491,7 +491,12 @@ class InlineManager(
             self._bot_handler_refs[hid] = (handler, event_builder)
         logger.debug("Rebuilt custom handlers after unregistering %s", handler_id)
 
-    async def _invoke_unit(self, unit_id: str, message: Message) -> Message:
+    async def _invoke_unit(
+        self,
+        unit_id: str,
+        message: Message,
+        reply_to: Message | int | None = None,
+    ) -> Message:
         event = asyncio.Event()
         self._error_events[unit_id] = event
 
@@ -531,6 +536,10 @@ class InlineManager(
         return await q[0].click(
             utils.get_chat_id(message) if isinstance(message, Message) else message,
             reply_to=(
-                message.reply_to_msg_id if isinstance(message, Message) else None
+                reply_to
+                if reply_to is not None
+                else (
+                    message.reply_to_msg_id if isinstance(message, Message) else None
+                )
             ),
         )
