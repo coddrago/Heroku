@@ -409,14 +409,22 @@ def parse_arguments() -> dict:
         dest="proxy_type",
         action="store",
         default="mtproxy",
-        choices=("mtproxy", "socks5", "http"),
-        help="Proxy type: mtproxy, socks5 or http",
+        choices=("mtproxy", "socks5", "http", "webproxy"),
+        help="Proxy type: mtproxy, socks5, http or webproxy",
+    )
+    parser.add_argument(
+        "--proxy-mode",
+        dest="proxy_mode",
+        action="store",
+        default="websocket",
+        choices=("websocket", "websocket-lanes", "https", "https-lanes"),
+        help="Proxy mode: websocket, websocket-lanes, https, https-lanes (only for webproxy)",
     )
     parser.add_argument(
         "--proxy-secret",
         dest="proxy_secret",
         action="store",
-        help="MTProto proxy secret; required for --type-proxy mtproxy",
+        help="MTProto/Web proxy secret; required for mtproxy/webproxy",
     )
     parser.add_argument(
         "--root",
@@ -538,6 +546,20 @@ class Heroku:
 
         if not host and not port and not secret:
             self.proxy, self.conn = None, ConnectionTcpFull
+            return
+
+        if proxy_type == "webproxy":
+            if not secret:
+                raise ValueError("--proxy-secret is required for --type-proxy webproxy")
+            try:
+                from herokutl_webproxy import ConnectionWebProxy
+            except ImportError as e:
+                import sys
+                raise ImportError(f"herokutl-webproxy is not installed (using {sys.executable}). Details: {e}")
+            
+            logging.debug("Using WebProxy: %s (mode: %s)", host, self.arguments.proxy_mode)
+            self.proxy = (host, secret, {'mode': self.arguments.proxy_mode})
+            self.conn = ConnectionWebProxy
             return
 
         if not host or not port:

@@ -279,6 +279,8 @@ class InlineManager(
             self._client.api_id,
             self._client.api_hash,
             receive_updates=True,
+            connection=self._client._connection,
+            proxy=self._client._proxy,
         )
 
         try:
