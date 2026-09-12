@@ -327,43 +327,93 @@ class CoreMod(loader.Module):
             await utils.answer(message, self.strings["alias_args"])
             return
 
-        alias_lines = []
-        for line in args_raw.splitlines():
+        import keyword
+
+        def parse_alias_line(line: str) -> tuple[list[str], str] | None:
             line = line.strip()
             if not line:
-                continue
+                return None
 
             if "&&" in line:
+                parts = line.split("&&", 1)
+                alias_part, command_part = parts[0].strip(), parts[1].strip()
+                aliases = [a.strip().lower() for a in alias_part.split(",") if a.strip()]
+                return aliases, command_part
+            elif "," in line:
                 parts = [part.strip() for part in line.split(",")]
-                last = parts[-1].split(maxsplit=1)
-                if len(last) < 2:
-                    await utils.answer(message, self.strings["alias_args"])
-                    return
-
-                aliases = [part.lower() for part in parts[:-1] if part]
-                aliases.append(last[0].lower())
-                command = last[1]
+                if parts:
+                    last = parts[-1].split(maxsplit=1)
+                    if len(last) >= 2:
+                        aliases = [part.lower() for part in parts[:-1] if part]
+                        aliases.append(last[0].lower())
+                        return aliases, last[1]
             else:
                 args = line.split(maxsplit=1)
-                if len(args) < 2:
+                if len(args) >= 2:
+                    return [args[0].lower()], args[1]
+            return None
+
+        alias_lines = []
+        lines = args_raw.splitlines()
+
+        for line_idx, line in enumerate(lines):
+            is_new_alias = False
+            parsed_aliases = None
+            parsed_cmd = None
+            parsed_rest = None
+
+            stripped_line = line.strip()
+            if stripped_line:
+                parsed = parse_alias_line(line)
+                if parsed:
+                    aliases, command = parsed
+                    command_parts = command.split(maxsplit=1)
+                    cmd = command_parts[0]
+                    rest = command_parts[1] if len(command_parts) > 1 else None
+
+                    first_word = stripped_line.split()[0] if stripped_line else ""
+                    is_valid_candidate = (
+                        not line.startswith(" ")
+                        and not line.startswith("\t")
+                        and not keyword.iskeyword(first_word)
+                        and all(c.isalnum() or c in "_-" for c in first_word)
+                    )
+
+                    if is_valid_candidate and cmd in self.allmodules.commands:
+                        is_new_alias = True
+                        parsed_aliases = aliases
+                        parsed_cmd = cmd
+                        parsed_rest = rest
+
+            if line_idx == 0:
+                parsed = parse_alias_line(line)
+                if not parsed:
                     await utils.answer(message, self.strings["alias_args"])
                     return
+                aliases, command = parsed
+                command_parts = command.split(maxsplit=1)
+                cmd = command_parts[0]
+                rest = command_parts[1] if len(command_parts) > 1 else None
 
-                aliases = [args[0].lower()]
-                command = args[1]
+                if cmd not in self.allmodules.commands:
+                    await utils.answer(
+                        message,
+                        self.strings["no_command"].format(utils.escape_html(cmd)),
+                    )
+                    return
 
-            command_parts = command.split(maxsplit=1)
-            cmd = command_parts[0]
-            rest = command_parts[1] if len(command_parts) > 1 else None
-
-            if cmd not in self.allmodules.commands:
-                await utils.answer(
-                    message,
-                    self.strings["no_command"].format(utils.escape_html(cmd)),
-                )
-                return
-
-            alias_lines.append((aliases, cmd, rest))
+                alias_lines.append((aliases, cmd, rest))
+            else:
+                if is_new_alias:
+                    alias_lines.append((parsed_aliases, parsed_cmd, parsed_rest))
+                else:
+                    if alias_lines:
+                        aliases, cmd, rest = alias_lines[-1]
+                        if rest is None:
+                            new_rest = line
+                        else:
+                            new_rest = rest + "\n" + line
+                        alias_lines[-1] = (aliases, cmd, new_rest)
 
         if not alias_lines:
             await utils.answer(message, self.strings["alias_args"])
