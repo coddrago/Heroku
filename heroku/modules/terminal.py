@@ -850,7 +850,7 @@ class TerminalMod(loader.Module):
 
         return None
 
-    @loader.command()
+    @loader.command(alias="kill")
     async def terminatecmd(self, message):
         if not message.is_reply:
             await utils.answer(message, self.strings["what_to_kill"])
