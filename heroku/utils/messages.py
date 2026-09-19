@@ -379,6 +379,10 @@ async def answer(
         message = message[0]
 
     if rich_message is not None:
+        rich_filter = getattr(message, "_heroku_grep_rich", None)
+        if callable(rich_filter):
+            rich_message = rich_filter(rich_message)
+
         if isinstance(
             message,
             (InlineMessage, InlineCall, BotInlineMessage, BotInlineCall),

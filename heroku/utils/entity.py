@@ -186,17 +186,23 @@ def remove_html(text: str, escape: bool = False, keep_emojis: bool = False) -> s
     :param keep_emojis: Keep custom emojis
     :return: Text without HTML
     """
-    return (escape_html if escape else str)(
-        re.sub(
-            (
-                r"(<\/?a.*?>|<\/?b>|<\/?i>|<\/?u>|<\/?strong>|<\/?em>|<\/?code.*?>|<\/?strike>|<\/?del>|<\/?pre.*?>|<\/?blockquote.*?>)"
-                if keep_emojis
-                else r"(<\/?a.*?>|<\/?b>|<\/?i>|<\/?u>|<\/?strong>|<\/?em>|<\/?code.*?>|<\/?strike>|<\/?del>|<\/?pre.*?>|<\/?emoji.*?>|<\/?blockquote.*?>)"
-            ),
-            "",
-            text,
-        )
+    cleaned = re.sub(
+        (
+            r"(<\/?a.*?>|<\/?b>|<\/?i>|<\/?u>|<\/?strong>|<\/?em>|<\/?code.*?>|<\/?strike>|<\/?del>|<\/?pre.*?>|<\/?blockquote.*?>)"
+            if keep_emojis
+            else r"(<\/?a.*?>|<\/?b>|<\/?i>|<\/?u>|<\/?strong>|<\/?em>|<\/?code.*?>|<\/?strike>|<\/?del>|<\/?pre.*?>|<\/?emoji.*?>|<\/?tg-emoji.*?>|<\/?blockquote.*?>)"
+        ),
+        "",
+        text,
     )
+
+    if not escape:
+        return cleaned
+
+    # When custom emojis are kept, don't blindly escape_html the whole
+    # string - that would turn the surviving <tg-emoji>/<emoji> tags into
+    # literal &lt;tg-emoji...&gt; text instead of rendering as emojis.
+    return escape_non_html(cleaned) if keep_emojis else escape_html(cleaned)
 
 
 def check_url(url: str) -> bool:
