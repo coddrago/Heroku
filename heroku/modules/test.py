@@ -162,6 +162,17 @@ class TestMod(loader.Module):
             ignore_common=self.config["ignore_common"],
         )
 
+    def _resolve_mod(self, name: str):
+        """Resolve a module name to (canonical_display_name, logger_prefix)
+        or None if no such module/library is loaded."""
+        mod = self.lookup(name)
+        if not mod:
+            return None
+
+        canonical = getattr(mod, "name", None) or mod.__class__.__name__
+        prefix = mod.__class__.__module__
+        return canonical, prefix
+
     @loader.command()
     async def clearlogs(self, message: Message):
         for handler in logging.getLogger().handlers:
@@ -177,12 +188,48 @@ class TestMod(loader.Module):
         message: Message | InlineCall,
         force: bool = False,
         lvl: int | None = None,
+        mods: list[str] | None = None,
+        mod_names: list[str] | None = None,
     ):
+        """[modules] [-f] - Dump logs, optionally filtered by module name(s)"""
         raw_args = utils.get_args_raw(message) if isinstance(message, Message) else ""
         args = raw_args.split()
         if "-f" in args or "--force" in args:
             force = True
             args = [arg for arg in args if arg not in {"-f", "--force"}]
+
+        if mods is None and mod_names is None and isinstance(message, Message):
+            level_names = {
+                "critical",
+                "error",
+                "warning",
+                "info",
+                "debug",
+                "all",
+                "notset",
+            }
+            raw_mod_args = [
+                a
+                for a in args
+                if not a.lstrip("-").isdigit() and a.lower() not in level_names
+            ]
+            args = [a for a in args if a not in raw_mod_args]
+
+            if raw_mod_args:
+                mods = []
+                mod_names = []
+                for raw_name in raw_mod_args:
+                    resolved = self._resolve_mod(raw_name)
+                    if resolved is None:
+                        await utils.answer(
+                            message,
+                            self.strings["bad_module"].format(utils.escape_html(raw_name)),
+                        )
+                        return
+
+                    canonical, prefix = resolved
+                    mod_names.append(canonical)
+                    mods.append(prefix)
 
         if not isinstance(lvl, int):
             if args:
@@ -203,15 +250,22 @@ class TestMod(loader.Module):
 
             try:
                 if self.inline.init_complete:
+                    text = (
+                        self.strings["choose_loglevel_of"].format(
+                            ", ".join(mod_names)
+                        )
+                        if mod_names
+                        else self.strings["choose_loglevel"]
+                    )
                     await utils.answer(
                         message,
-                        self.strings["choose_loglevel"],
+                        text,
                         reply_markup=utils.chunks(
                             [
                                 {
                                     "text": name,
                                     "callback": self.logs,
-                                    "args": (False, level),
+                                    "args": (False, level, mods, mod_names),
                                 }
                                 for name, level in [
                                     ("🚫 Critical", 60),
@@ -233,16 +287,16 @@ class TestMod(loader.Module):
 
             return
 
-        logs = "\n\n".join(
-            [
-                "\n".join(
-                    handler.dumps(lvl, client_id=self._client.tg_id)
-                    if "client_id" in inspect.signature(handler.dumps).parameters
-                    else handler.dumps(lvl)
-                )
-                for handler in logging.getLogger().handlers
-            ]
-        )
+        def _dump(handler):
+            params = inspect.signature(handler.dumps).parameters
+            kwargs = {}
+            if "client_id" in params:
+                kwargs["client_id"] = self._client.tg_id
+            if "mods" in params:
+                kwargs["mods"] = mods
+            return "\n".join(handler.dumps(lvl, **kwargs))
+
+        logs = "\n\n".join(_dump(handler) for handler in logging.getLogger().handlers)
 
         named_lvl = (
             lvl
@@ -261,7 +315,7 @@ class TestMod(loader.Module):
                         {
                             "text": self.strings["send_anyway"],
                             "callback": self.logs,
-                            "args": [True, lvl],
+                            "args": [True, lvl, mods, mod_names],
                         },
                         {"text": self.strings["cancel"], "action": "close"},
                     ],
@@ -290,6 +344,7 @@ class TestMod(loader.Module):
                         "reply_markup": {
                             "text": self.strings["back"],
                             "callback": self.logs,
+                            "args": (False, None, mods, mod_names),
                         },
                     }
                 ),

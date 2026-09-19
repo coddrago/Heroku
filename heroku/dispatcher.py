@@ -423,7 +423,11 @@ class CommandDispatcher:
         if await self._handle_tags(event, func):
             return False
 
-        if self._db.get(main.__name__, "grep", False) and not watcher:
+        if (
+            self._db.get(main.__name__, "grep", False)
+            and not watcher
+            and getattr(func.__self__.__class__, "__name__", "") != "TerminalMod"
+        ):
             message = self._handle_grep(message)
 
         return message, prefix, txt, func

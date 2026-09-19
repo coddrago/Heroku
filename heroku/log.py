@@ -342,13 +342,25 @@ class TelegramLogsHandler(logging.Handler):
         self,
         lvl: int = 0,
         client_id: int | None = None,
+        mods: list[str] | None = None,
     ) -> list[str]:
-        """Return all entries of minimum level as list of strings"""
+        """Return all entries of minimum level as list of strings,
+        optionally filtered to only those whose logger name belongs to
+        one of the given `mods` namespaces. `mods` must already be
+        resolved to real logger name prefixes (e.g. module's
+        `__module__`), not raw user input — this only does an exact
+        namespace match (equal or a sub-logger of it)."""
+        prefixes = [m for m in (mods or []) if m]
+
+        def _matches(name: str) -> bool:
+            return any(name == prefix or name.startswith(f"{prefix}.") for prefix in prefixes)
+
         return [
             self.targets[0].format(record)
             for record in (self.buffer + self.handledbuffer)
             if record.levelno >= lvl
             and (not record.heroku_caller or client_id == record.heroku_caller)
+            and (not prefixes or _matches(record.name or ""))
         ]
 
     async def _show_full_trace(
