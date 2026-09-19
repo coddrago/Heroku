@@ -267,20 +267,9 @@ class LoaderMod(loader.Module):
                     result_message = self._batch_loaded_message(
                         loaded_modules, not_installed, rich=rich_mode
                     )
-                    if not rich_mode:
-                        await utils.answer(
-                            message, result_message, parse_mode="HTML"
-                        )
-                    elif self._client.heroku_me.premium:
-                        await utils.answer(message, rich_message=result_message)
-                    else:
-                        await self.inline.form(
-                            text=f"{len(loaded_modules)} Modules loaded",
-                            message=message,
-                            rich_message=result_message,
-                            silent=True,
-                            ttl=600,
-                        )
+                    await self._answer_loaded_message(
+                        message, result_message, rich=rich_mode,
+                    )
         else:
             await self.inline.list(
                 message,
@@ -438,15 +427,56 @@ class LoaderMod(loader.Module):
             False,
         )
 
+    async def _answer_loaded_message(
+        self, message, text: str, *, rich: bool,
+        reply_markup=None, **kwargs,
+    ):
+        """Send installation results using the selected message format."""
+        if not rich:
+            return await utils.answer(
+                message, text, parse_mode="HTML",
+                reply_markup=reply_markup, **kwargs,
+            )
+        if isinstance(message, InlineCall):
+            return await utils.answer(
+                message, rich_message=text, reply_markup=reply_markup,
+            )
+        if reply_markup or not self._client.heroku_me.premium:
+            return await self.inline.form(
+                text="Modules loaded",
+                message=message,
+                rich_message=text,
+                reply_markup=reply_markup,
+                silent=True,
+                ttl=600,
+            )
+        return await utils.answer(message, rich_message=text)
+
     def _batch_loaded_message(
-        self, modules: list, failed: list[str], *, rich: bool = True
+        self, modules: list, failed: list[str], *, rich: bool = True,
+        command_lines: list[str] | None = None,
+        single: bool = False,
     ) -> str:
-        """Render batch results as Rich details or regular HTML blockquotes."""
+        """Render batch results or a single module with description and commands."""
         header = (
-            '<tg-emoji emoji-id="5872771279337033184">⬇️</tg-emoji> '
+            '<tg-emoji emoji-id="5134452506935427991">🪐</tg-emoji> '
             f"<b>{len(modules)} Modules loaded</b>"
         )
-        parts = [f"<p>{header}</p>" if rich else header]
+        parts = [] if single else [f"<p>{header}</p>" if rich else header]
+        if rich and not single and self.config["show_banner"]:
+            slides = []
+            for module in modules:
+                banner_url = getattr(module, "heroku_meta_banner", None)
+                if not isinstance(banner_url, str):
+                    continue
+                try:
+                    parsed = urlparse(banner_url)
+                except ValueError:
+                    continue
+                if parsed.scheme in {"http", "https"} and parsed.netloc:
+                    slides.append(f'<img src="{utils.escape_html(banner_url)}"/>')
+            if slides:
+                parts.insert(0, "<tg-slideshow>" + "".join(slides) + "</tg-slideshow>")
         prefix = utils.escape_html(self.get_prefix())
         emoji = self.config["command_emoji"]
 
@@ -502,12 +532,29 @@ class LoaderMod(loader.Module):
                     f"{emoji} <code>{prefix}{utils.escape_html(command)}</code>"
                     f" - {description}"
                 )
-            section(
-                '<tg-emoji emoji-id="4916086774649848789">🔗</tg-emoji> '
-                + utils.escape_html(str(name)),
-                lines,
-                version_suffix,
-            )
+            lines = lines if command_lines is None else command_lines
+            if single:
+                title = (
+                    '<tg-emoji emoji-id="5134452506935427991">🪐</tg-emoji> '
+                    f"<b>{utils.escape_html(str(name))}</b>{version_suffix}"
+                )
+                parts.append(f"<p>{title}</p>" if rich else title)
+                description = utils.escape_html(inspect.getdoc(module) or "")
+                if description:
+                    parts.append(
+                        '<p><i><tg-emoji emoji-id="5879813604068298387">ℹ️</tg-emoji> '
+                        + description.replace("\n", "<br/>") + "</i></p>"
+                        if rich else "\n\n" + description
+                    )
+                if lines:
+                    section("Commands", lines)
+            else:
+                section(
+                    '<tg-emoji emoji-id="4916086774649848789">🔗</tg-emoji> '
+                    + utils.escape_html(str(name)),
+                    lines,
+                    version_suffix,
+                )
         if failed:
             section(
                 "Not loaded",
@@ -1265,6 +1312,7 @@ class LoaderMod(loader.Module):
             developer_entity = None
 
         if _loaded_modules is not None:
+            instance.heroku_meta_banner = self._get_banner_url(doc)
             _loaded_modules.append(instance)
 
         if message is None:
@@ -1308,27 +1356,51 @@ class LoaderMod(loader.Module):
             else ""
         )
 
+        rich_mode = self.config["rich_mode"]
+
         def loaded_msg(use_subscribe: bool = True):
-            nonlocal modname, version, mod_doc, modhelp, placeholders, developer, origin, subscribe, blob_link, depends_from
-            return self.strings["loaded"].format(
-                modname.strip(),
-                version,
-                utils.ascii_face(),
-                mod_doc if mod_doc else "",
-                "<blockquote expandable>{}</blockquote>".format("\n".join(modhelp)),
-                "\n<blockquote expandable>{}</blockquote>".format(
-                    "\n".join(placeholders)
-                ),
-                developer if not subscribe or not use_subscribe else "",
-                depends_from,
-                (
-                    self.strings["modlink"].format(origin)
-                    if origin != "<string>" and self.config["share_link"]
-                    else ""
-                ),
-                blob_link,
-                subscribe if use_subscribe else "",
+            if not rich_mode:
+                return self.strings["loaded"].format(
+                    modname.strip(),
+                    version,
+                    utils.ascii_face(),
+                    mod_doc if mod_doc else "",
+                    "<blockquote expandable>{}</blockquote>".format("\n".join(modhelp)),
+                    "\n<blockquote expandable>{}</blockquote>".format(
+                        "\n".join(placeholders)
+                    ),
+                    developer if not subscribe or not use_subscribe else "",
+                    depends_from,
+                    (
+                        self.strings["modlink"].format(origin)
+                        if origin != "<string>" and self.config["share_link"]
+                        else ""
+                    ),
+                    blob_link,
+                    subscribe if use_subscribe else "",
+                )
+            result = self._batch_loaded_message(
+                [instance], [], rich=True, single=True,
+                command_lines=[
+                    line.replace("\n", "<br/>") if rich_mode else line
+                    for line in modhelp
+                ],
             )
+            if self.config["show_banner"]:
+                banner_url = self._get_banner_url(doc)
+                if banner_url and urlparse(banner_url).scheme in {"http", "https"}:
+                    result = f'<img src="{utils.escape_html(banner_url)}"/>' + result
+            extra = []
+            if origin != "<string>" and self.config["share_link"]:
+                extra.append(self.strings["modlink"].format(utils.escape_html(origin)))
+            if use_subscribe and subscribe:
+                extra.append(subscribe)
+            for text in extra:
+                result += (
+                    "<p>" + text.replace("\n", "<br/>") + "</p>"
+                    if rich_mode else "\n\n" + text
+                )
+            return result
 
         if developer:
             if developer.startswith("@") and developer not in self.get(
@@ -1350,6 +1422,7 @@ class LoaderMod(loader.Module):
                                 developer_entity.id,
                                 functools.partial(loaded_msg, use_subscribe=False),
                                 True,
+                                rich_mode,
                             ),
                         },
                         {
@@ -1359,6 +1432,7 @@ class LoaderMod(loader.Module):
                                 developer,
                                 functools.partial(loaded_msg, use_subscribe=False),
                                 False,
+                                rich_mode,
                             ),
                         },
                     ]
@@ -1388,9 +1462,10 @@ class LoaderMod(loader.Module):
             line.replace(" ", "") == "#scope:disable_onload_docs"
             for line in doc.splitlines()
         ):
-            await utils.answer(
+            await self._answer_loaded_message(
                 message,
                 loaded_msg(),
+                rich=rich_mode,
                 reply_markup=subscribe_markup,
                 **banner_kwargs,
             )
@@ -1401,7 +1476,10 @@ class LoaderMod(loader.Module):
             key=lambda x: x[0],
         ):
             modhelp.append(
-                "{} <code>{}{}</code> {}".format(
+                (
+                    "{} <code>{}{}</code> - {}"
+                    if rich_mode else "{} <code>{}{}</code> {}"
+                ).format(
                     f"{self.config['command_emoji']}",
                     utils.escape_html(self.get_prefix()),
                     _name,
@@ -1430,17 +1508,17 @@ class LoaderMod(loader.Module):
                 )
 
         try:
-            await utils.answer(
+            await self._answer_loaded_message(
                 message,
                 loaded_msg(),
+                rich=rich_mode,
                 reply_markup=subscribe_markup,
                 **banner_kwargs,
             )
         except MediaCaptionTooLongError:
-            if hasattr(message, "reply"):
-                await message.reply(loaded_msg(False))
-            else:
-                await message.edit(loaded_msg(False))
+            await self._answer_loaded_message(
+                message, loaded_msg(False), rich=rich_mode,
+            )
 
         return True
 
@@ -1450,15 +1528,16 @@ class LoaderMod(loader.Module):
         entity: int,
         msg: typing.Callable[[], str],
         subscribe: bool,
+        rich: bool = False,
     ):
         if not subscribe:
             self.set("do_not_subscribe", self.get("do_not_subscribe", []) + [entity])
-            await utils.answer(call, msg())
+            await self._answer_loaded_message(call, msg(), rich=rich)
             await call.answer(self.strings["not_subscribed"])
             return
 
         await self._client(JoinChannelRequest(entity))
-        await utils.answer(call, msg())
+        await self._answer_loaded_message(call, msg(), rich=rich)
         await call.answer(self.strings["subscribed"])
 
     @loader.command(alias="ulm")
