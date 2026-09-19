@@ -111,7 +111,7 @@ class LoaderMod(loader.Module):
             ),
             loader.ConfigValue(
                 "rich_mode",
-                False,
+                True,
                 lambda: self.strings["rich_mode_doc"],
                 validator=loader.validators.Boolean(),
             ),
@@ -437,20 +437,9 @@ class LoaderMod(loader.Module):
                 message, text, parse_mode="HTML",
                 reply_markup=reply_markup, **kwargs,
             )
-        if isinstance(message, InlineCall):
-            return await utils.answer(
-                message, rich_message=text, reply_markup=reply_markup,
-            )
-        if reply_markup or not self._client.heroku_me.premium:
-            return await self.inline.form(
-                text="Modules loaded",
-                message=message,
-                rich_message=text,
-                reply_markup=reply_markup,
-                silent=True,
-                ttl=600,
-            )
-        return await utils.answer(message, rich_message=text)
+        return await utils.answer(
+            message, rich_message=text, reply_markup=reply_markup, **kwargs,
+        )
 
     def _batch_loaded_message(
         self, modules: list, failed: list[str], *, rich: bool = True,

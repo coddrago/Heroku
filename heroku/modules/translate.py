@@ -114,6 +114,13 @@ class Translator(loader.Module):
                         raise ValueError("Telegram returned no translated Rich Message")
                     if self.config["only_text"]:
                         tr_text = utils.rich_message_to_html(translated[0])
+                    elif not self._client.heroku_me.premium:
+                        await utils.answer(
+                            message,
+                            rich_message=utils.rich_message_to_html(translated[0]),
+                            reply_to=reply.id,
+                        )
+                        return
                     else:
                         await self._client.send_rich_message(
                             message.peer_id,

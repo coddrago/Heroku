@@ -319,7 +319,9 @@ async def _edit_inline_rich_message(
             caller,
             reply_markup=reply_markup or [],
             rich_message=rich_message,
+            reply_to=unit.get("top_msg_id"),
             silent=True,
+            ttl=600,
         )
     rich_markup = (
         message.inline_manager.generate_markup(reply_markup)
@@ -391,6 +393,32 @@ async def answer(
                 message,
                 rich_message,
                 reply_markup=reply_markup,
+            )
+
+        if reply_markup or not getattr(
+            getattr(message.client, "heroku_me", None), "premium", False
+        ):
+            inline = message.client.loader.inline
+            form_kwargs = {
+                key: kwargs[key]
+                for key in (
+                    "force_me", "always_allow", "manual_security",
+                    "disable_security", "on_unload",
+                )
+                if key in kwargs
+            }
+            return await inline.form(
+                text=response or "Rich message",
+                message=message if message.out else get_chat_id(message),
+                rich_message=rich_message,
+                reply_markup=inline._normalize_markup(reply_markup)
+                if reply_markup else [],
+                reply_to=kwargs.get("reply_to")
+                or getattr(message, "reply_to_msg_id", None)
+                or get_topic(message),
+                silent=kwargs.get("silent", True),
+                ttl=kwargs.get("ttl", 600),
+                **form_kwargs,
             )
 
         edit = message.out and not message.via_bot_id and not message.fwd_from
