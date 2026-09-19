@@ -147,6 +147,9 @@ def die():
 
 
 def restart():
+    from .update_guard import launch_pending
+
+    launch_pending()
     if "--sandbox" in " ".join(sys.argv):
         exit(0)
 
