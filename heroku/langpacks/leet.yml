@@ -190,6 +190,10 @@ terminal:
   exec_running: "<b>3x3cu71ng...</b>"
   btn_execute: "3x3cu73"
   btn_continue: "c0n71nu3 1npu7"
+  btn_input_password: "1npu7 p455w0rd"
+  sudo_password_input: "5ubm17 sudo p455w0rd"
+  sudo_password_required: "<b>sudo: p455w0rd r3qu1r3d.</b>"
+  sudo_password_retry: "<b>sudo: 3n73r 7h3 p455w0rd 4g41n.</b>"
   inline_hint: "73rm1n4l"
   inline_hint_desc: "574r7 7yp1ng 4 c0mm4nd"
 

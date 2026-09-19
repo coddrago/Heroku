@@ -181,6 +181,10 @@ terminal:
   exec_running: "<b>Виконую...</b>"
   btn_execute: "Виконати"
   btn_continue: "Продовжити введення"
+  btn_input_password: "Ввести пароль"
+  sudo_password_input: "Передати пароль sudo"
+  sudo_password_required: "<b>sudo: потрібен пароль.</b>"
+  sudo_password_retry: "<b>sudo: введіть пароль повторно.</b>"
   inline_hint: "Terminal"
   inline_hint_desc: "Почніть вводити команду"
 

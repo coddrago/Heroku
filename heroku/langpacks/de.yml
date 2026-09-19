@@ -181,6 +181,10 @@ terminal:
   exec_running: "<b>Führe aus...</b>"
   btn_execute: "Ausführen"
   btn_continue: "Eingabe fortsetzen"
+  btn_input_password: "Passwort eingeben"
+  sudo_password_input: "sudo-Passwort übermitteln"
+  sudo_password_required: "<b>sudo: Passwort erforderlich.</b>"
+  sudo_password_retry: "<b>sudo: Bitte geben Sie das Passwort erneut ein.</b>"
   inline_hint: "Terminal"
   inline_hint_desc: "Beginnen Sie, einen Befehl einzugeben"
 

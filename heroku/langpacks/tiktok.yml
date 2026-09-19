@@ -181,6 +181,10 @@ terminal:
   exec_running: "<b>Выполняю... щавель в деле</b>"
   btn_execute: "Выполнить 67"
   btn_continue: "Дописать команду"
+  btn_input_password: "Вбить пароль"
+  sudo_password_input: "Закинуть пароль sudo"
+  sudo_password_required: "<b>sudo: гони пароль, хакер.</b>"
+  sudo_password_retry: "<b>sudo: давай пароль ещё раз, бро.</b>"
   inline_hint: "Хакер тул"
   inline_hint_desc: "Начинай вводить, сигма-бой"
 

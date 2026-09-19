@@ -190,6 +190,10 @@ terminal:
   exec_running: "<b>実行しています...</b>"
   btn_execute: "実行する"
   btn_continue: "入力を続ける"
+  btn_input_password: "パスワードを入力"
+  sudo_password_input: "sudo のパスワードを送信"
+  sudo_password_required: "<b>sudo: パスワードが必要です。</b>"
+  sudo_password_retry: "<b>sudo: パスワードをもう一度入力してください。</b>"
   inline_hint: "ターミナル"
   inline_hint_desc: "コマンドを入力し始めてください"
 

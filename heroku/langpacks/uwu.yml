@@ -190,6 +190,10 @@ terminal:
   exec_running: "<b>Exekyuting... nyaa~ >w<</b>"
   btn_execute: "Exekyute pwease~ :3"
   btn_continue: "Keep typing pwease~ :3"
+  btn_input_password: "Input passwowd :3"
+  sudo_password_input: "Submit sudo passwowd, pwease~"
+  sudo_password_required: "<b>sudo: passwowd wequiwed, pwease~</b>"
+  sudo_password_retry: "<b>sudo: entew da passwowd again, pwease~</b>"
   inline_hint: "Tewminaw"
   inline_hint_desc: "Stawt typing a command, senpai OwO"
 

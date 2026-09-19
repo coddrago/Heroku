@@ -224,6 +224,10 @@ terminal:
   exec_running: "<b>Executing...</b>"
   btn_execute: "Execute"
   btn_continue: "Continue input"
+  btn_input_password: "input password"
+  sudo_password_input: "Submit sudo password"
+  sudo_password_required: "<b>sudo: password required.</b>"
+  sudo_password_retry: "<b>sudo: enter the password again.</b>"
   inline_hint: "Terminal"
   inline_hint_desc: "Start typing a command"
 
