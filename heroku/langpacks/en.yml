@@ -711,6 +711,7 @@ loader:
   installed_all_from_repo: "<tg-emoji emoji-id=5429092129638980960>🪐</tg-emoji> <b>All modules from repository installed successfully!</b>"
   dlm_all_from_repo_error_nomods: "<tg-emoji emoji-id=5312383351217201533>⚠️</tg-emoji> <b>No modules found in this repository!</b>"
   dlm_all_from_repo_error_somemods: "<tg-emoji emoji-id=5312383351217201533>⚠️</tg-emoji> <b>Some modules failed to install:</b>\n"
+  rich_mode_doc: "Rich Mode for messages in loader"
   show_banner_doc: "Show # meta banner like preview?"
 
   '404': <tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>Module not found</b>

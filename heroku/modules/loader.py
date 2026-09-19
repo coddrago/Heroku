@@ -110,6 +110,12 @@ class LoaderMod(loader.Module):
                 lambda: "Emoji for command",
             ),
             loader.ConfigValue(
+                "rich_mode",
+                False,
+                lambda: self.strings["rich_mode_doc"],
+                validator=loader.validators.Boolean(),
+            ),
+            loader.ConfigValue(
                 "show_banner",
                 True,
                 lambda: self.strings["show_banner_doc"],
@@ -241,24 +247,40 @@ class LoaderMod(loader.Module):
                         self.update_modules_in_db()
                 case _:
                     not_installed = []
+                    loaded_modules = []
 
-                    await utils.answer(message, f"Installing {len(args)} modules...")
+                    message = await utils.answer(
+                        message, f"Installing {len(args)} modules..."
+                    )
 
                     for arg in args:
-                        result = await self.download_and_install(arg)
-
-                        if result == MODULE_LOADING_FAILED:
+                        result = await self.download_and_install(
+                            arg, _loaded_modules=loaded_modules
+                        )
+                        if result != MODULE_LOADING_SUCCESS:
                             not_installed.append(arg)
-                    await utils.answer(
-                        message,
-                        "{} modules was installed.\n\nModules <code>{}</code> cannot be installed because they are not available in the repo".format(
-                            len(args) - len(not_installed),
-                            "</code>, <code>".join(not_installed),
-                        ),
-                    )
 
                     if self.fully_loaded:
                         self.update_modules_in_db()
+
+                    rich_mode = self.config["rich_mode"]
+                    result_message = self._batch_loaded_message(
+                        loaded_modules, not_installed, rich=rich_mode
+                    )
+                    if not rich_mode:
+                        await utils.answer(
+                            message, result_message, parse_mode="HTML"
+                        )
+                    elif self._client.heroku_me.premium:
+                        await utils.answer(message, rich_message=result_message)
+                    else:
+                        await self.inline.form(
+                            text=f"{len(loaded_modules)} Modules loaded",
+                            message=message,
+                            rich_message=result_message,
+                            silent=True,
+                            ttl=600,
+                        )
         else:
             await self.inline.list(
                 message,
@@ -416,12 +438,90 @@ class LoaderMod(loader.Module):
             False,
         )
 
+    def _batch_loaded_message(
+        self, modules: list, failed: list[str], *, rich: bool = True
+    ) -> str:
+        """Render batch results as Rich details or regular HTML blockquotes."""
+        header = (
+            '<tg-emoji emoji-id="5872771279337033184">⬇️</tg-emoji> '
+            f"<b>{len(modules)} Modules loaded</b>"
+        )
+        parts = [f"<p>{header}</p>" if rich else header]
+        prefix = utils.escape_html(self.get_prefix())
+        emoji = self.config["command_emoji"]
+
+        def section(title: str, lines: list[str], suffix: str = ""):
+            if rich:
+                parts.append(
+                    f"<details><summary>{title}{suffix}</summary>"
+                    + "".join(f"<p>{line}</p>" for line in lines)
+                    + "</details>"
+                )
+            else:
+                parts.append(f"\n\n<b>{title}</b>{suffix}")
+                if lines:
+                    parts.append(
+                        "\n<blockquote expandable>"
+                        + "\n".join(lines)
+                        + "</blockquote>"
+                    )
+
+        for module in modules:
+            strings = getattr(module, "strings", {})
+            try:
+                name = strings["name"]
+            except (KeyError, TypeError, AttributeError):
+                name = None
+            if not name or name == "Unknown strings: name":
+                base_strings = getattr(strings, "_base_strings", {})
+                name = base_strings.get("name")
+            if not name:
+                class_strings = getattr(type(module), "strings", {})
+                name = (
+                    class_strings.get("name")
+                    if isinstance(class_strings, dict)
+                    else None
+                )
+            name = name or "Unnamed module"
+
+            version = getattr(module, "__version__", None)
+            if isinstance(version, (tuple, list)):
+                version = ".".join(map(str, version))
+            elif version is not None:
+                version = str(version).strip()
+            version_suffix = (
+                f" <code>({utils.escape_html(version)})</code>" if version else ""
+            )
+            lines = []
+            for command, handler in getattr(module, "commands", {}).items():
+                description = inspect.getdoc(handler) or self.strings["undoc"]
+                description = utils.escape_html(description)
+                if rich:
+                    description = description.replace("\n", "<br/>")
+                lines.append(
+                    f"{emoji} <code>{prefix}{utils.escape_html(command)}</code>"
+                    f" - {description}"
+                )
+            section(
+                '<tg-emoji emoji-id="4916086774649848789">🔗</tg-emoji> '
+                + utils.escape_html(str(name)),
+                lines,
+                version_suffix,
+            )
+        if failed:
+            section(
+                "Not loaded",
+                [f"<code>{utils.escape_html(name)}</code>" for name in failed],
+            )
+        return "".join(parts)
+
     async def download_and_install(
         self,
         module_name: str,
         message: Message | None = None,
         force_pm: bool = False,
         name: str | None = None,
+        _loaded_modules: list | None = None,
     ) -> int:
         try:
             blob_link = False
@@ -476,6 +576,7 @@ class LoaderMod(loader.Module):
                 url,
                 blob_link=blob_link,
                 _raise_install_errors=True,
+                _loaded_modules=_loaded_modules,
             )
 
             if not installed:
@@ -675,6 +776,7 @@ class LoaderMod(loader.Module):
         did_requires: bool = False,
         did_packages: bool = False,
         _raise_install_errors: bool = False,
+        _loaded_modules: list | None = None,
     ) -> bool:
         module_label = name or origin
 
@@ -1161,6 +1263,9 @@ class LoaderMod(loader.Module):
 
         if not isinstance(developer_entity, Channel):
             developer_entity = None
+
+        if _loaded_modules is not None:
+            _loaded_modules.append(instance)
 
         if message is None:
             return True

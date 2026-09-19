@@ -676,6 +676,7 @@ loader:
   installed_all_from_repo: "<tg-emoji emoji-id=5429092129638980960>🪐</tg-emoji> <b>Aww moduwes fwom wepositowy instawwed successfuwwy! OwO yippee~</b>"
   dlm_all_from_repo_error_nomods: "<tg-emoji emoji-id=5312383351217201533>⚠️</tg-emoji> <b>Nyooo moduwes found in dis wepositowy! >///< Awe you suwe, mastew?</b>"
   dlm_all_from_repo_error_somemods: "<tg-emoji emoji-id=5312383351217201533>⚠️</tg-emoji> <b>Some moduwes faiwed to instaww... sowwy senpai :c</b>\n"
+  rich_mode_doc: "Rich Mode fow messages in woadew"
   show_banner_doc: "Show # meta bannyew wike pweview? Pwease? :3"
 
   '404': <tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>Moduwe nyot found >w<</b>

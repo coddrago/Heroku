@@ -681,6 +681,7 @@ loader:
   installed_all_from_repo: "<tg-emoji emoji-id=5429092129638980960>🪐</tg-emoji> <b>Все модули из репозитория успешно установлены!</b>"
   dlm_all_from_repo_error_nomods: "<tg-emoji emoji-id=5312383351217201533>⚠️</tg-emoji> <b>В этом репозитории не найдено ни одного модуля!</b>"
   dlm_all_from_repo_error_somemods: "<tg-emoji emoji-id=5312383351217201533>⚠️</tg-emoji> <b>Не удалось установить некоторые модули:</b>\n"
+  rich_mode_doc: "Режим Rich для сообщений в загрузчике"
   show_banner_doc: "Показать мета-баннера как превью ?"
 
   name: Loader

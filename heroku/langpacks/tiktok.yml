@@ -661,6 +661,7 @@ loader:
   installed_all_from_repo: "<tg-emoji emoji-id=5429092129638980960>🪐</tg-emoji> <b>Все модули из репозитория успешно установлены! Сигма момент</b>"
   dlm_all_from_repo_error_nomods: "<tg-emoji emoji-id=5312383351217201533>⚠️</tg-emoji> <b>В этой репе нет ни одного модуля. Кринж</b>"
   dlm_all_from_repo_error_somemods: "<tg-emoji emoji-id=5312383351217201533>⚠️</tg-emoji> <b>Плаки, плаки. Некоторые модули не установились, кароче фейл, щавель не зашёл:</b>\n"
+  rich_mode_doc: "Rich-режим сообщений в лоадере"
   show_banner_doc: "Сигма или нормис?)"
 
   name: Loader

@@ -675,6 +675,7 @@ loader:
   installed_all_from_repo: "<tg-emoji emoji-id=5429092129638980960>🪐</tg-emoji> <b>4ll m0dul35 fr0m r3p0 1n574ll3d 5ucc355fully!</b>"
   dlm_all_from_repo_error_nomods: "<tg-emoji emoji-id=5312383351217201533>⚠️</tg-emoji> <b>N0 m0dul35 f0und 1n 7h15 r3p0, f4gg07!</b>"
   dlm_all_from_repo_error_somemods: "<tg-emoji emoji-id=5312383351217201533>⚠️</tg-emoji> <b>50m3 m0dul35 f41l3d 2 1n574ll, b17ch:</b>\n"
+  rich_mode_doc: "R1ch M0d3 f0r m3554g35 1n l04d3r"
   show_banner_doc: "5h0w # m374 b4nn3r l1k3 pr3v13w?"
 
   '404': <tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>M0dul3 n07 f0und</b>

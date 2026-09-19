@@ -676,6 +676,7 @@ loader:
   installed_all_from_repo: "<tg-emoji emoji-id=5429092129638980960>🪐</tg-emoji> <b>リポジトリからすべてのモジュールが正常にインストールされました！</b>"
   dlm_all_from_repo_error_nomods: "<tg-emoji emoji-id=5312383351217201533>⚠️</tg-emoji> <b>このリポジトリにモジュールが見つかりません！</b>"
   dlm_all_from_repo_error_somemods: "<tg-emoji emoji-id=5312383351217201533>⚠️</tg-emoji> <b>一部のモジュールのインストールに失敗しました:</b>\n"
+  rich_mode_doc: "ローダーのメッセージにRichモードを使用"
   show_banner_doc: "メタバナーのプレビューを表示しますか？"
 
   '404': <tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji> <b>モジュールが見つかりません</b>
