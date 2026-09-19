@@ -74,6 +74,8 @@ from .tl_cache import CustomTelegramClient
 from .translations import Translator
 from .version import __version__
 
+meow
+
 BASE_DIR = (
     "/data"
     if "DOCKER" in os.environ
