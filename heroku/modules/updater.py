@@ -623,7 +623,7 @@ class UpdaterMod(loader.Module):
         hard: bool = False,
     ):
         if NO_GIT:
-            await utils.answer(msg_obj, "<b>Git disabled via --no-git.</b>")
+            logger.warning("Git disabled via --no-git; update skipped")
             return
         state = None
         root = os.path.dirname(utils.get_base_dir())
@@ -646,20 +646,14 @@ class UpdaterMod(loader.Module):
                     mod.__class__.__name__ for mod in modules.modules
                     if getattr(mod, "_heroku_ready", False)
                 ]
-            msg_obj = await utils.answer(msg_obj, "<b>Checking safe update…</b>")
             state = await asyncio.to_thread(update_guard.prepare, root, expected)
             if state is None:
-                await utils.answer(msg_obj, "<b>No updates available.</b>")
                 return
             await self.restart_common(msg_obj)
         except Exception as error:
             logger.exception("Safe update could not be started")
             if state:
                 update_guard.cancel_prepared(root, state["token"], str(error))
-            await utils.answer(
-                msg_obj,
-                "<b>Update not started.</b>\n" + utils.escape_html(str(error)),
-            )
 
     @loader.command()
     async def source(self, message: Message):
@@ -693,7 +687,7 @@ class UpdaterMod(loader.Module):
             ]
         )
 
-        if self.get("selfupdatemsg") is not None and not update_guard.trial_active():
+        if self.get("selfupdatemsg") is not None:
             try:
                 await self.update_complete()
             except Exception:
@@ -828,11 +822,7 @@ class UpdaterMod(loader.Module):
                 )
 
     async def update_complete(self):
-        if os.environ.get("HEROKU_UPDATE_STATE_DIR"):
-            state = update_guard.status()
-            if state and state["phase"] in {"rolled_back", "aborted"}:
-                return
-        logger.debug("Self update successful! Edit message")
+        logger.debug("Restart successful; modules are still loading. Edit message")
         start = self.get("restart_ts")
         try:
             took = round(time.time() - start)
@@ -880,14 +870,6 @@ class UpdaterMod(loader.Module):
             msg = self.strings[
                 "secure_boot_fail" if secure_boot else "full_fail"
             ].format(utils.ascii_face(), took, fails)
-
-        if os.environ.get("HEROKU_UPDATE_STATE_DIR"):
-            state = update_guard.status()
-            if state and state["phase"] in {"rolled_back", "aborted"}:
-                msg = (
-                    "<b>Update not applied. The previous version is running.</b>\n"
-                    + utils.escape_html(state.get("reason", "Startup validation failed."))
-                )
 
         if ms is None:
             return
