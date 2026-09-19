@@ -350,6 +350,7 @@ async def answer(
     *,
     reply_markup: HerokuReplyMarkup | None = None,
     rich_message: str | None = None,
+    rich: bool = False,
     **kwargs,
 ) -> InlineCall | InlineMessage | Message:
     """
@@ -379,6 +380,11 @@ async def answer(
 
     if isinstance(message, list) and message:
         message = message[0]
+
+    if rich and rich_message is None:
+        if not isinstance(response, str):
+            raise TypeError("response must be a string when rich=True")
+        rich_message = response
 
     if rich_message is not None:
         rich_filter = getattr(message, "_heroku_grep_rich", None)
@@ -482,7 +488,7 @@ async def answer(
     )
 
     if isinstance(response, str) and not kwargs.pop("asfile", False):
-        text, entities = parse_mode.parse(response)
+        text, entities = parse_mode.parse(response) if parse_mode else (response, [])
 
         if len(text) >= 4096 and not hasattr(message, "heroku_grepped"):
             try:
