@@ -235,6 +235,11 @@ heroku_web:
   name: HerokuAccounts
   _cls_doc: インラインアカウント管理
   _cmd_doc_addacc: '[user/id/reply] - インラインログインで別アカウントを追加'
+  no_beta: "<tg-emoji emoji-id=5240241223632954241>🚫</tg-emoji><b> | おっと... ベータ版がありません。マスターブランチへの強制切り替えを避けるには、バインドが必要なアカウントのベータ版を購入する必要があります。</b>"
+  donate: "<b><tg-emoji emoji-id=5985416365861768868>➡️</tg-emoji></b> <b>ベータ版の購入方法:</b>"
+  feedback_me: "お問い合わせ"
+  get_beta: "購入する"
+  close_addacc: "閉じる"
 heroku_backup:
   period: "⌚️ <b>ユニット «ALPHA»</b> は定期的なバックアップを作成します。これらの設定は後で変更できます。\n\nバックアップの頻度を選択してください\n\n<b>🚫 これにより、.lm コマンドでファイルからダウンロードされたモジュールを復元することは不可能になります！注意してください。復元する前に .backupmods を行ってください。</b>"
   saved: "✅ 周期が保存されました！ <code>{prefix}set_backup_period</code> で変更できます"

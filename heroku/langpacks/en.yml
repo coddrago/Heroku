@@ -269,6 +269,11 @@ heroku_web:
   name: HerokuAccounts
   _cls_doc: Inline account management
   _cmd_doc_addacc: '[user/id/reply] - Add another account through inline login'
+  no_beta: "<tg-emoji emoji-id=5240241223632954241>🚫</tg-emoji><b> | Oops... you don't have the beta version. To avoid forced switching to the master branch, you need to purchase a beta version for an account that requires binding.</b>"
+  donate: "<b><tg-emoji emoji-id=5985416365861768868>➡️</tg-emoji></b> <b>How to purchase the beta version:</b>"
+  feedback_me: "Contact me"
+  get_beta: "Get beta"
+  close_addacc: "Close"
 heroku_backup:
   period: "⌚️ <b>The unit «ALPHA»</b> creates regular backups. These settings can be changed later.\n\nPlease select the backup frequency\n\n<b>🚫 It is thus impossible to restore modules downloaded from files with the .lm command! Be careful and do .backupmods before restoring.</b>"
   saved: "✅ The periodicity is saved! It can be changed with <code>{prefix}set_backup_period</code>"
