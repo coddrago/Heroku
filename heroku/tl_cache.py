@@ -10,6 +10,7 @@
 # You can redistribute it and/or modify it under the terms of the GNU AGPLv3
 # 🔑 https://www.gnu.org/licenses/agpl-3.0.html
 
+import asyncio
 import copy
 import inspect
 import logging
@@ -21,10 +22,12 @@ from herokutl import TelegramClient
 from herokutl import helpers
 from herokutl import utils as tl_utils
 from herokutl.extensions import html as html_parser
+from herokutl.extensions.messagepacker import MessagePacker
 from herokutl._updates import ChannelState, Entity, EntityType, SessionState
 from herokutl.errors.rpcerrorlist import TopicDeletedError
 from herokutl.hints import EntityLike
-from herokutl.network import MTProtoSender
+from herokutl.network import MTProtoSender, mtprotosender
+from herokutl.network.requeststate import RequestState
 from herokutl.tl import functions
 from herokutl.tl.alltlobjects import LAYER
 from herokutl.tl.functions.channels import GetFullChannelRequest
@@ -62,6 +65,57 @@ if typing.TYPE_CHECKING:
     from .inline.core import InlineManager
 
 logger = logging.getLogger(__name__)
+
+
+class HerokuMessagePacker(MessagePacker):
+    async def get(self):
+        if not self._deque:
+            self._ready.clear()
+            await self._ready.wait()
+
+        rejected = set()
+        for _ in range(len(self._deque)):
+            state = self._deque.popleft()
+            try:
+                if not isinstance(state, RequestState):
+                    raise TypeError("Outgoing queue item is not a RequestState")
+                if id(state.after) in rejected:
+                    raise ValueError("Previous ordered request could not be serialized")
+                if not isinstance(state.data, bytes):
+                    self._log.warning(
+                        "Invalid outgoing payload: state=%s request=%s data=%s; "
+                        "serializing the request again",
+                        type(state).__name__,
+                        type(state.request).__name__,
+                        type(state.data).__name__,
+                    )
+                    replacement = RequestState(state.request, after=state.after)
+                    try:
+                        if not isinstance(replacement.data, bytes):
+                            raise TypeError("RequestState did not serialize to bytes")
+                        state.data = replacement.data
+                    finally:
+                        replacement.future.cancel()
+            except Exception as error:
+                rejected.add(id(state))
+                self._log.error(
+                    "Rejected invalid outgoing state %s: %s",
+                    type(state).__name__,
+                    type(error).__name__,
+                )
+                future = getattr(state, "future", None)
+                if isinstance(future, asyncio.Future) and not future.done():
+                    future.set_exception(error)
+            else:
+                self._deque.append(state)
+
+        if not self._deque:
+            return None, None
+        return await super().get()
+
+
+
+mtprotosender.MessagePacker = HerokuMessagePacker
 
 
 def hashable(value: typing.Any) -> bool:
