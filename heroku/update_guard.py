@@ -141,8 +141,6 @@ def prepare(root, expected, *, timeout=STARTUP_TIMEOUT):
         previous = read_json(directory / "transaction.json")
         if previous and previous["phase"] in ACTIVE:
             raise UpdateError("An unfinished safe update already exists.")
-        if not expected or any(not modules for modules in expected.values()):
-            raise UpdateError("Not all accounts and modules are ready for the update.")
         old = head(root)
         branch = git(root, "symbolic-ref", "--short", "HEAD").decode().strip()
         upstream = git(root, "rev-parse", "--abbrev-ref", "@{upstream}").decode().strip()
@@ -153,6 +151,8 @@ def prepare(root, expected, *, timeout=STARTUP_TIMEOUT):
         target = git(root, "rev-parse", f"{upstream}^{{commit}}").decode().strip()
         if target == old:
             return None
+        if not expected or any(not modules for modules in expected.values()):
+            raise UpdateError("Wait for all accounts to finish startup with secure boot disabled.")
         _preflight(root, old, target)
         token = uuid.uuid4().hex
         backup_ref = f"refs/heroku/safe-update/{token}"

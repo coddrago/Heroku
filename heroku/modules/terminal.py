@@ -58,7 +58,13 @@ async def read_stream(func: Callable, stream, delay: float):
             last_update = time.monotonic()
 
 
-def sudo_stdin_command(command):
+def sudo_stdin_command(command, shell="/bin/sh"):
+    if os.path.basename(os.path.realpath(shell)) == "fish":
+        return (
+            "function sudo\n"
+            "    command sudo -S -p '[heroku-sudo] password:' $argv\n"
+            "end\n" + command
+        )
     return (
         "sudo() { command sudo -S -p '[heroku-sudo] password:' \"$@\"; };\n"
         + command
@@ -744,14 +750,14 @@ class TerminalMod(loader.Module):
         asyncio.ensure_future(self._run_inline(cmd, editor))
 
     async def _run_inline(self, cmd: str, editor: InlineMessageEditor):
-        shell = os.environ.get("SHELL", "/bin/sh")
+        shell = os.environ.get("SHELL") or "/bin/sh"
         utils.ensure_child_watcher()
 
         try:
             sproc = await asyncio.create_subprocess_exec(
                 shell,
                 "-c",
-                sudo_stdin_command(cmd),
+                sudo_stdin_command(cmd, shell),
                 stdin=asyncio.subprocess.PIPE,
                 stdout=asyncio.subprocess.PIPE,
                 stderr=asyncio.subprocess.PIPE,
@@ -797,14 +803,14 @@ class TerminalMod(loader.Module):
             )
             return
 
-        shell = os.environ.get("SHELL", "/bin/sh")
+        shell = os.environ.get("SHELL") or "/bin/sh"
         utils.ensure_child_watcher()
 
         try:
             sproc = await asyncio.create_subprocess_exec(
                 shell,
                 "-c",
-                sudo_stdin_command(cmd),
+                sudo_stdin_command(cmd, shell),
                 stdin=asyncio.subprocess.PIPE,
                 stdout=asyncio.subprocess.PIPE,
                 stderr=asyncio.subprocess.PIPE,

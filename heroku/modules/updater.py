@@ -577,9 +577,9 @@ class UpdaterMod(loader.Module):
                     repo.iter_commits(f"origin/{version.branch}", max_count=1)
                 ).hexsha
             if (
-                "-f" in args
-                or not self.inline.init_complete
-                or not await self.inline.form(
+                "-f" not in args
+                and self.inline.init_complete
+                and await self.inline.form(
                     message=message,
                     text=(
                         self.strings["update_confirm"].format(
@@ -602,9 +602,10 @@ class UpdaterMod(loader.Module):
                     ],
                 )
             ):
-                raise
+                return
         except Exception:
-            await self.inline_update(message)
+            logger.debug("Update confirmation unavailable", exc_info=True)
+        await self.inline_update(message)
 
     @loader.command()
     async def autoupdate(self, message: Message):
@@ -639,16 +640,13 @@ class UpdaterMod(loader.Module):
                     or not module_loader.fully_loaded
                     or modules.secure_boot
                 ):
-                    raise update_guard.UpdateError(
-                        "Wait for all accounts to finish startup with secure boot disabled."
-                    )
+                    expected = {}
+                    break
                 expected[str(client.tg_id)] = [
                     mod.__class__.__name__ for mod in modules.modules
                     if getattr(mod, "_heroku_ready", False)
                 ]
             state = await asyncio.to_thread(update_guard.prepare, root, expected)
-            if state is None:
-                return
             await self.restart_common(msg_obj)
         except Exception as error:
             logger.exception("Safe update could not be started")
