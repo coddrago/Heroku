@@ -40,7 +40,7 @@ from herokutl.errors.rpcerrorlist import MediaCaptionTooLongError
 from herokutl.tl.functions.channels import JoinChannelRequest
 from herokutl.tl.types import Channel, InputMediaWebPage
 
-from .. import loader, main, update_guard, utils
+from .. import loader, main, utils
 from .._local_storage import RemoteStorage
 from ..inline.types import InlineCall
 from ..types import CoreOverwriteError, CoreUnloadError
@@ -685,9 +685,6 @@ class LoaderMod(loader.Module):
         )
 
     async def install_requirements(self, requirements: list):
-        if update_guard.trial_active():
-            logger.error("Dependency installation blocked during safe update trial")
-            return False
         is_venv = hasattr(sys, "real_prefix") or sys.prefix != getattr(
             sys, "base_prefix", sys.prefix
         )
@@ -731,9 +728,6 @@ class LoaderMod(loader.Module):
         return True
 
     async def install_packages(self, packages: list):
-        if update_guard.trial_active():
-            logger.error("System package installation blocked during safe update trial")
-            return False
         try:
             is_root = os.geteuid() == 0
 
@@ -2016,8 +2010,6 @@ class LoaderMod(loader.Module):
         name: str | None = None,
         offer_update: bool = True,
     ) -> bool:
-        if update_guard.trial_active():
-            return False
         if cached_doc is None:
             path = self._module_cache_path(url)
             if not os.path.isfile(path):

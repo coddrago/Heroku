@@ -172,3 +172,36 @@ def get_args_bool(message: Message | str) -> list[bool]:
         elif lower_arg in ["false", "no", "0", "off"]:
             result.append(False)
     return result
+
+
+def normalize_prefixes(value):
+    values = [value] if isinstance(value, str) else value or []
+    return list(dict.fromkeys(p for p in values if isinstance(p, str) and p))
+
+
+def user_prefixes(db, namespace, user_id=None, self_id=None):
+    primary = db.get(namespace, "command_prefix", ".")
+    defaults = normalize_prefixes(primary) + normalize_prefixes(
+        db.get(namespace, "command_prefix_aliases", [])
+    )
+    defaults = normalize_prefixes(defaults) or ["."]
+    if user_id is None or user_id == self_id:
+        return defaults
+    personal = db.get(namespace, "command_prefixes", {}).get(str(user_id))
+    return normalize_prefixes(personal) or defaults
+
+
+def match_prefix(text, prefixes, translation):
+    ordered = sorted(prefixes, key=len, reverse=True)
+    for prefix in ordered:
+        if text.startswith(prefix):
+            return prefix, False
+    for prefix in ordered:
+        if text.startswith(prefix.translate(translation)):
+            return prefix, True
+    return None, False
+
+
+def format_prefixes(value):
+    prefixes = normalize_prefixes(value)
+    return prefixes[0] if len(prefixes) == 1 else "[" + ", ".join(prefixes) + "]"

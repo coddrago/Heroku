@@ -58,7 +58,7 @@ from herokutl.tl.functions.account import GetPasswordRequest
 from herokutl.tl.functions.auth import CheckPasswordRequest
 from herokutl.tl.functions.contacts import UnblockRequest
 
-from . import database, loader, update_guard, utils, version
+from . import database, loader, utils, version
 from ._internal import (
     client_id_ctx,
     client_id_override,
@@ -1138,10 +1138,6 @@ class Heroku:
         await modules.inline.register_manager()
         await db.ensure_content_channel()
         await modules.send_ready()
-        modules._core_ready = True
-        modules._update_health_task = asyncio.create_task(
-            update_guard.monitor_client(client, modules)
-        )
 
         if first:
             await self._badge(client)

@@ -38,7 +38,7 @@ from herokutl.tl.types import (
     TextWithEntities,
 )
 
-from .. import loader, update_guard, utils, version
+from .. import loader, utils, version
 from .._internal import restart
 from ..inline.types import BotInlineCall, InlineCall
 
@@ -222,19 +222,10 @@ class UpdaterMod(loader.Module):
 
     @loader.loop(interval=60, autostart=True)
     async def poller(self):
-        if NO_GIT or update_guard.trial_active():
+        if NO_GIT:
             return
         try:
             current, self._pending, changelog = self._get_update_state()
-            safe_state = update_guard.status()
-            if safe_state and (
-                safe_state["phase"] in update_guard.ACTIVE
-                or (
-                    safe_state["phase"] in {"rolled_back", "rollback_failed", "aborted"}
-                    and safe_state["target"] == self._pending
-                )
-            ):
-                return
         except Exception as e:
             self._log_git_poll_error(e)
             return
@@ -626,32 +617,12 @@ class UpdaterMod(loader.Module):
         if NO_GIT:
             logger.warning("Git disabled via --no-git; update skipped")
             return
-        state = None
-        root = os.path.dirname(utils.get_base_dir())
         try:
-            expected = {}
-            for client in self.allclients:
-                modules = getattr(client, "loader", None)
-                module_loader = modules.lookup("LoaderMod") if modules else None
-                if (
-                    not client.is_connected()
-                    or not getattr(modules, "_core_ready", False)
-                    or not module_loader
-                    or not module_loader.fully_loaded
-                    or modules.secure_boot
-                ):
-                    expected = {}
-                    break
-                expected[str(client.tg_id)] = [
-                    mod.__class__.__name__ for mod in modules.modules
-                    if getattr(mod, "_heroku_ready", False)
-                ]
-            state = await asyncio.to_thread(update_guard.prepare, root, expected)
+            if await self.download_common():
+                await asyncio.to_thread(self.req_common)
             await self.restart_common(msg_obj)
-        except Exception as error:
-            logger.exception("Safe update could not be started")
-            if state:
-                update_guard.cancel_prepared(root, state["token"], str(error))
+        except Exception:
+            logger.exception("Update failed")
 
     @loader.command()
     async def source(self, message: Message):
@@ -841,8 +812,6 @@ class UpdaterMod(loader.Module):
         )
 
     async def full_restart_complete(self, secure_boot: bool = False):
-        if update_guard.trial_active():
-            return
         start = self.get("restart_ts")
 
         try:

@@ -21,10 +21,6 @@ import subprocess
 import sys
 from pathlib import Path
 
-from . import update_guard
-
-update_guard.bootstrap()
-
 from ._internal import restart
 
 if "--no-git" in sys.argv:
@@ -103,8 +99,6 @@ def get_file_hash(filename):
 
 
 def deps():
-    if update_guard.trial_active():
-        raise RuntimeError("Dependency installation is disabled during a safe update trial")
     subprocess.run(
         [
             sys.executable,

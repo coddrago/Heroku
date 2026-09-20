@@ -32,7 +32,7 @@ from uuid import uuid4
 
 from herokutl.tl.tlobject import TLObject
 
-from . import main, security, update_guard, utils, validators
+from . import main, security, utils, validators
 from ._internal import resolve_client_id, set_client_id, tag_client_id
 from .database import Database
 from .inline.core import BotUpdateType, InlineManager
@@ -686,7 +686,6 @@ class Modules:
 
                 logger.debug("Successfully loaded %s from filesystem", module_name)
             except Exception as e:
-                self._record_startup_error(os.path.basename(mod))
                 logger.exception("Failed to load module %s due to %s:", mod, e)
 
         return loaded
@@ -1165,18 +1164,11 @@ class Modules:
             logger.exception("Failed to send mod config complete signal due to %s", e)
             raise
 
-    def _record_startup_error(self, name):
-        if update_guard.trial_active():
-            if not hasattr(self, "_startup_errors"):
-                self._startup_errors = []
-            self._startup_errors.append(str(name))
-
     async def send_ready_one_wrapper(self, *args, **kwargs):
         """Wrapper for send_ready_one"""
         try:
             await self.send_ready_one(*args, **kwargs)
         except Exception as e:
-            self._record_startup_error(args[0].__class__.__name__)
             logger.exception("Failed to send mod init complete signal due to %s", e)
 
     async def send_ready(self):
@@ -1192,7 +1184,6 @@ class Modules:
         no_self_unload: bool = False,
         from_dlmod: bool = False,
     ):
-        mod._heroku_ready = False
         if from_dlmod:
             try:
                 if len(inspect.signature(mod.on_dlmod).parameters) == 2:
@@ -1269,7 +1260,6 @@ class Modules:
         self.register_watchers(mod)
         self.register_raw_handlers(mod)
         self.register_bot_update_handlers(mod)
-        mod._heroku_ready = True
 
     def get_classname(self, name: str) -> str:
         return next(
