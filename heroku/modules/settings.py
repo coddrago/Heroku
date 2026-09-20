@@ -217,90 +217,64 @@ class CoreMod(loader.Module):
 
     @loader.command()
     async def setprefix(self, message: Message):
-        if not (args := utils.get_args(message)):
-            await utils.answer(message, self.strings["what_prefix"])
-            return
-
-        if len(args[0]) != 1 and self.config.get("allow_nonstandart_prefixes") is False:
-            await utils.answer(message, self.strings["prefix_incorrect"])
-            return
-
-        if args[0] == "s":
-            await utils.answer(message, self.strings["prefix_incorrect"])
-            return
-
-        if len(args) == 2:
-            if args[1].isdigit():
-                args[1] = int(args[1])
-            try:
-                entity = await self.client.get_entity(args[1])
-            except Exception:
-                return await utils.answer(
-                    message, self.strings["invalid_id_or_username"]
-                )
-
-            if not isinstance(entity, User):
-                return await utils.answer(
-                    message, self.strings["not_a_user"].format(args[1])
-                )
-
-            if entity.id != self.tg_id:
-                sgroup_users = []
-                for g in self._client.dispatcher.security._sgroups.values():
-                    for u in g.users:
-                        sgroup_users.append(u)
-
-                tsec_users = [
-                    rule["target"]
-                    for rule in self._client.dispatcher.security._tsec_user
-                ]
-                ub_owners = self._client.dispatcher.security.owner.copy()
-
-                all_users = sgroup_users + tsec_users + ub_owners
-
-                if entity.id not in all_users:
-                    return await utils.answer(
-                        message, self.strings["id_not_found_scgroup"]
-                    )
-
-                oldprefix = utils.escape_html(self.get_prefix(entity.id))
-                all_prefixes = self._db.get(
-                    main.__name__,
-                    "command_prefixes",
-                    {},
-                )
-
-                all_prefixes[str(entity.id)] = args[0]
-
-                self._db.set(
-                    main.__name__,
-                    "command_prefixes",
-                    all_prefixes,
-                )
-                return await utils.answer(
-                    message,
-                    self.strings["entity_prefix_set"].format(
-                        "<tg-emoji emoji-id=5197474765387864959>👍</tg-emoji>",
-                        entity_name=utils.escape_html(entity.first_name),
-                        newprefix=utils.escape_html(args[0]),
-                        oldprefix=utils.escape_html(oldprefix),
-                        entity_id=args[1],
-                    ),
-                )
-
-        oldprefix = utils.escape_html(self.get_prefix())
-
-        self._db.set(
-            main.__name__,
-            "command_prefix",
-            args[0],
+        """<prefix ...> [@owner] or --user <ID> <prefix ...> — Set personal prefixes."""
+        args = utils.get_args(message)
+        if not isinstance(args, list):
+            return await utils.answer(message, self.strings["what_prefix"])
+        target = getattr(message, "sender_id", None) or self.tg_id
+        if "--user" in args:
+            index = args.index("--user")
+            if index + 1 >= len(args):
+                return await utils.answer(message, self.strings["what_prefix"])
+            target = args[index + 1]
+            del args[index:index + 2]
+        elif len(args) > 1 and (
+            (args[-1].startswith("@") and len(args[-1]) > 1)
+            or (args[-1].isdigit() and len(args[-1]) >= 5)
+        ):
+            target = args.pop()
+        if not args:
+            return await utils.answer(message, self.strings["what_prefix"])
+        if any(
+            not p or p == "s" or any(c.isspace() for c in p)
+            or (len(p) != 1 and not self.config.get("allow_nonstandart_prefixes"))
+            for p in args
+        ):
+            return await utils.answer(message, self.strings["prefix_incorrect"])
+        prefixes = utils.normalize_prefixes(args)
+        target = int(target) if str(target).isdigit() else target
+        try:
+            entity = await self.client.get_entity(target)
+        except Exception:
+            return await utils.answer(message, self.strings["invalid_id_or_username"])
+        if not isinstance(entity, User):
+            return await utils.answer(message, self.strings["not_a_user"].format(target))
+        oldprefixes = utils.user_prefixes(
+            self._db, main.__name__, entity.id, self.tg_id
         )
+        if entity.id != self.tg_id:
+            security = self._client.dispatcher.security
+            allowed = set(security.owner)
+            allowed.update(u for g in security._sgroups.values() for u in g.users)
+            allowed.update(rule["target"] for rule in security._tsec_user)
+            if entity.id not in allowed:
+                return await utils.answer(message, self.strings["id_not_found_scgroup"])
+            personal = dict(self._db.get(main.__name__, "command_prefixes", {}))
+            personal[str(entity.id)] = prefixes[0] if len(prefixes) == 1 else prefixes
+            self._db.set(main.__name__, "command_prefixes", personal)
+        else:
+            self._db.set(main.__name__, "command_prefix", prefixes[0])
+            self._db.set(main.__name__, "command_prefix_aliases", prefixes[1:])
         await utils.answer(
             message,
-            self.strings["prefix_set"].format(
+            self.strings[
+                "prefix_set" if entity.id == self.tg_id else "entity_prefix_set"
+            ].format(
                 "<tg-emoji emoji-id=5197474765387864959>👍</tg-emoji>",
-                newprefix=utils.escape_html(args[0]),
-                oldprefix=utils.escape_html(oldprefix),
+                entity_name=utils.escape_html(entity.first_name),
+                entity_id=entity.id,
+                newprefix=utils.escape_html(utils.format_prefixes(prefixes)),
+                oldprefix=utils.escape_html(" ".join(oldprefixes)),
             ),
         )
 

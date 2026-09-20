@@ -89,12 +89,15 @@ def get_args_html(message: Message) -> str:
     :param message: Message to get arguments from
     :return: String with HTML arguments
     """
-    prefix = message.client.loader.get_prefix()
+    prefix = next((
+        p for p in sorted(message.client.loader.get_prefixes(), key=len, reverse=True)
+        if (message.raw_text or "").startswith(p)
+    ), None)
 
     if not (message := message.text):
         return False
 
-    if prefix not in message:
+    if prefix is None:
         return message
 
     raw_text, entities = parser.parse(message)
@@ -102,9 +105,7 @@ def get_args_html(message: Message) -> str:
     raw_text = parser._add_surrogate(raw_text)
 
     try:
-        command = raw_text[
-            raw_text.index(prefix) : raw_text.index(" ", raw_text.index(prefix) + 1)
-        ]
+        command = raw_text[:raw_text.index(" ")]
     except ValueError:
         return ""
 

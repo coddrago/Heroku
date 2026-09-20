@@ -428,7 +428,7 @@ class TestMod(loader.Module):
             placeholders_msg = self.config["custom_message"].format(**data)
         except KeyError:
             logger.exception("Missing placeholder in custom_message")
-            placeholders_msg = "<tg-emoji emoji-id=5210952531676504517>🚫</tg-emoji>"
+            placeholders_msg = "<tg-emoji emoji-id=5121063440311386962>❌</tg-emoji>"
         if self.config["rich_mode"]:
             rich_message = placeholders_msg.replace("\r\n", "<br>").replace("\n", "<br>")
             await utils.answer(

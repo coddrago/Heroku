@@ -189,3 +189,4 @@ class InlineStuff(loader.Module):
     async def reset_prefix(self, call: InlineCall, message):
         await message.answer(self.strings["prefix_reset"])
         self.db.set("heroku.main", "command_prefix", ".")
+        self.db.set("heroku.main", "command_prefix_aliases", [])

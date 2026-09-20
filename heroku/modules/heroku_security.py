@@ -578,6 +578,7 @@ class HerokuSecurityMod(loader.Module):
         user: int = None,
         enable_nonick: bool = False,
         force: bool = False,
+        prefix: str | list[str] = None,
     ):
         if user is None and not (user := await self._resolve_user(message)):
             return
@@ -585,12 +586,23 @@ class HerokuSecurityMod(loader.Module):
         if isinstance(user, int):
             user = await self._client.get_entity(user, exp=0)
 
+        if user.id in getattr(self._client.dispatcher.security, group):
+            return await utils.answer(
+                message,
+                self.strings["owner_exists"].format(
+                    user.id, utils.escape_html(get_display_name(user))
+                ),
+            )
+
         if not confirmed and not force:
             await self.inline.form(
                 self.strings["warning"].format(
                     user.id,
                     utils.escape_html(get_display_name(user)),
                     group,
+                ) + (
+                    "\n\n" + self.strings["owner_prefix"].format(utils.escape_html(utils.format_prefixes(prefix)))
+                    if prefix is not None else ""
                 ),
                 message=message,
                 ttl=10 * 60,
@@ -602,7 +614,7 @@ class HerokuSecurityMod(loader.Module):
                     {
                         "text": self.strings["confirm"],
                         "callback": self._add_to_group,
-                        "args": (group, True, user.id, enable_nonick),
+                        "args": (group, True, user.id, enable_nonick, False, prefix),
                     },
                 ],
             )
@@ -611,6 +623,15 @@ class HerokuSecurityMod(loader.Module):
         if user.id not in getattr(self._client.dispatcher.security, group):
             getattr(self._client.dispatcher.security, group).append(user.id)
             self._client.dispatcher.security._reload_rights(force=True)
+
+        prefix_text = ""
+        if prefix is not None:
+            prefixes = dict(self._db.get(main.__name__, "command_prefixes", {}))
+            prefixes[str(user.id)] = prefix
+            self._db.set(main.__name__, "command_prefixes", prefixes)
+            prefix_text = "\n\n" + self.strings["owner_prefix"].format(
+                utils.escape_html(utils.format_prefixes(prefix))
+            )
 
         if enable_nonick:
             self._db.set(
@@ -625,6 +646,7 @@ class HerokuSecurityMod(loader.Module):
                     user.id,
                     utils.escape_html(get_display_name(user)),
                 )
+                + prefix_text
                 + "\n\n"
                 + self.strings["user_nn"].format(
                     user.id,
@@ -640,6 +662,7 @@ class HerokuSecurityMod(loader.Module):
                     user.id,
                     utils.escape_html(get_display_name(user)),
                 )
+                + prefix_text
                 + "\n\n"
                 + self.strings["suggest_nonick"]
             ),
@@ -674,12 +697,37 @@ class HerokuSecurityMod(loader.Module):
 
     @loader.command()
     async def owneradd(self, message: Message):
+        """[-f|--force] [-n|--nonick] [-p <prefix>]... <user or reply> — Add owner."""
         args = utils.get_args(message)
-        force = any(arg in {"-f", "--force"} for arg in args)
-        enable_nonick = any(arg in {"-n", "--nonick"} for arg in args)
-        user_args = " ".join(
-            arg for arg in args if arg not in {"-f", "--force", "-n", "--nonick"}
-        )
+        if not isinstance(args, list):
+            return await utils.answer(message, self.strings["owneradd_usage"])
+        force = enable_nonick = False
+        prefix = None
+        targets = []
+        options = {"-f", "--force", "-n", "--nonick", "-p", "--prefix"}
+        tokens = iter(args)
+        for arg in tokens:
+            if arg in {"-f", "--force"}:
+                force = True
+            elif arg in {"-n", "--nonick"}:
+                enable_nonick = True
+            elif arg in {"-p", "--prefix"}:
+                value = next(tokens, None)
+                if not value or value in options:
+                    return await utils.answer(message, self.strings["owneradd_usage"])
+                prefix = utils.normalize_prefixes(utils.normalize_prefixes(prefix) + [value])
+            else:
+                targets.append(arg)
+        if len(targets) > 1:
+            return await utils.answer(message, self.strings["owneradd_usage"])
+        if prefix is not None:
+            settings = self.lookup("CoreMod")
+            allow_long = settings and settings.config.get("allow_nonstandart_prefixes")
+            if any(p == "s" or any(c.isspace() for c in p) or (
+                len(p) != 1 and not allow_long
+            ) for p in prefix):
+                return await utils.answer(message, self.strings["owner_prefix_invalid"])
+        user_args = " ".join(targets)
         user = await self._resolve_user(message, user_args)
 
         if not user:
@@ -691,6 +739,7 @@ class HerokuSecurityMod(loader.Module):
             user=user.id,
             enable_nonick=enable_nonick,
             force=force,
+            prefix=prefix[0] if prefix and len(prefix) == 1 else prefix,
         )
 
     @loader.command()
@@ -722,9 +771,10 @@ class HerokuSecurityMod(loader.Module):
             await utils.answer(message, self.strings["no_owner"])
             return
 
-        prefixes = self._db.get(main.__name__, "command_prefixes", {})
         for user in _resolved_users:
-            _and_prefixes += [prefixes.get(str(user.id), None)]
+            _and_prefixes.append(utils.format_prefixes(utils.user_prefixes(
+                self._db, main.__name__, user.id, self.tg_id
+            )))
 
         await utils.answer(
             message,
@@ -734,7 +784,7 @@ class HerokuSecurityMod(loader.Module):
                         self.strings["li"].format(
                             utils.get_entity_url(i), utils.escape_html(get_display_name(i))
                         )
-                        + (f" ({p})" if p else "")
+                        + (f" (<code>{utils.escape_html(p)}</code>)" if p else "")
                         for i, p in zip(_resolved_users, _and_prefixes)
                     ]
                 )

@@ -996,27 +996,17 @@ class Modules:
         """Get command prefix"""
         from . import main
 
-        key = main.__name__
-        default = "."
-
-        if ent_id:
-            prefixes = self._db.get(key, "command_prefixes", {})
-            result = prefixes.get(str(ent_id), default)
-        else:
-            result = self._db.get(key, "command_prefix", default)
-        return result
+        return utils.user_prefixes(
+            self._db, main.__name__, ent_id, self.client.tg_id
+        )[0]
 
     def get_prefixes(self) -> set[str]:
         """Get all command prefixes"""
         from . import main
 
-        key = main.__name__
-        default = "."
-
-        prefixes = ()
-        prefixes += tuple(self._db.get(key, "command_prefixes", {}).values())
-        prefixes += tuple(self._db.get(key, "command_prefix", default))
-
+        prefixes = utils.user_prefixes(self._db, main.__name__)
+        for value in self._db.get(main.__name__, "command_prefixes", {}).values():
+            prefixes.extend(utils.normalize_prefixes(value))
         return set(prefixes)
 
     @tag_client_id("client.tg_id")

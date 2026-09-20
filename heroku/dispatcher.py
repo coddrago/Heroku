@@ -291,16 +291,19 @@ class CommandDispatcher:
 
         initiator = getattr(event, "sender_id", 0)
 
-        main_prefix = self._db.get(main.__name__, "command_prefix", ".")
-        if initiator == self._client.tg_id:
-            prefix = main_prefix
-        else:
-            prefix = self._db.get(main.__name__, "command_prefixes", {})
-            prefix = prefix.get(str(initiator), main_prefix)
+        prefixes = utils.user_prefixes(
+            self._db, main.__name__, initiator, self._client.tg_id
+        )
 
         message = utils.censor(event.message)
 
         if not event.message.message:
+            return False
+
+        prefix, _switch_layout = utils.match_prefix(
+            event.message.message, prefixes, _LAYOUT_TRANSLATION
+        )
+        if prefix is None:
             return False
 
         if (
@@ -322,19 +325,12 @@ class CommandDispatcher:
                         message.message[len(prefix) :],
                         parse_mode=lambda s: (
                             s,
-                            utils.relocate_entities(message.entities, -1)
+                            utils.relocate_entities(message.entities, -len(prefix))
                             or (),
                         ),
                     )
                 return False
 
-        _translated_prefix = str.translate(prefix, _LAYOUT_TRANSLATION)
-        _switch_layout = (
-            _translated_prefix != prefix
-            and event.message.message.startswith(_translated_prefix)
-        )
-        if not _switch_layout and not event.message.message.startswith(prefix):
-            return False
         _msg = (
             str.translate(message.message, _LAYOUT_TRANSLATION)
             if _switch_layout
