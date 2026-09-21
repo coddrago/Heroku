@@ -422,6 +422,11 @@ class TestMod(loader.Module):
             "hostname": lib_platform.node(),
             "user": getpass.getuser(),
             "platform": utils.get_platform_name(),
+            "img": (
+                f'<img src="{utils.escape_html(str(self.config["banner_url"]))}"/>'
+                if self.config["rich_mode"] and self.config["banner_url"]
+                else ""
+            ),
         }
         data = await utils.get_placeholders(data, self.config["custom_message"])
         try:

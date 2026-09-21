@@ -173,6 +173,11 @@ class HerokuInfoMod(loader.Module):
             "ping": round((time.perf_counter_ns() - start) / 10**6, 3),
             "htl_ver": herokutl.__version__,
             "git_status": utils.get_git_status(),
+            "img": (
+                f'<img src="{utils.escape_html(str(self.config["banner_url"]))}"/>'
+                if template_key == "rich_info_message" and self.config["banner_url"]
+                else ""
+            ),
         }
 
         cpu_info = self._get_cpu_info()
@@ -200,6 +205,7 @@ class HerokuInfoMod(loader.Module):
                     else ""
                 ),
                 banner_url=self.config["banner_url"],
+                img=data["img"],
                 me=me,
                 version=_version,
                 prefix=prefix,
