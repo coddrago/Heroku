@@ -843,3 +843,10 @@ loader_restrictor:
   unlocked: "<tg-emoji emoji-id=5118861066981344121>✅</tg-emoji> <b>Prüfung bestanden, Drittanbieter-Modulinstallation ist freigeschaltet</b>"
   unlock_prompt: "<tg-emoji emoji-id=5447644880824181073>⚠️</tg-emoji> <b>Um die Installation von Drittanbietermodulen freizuschalten, führen Sie eine kurze Überprüfung durch</b>"
   unlock_prompt_btn: "Nimm den Scheck"
+
+command_conflicts:
+  choose: "<tg-emoji emoji-id=5870982283724328568>⚙</tg-emoji> Wähle ein Modul für <code>{}</code>:"
+  denied: "Nur der Befehlsautor darf wählen."
+  used: "Der Befehl wurde bereits ausgewählt."
+  unavailable: "<tg-emoji emoji-id=5870657884844462243>❌</tg-emoji> Der Befehl ist nicht mehr verfügbar."
+  failed: "<tg-emoji emoji-id=5870931487146119264>❗</tg-emoji> Modulauswahl nicht verfügbar. Prüfe den Inline-Bot."

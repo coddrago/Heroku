@@ -854,3 +854,10 @@ loader_restrictor:
   unlocked: "<tg-emoji emoji-id=5118861066981344121>✅</tg-emoji> <b>Ch3ck p4553d, 7h1rd-p4r7y m0dul3 1n574ll4710n 15 unl0ck3d</b>"
   unlock_prompt: "<tg-emoji emoji-id=5447644880824181073>⚠️</tg-emoji> <b>70 unl0ck 7h1rd-p4r7y m0dul3 1n574ll4710n, c0mpl373 4 5h0r7 ch3ck</b>"
   unlock_prompt_btn: "74k3 7h3 ch3ck"
+
+command_conflicts:
+  choose: "<tg-emoji emoji-id=5870982283724328568>⚙</tg-emoji> Ch0053 4 m0dul3 f0r <code>{}</code>:"
+  denied: "0nly th3 c0mm4nd 4uth0r c4n ch0053."
+  used: "C0mm4nd 4lr34dy 53l3ct3d."
+  unavailable: "<tg-emoji emoji-id=5870657884844462243>❌</tg-emoji> C0mm4nd un4v41l4bl3."
+  failed: "<tg-emoji emoji-id=5870931487146119264>❗</tg-emoji> C4nn0t 5h0w m0dul35. Ch3ck 1nl1n3 b0t."
