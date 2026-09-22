@@ -599,6 +599,7 @@ heroku_info:
 
   name: HerokuInfo
 loader:
+  loaded_placeholders: "プレースホルダー"
   module_update_prompt: "<tg-emoji emoji-id=5765071340847501478>🔗</tg-emoji> <b>モジュール {} が更新されました。インストールしますか？</b>"
   module_update_yes: "はい"
   module_update_no: "いいえ"

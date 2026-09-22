@@ -598,6 +598,7 @@ heroku_info:
 
   name: HerokuInfo
 loader:
+  loaded_placeholders: "Pl4c3h0ld3r5"
   module_update_prompt: "<tg-emoji emoji-id=5765071340847501478>🔗</tg-emoji> <b>M0dul3 {} h45 b33n upd473d. 1n574ll 17?</b>"
   module_update_yes: "Y35"
   module_update_no: "N0"

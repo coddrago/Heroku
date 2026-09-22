@@ -433,13 +433,28 @@ class LoaderMod(loader.Module):
     ):
         """Send installation results using the selected message format."""
         if not rich:
-            return await utils.answer(
+            return await utils.answer_with_media_fallback(
                 message, text, parse_mode="HTML",
                 reply_markup=reply_markup, **kwargs,
             )
-        return await utils.answer(
+        return await utils.answer_with_media_fallback(
             message, rich_message=text, reply_markup=reply_markup, **kwargs,
         )
+
+    def _loaded_command_name(self, name: str, handler) -> str:
+        prefix = utils.escape_html(self.get_prefix())
+        result = f"<code>{prefix}{utils.escape_html(name)}</code>"
+        aliases = getattr(handler, "aliases", None) or []
+        if not aliases and (alias := getattr(handler, "alias", None)):
+            aliases = [alias]
+        if aliases:
+            result += " ({})".format(
+                ", ".join(
+                    f"<code>{prefix}{utils.escape_html(alias)}</code>"
+                    for alias in aliases
+                )
+            )
+        return result
 
     def _batch_loaded_message(
         self, modules: list, failed: list[str], *, rich: bool = True,
@@ -466,7 +481,6 @@ class LoaderMod(loader.Module):
                     slides.append(f'<img src="{utils.escape_html(banner_url)}"/>')
             if slides:
                 parts.insert(0, "<tg-slideshow>" + "".join(slides) + "</tg-slideshow>")
-        prefix = utils.escape_html(self.get_prefix())
         emoji = self.config["command_emoji"]
 
         def section(title: str, lines: list[str], suffix: str = ""):
@@ -518,7 +532,7 @@ class LoaderMod(loader.Module):
                 if rich:
                     description = description.replace("\n", "<br/>")
                 lines.append(
-                    f"{emoji} <code>{prefix}{utils.escape_html(command)}</code>"
+                    f"{emoji} {self._loaded_command_name(command, handler)}"
                     f" - {description}"
                 )
             lines = lines if command_lines is None else command_lines
@@ -543,6 +557,13 @@ class LoaderMod(loader.Module):
                     + utils.escape_html(str(name)),
                     lines,
                     version_suffix,
+                )
+            placeholders = utils.help_placeholders(module.__class__.__name__, self)
+            if placeholders:
+                section(
+                    self.strings["loaded_placeholders"],
+                    [line.replace("\n", "<br/>") for line in placeholders]
+                    if rich else placeholders,
                 )
         if failed:
             section(
@@ -1466,12 +1487,11 @@ class LoaderMod(loader.Module):
         ):
             modhelp.append(
                 (
-                    "{} <code>{}{}</code> - {}"
-                    if rich_mode else "{} <code>{}{}</code> {}"
+                    "{} {} - {}"
+                    if rich_mode else "{} {} {}"
                 ).format(
                     f"{self.config['command_emoji']}",
-                    utils.escape_html(self.get_prefix()),
-                    _name,
+                    self._loaded_command_name(_name, fun),
                     (
                         utils.escape_html(inspect.getdoc(fun))
                         if fun.__doc__

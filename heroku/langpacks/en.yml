@@ -634,6 +634,7 @@ heroku_info:
 
   name: HerokuInfo
 loader:
+  loaded_placeholders: "Placeholders"
   module_update_prompt: "<tg-emoji emoji-id=5765071340847501478>🔗</tg-emoji> <b>Module {} has been updated. Install it?</b>"
   module_update_yes: "Yes"
   module_update_no: "No"

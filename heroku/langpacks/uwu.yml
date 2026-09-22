@@ -599,6 +599,7 @@ heroku_info:
 
   name: HerokuInfo
 loader:
+  loaded_placeholders: "Pwacehowdews"
   module_update_prompt: "<tg-emoji emoji-id=5765071340847501478>🔗</tg-emoji> <b>Moduwe {} has been updated. Instaww it?</b>"
   module_update_yes: "Yes"
   module_update_no: "No"

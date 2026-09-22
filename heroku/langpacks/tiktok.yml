@@ -584,6 +584,7 @@ heroku_info:
   name: HerokuInfo
   _cls_doc: Показать инфу о юзерботе
 loader:
+  loaded_placeholders: "Плейсхолдеры"
   module_update_prompt: "<tg-emoji emoji-id=5765071340847501478>🔗</tg-emoji> <b>Модуль {} получил обнову. Установить?</b>"
   module_update_yes: "Да"
   module_update_no: "Нет"

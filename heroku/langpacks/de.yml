@@ -585,6 +585,7 @@ heroku_info:
   name: HerokuInfo
   _cls_doc: Userbot-Informationen anzeigen
 loader:
+  loaded_placeholders: "Platzhalter"
   module_update_prompt: "<tg-emoji emoji-id=5765071340847501478>🔗</tg-emoji> <b>Das Modul {} wurde aktualisiert. Installieren?</b>"
   module_update_yes: "Ja"
   module_update_no: "Nein"
