@@ -164,15 +164,8 @@ class HerokuInfoMod(loader.Module):
             platform_emoji = platform_emoji.replace(emoji, icon)
         return platform_emoji
 
-    async def _render_info(
-        self,
-        start: float,
-        template_key: str = "info_message",
-    ) -> str:
-        custom_message = self.config["custom_message"]
-        template = custom_message or self.strings[template_key]
-        required = set(re.findall(r"{(\w+)}", template))
-        providers = {
+    def _get_placeholder_providers(self, template_key):
+        return {
             "banner_url": lambda: self.config["banner_url"],
             "me": lambda: (
                 '<b><a href="tg://user?id={}">{}</a></b>'.format(
@@ -204,27 +197,28 @@ class HerokuInfoMod(loader.Module):
                 else ""
             ),
         }
-        class PlaceholderData(dict):
-            def __missing__(self, name):
-                if name not in providers:
-                    raise KeyError(name)
-                try:
-                    value = providers[name]()
-                    self[name] = value if value is not None else ""
-                except OSError:
-                    self[name] = ""
-                except Exception:
-                    logger.exception("Unavailable placeholder: %s", name)
-                    self[name] = ""
-                return self[name]
 
-            def get(self, name, default=None):
-                try:
-                    return self[name]
-                except KeyError:
-                    return default
+    def _format_custom_message(self, template, data):
+        def replace(match):
+            name = match.group(1)
+            if name in data:
+                return str(data[name])
+            return self.strings["missing_placeholder"].format(
+                placeholder=utils.escape_html(match.group(0))
+            )
 
-        data = PlaceholderData()
+        return re.sub(r"{(\w+)}", replace, template)
+
+    async def _render_info(
+        self,
+        start: float,
+        template_key: str = "info_message",
+    ) -> str:
+        custom_message = self.config["custom_message"]
+        template = custom_message or self.strings[template_key]
+        required = set(re.findall(r"{(\w+)}", template))
+        providers = self._get_placeholder_providers(template_key)
+        data = utils.LazyPlaceholderData(providers)
         for name in required & providers.keys():
             data[name]
 
@@ -232,17 +226,7 @@ class HerokuInfoMod(loader.Module):
             data["ping"] = round((time.perf_counter_ns() - start) / 10**6, 3)
         if custom_message:
             data = await utils.get_placeholders(data, custom_message)
-            return re.sub(
-                r"{(\w+)}",
-                lambda match: (
-                    str(data[match.group(1)])
-                    if match.group(1) in data
-                    else self.strings["missing_placeholder"].format(
-                        placeholder=utils.escape_html(match.group(0))
-                    )
-                ),
-                custom_message,
-            )
+            return self._format_custom_message(custom_message, data)
         return template.format(
             (
                 utils.get_platform_emoji()
@@ -278,25 +262,16 @@ class HerokuInfoMod(loader.Module):
             media = None
 
         try:
-            match True:
-                case _ if self.config["custom_message"] is None:
-                    await utils.answer(
-                        message,
-                        await self._render_info(start),
-                        file=media,
-                        reply_to=getattr(message, "reply_to_msg_id", None),
-                        invert_media=self.config["invert_media"],
-                    )
-                case _:
-                    if "{ping}" in self.config["custom_message"]:
-                        message = await utils.answer(message, self.config["ping_emoji"])
-                    await utils.answer(
-                        message,
-                        await self._render_info(start),
-                        file=media,
-                        reply_to=getattr(message, "reply_to_msg_id", None),
-                        invert_media=self.config["invert_media"],
-                    )
+            custom_message = self.config["custom_message"]
+            if custom_message is not None and "{ping}" in custom_message:
+                message = await utils.answer(message, self.config["ping_emoji"])
+            await utils.answer(
+                message,
+                await self._render_info(start),
+                file=media,
+                reply_to=getattr(message, "reply_to_msg_id", None),
+                invert_media=self.config["invert_media"],
+            )
         except WebpageMediaEmptyError:
             await utils.answer(
                 message,
