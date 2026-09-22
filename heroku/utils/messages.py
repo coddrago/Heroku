@@ -13,6 +13,7 @@ import typing
 
 import grapheme
 import herokutl
+from herokutl.errors import RPCError, WebpageMediaEmptyError
 from herokutl.tl.custom import Message
 from herokutl.tl.types import (
     Channel,
@@ -342,6 +343,33 @@ async def _edit_inline_rich_message(
             reply_markup=rich_markup,
         )
     return message
+
+
+async def answer_with_media_fallback(message, *args, **kwargs):
+    try:
+        return await answer(message, *args, **kwargs)
+    except RPCError as error:
+        if not isinstance(error, WebpageMediaEmptyError) and getattr(
+            error, "message", None
+        ) != "RICH_MESSAGE_PHOTO_NO_MEDIA_FOUND":
+            raise
+        rich_message = kwargs.get("rich_message")
+        if rich_message:
+            without_images = re.sub(
+                r"<img\b(?:[^>\"']|\"[^\"]*\"|'[^']*')*>",
+                "",
+                rich_message,
+                flags=re.IGNORECASE,
+            )
+            if without_images == rich_message:
+                raise
+            kwargs["rich_message"] = without_images
+        elif not kwargs.get("file"):
+            raise
+        kwargs.pop("file", None)
+        kwargs.pop("invert_media", None)
+        kwargs["link_preview"] = False
+    return await answer(message, *args, **kwargs)
 
 
 async def answer(

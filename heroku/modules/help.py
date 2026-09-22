@@ -296,10 +296,10 @@ class Help(loader.Module):
             )
             if banner_url:
                 rich_message = f'<figure><img src="{banner_url}"/></figure>' + rich_message
-            await utils.answer(message, rich_message=rich_message)
+            await utils.answer_with_media_fallback(message, rich_message=rich_message)
             return
 
-        await utils.answer(
+        await utils.answer_with_media_fallback(
             message,
             f"{reply}<blockquote expandable>{cmds}{inline_cmd}</blockquote>"
             + (
@@ -514,12 +514,12 @@ class Help(loader.Module):
             )
             if not self.lookup("LoaderMod").fully_loaded:
                 rich_message += f"<p>{self.strings['partial_load']}</p>"
-            await utils.answer(message, rich_message=rich_message)
+            await utils.answer_with_media_fallback(message, rich_message=rich_message)
             return
 
         match True:
             case _ if only_core:
-                await utils.answer(
+                await utils.answer_with_media_fallback(
                     message,
                     (
                         self.config["desc_icon"]
@@ -537,7 +537,7 @@ class Help(loader.Module):
                     invert_media=self.config["invert_media"],
                 )
             case _ if only_loaded:
-                await utils.answer(
+                await utils.answer_with_media_fallback(
                     message,
                     (
                         self.config["desc_icon"]
@@ -555,7 +555,7 @@ class Help(loader.Module):
                     invert_media=self.config["invert_media"],
                 )
             case _:
-                await utils.answer(
+                await utils.answer_with_media_fallback(
                     message,
                     (
                         self.config["desc_icon"]

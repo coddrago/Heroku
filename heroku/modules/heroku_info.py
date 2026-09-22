@@ -243,7 +243,7 @@ class HerokuInfoMod(loader.Module):
         start = time.perf_counter_ns()
 
         if self.config["rich_mode"]:
-            await utils.answer(
+            await utils.answer_with_media_fallback(
                 message,
                 rich_message=await self._render_info(
                     start,
@@ -265,7 +265,7 @@ class HerokuInfoMod(loader.Module):
             custom_message = self.config["custom_message"]
             if custom_message is not None and "{ping}" in custom_message:
                 message = await utils.answer(message, self.config["ping_emoji"])
-            await utils.answer(
+            await utils.answer_with_media_fallback(
                 message,
                 await self._render_info(start),
                 file=media,
