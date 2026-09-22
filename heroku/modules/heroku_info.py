@@ -11,7 +11,6 @@
 # 🔑 https://www.gnu.org/licenses/agpl-3.0.html
 
 import time
-import psutil
 import logging
 import herokutl
 
@@ -84,12 +83,25 @@ class HerokuInfoMod(loader.Module):
 
     def _get_cpu_info(self) -> str | None:
         try:
+            import psutil
+
             return f"{psutil.cpu_count(logical=False)} ({psutil.cpu_count()}) core(-s); {psutil.cpu_percent()}% total"
         except PermissionError:
             return None
         except Exception:
             logger.exception("Unsupported placeholder")
             return None
+
+    def _get_cpu_usage(self) -> str:
+        try:
+            import psutil
+
+            return f"{psutil.cpu_percent(interval=0.1):.2f}"
+        except PermissionError:
+            return ""
+        except Exception:
+            logger.exception("Unsupported placeholder")
+            return ""
 
     def _get_os_name(self):
         try:
@@ -163,7 +175,7 @@ class HerokuInfoMod(loader.Module):
             "upd": upd,
             "python_ver": lib_platform.python_version(),
             "uptime": utils.formatted_uptime(),
-            "cpu_usage": utils.get_cpu_usage(),
+            "cpu_usage": self._get_cpu_usage(),
             "ram_usage": f"{utils.get_ram_usage()} MB",
             "branch": version.branch,
             "hostname": lib_platform.node(),
@@ -180,21 +192,21 @@ class HerokuInfoMod(loader.Module):
             ),
         }
 
-        cpu_info = self._get_cpu_info()
-        if cpu_info:
-            data["cpu"] = cpu_info
+        data["cpu"] = self._get_cpu_info() or ""
 
         data = await utils.get_placeholders(data, self.config["custom_message"])
         if self.config["custom_message"]:
-            try:
-                placeholders_msg = re.sub(
-                    r"{(\w+)}",
-                    lambda match: str(data.get(match.group(1), match.group(0))),
-                    self.config["custom_message"],
-                )
-            except KeyError:
-                logger.exception("Missing placeholder in custom_message")
-                placeholders_msg = self.config["custom_message"]
+            placeholders_msg = re.sub(
+                r"{(\w+)}",
+                lambda match: (
+                    str(data[match.group(1)])
+                    if match.group(1) in data
+                    else self.strings["missing_placeholder"].format(
+                        placeholder=utils.escape_html(match.group(0))
+                    )
+                ),
+                self.config["custom_message"],
+            )
         return (
             placeholders_msg
             if self.config["custom_message"]
@@ -211,8 +223,8 @@ class HerokuInfoMod(loader.Module):
                 prefix=prefix,
                 uptime=utils.formatted_uptime(),
                 branch=version.branch,
-                cpu_usage=utils.get_cpu_usage(),
-                ram_usage=f"{utils.get_ram_usage()} MB",
+                cpu_usage=data["cpu_usage"],
+                ram_usage=data["ram_usage"],
                 ping=round((time.perf_counter_ns() - start) / 10**6, 3),
                 upd=upd,
                 platform=platform,
