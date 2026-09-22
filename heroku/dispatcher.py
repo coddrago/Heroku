@@ -659,7 +659,17 @@ class CommandDispatcher:
         exception_handler: Callable,
         *args,
     ):
+        module = getattr(func, "__self__", None)
+        if module is not None:
+            if getattr(module, "_unloading", False):
+                return
+            if "_managed_tasks" not in module.__dict__:
+                module._managed_tasks = set()
+            module._managed_tasks.add(asyncio.current_task())
         try:
             await func(message)
         except Exception as e:
             await exception_handler(e, message, *args)
+        finally:
+            if module is not None:
+                module._managed_tasks.discard(asyncio.current_task())
