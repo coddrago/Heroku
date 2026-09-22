@@ -119,6 +119,8 @@ class CoreMod(loader.Module):
                 current_user=getpass.getuser(),
                 banner_url="https://raw.githubusercontent.com/coddrago/assets/refs/heads/main/heroku/heroku_cmd.png",
             )
+            if branch_text:
+                rich_message += f"<footer>{branch_text.strip()}</footer>"
             await utils.answer(
                 message,
                 rich_message=rich_message,

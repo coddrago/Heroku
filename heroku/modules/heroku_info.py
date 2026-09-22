@@ -96,7 +96,7 @@ class HerokuInfoMod(loader.Module):
         try:
             import psutil
 
-            return f"{psutil.cpu_percent(interval=0.1):.2f}"
+            return f"{psutil.cpu_percent(interval=None):.2f}"
         except PermissionError:
             return ""
         except Exception:
@@ -112,11 +112,19 @@ class HerokuInfoMod(loader.Module):
         except FileNotFoundError:
             return self.strings["non_detectable"]
 
-    async def _render_info(
-        self,
-        start: float,
-        template_key: str = "info_message",
-    ) -> str:
+    def _get_ram_usage(self):
+        import psutil
+
+        process = psutil.Process()
+        memory = process.memory_info().rss
+        for child in process.children(recursive=True):
+            try:
+                memory += child.memory_info().rss
+            except psutil.NoSuchProcess:
+                continue
+        return f"{round(memory / 2**20, 1)} MB"
+
+    def _get_update_status(self):
         try:
             up_to_date = utils.is_up_to_date()
             if up_to_date:
@@ -126,19 +134,9 @@ class HerokuInfoMod(loader.Module):
         except Exception:
             upd = ""
 
-        me = (
-            '<b><a href="tg://user?id={}">{}</a></b>'.format(
-                self._client.heroku_me.id,
-                utils.escape_html(get_display_name(self._client.heroku_me)),
-            )
-            .replace("{", "")
-            .replace("}", "")
-        )
-        build = utils.get_commit_url()
-        _version = f'<i>{".".join(list(map(str, list(version.__version__))))}</i>'
-        prefix = f"«<code>{utils.escape_html(self.get_prefix())}</code>»"
+        return upd
 
-        platform = utils.get_named_platform()
+    def _get_platform_emoji(self):
         platform_emoji = utils.get_named_platform_emoji()
 
         for emoji, icon in [
@@ -164,39 +162,77 @@ class HerokuInfoMod(loader.Module):
             ("🍏", '<tg-emoji emoji-id="5372908412604525258">🍏</tg-emoji>'),
         ]:
             platform_emoji = platform_emoji.replace(emoji, icon)
-        data = {
-            "banner_url": self.config["banner_url"],
-            "me": me,
-            "version": _version,
-            "build": build,
-            "prefix": prefix,
-            "platform": platform,
-            "platform_emoji": platform_emoji,
-            "upd": upd,
-            "python_ver": lib_platform.python_version(),
-            "uptime": utils.formatted_uptime(),
-            "cpu_usage": self._get_cpu_usage(),
-            "ram_usage": f"{utils.get_ram_usage()} MB",
-            "branch": version.branch,
-            "hostname": lib_platform.node(),
-            "user": getpass.getuser(),
-            "os": self._get_os_name() or self.strings["non_detectable"],
-            "kernel": lib_platform.release(),
-            "ping": round((time.perf_counter_ns() - start) / 10**6, 3),
-            "htl_ver": herokutl.__version__,
-            "git_status": utils.get_git_status(),
-            "img": (
+        return platform_emoji
+
+    async def _render_info(
+        self,
+        start: float,
+        template_key: str = "info_message",
+    ) -> str:
+        custom_message = self.config["custom_message"]
+        template = custom_message or self.strings[template_key]
+        required = set(re.findall(r"{(\w+)}", template))
+        providers = {
+            "banner_url": lambda: self.config["banner_url"],
+            "me": lambda: (
+                '<b><a href="tg://user?id={}">{}</a></b>'.format(
+                    self._client.heroku_me.id,
+                    utils.escape_html(get_display_name(self._client.heroku_me)),
+                ).replace("{", "").replace("}", "")
+            ),
+            "version": lambda: f'<i>{".".join(map(str, version.__version__))}</i>',
+            "build": utils.get_commit_url,
+            "prefix": lambda: f"«<code>{utils.escape_html(self.get_prefix())}</code>»",
+            "platform": utils.get_named_platform,
+            "platform_emoji": self._get_platform_emoji,
+            "upd": self._get_update_status,
+            "python_ver": lib_platform.python_version,
+            "uptime": utils.formatted_uptime,
+            "cpu_usage": self._get_cpu_usage,
+            "ram_usage": self._get_ram_usage,
+            "branch": lambda: version.branch,
+            "hostname": lib_platform.node,
+            "user": getpass.getuser,
+            "os": self._get_os_name,
+            "kernel": lib_platform.release,
+            "htl_ver": lambda: herokutl.__version__,
+            "git_status": utils.get_git_status,
+            "cpu": self._get_cpu_info,
+            "img": lambda: (
                 f'<img src="{utils.escape_html(str(self.config["banner_url"]))}"/>'
                 if template_key == "rich_info_message" and self.config["banner_url"]
                 else ""
             ),
         }
+        class PlaceholderData(dict):
+            def __missing__(self, name):
+                if name not in providers:
+                    raise KeyError(name)
+                try:
+                    value = providers[name]()
+                    self[name] = value if value is not None else ""
+                except OSError:
+                    self[name] = ""
+                except Exception:
+                    logger.exception("Unavailable placeholder: %s", name)
+                    self[name] = ""
+                return self[name]
 
-        data["cpu"] = self._get_cpu_info() or ""
+            def get(self, name, default=None):
+                try:
+                    return self[name]
+                except KeyError:
+                    return default
 
-        data = await utils.get_placeholders(data, self.config["custom_message"])
-        if self.config["custom_message"]:
-            placeholders_msg = re.sub(
+        data = PlaceholderData()
+        for name in required & providers.keys():
+            data[name]
+
+        if "ping" in required:
+            data["ping"] = round((time.perf_counter_ns() - start) / 10**6, 3)
+        if custom_message:
+            data = await utils.get_placeholders(data, custom_message)
+            return re.sub(
                 r"{(\w+)}",
                 lambda match: (
                     str(data[match.group(1)])
@@ -205,32 +241,17 @@ class HerokuInfoMod(loader.Module):
                         placeholder=utils.escape_html(match.group(0))
                     )
                 ),
-                self.config["custom_message"],
+                custom_message,
             )
-        return (
-            placeholders_msg
-            if self.config["custom_message"]
-            else self.strings[template_key].format(
-                (
-                    utils.get_platform_emoji()
-                    if self._client.heroku_me.premium and self.config["show_heroku"]
-                    else ""
-                ),
-                banner_url=self.config["banner_url"],
-                img=data["img"],
-                me=me,
-                version=_version,
-                prefix=prefix,
-                uptime=utils.formatted_uptime(),
-                branch=version.branch,
-                cpu_usage=data["cpu_usage"],
-                ram_usage=data["ram_usage"],
-                ping=round((time.perf_counter_ns() - start) / 10**6, 3),
-                upd=upd,
-                platform=platform,
-                os=self._get_os_name() or self.strings["non_detectable"],
-                python_ver=lib_platform.python_version(),
-            )
+        return template.format(
+            (
+                utils.get_platform_emoji()
+                if "{}" in template
+                and self._client.heroku_me.premium
+                and self.config.get("show_heroku", False)
+                else ""
+            ),
+            **data,
         )
 
     @loader.command()
