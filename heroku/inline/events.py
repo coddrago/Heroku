@@ -345,6 +345,7 @@ class Events(InlineUnit):
                 unit_id == query
                 and "future" in unit
                 and isinstance(unit["future"], Event)
+                and chosen_inline_query.user_id == self._me
             ):
                 unit["inline_message_id"] = chosen_inline_query.msg_id
                 unit["future"].set()

@@ -1236,6 +1236,7 @@ class Modules:
                 self.modules.remove(mod)
             raise
 
+        pack_url = None
         # Check for pack_url and load translations
         if hasattr(mod, "__source__"):
             pack_url = next(
@@ -1252,6 +1253,7 @@ class Modules:
                     pack_url,
                     MODULES_LANGPACKS_PATH
                     / f"{self.client.tg_id}_{mod.__class__.__name__}.yml",
+                    cache_only=not from_dlmod,
                 )
             ):
                 mod.strings.external_strings = transations
@@ -1273,6 +1275,18 @@ class Modules:
         self.register_watchers(mod)
         self.register_raw_handlers(mod)
         self.register_bot_update_handlers(mod)
+
+        if pack_url and not from_dlmod:
+            async def refresh_translations():
+                translations = await self.translator.load_module_translations(
+                    pack_url,
+                    MODULES_LANGPACKS_PATH
+                    / f"{self.client.tg_id}_{mod.__class__.__name__}.yml",
+                )
+                if translations:
+                    mod.strings.external_strings = translations
+
+            mod.create_task(refresh_translations())
 
     def get_classname(self, name: str) -> str:
         return next(

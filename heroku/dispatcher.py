@@ -29,7 +29,7 @@ from herokutl.tl.types import Message
 
 from . import main, security, utils
 from ._event_filters import ALL_TAGS, find_failed_tag
-from ._internal import tag_client_id
+from ._internal import tag_client_id, redact
 from .database import Database
 from .loader import Modules
 from .tl_cache import CustomTelegramClient
@@ -552,7 +552,7 @@ class CommandDispatcher:
                 )
 
         with contextlib.suppress(Exception):
-            await (message.edit if message.out else message.reply)(txt)
+            await (message.edit if message.out else message.reply)(redact(txt))
 
     async def watcher_exc(self, *_):
         logger.exception("Error running watcher", extra={"stack": inspect.stack()})

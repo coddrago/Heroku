@@ -41,6 +41,7 @@ from herokutl.tl.functions.channels import JoinChannelRequest
 from herokutl.tl.types import Channel, InputMediaWebPage
 
 from .. import loader, main, utils
+from .._internal import fetch_text, private_write
 from .._local_storage import RemoteStorage
 from ..inline.types import InlineCall
 from ..types import CoreOverwriteError, CoreUnloadError
@@ -77,6 +78,7 @@ class LoaderMod(loader.Module):
         self._storage: RemoteStorage = None
         self._modules_cache_dir = os.path.join(main.BASE_DIR, ".modules_cache")
         self._pending_module_updates = {}
+        self._startup_updates_task = None
 
         self.config = loader.ModuleConfig(
             loader.ConfigValue(
@@ -138,7 +140,7 @@ class LoaderMod(loader.Module):
             )
         )
         logger.debug("Modules: %s", modules)
-        asyncio.ensure_future(self._storage.preload(modules))
+        self.create_task(self._storage.preload(modules))
 
     async def client_ready(self):
         while not (settings := self.lookup("settings")):
@@ -150,8 +152,7 @@ class LoaderMod(loader.Module):
 
         main.heroku.ready.set()
 
-        asyncio.ensure_future(self._update_modules())
-        asyncio.ensure_future(self._async_init())
+        self.create_task(self._update_modules())
 
     @loader.loop(interval=3, wait_before=True, autostart=True)
     async def _config_autosaver(self):
@@ -372,27 +373,20 @@ class LoaderMod(loader.Module):
         if self._links_cache.get(repo, {}).get("exp", 0) >= time.time():
             return self._links_cache[repo]["data"]
 
-        res = await utils.run_sync(
-            requests.get,
-            f"{repo}/full.txt",
-            auth=(
-                tuple(self.config["basic_auth"].split(":", 1))
-                if self.config["basic_auth"]
-                else None
-            ),
-        )
-
-        if not str(res.status_code).startswith("2"):
-            logger.debug(
-                "Can't load repo %s contents because of %s status code",
-                repo,
-                res.status_code,
+        try:
+            content = await utils.run_sync(
+                fetch_text,
+                f"{repo}/full.txt",
+                auth=self.config["basic_auth"],
+                trusted_url=self.config["MODULES_REPO"],
             )
+        except (requests.RequestException, ValueError):
+            logger.warning("Can't load repository contents", exc_info=True)
             return []
 
         self._links_cache[repo] = {
             "exp": time.time() + 5 * 60,
-            "data": [link for link in res.text.strip().splitlines() if link],
+            "data": [link for link in content.strip().splitlines() if link],
         }
 
         return self._links_cache[repo]["data"]
@@ -613,7 +607,10 @@ class LoaderMod(loader.Module):
                 )
 
             try:
-                r = await self._storage.fetch(url, auth=self.config["basic_auth"])
+                r = await self._storage.fetch(
+                    url, auth=self.config["basic_auth"],
+                    trusted_url=self.config["MODULES_REPO"],
+                )
             except requests.exceptions.HTTPError as e:
                 logger.warning(
                     "Failed to download module %s from %s: %s",
@@ -1782,17 +1779,13 @@ class LoaderMod(loader.Module):
             args = f"https://{args}"
 
         try:
-            r = await utils.run_sync(
-                requests.get,
+            content = await utils.run_sync(
+                fetch_text,
                 f"{args}/full.txt",
-                auth=(
-                    tuple(self.config["basic_auth"].split(":", 1))
-                    if self.config["basic_auth"]
-                    else None
-                ),
+                auth=self.config["basic_auth"],
+                trusted_url=self.config["MODULES_REPO"],
             )
-            r.raise_for_status()
-            if not r.text.strip():
+            if not content.strip():
                 raise ValueError
         except Exception:
             await utils.answer(message, self.strings["no_repo"])
@@ -1901,16 +1894,9 @@ class LoaderMod(loader.Module):
         )
 
     def _write_module_cache(self, url: str, doc: str) -> None:
-        os.makedirs(self._modules_cache_dir, exist_ok=True)
+        os.makedirs(self._modules_cache_dir, mode=0o700, exist_ok=True)
         path = self._module_cache_path(url)
-        tmp_path = f"{path}.{uuid.uuid4().hex}.tmp"
-        try:
-            with open(tmp_path, "w", encoding="utf-8", newline="") as file:
-                file.write(doc)
-            os.replace(tmp_path, path)
-        finally:
-            with contextlib.suppress(FileNotFoundError):
-                os.remove(tmp_path)
+        private_write(path, doc)
 
     async def _accept_module_update(
         self,
@@ -2043,7 +2029,10 @@ class LoaderMod(loader.Module):
                 return False
 
         try:
-            remote_doc = await self._storage.fetch(url, auth=self.config["basic_auth"])
+            remote_doc = await self._storage.fetch(
+                url, auth=self.config["basic_auth"],
+                trusted_url=self.config["MODULES_REPO"],
+            )
         except Exception:
             logger.warning("Failed to check module update for %s", url, exc_info=True)
             return False
@@ -2079,31 +2068,26 @@ class LoaderMod(loader.Module):
 
         return False
 
-    async def _load_cached_module(self, url: str, name: str | None = None) -> None:
+    async def _load_cached_module(self, url: str, name: str | None = None) -> bool:
         path = self._module_cache_path(url)
-        if not os.path.isfile(path):
-            try:
-                doc = await self._storage.fetch(url, auth=self.config["basic_auth"])
-            except Exception:
-                await self.download_and_install(url, name=name)
-                return
+        cached = os.path.isfile(path)
+        try:
+            if cached:
+                with open(path, encoding="utf-8", newline="") as file:
+                    doc = file.read()
+            else:
+                doc = await self._storage.fetch(
+                    url, auth=self.config["basic_auth"],
+                    trusted_url=self.config["MODULES_REPO"],
+                )
 
             if self._is_core_module_update(url, doc):
-                self._write_module_cache(url, doc)
-                return
-
-            await self.download_and_install(url, name=name)
-            return
-
-        try:
-            with open(path, encoding="utf-8", newline="") as file:
-                cached_doc = file.read()
-            if self._is_core_module_update(url, cached_doc):
-                await self._check_module_update(url, cached_doc, name=name)
-                return
+                if not cached:
+                    self._write_module_cache(url, doc)
+                return cached
 
             installed = await self.load_module(
-                cached_doc,
+                doc,
                 None,
                 name,
                 url,
@@ -2111,15 +2095,32 @@ class LoaderMod(loader.Module):
             )
             if not installed:
                 raise ModuleInstallError(f"Cached module {url} was not installed")
+            if not cached:
+                self._write_module_cache(url, doc)
         except Exception:
             logger.exception("Failed to load cached module %s", url)
-            return
+            return False
 
-        await self._check_module_update(url, cached_doc, name=name)
+        return cached
+
+    async def _check_startup_updates(self, modules: dict):
+        semaphore = asyncio.Semaphore(4)
+
+        async def check(name, url):
+            async with semaphore:
+                try:
+                    await self._check_module_update(url, name=name)
+                except Exception:
+                    logger.exception("Failed to update module %s", name)
+
+        await asyncio.gather(*(check(name, url) for name, url in modules.items()))
 
     @loader.loop(interval=60, wait_before=True, autostart=True)
     async def _auto_update_modules(self):
         if not self.fully_loaded or self._storage is None:
+            return
+
+        if self._startup_updates_task and not self._startup_updates_task.done():
             return
 
         loaded_modules = self.get("loaded_modules", {})
@@ -2129,7 +2130,9 @@ class LoaderMod(loader.Module):
                 await self._check_module_update(url, offer_update=False, name=name)
 
     async def _update_modules(self):
+        started = time.perf_counter()
         todo = await self._get_modules_to_load()
+        updates = {}
 
         self._secure_boot = False
 
@@ -2138,7 +2141,12 @@ class LoaderMod(loader.Module):
             self._secure_boot = True
         else:
             for name, url in todo.items():
-                await self._load_cached_module(url, name)
+                module_started = time.perf_counter()
+                if await self._load_cached_module(url, name):
+                    updates[name] = url
+                elapsed = time.perf_counter() - module_started
+                if elapsed >= 1:
+                    logger.info("Module %s initialization took %.2fs", name, elapsed)
 
             self.update_modules_in_db()
 
@@ -2151,6 +2159,16 @@ class LoaderMod(loader.Module):
             self.lookup("settings").set("aliases", aliases)
 
         self.fully_loaded = True
+        logger.info(
+            "External module startup completed in %.2fs",
+            time.perf_counter() - started,
+        )
+
+        if not self._secure_boot:
+            self._startup_updates_task = self.create_task(
+                self._check_startup_updates(updates)
+            )
+            self.create_task(self._async_init())
 
         with contextlib.suppress(AttributeError):
             await self.lookup("Updater").full_restart_complete(self._secure_boot)

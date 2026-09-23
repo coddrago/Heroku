@@ -217,6 +217,34 @@ def check_url(url: str) -> bool:
         return False
 
 
+async def is_private_asset_channel(client, peer, *, allow_participants: bool = False) -> bool:
+    try:
+        entity = await client.get_entity(peer, force=True)
+        if (
+            not isinstance(entity, Channel)
+            or not entity.creator
+            or entity.username
+            or any(getattr(name, "active", False) for name in (entity.usernames or []))
+        ):
+            return False
+        if allow_participants:
+            return True
+        allowed = {client.tg_id}
+        inline = getattr(getattr(client, "loader", None), "inline", None)
+        bot_id = getattr(inline, "bot_id", None)
+        if bot_id:
+            allowed.add(bot_id)
+        participants = await client.get_participants(entity, limit=len(allowed) + 1)
+        return (
+            bool(participants)
+            and client.tg_id in {user.id for user in participants}
+            and all(user.id in allowed for user in participants)
+            and getattr(participants, "total", len(participants)) <= len(allowed)
+        )
+    except Exception:
+        return False
+
+
 async def asset_channel(
     client: CustomTelegramClient,
     title: str,
@@ -231,6 +259,7 @@ async def asset_channel(
     forum: bool = False,
     hide_general: bool = False,
     _folder: str | None = None,
+    allow_participants: bool = False,
 ) -> tuple[Channel, bool]:
     """
     Create new channel (if needed) and return its entity
@@ -255,10 +284,16 @@ async def asset_channel(
         title in client._channels_cache
         and client._channels_cache[title]["exp"] > time.time()
     ):
-        return client._channels_cache[title]["peer"], False
+        peer = client._channels_cache[title]["peer"]
+        if await is_private_asset_channel(
+            client, peer, allow_participants=allow_participants
+        ):
+            return peer, False
 
     async for d in client.iter_dialogs():
-        if d.title == title:
+        if d.title == title and await is_private_asset_channel(
+            client, d.entity, allow_participants=allow_participants
+        ):
             client._channels_cache[title] = {"peer": d.entity, "exp": int(time.time())}
             if invite_bot:
                 if all(

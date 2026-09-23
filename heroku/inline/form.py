@@ -468,7 +468,8 @@ class Form(InlineUnit):
                     return
 
         if (
-            inline_query.query not in self._units
+            inline_query.from_user.id != self._me
+            or inline_query.query not in self._units
             or self._units[inline_query.query]["type"] != "form"
         ):
             return

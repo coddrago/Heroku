@@ -25,7 +25,6 @@ import traceback
 import typing
 import os
 import functools
-from logging.handlers import RotatingFileHandler
 from collections.abc import Coroutine
 
 import herokutl
@@ -35,6 +34,9 @@ from herokutl.errors.rpcerrorlist import FloodWaitError
 
 from . import utils
 from ._internal import (
+    PrivateRotatingFileHandler,
+    RedactingFormatter,
+    redact,
     get_branch_name,
     get_client_id,
     check_commit_ancestor,
@@ -124,8 +126,8 @@ class HerokuException:
         full_stack: str,
         sysinfo: None | (tuple[object, Exception, traceback.TracebackException]) = None,
     ):
-        self.message = message
-        self.full_stack = full_stack
+        self.message = redact(message)
+        self.full_stack = redact(full_stack)
         self.sysinfo = sysinfo
         self.debug_url = None
 
@@ -162,7 +164,7 @@ class HerokuException:
 
             return dictionary
 
-        full_traceback = traceback.format_exc().replace(
+        full_traceback = redact(traceback.format_exc()).replace(
             "Traceback (most recent call last):\n",
             "",
         )
@@ -224,13 +226,13 @@ class HerokuException:
                 lineno,
                 utils.escape_html(name),
                 utils.escape_html(
-                    "".join(
+                    redact("".join(
                         traceback.format_exception_only(exc_type, exc_value)
-                    ).strip()
+                    ).strip())
                 ),
                 (
                     "\n💭 <b>Message:</b>"
-                    f" <code>{utils.escape_html(str(comment))}</code>"
+                    f" <code>{utils.escape_html(redact(comment))}</code>"
                     if comment
                     else ""
                 ),
@@ -329,7 +331,7 @@ class TelegramLogsHandler(logging.Handler):
             return False
 
         return (
-            caller is None
+            caller is None and len(self._mods) == 1
             or caller == client_id
             or self._option(client_id, "force_send_all")
         )
@@ -359,7 +361,11 @@ class TelegramLogsHandler(logging.Handler):
             self.targets[0].format(record)
             for record in (self.buffer + self.handledbuffer)
             if record.levelno >= lvl
-            and (not record.heroku_caller or client_id == record.heroku_caller)
+            and (
+                client_id is None
+                or client_id == record.heroku_caller
+                or record.heroku_caller is None and len(self._mods) <= 1
+            )
             and (not prefixes or _matches(record.name or ""))
         ]
 
@@ -410,6 +416,14 @@ class TelegramLogsHandler(logging.Handler):
 
     async def sender(self):
         async with self._send_lock:
+            if not self.tg_buff:
+                return
+            destinations = [
+                client_id for client_id, mod in self._mods.items()
+                if await utils.is_private_asset_channel(
+                    mod.client, mod.logchat, allow_participants=True
+                )
+            ]
             self._queue = {
                 client_id: utils.chunks(
                     utils.escape_html(
@@ -424,11 +438,11 @@ class TelegramLogsHandler(logging.Handler):
                     ),
                     4096,
                 )
-                for client_id in self._mods
+                for client_id in destinations
             }
 
             self._exc_queue = {}
-            for client_id in self._mods:
+            for client_id in destinations:
                 topic_id = await self.get_logs_topic_id_by_client(client_id)
 
                 funcs = []
@@ -456,7 +470,7 @@ class TelegramLogsHandler(logging.Handler):
                                             self._mods[client_id].inline.bot,
                                             item[0],
                                         ),
-                                        "disable_security": True,
+                                        "force_me": True,
                                     },
                                 ],
                             ),
@@ -475,7 +489,7 @@ class TelegramLogsHandler(logging.Handler):
 
             self.tg_buff = []
 
-            for client_id in self._mods:
+            for client_id in destinations:
                 if client_id not in self._queue:
                     continue
 
@@ -644,18 +658,18 @@ async def check_branch(me_id: int, allowed_ids: list, self):
     restart()
 
 
-_main_formatter = logging.Formatter(
+_main_formatter = RedactingFormatter(
     fmt="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
     datefmt="%Y-%m-%d %H:%M:%S",
     style="%",
 )
-_tg_formatter = logging.Formatter(
+_tg_formatter = RedactingFormatter(
     fmt="[%(levelname)s] %(name)s: %(message)s\n",
     datefmt=None,
     style="%",
 )
 
-rotating_handler = RotatingFileHandler(
+rotating_handler = PrivateRotatingFileHandler(
     filename="heroku.log",
     mode="a",
     maxBytes=10 * 1024 * 1024,

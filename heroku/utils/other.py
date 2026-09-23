@@ -9,15 +9,11 @@ import atexit as _atexit
 import contextlib
 import functools
 import logging
-import random
+import secrets
 import signal
 import sys
 import typing
 import warnings
-import aiohttp
-import base64
-import binascii
-import zlib
 
 import herokutl
 from herokutl import hints
@@ -64,7 +60,7 @@ def rand(size: int, /) -> str:
     :return: Random string
     """
     return "".join(
-        [random.choice("abcdefghijklmnopqrstuvwxyz1234567890") for _ in range(size)]
+        [secrets.choice("abcdefghijklmnopqrstuvwxyz1234567890") for _ in range(size)]
     )
 
 
@@ -255,30 +251,15 @@ async def allowed_ids() -> list[int]:
     Fetch beta users ids
     :return: allowed list ids
     """
-    _s = "485633554d534b53475a4c454336444b4e5a43474357424c4b4e5957495a43494b5a5558555a52514e4a4744435a4c43475649464d5753484b524b5649525a554a465a45555332584e493246453332574e5a58544d325a4c4734344553534c514f4a4358473332514d5252574f5642574e4242484b595a5a47524d544f34535a4d464655533333424a4e4e47324e33594d55595649524c45494a4755435133584a4e43554b364b574f3546474b3d3d3d"
+    from .._internal import fetch_text
+
     try:
-        d5 = binascii.unhexlify(_s)
-        d4 = base64.b32decode(d5).decode("utf-8")
-        d3 = d4[::-1]
-        d2 = base64.b64decode(d3)
-        d1 = zlib.decompress(d2).decode("utf-8")
-    except Exception as e:
-        logging.error(f"Error decoding URL: {e}")
+        content = await run_sync(
+            fetch_text,
+            "https://raw.githubusercontent.com/coddrago/modules-web/main/mods/ids/allowed_ids.txt",
+            max_size=1024 * 1024,
+        )
+        return [int(line.strip()) for line in content.splitlines() if line.strip()]
+    except Exception:
+        logger.warning("Unable to load beta user list", exc_info=True)
         return []
-
-    async with aiohttp.ClientSession() as session:
-        async with session.get(
-            d1, headers={"Accept": "application/vnd.github.v3.raw"}
-        ) as response:
-            if response.status != 200:
-                logging.error(
-                    f"Exception on loading allowed beta testers ids: {response.status}"
-                )
-                return []
-
-            content = await response.text()
-            return [
-                int(line.strip())
-                for line in content.split("\n")
-                if line.strip()
-            ]

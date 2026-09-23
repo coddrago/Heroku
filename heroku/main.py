@@ -14,8 +14,6 @@
 
 import argparse
 import asyncio
-import base64
-import binascii
 import collections
 import contextlib
 import importlib
@@ -30,11 +28,9 @@ import string
 import sys
 import traceback
 import typing
-import zlib
 from getpass import getpass
 from pathlib import Path
 
-import aiohttp
 from herokutl import events
 from herokutl.errors import (
     ApiIdInvalidError,
@@ -53,7 +49,7 @@ from herokutl.network.connection import (
     ConnectionTcpMTProxyRandomizedIntermediate,
 )
 from herokutl.password import compute_check
-from herokutl.sessions import MemorySession, SQLiteSession
+from herokutl.sessions import MemorySession, SQLiteSession, StringSession
 from herokutl.tl.functions.account import GetPasswordRequest
 from herokutl.tl.functions.auth import CheckPasswordRequest
 from herokutl.tl.functions.contacts import UnblockRequest
@@ -66,6 +62,9 @@ from ._internal import (
     print_banner,
     restart,
     set_client_id,
+    private_write,
+    register_secret,
+    register_secrets,
 )
 from .dispatcher import CommandDispatcher
 from .qr import QRCode
@@ -322,6 +321,7 @@ def _read_config() -> dict:
         return _CONFIG_CACHE
 
     _CONFIG_CACHE = json.loads(CONFIG_PATH.read_text())
+    register_secrets(_CONFIG_CACHE)
     _CONFIG_MTIME_NS = stat.st_mtime_ns
     return _CONFIG_CACHE
 
@@ -359,7 +359,8 @@ def save_config_key(key: str, value: str) -> bool:
     # Assign config value
     config[key] = value
     # And save config
-    CONFIG_PATH.write_text(json.dumps(config, indent=4))
+    register_secrets(config)
+    private_write(CONFIG_PATH, json.dumps(config, indent=4))
     _CONFIG_CACHE = config
     _CONFIG_MTIME_NS = CONFIG_PATH.stat().st_mtime_ns
     return True
@@ -568,7 +569,8 @@ class Heroku:
         self.conn = ConnectionTcpFull
 
     def _migrate_sessions(self):
-        os.makedirs(SESSIONS_DIR, exist_ok=True)
+        os.makedirs(SESSIONS_DIR, mode=0o700, exist_ok=True)
+        os.chmod(SESSIONS_DIR, 0o700)
 
         with os.scandir(BASE_DIR) as entries:
             legacy = [
@@ -993,6 +995,8 @@ class Heroku:
             client.hikka_me = me
             client.heroku_me = me
             set_client_id(me.id)
+            register_secret(StringSession.save(client.session))
+            register_secret(getattr(me, "phone", None))
 
             await version.check_branch(me.id, a_i, self)
 

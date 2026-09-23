@@ -30,6 +30,7 @@ from meval import meval
 
 from .. import loader, main, utils
 from ..log import HerokuException
+from .._internal import redact
 
 
 @loader.tds
@@ -99,7 +100,7 @@ class Evaluator(loader.Module):
                 self.strings["err"].format(
                     "4985626654563894116",
                     "python",
-                    utils.escape_html(args),
+                    utils.escape_html(self.censor(args)),
                     "error",
                     self.censor(
                         "\n".join(item.full_stack.splitlines()[:-1])
@@ -137,7 +138,7 @@ class Evaluator(loader.Module):
                 self.strings["eval_py"].format(
                     "4985626654563894116",
                     "python",
-                    utils.escape_html(args),
+                    utils.escape_html(self.censor(args)),
                 )
                 + (
                     self.strings["eval_result"].format(
@@ -445,6 +446,7 @@ class Evaluator(loader.Module):
             )
 
     def censor(self, ret: str) -> str:
+        ret = redact(ret)
         ret = ret.replace(str(self._client.heroku_me.phone), "&lt;phone&gt;")
 
         if redis := os.environ.get("REDIS_URL") or main.get_config_key("redis_uri"):

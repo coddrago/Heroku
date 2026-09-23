@@ -37,6 +37,12 @@ class HerokuBackupMod(loader.Module):
 
     strings = {"name": "HerokuBackup"}
 
+    async def _assert_backup_destination(self):
+        if not await utils.is_private_asset_channel(
+            self._client, self._content_channel_id, allow_participants=True
+        ):
+            raise PermissionError("Refusing to send backup to an unsafe content channel")
+
     async def client_ready(self):
         if not self.get("period"):
             await self.inline.bot.send_photo(
@@ -174,6 +180,7 @@ class HerokuBackupMod(loader.Module):
                 logger.error("Backups topic not found in database")
                 return
 
+            await self._assert_backup_destination()
             await self.inline.bot.send_document(
                 int(f"-100{self._content_channel_id}"),
                 archive,
@@ -307,6 +314,7 @@ class HerokuBackupMod(loader.Module):
             await utils.answer(message, self.strings["backup_sent"])
             return
 
+        await self._assert_backup_destination()
         backup_msg = await self.inline.bot.send_document(
             int(f"-100{self._content_channel_id}"),
             txt,
@@ -421,6 +429,7 @@ class HerokuBackupMod(loader.Module):
             )
             return
 
+        await self._assert_backup_destination()
         backup_msg = await self.inline.bot.send_document(
             int(f"-100{self._content_channel_id}"),
             archive,
@@ -531,6 +540,7 @@ class HerokuBackupMod(loader.Module):
             )
             return
 
+        await self._assert_backup_destination()
         backup_msg = await self.inline.bot.send_document(
             int(f"-100{self._content_channel_id}"),
             archive,

@@ -18,11 +18,9 @@ import hashlib
 import logging
 import os
 
-import requests
-
 from . import utils
+from ._internal import fetch_text, validate_url, private_write
 from .tl_cache import CustomTelegramClient
-from .version import __version__
 
 logger = logging.getLogger(__name__)
 
@@ -52,7 +50,7 @@ class LocalStorage:
     def _ensure_dirs(self):
         """Ensures that the local storage directory exists."""
         if not os.path.isdir(self._path):
-            os.makedirs(self._path)
+            os.makedirs(self._path, mode=0o700)
 
     def _get_path(self, repo: str, module_name: str) -> str:
         return os.path.join(
@@ -88,8 +86,7 @@ class LocalStorage:
         path = self._get_path(repo, module_name)
         previous_size = os.path.getsize(path) if os.path.isfile(path) else 0
 
-        with open(path, "w", encoding="utf-8", newline="") as f:
-            f.write(module_code)
+        private_write(path, module_code)
 
         self._tracked_total_size = self._total_size + size - previous_size
         logger.debug("Saved module %s from %s to local cache.", module_name, repo)
@@ -149,21 +146,24 @@ class RemoteStorage:
 
         return url, repo, module_name
 
-    async def fetch(self, url: str, auth: str | None = None) -> str:
+    async def fetch(
+        self, url: str, auth: str | None = None, trusted_url: str | None = None
+    ) -> str:
         """
         Fetches the module from the remote storage.
         :param url: URL to the module.
         :param auth: Optional authentication string in the format "username:password".
         :return: Module source code.
         """
+        validate_url(url)
         url, repo, module_name = self._parse_url(url)
         try:
-            r = await utils.run_sync(
-                requests.get,
+            content = await utils.run_sync(
+                fetch_text,
                 url,
-                auth=(tuple(auth.split(":", 1)) if auth else None),
+                auth=auth,
+                trusted_url=trusted_url,
             )
-            r.raise_for_status()
         except Exception:
             logger.debug(
                 "Can't load module from remote storage. Trying local storage.",
@@ -175,6 +175,6 @@ class RemoteStorage:
 
             raise
 
-        self._local_storage.save(repo, module_name, r.text)
+        self._local_storage.save(repo, module_name, content)
 
-        return r.text
+        return content

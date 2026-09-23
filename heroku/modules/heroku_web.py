@@ -30,11 +30,10 @@ from herokutl.sessions import MemorySession, SQLiteSession
 from herokutl.tl.custom import Message
 from herokutl.tl.types import User
 from herokutl.utils import parse_phone
-from ..utils.other import allowed_ids
 
 from .. import loader, main, security, utils
 from ..loader import LOADED_MODULES_PATH
-from .._internal import restart
+from .._internal import private_write, register_secret, restart
 from ..inline.types import InlineCall
 from ..tl_cache import CustomTelegramClient
 from ..version import __version__
@@ -75,17 +74,6 @@ class HerokuWebMod(loader.Module):
 
         if not user or not isinstance(user, User) or user.bot:
             await utils.answer(message, self.strings["invalid_target"])
-            return
-
-        if user.id not in await allowed_ids():
-            await self.inline.form(
-                self.strings["no_beta"],
-                message=message,
-                reply_markup=[
-                    {"text": self.strings["get_beta"], "callback": self.donate},
-                    {"text": self.strings["close_addacc"], "action": "close"},
-                ],
-            )
             return
 
         if user.id == self.tg_id or "force_insecure" in message.text.lower():
@@ -239,9 +227,9 @@ class HerokuWebMod(loader.Module):
                 lambda: redis.set(str(new_id), json.dumps(data, ensure_ascii=True))
             )
 
-        (Path(main.BASE_PATH) / f"config-{new_id}.json").write_text(
+        private_write(
+            Path(main.BASE_PATH) / f"config-{new_id}.json",
             json.dumps(data, ensure_ascii=False, indent=4),
-            encoding="utf-8",
         )
 
     async def _save_switch_session(
@@ -376,6 +364,7 @@ class HerokuWebMod(loader.Module):
             )
 
     async def inline_phone_handler(self, call, data, user, is_switch: bool = False):
+        register_secret(data)
         if not (phone := parse_phone(data)):
             await self._inline_login(call, user, after_fail=True, is_switch=is_switch)
             return
@@ -418,6 +407,7 @@ class HerokuWebMod(loader.Module):
     async def inline_code_handler(
         self, call, data, client, phone, user, is_switch: bool = False
     ):
+        register_secret(data)
         _code_markup = {
             "text": self.strings["enter_code"],
             "input": self.strings["login_code"],
@@ -541,6 +531,7 @@ class HerokuWebMod(loader.Module):
     async def inline_2fa_handler(
         self, call, data, client, phone, user, is_switch: bool = False
     ):
+        register_secret(data)
         _2fa_markup = {
             "text": self.strings["enter_2fa"],
             "input": self.strings["your_2fa"],

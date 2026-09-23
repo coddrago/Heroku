@@ -29,7 +29,6 @@ import typing
 from dataclasses import dataclass, field
 from importlib.abc import SourceLoader
 
-import requests
 from herokutl.hints import EntityLike
 from herokutl.tl.functions.account import UpdateNotifySettingsRequest
 from herokutl.tl.types import (
@@ -42,7 +41,7 @@ from herokutl.tl.types import (
 )
 
 from . import version
-from ._internal import tag_client_id
+from ._internal import fetch_text, register_secret, tag_client_id
 from ._reference_finder import replace_all_refs
 from .inline.types import (
     BotInlineCall,
@@ -496,9 +495,7 @@ class Module:
         if not utils.check_url(url):
             _raise(ValueError("Invalid url for library"))
 
-        code = await utils.run_sync(requests.get, url)
-        code.raise_for_status()
-        code = code.text
+        code = await utils.run_sync(fetch_text, url)
 
         if re.search(r"# ?scope: ?heroku_min", code):
             ver = tuple(
@@ -603,17 +600,6 @@ class Module:
                     )
                 )
             )
-
-        if (
-            all(
-                line.replace(" ", "") != "#scope:no_stats" for line in code.splitlines()
-            )
-            and self._db.get("heroku.main", "stats", True)
-            and url is not None
-            and utils.check_url(url)
-        ):
-            with contextlib.suppress(Exception):
-                await self.lookup("LoaderMod")._send_stats(url)
 
         lib_obj.source_url = url.strip("/")
         lib_obj.allmodules = self.allmodules
@@ -935,6 +921,9 @@ class ConfigValue:
         ignore_validation: bool = False,
     ):
         if key == "value":
+            if getattr(self.validator, "internal_id", None) == "Hidden":
+                register_secret(value)
+                register_secret(self.default)
             try:
                 value = ast.literal_eval(value)
             except Exception:
@@ -958,6 +947,10 @@ class ConfigValue:
                         value = self.validator.validate(value)
                     except validators.ValidationError as e:
                         if not ignore_validation:
+                            if getattr(self.validator, "internal_id", None) == "Hidden":
+                                raise validators.ValidationError(
+                                    "Invalid value for a hidden setting"
+                                ) from None
                             raise e
 
                         logger.debug(
@@ -991,6 +984,8 @@ class ConfigValue:
 
             # This attribute will tell the `Loader` to save this value in db
             self._save_marker = True
+            if getattr(self.validator, "internal_id", None) == "Hidden":
+                register_secret(value)
 
         object.__setattr__(self, key, value)
 
