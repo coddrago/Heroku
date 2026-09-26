@@ -1,6 +1,6 @@
 # ©️ Codrago, 2024-2030
 # This file is a part of Heroku Userbot
-# 🌐 https://github.com/coddrago/Heroku
+# 🌐 https://github.com/ZetGoHack/Heroku
 # You can redistribute it and/or modify it under the terms of the GNU AGPLv3
 # 🔑 https://www.gnu.org/licenses/agpl-3.0.html
 
@@ -32,7 +32,7 @@ def get_git_info() -> tuple[str, str]:
     hash_ = get_git_hash()
     return (
         hash_,
-        f"https://github.com/coddrago/Heroku/commit/{hash_}" if hash_ else "",
+        f"https://github.com/ZetGoHack/Heroku/commit/{hash_}" if hash_ else "",
     )
 
 
@@ -58,7 +58,7 @@ def get_commit_url() -> str:
         return "Unknown"
     try:
         hash_ = get_git_hash()
-        return f'<a href="https://github.com/coddrago/Heroku/commit/{hash_}">#{hash_[:7]}</a>'
+        return f'<a href="https://github.com/ZetGoHack/Heroku/commit/{hash_}">#{hash_[:7]}</a>'
     except Exception:
         return "Unknown"
 

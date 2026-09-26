@@ -305,10 +305,10 @@
 - Update to Hikka-TL 2.0.7
 - Allow double-restart
 - Personal messages scam modules protection
-- https://github.com/coddrago/Heroku/issues/115
-- https://github.com/coddrago/Heroku/issues/114
-- https://github.com/coddrago/Heroku/issues/119
-- https://github.com/coddrago/Heroku/issues/120
+- https://github.com/ZetGoHack/Heroku/issues/115
+- https://github.com/ZetGoHack/Heroku/issues/114
+- https://github.com/ZetGoHack/Heroku/issues/119
+- https://github.com/ZetGoHack/Heroku/issues/120
 - Other changes
 
 ## 🌑 Heroku 1.6.3
