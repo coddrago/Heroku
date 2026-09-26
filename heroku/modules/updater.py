@@ -6,7 +6,7 @@
 
 # ©️ Codrago, 2024-2030
 # This file is a part of Heroku Userbot
-# 🌐 https://github.com/coddrago/Heroku
+# 🌐 https://github.com/ZetGoHack/Heroku
 # You can redistribute it and/or modify it under the terms of the GNU AGPLv3
 # 🔑 https://www.gnu.org/licenses/agpl-3.0.html
 
@@ -51,7 +51,7 @@ class UpdaterMod(loader.Module):
         self.config = loader.ModuleConfig(
             loader.ConfigValue(
                 "GIT_ORIGIN_URL",
-                "https://github.com/coddrago/Heroku",
+                "https://github.com/ZetGoHack/Heroku",
                 lambda: self.strings("origin_cfg_doc"),
                 validator=loader.validators.Link(),
             ),
@@ -171,7 +171,7 @@ class UpdaterMod(loader.Module):
                 try:
                     async with aiohttp.ClientSession() as session:
                         r = await session.get(
-                            url=f"https://api.github.com/repos/coddrago/Heroku/contents/heroku/version.py?ref={version.branch}",
+                            url=f"https://api.github.com/repos/ZetGoHack/Heroku/contents/heroku/version.py?ref={version.branch}",
                             headers={"Accept": "application/vnd.github.v3.raw"}
                         )
                         text = await r.text()
@@ -195,7 +195,7 @@ class UpdaterMod(loader.Module):
                     "https://raw.githubusercontent.com/coddrago/assets/refs/heads/main/heroku/updated.png",
                     caption=self.strings("update_required").format(
                         utils.get_git_hash()[:6],
-                        '<a href="https://github.com/coddrago/Heroku/compare/{}...{}">{}</a>'.format(
+                        '<a href="https://github.com/ZetGoHack/Heroku/compare/{}...{}">{}</a>'.format(
                             utils.get_git_hash()[:12],
                             self.get_latest()[:12],
                             self.get_latest()[:6],
@@ -219,7 +219,7 @@ class UpdaterMod(loader.Module):
                     caption=self.strings("autoupdate_notifier").format(
                         self.get_latest()[:6],
                         self.get_changelog(),
-                        '<a href="https://github.com/coddrago/Heroku/compare/{}...{}">{}</a>'.format(
+                        '<a href="https://github.com/ZetGoHack/Heroku/compare/{}...{}">{}</a>'.format(
                             utils.get_git_hash()[:12],
                             self.get_latest()[:12],
                             "🔎 diff",

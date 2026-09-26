@@ -3,7 +3,7 @@
 PORT=3429 # Port to run the server on
 echo "EXTERNAL_PORT=$PORT" >.env
 
-eval "git clone https://github.com/coddrago/Heroku"
+eval "git clone https://github.com/ZetGoHack/Heroku"
 cd Heroku
 
 touch heroku-install.log
